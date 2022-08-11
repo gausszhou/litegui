@@ -5,17 +5,11 @@ import "./styles/style.css";
 import "./styles/widgets.css";
 
 import LiteGUI from "./core";
-import Dialog from "./Dialog";
-import Menu from "./Menu";
 
-export {
-  Menu,
-  Dialog
-}
+// (function(global) {
+//   global.LiteGUI = LiteGUI
+// })(window);
 
-(function(global) {
-  global.LiteGUI = LiteGUI
-  console.log(global)
-})(window as any);
+// window.LiteGUI = LiteGUI
 
 export default LiteGUI;

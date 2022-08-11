@@ -1,92 +1,86 @@
 import LiteGUI from "./core";
 
-class Inspector {
-  // root: any;
-  // one_line: any;
-  // sections: any;
-  // values: any;
-  // widgets: any[];
-  // widgets_by_name: any;
-  // row_number: any;
-  // tab_index: any;
-  // name_width: any;
-  // widgets_width: any;
-  // onchange: any;
-  // className: any;
-  // widgets_per_row: any;
-  constructor(options) {
-    //for legacy code
-    if (options && options.constructor === String) {
-      var id = options;
-      options = arguments[1] || {};
-      options.id = id;
-      console.warn("LiteGUI.Inspector legacy parameter, use options as first parameter instead of id.");
-    }
+/**
+* Inspector allows to create a list of widgets easily, it also provides methods to create the widgets automatically.<br/>
+* Every widget is created calling the function add followed by the widget name, p.e. addSlider or addVector3 or addNumber.<br/>
+* Widgets always receive three parameters:<br/>
+* - name: String that defines the name at that it will be shown in the left side of the widget.<br/>
+* - value: the value that will be displayed in the widget.<br/>
+* - options: Object containing all the values .<br/>
+*
+* @class Inspector
+* @param {Object} options object with a set of options { <br/>
+  width: total width <br/>
+  height: total height <br/>
+  widgets_width: width of every widget (used mostly in horizontal inspectors) <br/>
+  name_width: width of the name part of widgets <br/>
+  full: set to true if you want the inspector to use all the parent width and height <br/>
+  widgets_per_row: number of widgets per row, default is 1 but you can change it if you want to pack several widgets in a row (useful for small widgets like checkboxes) <br/>
+  one_line: widgets are place one next to the other horizontaly <br/>
+  onchange: callback to call when something changes <br/>
+   } <br/>
 
-    options = options || {};
-    this.root = document.createElement("DIV");
-    this.root.className = "inspector " + (options.full ? "full" : "") + (options.className || "");
-    if (options.one_line) {
-      this.one_line = true;
-      this.root.className += " one_line";
-    }
+  Dependencies: 
+    - jscolor.js
 
-    if (options.id)
-      this.root.id = options.id;
+* @constructor
+*/
 
-    this.sections = [];
-    this.values = {};
-    this.widgets = [];
-    this.widgets_by_name = {};
-    this.row_number = 0; //used to detect if element is even (cannot use CSS, special cases everywhere)
-
-    this.addContainer(); //add empty container
-    this.tab_index = Math.floor(Math.random() * 10000);
-
-    if (options.width)
-      this.root.style.width = LiteGUI.sizeToCSS(options.width);
-    if (options.height) {
-      this.root.style.height = LiteGUI.sizeToCSS(options.height);
-      if (!options.one_line)
-        this.root.style.overflow = "auto";
-    }
-
-    if (options.name_width)
-      this.name_width = options.name_width;
-    if (options.widgets_width)
-      this.widgets_width = options.widgets_width;
-
-    if (options.noscroll)
-      this.root.style.overflow = "hidden";
-
-    if (options.onchange)
-      this.onchange = options.onchange;
-
-    if (options.parent)
-      this.appendTo(options.parent);
-
-    this.className = this.root.className;
-
-    this.widgets_per_row = options.widgets_per_row || 1;
+function Inspector(options) {
+  //for legacy code
+  if (options && options.constructor === String) {
+    var id = options;
+    options = arguments[1] || {};
+    options.id = id;
+    console.warn("LiteGUI.Inspector legacy parameter, use options as first parameter instead of id.");
   }
-  // Append widget to this inspector ( TODO: rename to appendWidget)
-  // + widget_parent
-  // + replace
-  append = function (widget, options) {
-    options = options || {};
 
-    var root = options.widget_parent || this._current_container || this.root;
-
-    if (options.replace)
-      options.replace.parentNode.replaceChild(widget, options.replace);
-    else {
-      widget.section = this.current_section;
-      root.appendChild(widget);
-    }
+  options = options || {};
+  this.root = document.createElement("DIV");
+  this.root.className = "inspector " + (options.full ? "full" : "") + (options.className || "");
+  if (options.one_line) {
+    this.one_line = true;
+    this.root.className += " one_line";
   }
+
+  if (options.id)
+    this.root.id = options.id;
+
+  this.sections = [];
+  this.values = {};
+  this.widgets = [];
+  this.widgets_by_name = {};
+  this.row_number = 0; //used to detect if element is even (cannot use CSS, special cases everywhere)
+
+  this.addContainer(); //add empty container
+  this.tab_index = Math.floor(Math.random() * 10000);
+
+  if (options.width)
+    this.root.style.width = LiteGUI.sizeToCSS(options.width);
+  if (options.height) {
+    this.root.style.height = LiteGUI.sizeToCSS(options.height);
+    if (!options.one_line)
+      this.root.style.overflow = "auto";
+  }
+
+  if (options.name_width)
+    this.name_width = options.name_width;
+  if (options.widgets_width)
+    this.widgets_width = options.widgets_width;
+
+  if (options.noscroll)
+    this.root.style.overflow = "hidden";
+
+  if (options.onchange)
+    this.onchange = options.onchange;
+
+  if (options.parent)
+    this.appendTo(options.parent);
+
+  this.className = this.root.className;
+
+  this.widgets_per_row = options.widgets_per_row || 1;
 }
-
-
 
 Inspector.prototype.getValues = function () {
   var r = {};
@@ -147,6 +141,21 @@ Inspector.prototype.refresh = function () {
     this.on_refresh();
 }
 
+// Append widget to this inspector (TODO: rename to appendWidget)
+// + widget_parent
+// + replace
+Inspector.prototype.append = function (widget, options) {
+  options = options || {};
+
+  var root = options.widget_parent || this._current_container || this.root;
+
+  if (options.replace)
+    options.replace.parentNode.replaceChild(widget, options.replace);
+  else {
+    widget.section = this.current_section;
+    root.appendChild(widget);
+  }
+}
 
 Inspector.prototype.pushContainer = function (container) {
   if (!this._current_container_stack)

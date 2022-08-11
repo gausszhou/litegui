@@ -60,7 +60,7 @@ function Tree(data, options, legacy) {
 
 	//bg click
 	root.addEventListener("click", function (e) {
-		if (e.srcElement != that.root)
+		if (e.target != that.root)
 			return;
 
 		if (that.onBackgroundClicked)
@@ -549,7 +549,7 @@ Tree.prototype.createTreeItem = function (data, options, level) {
 		count--;
 		if (count == 0)
 			title_element.classList.remove("dragover");
-		//if(ev.srcElement == this) return;
+		//if(ev.target == this) return;
 	});
 
 	//test if allows to drag stuff on top?
