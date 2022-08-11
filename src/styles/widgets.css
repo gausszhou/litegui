@@ -1,0 +1,157 @@
+/********************/
+.liteslider {
+	display: inline-block;
+	position: relative; 
+	width: calc(100% - 50px);
+	height: 1.2em;
+	cursor: pointer;
+}
+
+.liteslider-value {
+	width: 40px;
+	padding-left: 5px;
+}
+
+.slider-container {
+    margin-left: 5px;
+    margin-top: 1px;
+    /*margin-right: 5px;*/
+}
+
+.colorpicker-window {
+	position: absolute;
+	top: 50px;
+	left: 10px;
+	background-color: #333;
+	padding: 2px;
+	font-size: 0.8em;
+	color: #aaa;
+}
+
+.colorpicker-window input {
+	border: 0;
+}
+
+.searchbox {
+    padding: 2px;
+    opacity: 0.5;
+    transition: all 0.5s;
+    width: 100%;
+}
+
+.searchbox input {
+    padding: 2px 4px;
+    outline: 0;
+    width: 100%;
+}
+
+.searchbox input:focus
+{
+    outline: 0;
+}
+
+.searchbox:hover {
+    opacity: 1;
+}
+
+
+.litecheckbox {
+
+	width: 1em;
+	height: 1em;
+	display: inline-block;
+	vertical-align: top;
+	background-color: #1f1f1f;
+	border: 0;
+	border-radius: 2px;
+	margin: 0 4px;
+	margin-top: 2px;
+	text-align: center;
+
+	user-select: none;
+	-moz-user-select: none;
+	-webkit-user-select: none;
+
+	cursor: pointer;
+}
+
+.litecheckbox .on {
+	background-color: #5AF;
+	color: black;
+}
+
+.litecheckbox .flag {
+	display: block;
+	width: 100%;
+	height: 100%;
+	border: 2px solid black;
+	user-select: none;
+	-moz-user-select: none;
+	-webkit-user-select: none;
+	cursor: pointer;
+}
+
+.liteconsole {
+	width: 100%;
+	height: 100%;
+	background-color: black;
+	border: 1px solid #222;
+}
+
+.liteconsole .log {
+	width: 100%;
+	height: calc( 100% - 26px );
+	overflow: auto;
+	color: #AAA;
+	padding: 4px;
+}
+
+.liteconsole .log .msg {
+    white-space: pre-wrap;
+	margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+.liteconsole .log .msg.me {
+	color: white;
+}
+
+.liteconsole .log .msg.msglog { color: #AAA; }
+.liteconsole .log .msg.msgwarn { color: #FFA; }
+.liteconsole .log .msg.msgerror { color: #FAA; }
+.liteconsole .log .msg.good { color: #AFA; }
+
+.liteconsole .foot {
+	width: 100%;
+	height: 24px;
+	color: #111;
+}
+
+.liteconsole .foot input {
+	width: 100%;
+	height: 24px;
+	color: white;
+	background-color: black;
+	border: 0;
+	border-top: 1px solid #444;
+	margin: 0;
+	padding-left: 10px;
+	resize: none;
+}
+
+.liteconsole .foot input:focus{
+    outline: none;
+}
+
+.litecomplexlist { background-color: black; padding: 4px; overflow: auto; }
+.litecomplexlist .listitem { border-radius: 2px; margin: 2px; padding: 2px; background-color: #2A2A2A; cursor: pointer; line-height: 2em; }
+.litecomplexlist .listitem:hover { background-color: #363636; } 
+.litecomplexlist .listitem.selected { background-color: #354a5f; } 
+.litecomplexlist .listtitle { margin: 4px; margin-top: 10px; font-size: 1.2em; color: #AAA; }
+.litecomplexlist .listitem .title { color: #8e96a7; width: calc(100% - 60px); display: inline-block; padding-left: 10px; font-size: 1.2em; vertical-align: middle; } 
+.litecomplexlist .listitem .tick { cursor: pointer; text-align: center; width: 24px; height: 24px; display: inline-block; margin: 4px; color: #AFA; vertical-align: top; background-color: black; border-radius: 2px; }
+.litecomplexlist .listitem .tick span { transform: translate(0,0px); display: inline-block; }
+.litecomplexlist .listitem:not(.enabled) .tick { color: black; }
+.litecomplexlist .listitem button { border:0; background-color: #363636; border-radius: 4px; color: #9c9c9c; vertical-align: middle; margin-bottom: 0; }
+.litecomplexlist .listtext { cursor: pointer; text-align: center; }

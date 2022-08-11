@@ -1,0 +1,166 @@
+/* Here goes all the CSS related to layout the web (panels, windows, bars, etc) */
+
+html, body {
+	height: 100%;
+	background-color: #111;
+}
+
+div {
+	margin: 0;
+	padding: 0;
+}
+
+.litegui-wrap {
+	width: 1000px;
+	height: 600px;
+	margin: auto;
+	background-color: #333;
+}
+
+.litegui-wrap.fullscreen {
+	width: 100%;
+	height: 100%;
+}
+
+.litegui-maincontent {
+	width: 100%;
+	height: 100%;
+}
+
+.litearea {
+	vertical-align: top;
+	position: relative;
+	-moz-box-sizing: border-box;	
+	-webkit-box-sizing: border-box;	
+	box-sizing: border-box;	
+	width: 100%;
+	height: 100%;
+	position: relative;
+	/* outline: 2px solid red; */
+}
+
+.litearea.empty {
+	/*border: 2px dashed #334;*/
+}
+
+.litepanel {
+	width: 100%;
+	height: 100%;
+}
+
+.litedialog {
+	position: absolute;
+	z-index: 10;
+}
+
+.litepanel, .litedialog {
+	background-color: #444;
+	box-sizing: border-box;
+	overflow:hidden;
+    background-image: linear-gradient(top , #444444, #333333);
+    background-image: -moz-linear-gradient(top , #444444, #333333);
+    background-image: -webkit-linear-gradient(top , #444444, #333333);
+	color: #888;
+}
+
+.litepanel .panel-header, .litedialog .panel-header {
+	font-size: 1em;
+	padding: 0.2em 0 0 0.2em;
+	background-color: #778;
+    background-image: linear-gradient(right , #555, #333);
+    background-image: -moz-linear-gradient(right , #555, #333);
+    background-image: -webkit-linear-gradient(right , #555, #333);
+
+	-moz-box-sizing: border-box;	
+	-webkit-box-sizing: border-box;	
+	box-sizing: border-box;	
+	color: white;
+
+	width: 100%;
+	min-height: 20px;
+	-moz-user-select: none;  
+	-webkit-user-select: none;  
+	user-select: none; 
+	overflow: hidden;
+}
+
+.litepanel .panel-header button, .litedialog .panel-header button {
+	margin-top: 0;
+    background-image: none;
+	border: 0;
+	box-shadow: 0 0 0 transparent;
+	background-color: #333;
+}
+
+.litedialog.alert {
+	font-size: 1.6em; 
+}
+
+.litedialog.ui-draggable .panel-header{
+	cursor: move;
+}
+
+.litepanel .content {
+	/*overflow: auto; */
+	height: calc( 100% - 20px );
+}
+
+
+.litepanel .panel-footer, .litedialog .panel-footer {
+	position: absolute;
+	bottom: 0;
+	font-size: 0.8em;
+	margin: 2px;
+	padding: 2px 0 0 2px;
+	width: -moz-calc(100% - 6px);
+	width: -webkit-calc(100% - 6px);
+	width: calc(100% - 6px);
+	-moz-user-select: none;  
+	-webkit-user-select: none;  
+	user-select: none; 
+	text-align: right;
+}
+
+.litedialog .panel-footer.resizable {
+	cursor: s-resize;
+}
+
+.litedialog  .resizable-corner {
+	display: inline-block;
+	position: absolute;
+	bottom: 0;
+	right: 0;
+	width: 10px;
+	height: 10px;
+	cursor: se-resize;
+	opacity: 0;
+	background-color: red;
+}
+
+.litedialog .panel-footer button {
+	font-size: inherit;
+	padding: 0.1em 0.6em;
+}
+
+.litedialog .buttons {
+	position: absolute;
+	top: 2px;
+	right: 2px;
+}
+
+.litedialog .content p {
+	padding: 0.2em;	
+	margin: 0.2em;
+}
+
+
+.litemodalbg {
+	position: absolute;
+	top:0;
+	left:0;
+	background-color: rgba(0,0,0,0.8);
+	width: 100%;
+	height: 100%;
+	z-index: 100;
+}
+
