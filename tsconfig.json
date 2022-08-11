@@ -20,5 +20,5 @@
     "./node_modules/@types",
     "./types"
   ],
-  "include": ["src", "packages"]
+  "include": ["src", "src/packages", "types/utils.d.ts"]
 }

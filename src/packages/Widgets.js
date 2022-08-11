@@ -648,8 +648,8 @@ export function LineEditor(value, options) {
 		var rect = canvas.parentNode.getBoundingClientRect();
 		if (rect && canvas.width != rect.width && rect.width && rect.width < 1000)
 			canvas.width = rect.width;
-		if (rect && canvas.height != rect.height && rect.height && rect.height < 1000)
-			canvas.height = rect.height;
+		// if (rect && canvas.height != rect.height && rect.height && rect.height < 1000)
+		// 	canvas.height = rect.height;
 
 		var ctx = canvas.getContext("2d");
 		ctx.setTransform(1, 0, 0, 1, 0, 0);
@@ -701,7 +701,7 @@ export function LineEditor(value, options) {
 			}
 		}
 	}
-
+	window.onresize = () => element.redraw()
 	var last_mouse = [0, 0];
 	function onmousedown(evt) {
 		document.addEventListener("mousemove", onmousemove);
@@ -722,6 +722,7 @@ export function LineEditor(value, options) {
 
 		last_mouse = [mousex, mousey];
 		element.redraw();
+	
 		evt.preventDefault();
 		evt.stopPropagation();
 	}

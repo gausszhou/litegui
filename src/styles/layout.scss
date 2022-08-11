@@ -1,6 +1,7 @@
 /* Here goes all the CSS related to layout the web (panels, windows, bars, etc) */
 
-html, body {
+html,
+body {
 	height: 100%;
 	background-color: #111;
 }
@@ -20,32 +21,35 @@ div {
 .litegui-wrap.fullscreen {
 	width: 100%;
 	height: 100%;
+	overflow: hidden;
 }
 
 .litegui-maincontent {
 	width: 100%;
 	height: 100%;
+	overflow: hidden;
 }
 
 .litearea {
 	vertical-align: top;
 	position: relative;
-	-moz-box-sizing: border-box;	
-	-webkit-box-sizing: border-box;	
-	box-sizing: border-box;	
+	-moz-box-sizing: border-box;
+	-webkit-box-sizing: border-box;
+	box-sizing: border-box;
 	width: 100%;
 	height: 100%;
 	position: relative;
-	/* outline: 2px solid red; */
+	//  outline: 2px solid red; 
 }
 
 .litearea.empty {
-	/*border: 2px dashed #334;*/
+	// border: 2px dashed #334;
 }
 
 .litepanel {
 	width: 100%;
 	height: 100%;
+	box-sizing: border-box;
 }
 
 .litedialog {
@@ -53,60 +57,63 @@ div {
 	z-index: 10;
 }
 
-.litepanel, .litedialog {
+.litepanel,
+.litedialog {
 	background-color: #444;
 	box-sizing: border-box;
-	overflow:hidden;
-    background-image: linear-gradient(top , #444444, #333333);
-    background-image: -moz-linear-gradient(top , #444444, #333333);
-    background-image: -webkit-linear-gradient(top , #444444, #333333);
+	overflow: hidden;
+	background-image: linear-gradient(top, #444444, #333333);
 	color: #888;
 }
 
-.litepanel .panel-header, .litedialog .panel-header {
+.litepanel .panel-header,
+.litedialog .panel-header {
 	font-size: 1em;
-	padding: 0.2em 0 0 0.2em;
+	line-height: 1.5;
+	padding:  0 0.3em;
 	background-color: #778;
-    background-image: linear-gradient(right , #555, #333);
-    background-image: -moz-linear-gradient(right , #555, #333);
-    background-image: -webkit-linear-gradient(right , #555, #333);
+	background-image: linear-gradient(right, #555, #333);
+	background-image: -moz-linear-gradient(right, #555, #333);
+	background-image: -webkit-linear-gradient(right, #555, #333);
 
-	-moz-box-sizing: border-box;	
-	-webkit-box-sizing: border-box;	
-	box-sizing: border-box;	
+	-moz-box-sizing: border-box;
+	-webkit-box-sizing: border-box;
+	box-sizing: border-box;
 	color: white;
 
 	width: 100%;
 	min-height: 20px;
-	-moz-user-select: none;  
-	-webkit-user-select: none;  
-	user-select: none; 
+	-moz-user-select: none;
+	-webkit-user-select: none;
+	user-select: none;
 	overflow: hidden;
 }
 
-.litepanel .panel-header button, .litedialog .panel-header button {
+.litepanel .panel-header button,
+.litedialog .panel-header button {
 	margin-top: 0;
-    background-image: none;
+	background-image: none;
 	border: 0;
 	box-shadow: 0 0 0 transparent;
 	background-color: #333;
 }
 
 .litedialog.alert {
-	font-size: 1.6em; 
+	font-size: 1.6em;
 }
 
-.litedialog.ui-draggable .panel-header{
+.litedialog.ui-draggable .panel-header {
 	cursor: move;
 }
 
 .litepanel .content {
-	/*overflow: auto; */
-	height: calc( 100% - 20px );
+	height: calc(100% - 20px);
+	overflow-y: auto;
 }
 
 
-.litepanel .panel-footer, .litedialog .panel-footer {
+.litepanel .panel-footer,
+.litedialog .panel-footer {
 	position: absolute;
 	bottom: 0;
 	font-size: 0.8em;
@@ -115,9 +122,9 @@ div {
 	width: -moz-calc(100% - 6px);
 	width: -webkit-calc(100% - 6px);
 	width: calc(100% - 6px);
-	-moz-user-select: none;  
-	-webkit-user-select: none;  
-	user-select: none; 
+	-moz-user-select: none;
+	-webkit-user-select: none;
+	user-select: none;
 	text-align: right;
 }
 
@@ -125,7 +132,7 @@ div {
 	cursor: s-resize;
 }
 
-.litedialog  .resizable-corner {
+.litedialog .resizable-corner {
 	display: inline-block;
 	position: absolute;
 	bottom: 0;
@@ -149,18 +156,17 @@ div {
 }
 
 .litedialog .content p {
-	padding: 0.2em;	
+	padding: 0.2em;
 	margin: 0.2em;
 }
 
 
 .litemodalbg {
 	position: absolute;
-	top:0;
-	left:0;
-	background-color: rgba(0,0,0,0.8);
+	top: 0;
+	left: 0;
+	background-color: rgba(0, 0, 0, 0.8);
 	width: 100%;
 	height: 100%;
 	z-index: 100;
 }
-

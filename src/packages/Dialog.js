@@ -1,6 +1,5 @@
 import LiteGUI from "."
 
-// (function(){
 /****************** DIALOG **********************/
 /**
 * Dialog
@@ -9,6 +8,7 @@ import LiteGUI from "."
 * @param {Object} options useful options are { title, width, height, closable, on_close, scroll }
 * @constructor
 */
+
 function Dialog(options, legacy) {
   if (legacy || (options && options.constructor === String)) {
     var id = options;
@@ -34,6 +34,8 @@ Dialog.prototype._ctor = function (options) {
   options = options || {};
 
   var that = this;
+  this.left = 0;
+  this.right = 0;
   this.width = options.width;
   this.height = options.height;
   this.minWidth = options.minWidth || 150;
@@ -513,6 +515,7 @@ Dialog.prototype.setTitle = function (text) {
   this.header.innerHTML = text;
 }
 
+// TODO change prop
 Dialog.prototype.center = function () {
   if (!this.root.parentNode)
     return;
@@ -649,6 +652,5 @@ Dialog.closeAll = function () {
 }
 
 // LiteGUI.Dialog = Dialog;
-// })();
 
 export default Dialog;

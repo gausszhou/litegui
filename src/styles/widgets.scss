@@ -1,21 +1,34 @@
 /********************/
 .liteslider {
 	display: inline-block;
-	position: relative; 
+	position: relative;
 	width: calc(100% - 50px);
 	height: 1.2em;
 	cursor: pointer;
 }
 
 .liteslider-value {
-	width: 40px;
+	width: 42px;
 	padding-left: 5px;
 }
 
+.widget .wcontent .inputfield {
+	display: flex;
+	height: 100%;
+	align-items: center;
+}
+
 .slider-container {
-    margin-left: 5px;
-    margin-top: 1px;
-    /*margin-right: 5px;*/
+	// margin-left: 5px;
+	// margin-top: 1px;
+	padding: 0 2px;
+	flex: 1;
+}
+
+.liteslider {
+	display: block;
+	width: 100%;
+	border-radius: 2px;
 }
 
 .colorpicker-window {
@@ -33,25 +46,24 @@
 }
 
 .searchbox {
-    padding: 2px;
-    opacity: 0.5;
-    transition: all 0.5s;
-    width: 100%;
+	padding: 2px;
+	opacity: 0.5;
+	transition: all 0.5s;
+	width: 100%;
 }
 
 .searchbox input {
-    padding: 2px 4px;
-    outline: 0;
-    width: 100%;
+	padding: 2px 4px;
+	outline: 0;
+	width: 100%;
 }
 
-.searchbox input:focus
-{
-    outline: 0;
+.searchbox input:focus {
+	outline: 0;
 }
 
 .searchbox:hover {
-    opacity: 1;
+	opacity: 1;
 }
 
 
@@ -100,27 +112,38 @@
 
 .liteconsole .log {
 	width: 100%;
-	height: calc( 100% - 26px );
+	height: calc(100% - 26px);
 	overflow: auto;
 	color: #AAA;
 	padding: 4px;
 }
 
 .liteconsole .log .msg {
-    white-space: pre-wrap;
+	white-space: pre-wrap;
 	margin: 0;
-    padding: 0;
-    box-sizing: border-box;
+	padding: 0;
+	box-sizing: border-box;
 }
 
 .liteconsole .log .msg.me {
 	color: white;
 }
 
-.liteconsole .log .msg.msglog { color: #AAA; }
-.liteconsole .log .msg.msgwarn { color: #FFA; }
-.liteconsole .log .msg.msgerror { color: #FAA; }
-.liteconsole .log .msg.good { color: #AFA; }
+.liteconsole .log .msg.msglog {
+	color: #AAA;
+}
+
+.liteconsole .log .msg.msgwarn {
+	color: #FFA;
+}
+
+.liteconsole .log .msg.msgerror {
+	color: #FAA;
+}
+
+.liteconsole .log .msg.good {
+	color: #AFA;
+}
 
 .liteconsole .foot {
 	width: 100%;
@@ -140,18 +163,81 @@
 	resize: none;
 }
 
-.liteconsole .foot input:focus{
-    outline: none;
+.liteconsole .foot input:focus {
+	outline: none;
 }
 
-.litecomplexlist { background-color: black; padding: 4px; overflow: auto; }
-.litecomplexlist .listitem { border-radius: 2px; margin: 2px; padding: 2px; background-color: #2A2A2A; cursor: pointer; line-height: 2em; }
-.litecomplexlist .listitem:hover { background-color: #363636; } 
-.litecomplexlist .listitem.selected { background-color: #354a5f; } 
-.litecomplexlist .listtitle { margin: 4px; margin-top: 10px; font-size: 1.2em; color: #AAA; }
-.litecomplexlist .listitem .title { color: #8e96a7; width: calc(100% - 60px); display: inline-block; padding-left: 10px; font-size: 1.2em; vertical-align: middle; } 
-.litecomplexlist .listitem .tick { cursor: pointer; text-align: center; width: 24px; height: 24px; display: inline-block; margin: 4px; color: #AFA; vertical-align: top; background-color: black; border-radius: 2px; }
-.litecomplexlist .listitem .tick span { transform: translate(0,0px); display: inline-block; }
-.litecomplexlist .listitem:not(.enabled) .tick { color: black; }
-.litecomplexlist .listitem button { border:0; background-color: #363636; border-radius: 4px; color: #9c9c9c; vertical-align: middle; margin-bottom: 0; }
-.litecomplexlist .listtext { cursor: pointer; text-align: center; }
+.litecomplexlist {
+	background-color: black;
+	padding: 4px;
+	overflow: auto;
+}
+
+.litecomplexlist .listitem {
+	border-radius: 2px;
+	margin: 2px;
+	padding: 2px;
+	background-color: #2A2A2A;
+	cursor: pointer;
+	line-height: 2em;
+}
+
+.litecomplexlist .listitem:hover {
+	background-color: #363636;
+}
+
+.litecomplexlist .listitem.selected {
+	background-color: #354a5f;
+}
+
+.litecomplexlist .listtitle {
+	margin: 4px;
+	margin-top: 10px;
+	font-size: 1.2em;
+	color: #AAA;
+}
+
+.litecomplexlist .listitem .title {
+	color: #8e96a7;
+	width: calc(100% - 60px);
+	display: inline-block;
+	padding-left: 10px;
+	font-size: 1.2em;
+	vertical-align: middle;
+}
+
+.litecomplexlist .listitem .tick {
+	cursor: pointer;
+	text-align: center;
+	width: 24px;
+	height: 24px;
+	display: inline-block;
+	margin: 4px;
+	color: #AFA;
+	vertical-align: top;
+	background-color: black;
+	border-radius: 2px;
+}
+
+.litecomplexlist .listitem .tick span {
+	transform: translate(0, 0px);
+	display: inline-block;
+}
+
+.litecomplexlist .listitem:not(.enabled) .tick {
+	color: black;
+}
+
+.litecomplexlist .listitem button {
+	border: 0;
+	background-color: #363636;
+	border-radius: 4px;
+	color: #9c9c9c;
+	vertical-align: middle;
+	margin-bottom: 0;
+}
+
+.litecomplexlist .listtext {
+	cursor: pointer;
+	text-align: center;
+}

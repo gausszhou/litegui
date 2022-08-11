@@ -452,7 +452,6 @@ Inspector.prototype.createWidget = function (name, content, options) {
   element.inspector = this;
   element.options = options;
   element.name = name;
-
   this.row_number += this.widgets_per_row;
   if (this.row_number % 2 == 0)
     element.className += " even";
@@ -510,9 +509,9 @@ Inspector.prototype.createWidget = function (name, content, options) {
   if (name === null || name === undefined)
     content_class += " full";
   else if (name === "") //three equals because 0 == "" 
-    code += "<span class='wname' title='" + title + "' " + namewidth + ">" + pretitle + "</span>";
+    code += "<span class='wname " + name + "' title='" + title + "' " + namewidth + ">" + pretitle + "</span>";
   else
-    code += "<span class='wname' title='" + title + "' " + namewidth + ">" + pretitle + name + filling + "</span>";
+    code += "<span class='wname " + name + "' title='" + title + "' " + namewidth + ">" + pretitle + name + filling + "</span>";
 
   if (content.constructor === String || content.constructor === Number || content.constructor === Boolean)
     element.innerHTML = code + "<span class='info_content " + content_class + "' " + contentwidth + ">" + content + "</span>";
@@ -801,7 +800,7 @@ Inspector.prototype.addString = function (name, value, options) {
 * - disabled: shows the widget disabled
 * - button: string to show inside the button, default is "..."
 * - callback: function to call when the string is edited
-* - callback_button: function to call when the button is pressed
+* - callback: function to call when the button is pressed
 * @return {HTMLElement} the widget in the form of the DOM element that contains it
 **/
 Inspector.prototype.addStringButton = function (name, value, options) {
@@ -839,8 +838,8 @@ Inspector.prototype.addStringButton = function (name, value, options) {
 
   var button = element.querySelector(".wcontent button");
   button.addEventListener("click", function (e) {
-    if (options.callback_button)
-      options.callback_button.call(element, input.value, e);
+    if (options.callback)
+      options.callback.call(element, input.value, e);
   });
 
   if (options.button_width) {
@@ -1541,6 +1540,7 @@ Inspector.prototype.addSlider = function (name, value, options) {
   if (options.step === undefined)
     options.step = 0.01;
 
+  const { step } = options
   var that = this;
   if (value === undefined || value === null)
     value = 0;
@@ -1559,17 +1559,18 @@ Inspector.prototype.addSlider = function (name, value, options) {
   var text_input = element.querySelector(".slider-text");
   text_input.value = value;
   text_input.addEventListener('change', function (e) {
-    if (skip_change)
-      return;
-    var v = parseFloat(this.value);
-    value = v;
-    slider.setValue(v);
+    if (skip_change) return;
+    let v = parseFloat(this.value);
+    value = Math.floor(v / step) * step;
+    slider.setValue(value);
     Inspector.onWidgetChange.call(that, element, name, v, options);
   });
 
   //Slider change -> update Text
   slider.onChange = function (value) {
-    text_input.value = value;
+    let v = Math.floor(parseFloat(value) / step) * step;
+    slider.setValue(v);
+    text_input.value = v
     Inspector.onWidgetChange.call(that, element, name, value, options);
   };
 
@@ -2827,6 +2828,7 @@ Inspector.prototype.addSection = function (name, options) {
       element.classList.toggle("collapsed");
       var seccont = element.querySelector(".wsectioncontent");
       seccont.style.display = seccont.style.display === "none" ? null : "none";
+
       if (options.callback)
         options.callback.call(element, !element.classList.contains("collapsed"));
     });

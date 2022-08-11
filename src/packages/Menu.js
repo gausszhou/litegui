@@ -1,9 +1,16 @@
-// import { MenuItem } from "../types/Menu"
 import LiteGUI from "."
 
-// (function(){
+const MENU_CLASS_NAME = "lite-menu"
+const MENU_PANEL_CLASS_NAME = "lite-menu-panel"
+const MENU_ITEM_CLASS_NAME = "lite-menu-entry"
 
-/************** MENUBAR ************************/
+/**
+ * MenuItem
+ * @param {*} id 
+ * @param {*} options 
+ */
+
+
 function Menu(id, options) {
   options = options || {};
 
@@ -12,7 +19,7 @@ function Menu(id, options) {
 
   this.root = document.createElement("div");
   this.root.id = id;
-  this.root.className = "litemenubar";
+  this.root.className = MENU_CLASS_NAME;
 
   this.content = document.createElement("ul");
   this.root.appendChild(this.content);
@@ -81,10 +88,12 @@ Menu.prototype.add = function (path, data) {
         current_token++;
         continue;
       }
-      else //last token
-      {
-        console.warn("Warning: Adding menu that already exists: " + path);
-        break;
+      else {
+        // last token but like File/ enable repeat
+        if (menu[current_pos].name !== ""){
+          console.warn("Warning: Adding menu that already exists: " + path);
+          break;
+        }
       }
     }
     current_pos++;
@@ -212,7 +221,7 @@ Menu.prototype.showMenu = function (menu, e, root, is_submenu) {
     clearInterval(that.closing_by_leave);
 
   var element = document.createElement("div");
-  element.className = "litemenubar-panel";
+  element.className = MENU_PANEL_CLASS_NAME;
 
   var sorted_entries = [];
   for (var i in menu.children)
@@ -228,12 +237,12 @@ Menu.prototype.showMenu = function (menu, e, root, is_submenu) {
       if (b && b.separator && b.order != null) b_order = b.order;
       return a_order - b_order;
     });
-
+  
   for (var i in sorted_entries) {
     var item = document.createElement("p");
     var menu_item = sorted_entries[i];
-
-    item.className = 'litemenu-entry ' + (item.children ? " submenu" : "");
+    item.className = MENU_ITEM_CLASS_NAME
+    item.className += item.children ? " submenu" : ""
     var has_submenu = menu_item.children && menu_item.children.length;
 
     if (has_submenu)
@@ -336,7 +345,7 @@ Menu.prototype.showMenu = function (menu, e, root, is_submenu) {
     that.closing_by_leave = null;
   });
 
-  //compute X and Y for menu
+  // compute X and Y for menu
   var box = root.getBoundingClientRect();
   element.style.left = box.left + (is_submenu ? 200 : 0) + "px";
   element.style.top = box.top + box.height + (is_submenu ? -20 : 10) + "px";
@@ -354,7 +363,5 @@ Menu.prototype.showMenu = function (menu, e, root, is_submenu) {
   document.body.appendChild(element);
 }
 
-// LiteGUI.Menu = Menu;
-// })();
 
 export default Menu;

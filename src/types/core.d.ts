@@ -1,4 +1,4 @@
-import {
+ import {
   Area,
   Console,
   Dialog,
@@ -42,16 +42,13 @@ export interface LiteGUIInstance {
 
   root: any;
   content: any;
-  //the top menu
   mainmenu: any;
   menubar: any;
   container: null | HTMLElement;
   panels: any;
   windows: any[];
   special_codes: any;
-  //undo
   undo_steps: any;
-  //used for blacken when a modal dialog is shown
   modalbg_div: any;
   _safe_cliboard: any;
 
@@ -112,18 +109,6 @@ export interface LiteGUIInstance {
   createDropArea: (element: any, callback_drop: any, callback_enter: any, callback_exit: any) => any
 }
 
-interface Attributes {
-  name: sting
-};
-
-
-interface LiteGUIWidget {
-  root: HTMLElement;
-  attributes: Attributes[];
-  childNodes: any[],
-  [propName: string]: any;
-}
-
 interface LiteGUIInitOptions {
   width: number,
   height: number,
@@ -133,23 +118,14 @@ interface LiteGUIInitOptions {
   gui_callback: any
 }
 
-interface MessageOptions {
-  title: string
+interface LiteGUIWidget {
+  root: HTMLElement;
+  attributes: any[];
+  childNodes: any[],
+  [propName: string]: any;
 }
+
 
 interface Callback {
   (event: any, ...item: any): any
 }
-
-interface SuccessCallback {
-  (event: any, ...item: any): any
-}
-
-interface FailureCallback {
-  (event: any, ...item: any): any
-}
-
-interface ProgressCallback {
-  (event: any, ...item: any): any
-}
-
