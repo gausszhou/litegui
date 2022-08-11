@@ -1,4 +1,4 @@
-
+import LiteGUI from ".";
 /**
 * To create interactive trees (useful for folders or hierarchies).<br>
 * Options are:<br>

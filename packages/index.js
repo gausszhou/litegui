@@ -1,8 +1,9 @@
 import { isFunction, isArray } from 'lodash-es';
 // import { ContentType } from "../types/utils";
 // import { LiteGUIInstance } from '../types/core';
-import {beautifyCode} from "./utils"
+import { purgeElement, beautifyCode ,beautifyJSON,dataURItoBlob} from "./utils"
 window.beautifyCode = beautifyCode
+
 import Area from "./Area";
 import Console from "./Console";
 import Dialog from "./Dialog";
@@ -14,7 +15,7 @@ import Split from "./Split";
 import Table from "./Table";
 import Tabs from "./Tabs";
 import Tree from "./Tree";
-import { SearchBox, ContextMenu, Checkbox, List, LineEditor, Slider, ComplexList } from "./Widgets";
+import { SearchBox, ContextMenu, Checkbox, List, LineEditor, Slider, ComplexList, createLitebox } from "./Widgets";
 
 /**
  * Core namespace of LiteGUI library, it holds some useful functions
@@ -42,7 +43,7 @@ const LiteGUI = {
   LineEditor: LineEditor,
   Slider: Slider,
   ComplexList: ComplexList,
-
+  createLitebox: createLitebox,
 
   root: null,
   content: null,
@@ -111,7 +112,7 @@ const LiteGUI = {
 
     //create menubar
     if (options.menubar)
-      this.createMenubar();
+      this.createMenu();
 
     //called before anything
     if (options.gui_callback)
@@ -269,8 +270,8 @@ const LiteGUI = {
     return document.getElementById(id);
   },
 
-  createMenubar: function () {
-    this.menubar = new LiteGUI.Menubar("mainmenubar");
+  createMenu: function () {
+    this.menubar = new LiteGUI.Menu("mainmenubar");
     this.add(this.menubar);
   },
 
@@ -1246,26 +1247,6 @@ Object.defineProperty(String.prototype, "template", {
 });
 
 
-function purgeElement(d, skip) {
-  var a = d.attributes, i, l, n;
-
-  if (a) {
-    for (i = a.length - 1; i >= 0; i -= 1) {
-      n = a[i].name;
-      if (typeof d[n] === 'function') {
-        d[n] = null;
-      }
-    }
-  }
-
-  a = d.childNodes;
-  if (a) {
-    l = a.length;
-    for (i = 0; i < l; i += 1) {
-      purgeElement(d.childNodes[i]);
-    }
-  }
-}
 
 //useful functions
 

@@ -20,5 +20,5 @@
     "./node_modules/@types",
     "./types"
   ],
-  "include": ["src"]
+  "include": ["src", "packages"]
 }

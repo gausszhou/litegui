@@ -1,3 +1,4 @@
+import LiteGUI from ".";
 //enclose in a scope
 
 

@@ -1,4 +1,4 @@
-
+import LiteGUI from ".";
 /**
 * Widget that contains several tabs and their content
 * Options:

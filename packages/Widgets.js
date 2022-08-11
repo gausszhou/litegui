@@ -1,3 +1,4 @@
+import LiteGUI from ".";
 
 export function Button(value, options) {
 	options = options || {};
@@ -925,7 +926,7 @@ ComplexList.prototype.addItem = function (item, text, is_enabled, can_be_removed
 
 
 //the tiny box to expand the children of a node
-function createLitebox(state, on_change) {
+export function createLitebox(state, on_change) {
 	var element = document.createElement("span");
 	element.className = "listbox " + (state ? "listopen" : "listclosed");
 	element.innerHTML = state ? "&#9660;" : "&#9658;";
@@ -987,14 +988,3 @@ function createLitebox(state, on_change) {
 // LiteGUI.createLitebox = createLitebox;
 
 // LiteGUI.ComplexList = ComplexList;
-
-export default {
-	Button,
-	SearchBox,
-	ContextMenu,
-	Checkbox,
-	List,
-	LineEditor,
-	Slider,
-	ComplexList
-}

@@ -1,10 +1,10 @@
 // import { MenuItem } from "../types/Menu"
-import LiteGUI from "./core"
+import LiteGUI from "."
 
 // (function(){
 
 /************** MENUBAR ************************/
-function Menubar(id, options) {
+function Menu(id, options) {
   options = options || {};
 
   this.menu = [];
@@ -22,19 +22,19 @@ function Menubar(id, options) {
   this.sort_entries = options.sort_entries || false;
 }
 
-Menubar.closing_time = 500;
+Menu.closing_time = 500;
 
-Menubar.prototype.clear = function () {
+Menu.prototype.clear = function () {
   this.content.innerHTML = "";
   this.menu = [];
   this.panels = [];
 }
 
-Menubar.prototype.attachToPanel = function (panel) {
+Menu.prototype.attachToPanel = function (panel) {
   panel.content.insertBefore(this.root, panel.content.firstChild);
 }
 
-Menubar.prototype.add = function (path, data) {
+Menu.prototype.add = function (path, data) {
   data = data || {};
 
   if (typeof (data) == "function")
@@ -50,7 +50,7 @@ Menubar.prototype.add = function (path, data) {
 
   while (menu) {
     if (current_token > 5)
-      throw ("Error: Menubar too deep");
+      throw ("Error: Menu too deep");
     //token not found in this menu, create it
     if (menu.length == current_pos) {
       var v = { parent: last_item, children: [] };
@@ -94,7 +94,7 @@ Menubar.prototype.add = function (path, data) {
     this.updateMenu();
 };
 
-Menubar.prototype.remove = function (path) {
+Menu.prototype.remove = function (path) {
   var menu = this.findMenu(path);
   if (!menu)
     return;
@@ -106,7 +106,7 @@ Menubar.prototype.remove = function (path) {
     menu.parent.children.splice(index, 1);
 },
 
-  Menubar.prototype.separator = function (path, order) {
+  Menu.prototype.separator = function (path, order) {
     var menu = this.findMenu(path);
     if (!menu)
       return;
@@ -114,7 +114,7 @@ Menubar.prototype.remove = function (path) {
   }
 
 //returns the menu entry that matches this path
-Menubar.prototype.findMenu = function (path) {
+Menu.prototype.findMenu = function (path) {
   var tokens = path.split("/");
   var current_token = 0;
   var current_pos = 0;
@@ -153,7 +153,7 @@ Menubar.prototype.findMenu = function (path) {
 }
 
 //update top main menu
-Menubar.prototype.updateMenu = function () {
+Menu.prototype.updateMenu = function () {
   var that = this;
 
   this.content.innerHTML = "";
@@ -189,7 +189,7 @@ Menubar.prototype.updateMenu = function () {
   }
 }
 
-Menubar.prototype.hidePanels = function () {
+Menu.prototype.hidePanels = function () {
   if (!this.panels.length)
     return;
 
@@ -199,7 +199,7 @@ Menubar.prototype.hidePanels = function () {
 }
 
 //Create the panel with the drop menu
-Menubar.prototype.showMenu = function (menu, e, root, is_submenu) {
+Menu.prototype.showMenu = function (menu, e, root, is_submenu) {
 
   if (!is_submenu)
     this.hidePanels();
@@ -327,7 +327,7 @@ Menubar.prototype.showMenu = function (menu, e, root, is_submenu) {
     that.closing_by_leave = setTimeout(function () {
       that.is_open = false;
       that.hidePanels();
-    }, LiteGUI.Menubar.closing_time);
+    }, LiteGUI.Menu.closing_time);
   });
 
   element.addEventListener("mouseenter", function (e) {
@@ -354,7 +354,7 @@ Menubar.prototype.showMenu = function (menu, e, root, is_submenu) {
   document.body.appendChild(element);
 }
 
-// LiteGUI.Menubar = Menubar;
+// LiteGUI.Menu = Menu;
 // })();
 
-export default Menubar;
+export default Menu;

@@ -1,6 +1,14 @@
 import {
-  Area, Console, Dialog,
-  Dragger, Inspector, Split, Table, Tabs, Tree, Button,
+  Area,
+  Console,
+  Dialog,
+  Dragger,
+  Inspector,
+  Split,
+  Table,
+  Tabs,
+  Tree,
+  Button,
   SearchBox,
   ContextMenu,
   Checkbox,
@@ -73,10 +81,10 @@ export interface LiteGUIInstance {
   requireScript: (url: string | string[], onComplete: Callback, onError: Callback, onProgress: Callback, version: any) => void;
   requireScriptSerial: (url: string | string[], onComplete: Callback, onProgress: Callback) => void;
 
-  createElement:(tag: string, id_class: string, content: string, style: object, events: any)=>any;
+  createElement: (tag: string, id_class: string, content: string, style: object, events: any) => any;
   createListItem: (code: string, values: string[], styles: string[]) => void;
   createButton: (id_class: string, content: string, callback: Callback, styles: string[]) => HTMLElement;
-  createMenubar: () => void;
+  createMenu: () => void;
 
   newWindow: (title: string, width: number, height: number, options: any) => void;
   getParents: (element: HTMLElement) => HTMLElement[]

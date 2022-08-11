@@ -1,4 +1,4 @@
-import LiteGUI from "./core";
+import LiteGUI from ".";
 
 /**
 * Inspector allows to create a list of widgets easily, it also provides methods to create the widgets automatically.<br/>

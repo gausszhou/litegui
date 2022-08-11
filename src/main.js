@@ -1,4 +1,5 @@
-import LiteGUI from "../src/index"
+import LiteGUI from "./index"
+console.log(LiteGUI)
 var mainarea = null;
 
 window.onload = function () {

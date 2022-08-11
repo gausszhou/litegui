@@ -1,3 +1,4 @@
+import LiteGUI from ".";
 /**
 * Split 
 * @class Split

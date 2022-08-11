@@ -1,5 +1,6 @@
 import typescript from '@rollup/plugin-typescript';
 import postcss from 'rollup-plugin-postcss';
+import scss from 'rollup-plugin-scss'
 export default [
   {
     input: "src/index.ts",
@@ -7,10 +8,10 @@ export default [
       {
         format: "umd",
         file: "lib/bundle.umd.js",
-        name:"LiteGUI"
+        name: "LiteGUI"
       }
     ],
-    plugins: [typescript(),postcss()]
+    plugins: [typescript(), postcss()]
   },
   {
     input: "src/index.ts",
@@ -20,6 +21,6 @@ export default [
         file: "lib/bundle.esm.js"
       }
     ],
-    plugins: [typescript(),postcss()]
+    plugins: [typescript(), postcss(),scss()]
   }
 ];

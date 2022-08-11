@@ -1,3 +1,4 @@
+import LiteGUI from ".";
 
 function Dragger(value, options) {
 	if (value === null || value === undefined)

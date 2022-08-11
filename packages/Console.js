@@ -1,3 +1,4 @@
+import LiteGUI from ".";
 
 function Console(options) {
 	options = options || {};

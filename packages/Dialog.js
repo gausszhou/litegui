@@ -1,4 +1,4 @@
-import LiteGUI from "./core"
+import LiteGUI from "."
 
 // (function(){
 /****************** DIALOG **********************/
