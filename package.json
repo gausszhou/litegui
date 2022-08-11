@@ -6,11 +6,11 @@
   "files": [
     "dist"
   ],
-  "main": "./dist/bundle.umd.cjs",
-  "module": "./dist/bundle.js",
+  "main": "./lib/bundle.umd.cjs",
+  "module": "./lib/bundle.esm.js",
   "exports": {
     ".": {
-      "import": "./dist/bundle.js",
+      "import": "./dist/bundle.esm.js",
       "require": "./dist/bundle.umd.cjs"
     }
   },

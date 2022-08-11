@@ -3,7 +3,7 @@ import postcss from 'rollup-plugin-postcss';
 import scss from 'rollup-plugin-scss'
 export default [
   {
-    input: "src/index.ts",
+    input: "src/index",
     output: [
       {
         format: "umd",
@@ -14,7 +14,7 @@ export default [
     plugins: [typescript(), postcss()]
   },
   {
-    input: "src/index.ts",
+    input: "src/index",
     output: [
       {
         format: "esm",
