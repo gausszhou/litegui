@@ -1,6 +1,4 @@
 import { isFunction, isArray } from 'lodash-es';
-// import { ContentType } from "../types/utils";
-// import { LiteGUIInstance } from '../types/core';
 import { purgeElement, beautifyCode ,beautifyJSON,dataURItoBlob} from "./utils"
 window.beautifyCode = beautifyCode
 

@@ -1,5 +1,5 @@
-import LiteGUI from "./index"
-// console.log(LiteGUI)
+// import LiteGUI from "./index"
+import LiteGUI from "../lib/bundle.esm"
 
 let mainarea = null;
 let bottomPanel = null;
@@ -181,11 +181,11 @@ function updateSidePanel(root) {
     ]
   };
 
-  var litetree = new LiteGUI.Tree(mytree, { allow_rename: true });
+  const litetree = new LiteGUI.Tree(mytree, { allow_rename: true });
   LiteGUI.bind(litetree.root, "item_selected", function (e) {
     console.log("Node selected: ", e.detail);
   });
-  var tree_tab_content = tabs_widget.getTabContent("Tree");
+  const tree_tab_content = tabs_widget.getTabContent("Tree");
   tree_tab_content.appendChild(litetree.root)
 
   litetree.insertItem({ id: "FOO" }, "Child2", 2);
@@ -194,7 +194,7 @@ function updateSidePanel(root) {
   root.add(tabs_widget);
 
   //side panel widget
-  var widgets = new LiteGUI.Inspector();
+  const widgets = new LiteGUI.Inspector();
   widgets.onchange = function (name, value, widget) {
     console.log("Widget change: " + name + " -> " + value);
   };
@@ -240,12 +240,12 @@ function createTableDialog() {
   dialog.addButton("Randomize", inner);
 
   dialog.show()
-  var table = new LiteGUI.Table({ scrollable: true });
+  const table = new LiteGUI.Table({ scrollable: true });
   dialog.add(table);
 
   table.setColumns(["Name", { name: "Age", width: 50 }, "Address"]);
 
-  var data = [];
+  const data = [];
 
   for (var i = 0; i < 10; ++i){
     data.push({
@@ -265,16 +265,16 @@ function createTableDialog() {
 }
 
 function createComplexListDialog() {
-  var dialog = new LiteGUI.Dialog({ title: "Complex List", close: true, minimize: true, width: 300, height: 400, scroll: true, resizable: true, draggable: true });
+  const dialog = new LiteGUI.Dialog({ title: "Complex List", close: true, minimize: true, width: 300, height: 400, scroll: true, resizable: true, draggable: true });
   dialog.show();
   dialog.setPosition(450, 200);
 
-  var list = new LiteGUI.ComplexList({ height: "100%" });
+  const list = new LiteGUI.ComplexList({ height: "100%" });
   dialog.add(list);
 
   list.addTitle("Example of title");
   for (var i = 0; i < 10; ++i)
-    var elem = list.addItem({}, "Example", Math.random() > 0.5, true);
+    list.addItem({}, "Example", Math.random() > 0.5, true);
   list.addTitle("Example of title");
   for (var i = 0; i < 10; ++i)
     list.addItem({}, "More items", Math.random() > 0.5, true);

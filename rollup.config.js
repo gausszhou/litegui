@@ -1,6 +1,7 @@
+import { uglify } from "rollup-plugin-uglify";
 import typescript from '@rollup/plugin-typescript';
 import postcss from 'rollup-plugin-postcss';
-import scss from 'rollup-plugin-scss'
+// import scss from 'rollup-plugin-scss';
 export default [
   {
     input: "src/index",
@@ -9,18 +10,12 @@ export default [
         format: "umd",
         file: "lib/bundle.umd.js",
         name: "LiteGUI"
-      }
-    ],
-    plugins: [typescript(), postcss()]
-  },
-  {
-    input: "src/index",
-    output: [
+      },
       {
         format: "esm",
         file: "lib/bundle.esm.js"
       }
     ],
-    plugins: [typescript(), postcss(),scss()]
+    plugins: [uglify(), typescript(), postcss()]
   }
 ];

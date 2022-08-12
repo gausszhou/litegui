@@ -6,7 +6,7 @@
     "lib": ["ESNext", "DOM"],
     "moduleResolution": "Node",
     "strict": true,
-    "sourceMap": true,
+    "sourceMap": false,
     "resolveJsonModule": true,
     "isolatedModules": true,
     "esModuleInterop": true,
@@ -17,8 +17,7 @@
     "skipLibCheck": true
   },
   "typeRoots": [
-    "./node_modules/@types",
-    "./types"
+    "./src/types"
   ],
-  "include": ["src", "src/packages", "types/utils.d.ts"]
+  "include": ["src", "src/packages"]
 }

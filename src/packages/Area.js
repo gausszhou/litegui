@@ -10,6 +10,7 @@ import LiteGUI from ".";
 * @constructor
 * @param {Object} options
 */
+
 function Area(options, legacy) {
 	//for legacy code
 	if ((options && options.constructor === String) || legacy) {

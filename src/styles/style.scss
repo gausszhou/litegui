@@ -50,15 +50,17 @@ a:hover {
 	height: 24px;
 }
 
-.lite-menu ul {
-	font-family: Tahoma, sans-serif;
-	margin: 0;
-	padding: 0;
-	height: 2em;
-	display: flex;
-	align-items: center;
-	background-color: #232323;
-	border-bottom: 1px solid #523074;
+.lite-menu {
+	ul {
+		font-family: Tahoma, sans-serif;
+		margin: 0;
+		padding: 0;
+		height: 2em;
+		display: flex;
+		align-items: center;
+		background-color: #232323;
+		border-bottom: 1px solid #523074;
+	}
 }
 
 .lite-menu li {
@@ -524,22 +526,6 @@ li.ltreeitem.filtered {
 	color: white;
 	background-color: rgba(100, 100, 100, 0.5);
 }
-
-.listbox.listopen {}
-
-.listbox.listclosed {}
-
-/*
-.listbox.listopen::after
-{ 
-	content:"-";
-}
-
-.listbox.listclosed::after
-{ 
-	content:"+";
-}
-*/
 
 /**** LiteList ***/
 
