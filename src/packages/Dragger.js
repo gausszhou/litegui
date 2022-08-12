@@ -1,12 +1,9 @@
 import LiteGUI from ".";
 
 function Dragger(value, options) {
-	if (value === null || value === undefined)
-		value = 0;
-	else if (value.constructor === String)
-		value = parseFloat(value);
-	else if (value.constructor !== Number)
-		value = 0;
+	if (value === null || value === undefined) value = 0;
+	else if (value.constructor === String) value = parseFloat(value);
+	else if (value.constructor !== Number) value = 0;
 
 	this.value = value;
 	var that = this;
@@ -19,8 +16,7 @@ function Dragger(value, options) {
 
 	var wrap = document.createElement("span");
 	wrap.className = "inputfield " + (options.extraclass ? options.extraclass : "") + (options.full ? " full" : "");
-	if (options.disabled)
-		wrap.className += " disabled";
+	if (options.disabled) wrap.className += " disabled";
 	element.appendChild(wrap);
 
 	var dragger_class = options.dragger_class || "full";
@@ -32,19 +28,14 @@ function Dragger(value, options) {
 	this.input = input;
 	element.input = input;
 
-	if (options.disabled)
-		input.disabled = true;
-	if (options.tab_index)
-		input.tabIndex = options.tab_index;
+	if (options.disabled) input.disabled = true;
+	if (options.tab_index) input.tabIndex = options.tab_index;
 	wrap.appendChild(input);
 
 	input.addEventListener("keydown", function (e) {
-		if (e.keyCode == 38)
-			inner_inc(1, e);
-		else if (e.keyCode == 40)
-			inner_inc(-1, e);
-		else
-			return;
+		if (e.keyCode == 38) inner_inc(1, e);
+		else if (e.keyCode == 40) inner_inc(-1, e);
+		else return;
 		e.stopPropagation();
 		e.preventDefault();
 		return true;
@@ -52,8 +43,7 @@ function Dragger(value, options) {
 
 	var dragger = document.createElement("div");
 	dragger.className = "drag_widget";
-	if (options.disabled)
-		dragger.className += " disabled";
+	if (options.disabled) dragger.className += " disabled";
 
 	wrap.appendChild(dragger);
 	element.dragger = dragger;
@@ -71,8 +61,7 @@ function Dragger(value, options) {
 		doc_binded.removeEventListener("mouseup", inner_up);
 
 		if (!options.disabled) {
-			if (element.requestPointerLock)
-				element.requestPointerLock();
+			if (element.requestPointerLock) element.requestPointerLock();
 			doc_binded.addEventListener("mousemove", inner_move);
 			doc_binded.addEventListener("mouseup", inner_up);
 
@@ -89,8 +78,7 @@ function Dragger(value, options) {
 		var deltax = e.screenX - dragger.data[0];
 		var deltay = dragger.data[1] - e.screenY;
 		var diff = [deltax, deltay];
-		if (e.movementX !== undefined)
-			diff = [e.movementX, -e.movementY]
+		if (e.movementX !== undefined) diff = [e.movementX, -e.movementY];
 		//console.log(e);
 		dragger.data = [e.screenX, e.screenY];
 		var axis = options.horizontal ? 0 : 1;
@@ -99,13 +87,12 @@ function Dragger(value, options) {
 		e.stopPropagation();
 		e.preventDefault();
 		return false;
-	};
+	}
 
 	function inner_wheel(e) {
 		//console.log("wheel!");
-		if (document.activeElement !== this)
-			return;
-		var delta = e.wheelDelta !== undefined ? e.wheelDelta : (e.deltaY ? -e.deltaY / 3 : 0);
+		if (document.activeElement !== this) return;
+		var delta = e.wheelDelta !== undefined ? e.wheelDelta : e.deltaY ? -e.deltaY / 3 : 0;
 		inner_inc(delta > 0 ? 1 : -1, e);
 		e.stopPropagation();
 		e.preventDefault();
@@ -117,32 +104,25 @@ function Dragger(value, options) {
 		doc_binded = null;
 		doc.removeEventListener("mousemove", inner_move);
 		doc.removeEventListener("mouseup", inner_up);
-		if (doc.exitPointerLock)
-			doc.exitPointerLock();
+		if (doc.exitPointerLock) doc.exitPointerLock();
 		LiteGUI.trigger(dragger, "blur");
 		e.stopPropagation();
 		e.preventDefault();
 		return false;
-	};
+	}
 
 	function inner_inc(v, e) {
-		if (!options.linear)
-			v = v > 0 ? Math.pow(v, 1.2) : Math.pow(Math.abs(v), 1.2) * -1;
-		var scale = (options.step ? options.step : 1.0);
-		if (e && e.shiftKey)
-			scale *= 10;
-		else if (e && e.ctrlKey)
-			scale *= 0.1;
+		if (!options.linear) v = v > 0 ? Math.pow(v, 1.2) : Math.pow(Math.abs(v), 1.2) * -1;
+		var scale = options.step ? options.step : 1.0;
+		if (e && e.shiftKey) scale *= 10;
+		else if (e && e.ctrlKey) scale *= 0.1;
 		var value = parseFloat(input.value) + v * scale;
-		if (options.max != null && value > options.max)
-			value = options.max;
-		if (options.min != null && value < options.min)
-			value = options.min;
+		if (options.max != null && value > options.max) value = options.max;
+		if (options.min != null && value < options.min) value = options.min;
 
 		input.value = value.toFixed(precision);
 		//input.value = ((value * 1000)<<0) / 1000; //remove ugly decimals
-		if (options.units)
-			input.value += options.units;
+		if (options.units) input.value += options.units;
 		LiteGUI.trigger(input, "change");
 	}
 }
@@ -150,23 +130,20 @@ function Dragger(value, options) {
 Dragger.prototype.setRange = function (min, max) {
 	this.options.min = min;
 	this.options.max = max;
-}
+};
 
 Dragger.prototype.setValue = function (v, skip_event) {
 	v = parseFloat(v);
 	this.value = v;
-	if (this.options.precision)
-		v = v.toFixed(this.options.precision);
-	if (this.options.units)
-		v += this.options.units;
+	if (this.options.precision) v = v.toFixed(this.options.precision);
+	if (this.options.units) v += this.options.units;
 	this.input.value = v;
-	if (!skip_event)
-		LiteGUI.trigger(this.input, "change");
-}
+	if (!skip_event) LiteGUI.trigger(this.input, "change");
+};
 
 Dragger.prototype.getValue = function () {
 	return this.value;
-}
+};
 
 // LiteGUI.Dragger = Dragger;
 

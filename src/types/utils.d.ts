@@ -1,1 +1,1 @@
-export type ContentType = "text/plain" | "application/octet-stream";   
+export type ContentType = "text/plain" | "application/octet-stream";

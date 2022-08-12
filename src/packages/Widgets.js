@@ -3,8 +3,7 @@ import LiteGUI from ".";
 export function Button(value, options) {
 	options = options || {};
 
-	if (typeof (options) === "function")
-		options = { callback: options };
+	if (typeof options === "function") options = { callback: options };
 
 	var that = this;
 	var element = document.createElement("div");
@@ -22,28 +21,27 @@ export function Button(value, options) {
 	});
 
 	this.click = function () {
-		if (options.callback)
-			options.callback.call(that);
-	}
+		if (options.callback) options.callback.call(that);
+	};
 }
 
 // LiteGUI.Button = Button;
 
 /**
-* SearchBox 
-*
-* @class SearchBox
-* @constructor
-* @param {*} value
-* @param {Object} options
-*/
+ * SearchBox
+ *
+ * @class SearchBox
+ * @constructor
+ * @param {*} value
+ * @param {Object} options
+ */
 
 export function SearchBox(value, options) {
 	options = options || {};
 	value = value || "";
 	var element = document.createElement("div");
 	element.className = "litegui searchbox";
-	var placeholder = (options.placeholder != null ? options.placeholder : "Search");
+	var placeholder = options.placeholder != null ? options.placeholder : "Search";
 	element.innerHTML = "<input value='" + value + "' placeholder='" + placeholder + "'/>";
 	this.input = element.querySelector("input");
 	this.root = element;
@@ -51,29 +49,32 @@ export function SearchBox(value, options) {
 
 	this.input.onchange = function (e) {
 		var value = e.target.value;
-		if (options.callback)
-			options.callback.call(that, value);
+		if (options.callback) options.callback.call(that, value);
 	};
 }
 
-SearchBox.prototype.setValue = function (v) { this.input.value = v; this.input.onchange(); };
-SearchBox.prototype.getValue = function () { return this.input.value; };
+SearchBox.prototype.setValue = function (v) {
+	this.input.value = v;
+	this.input.onchange();
+};
+SearchBox.prototype.getValue = function () {
+	return this.input.value;
+};
 
 // LiteGUI.SearchBox = SearchBox;
 
-
 /**
-* ContextMenu 
-*
-* @class ContextMenu 
-* @constructor
-* @param {Array} values (allows object { title: "Nice text", callback: function ... })
-* @param {Object} options [optional] Some options:\
-* - title: title to show on top of the menu
-* - callback: function to call when an option is clicked, it receives the item information
-* - ignore_item_callbacks: ignores the callback inside the item, it just calls the options.callback 
-* - event: you can pass a MouseEvent, this way the ContextMenu appears in that position
-*/
+ * ContextMenu
+ *
+ * @class ContextMenu
+ * @constructor
+ * @param {Array} values (allows object { title: "Nice text", callback: function ... })
+ * @param {Object} options [optional] Some options:\
+ * - title: title to show on top of the menu
+ * - callback: function to call when an option is clicked, it receives the item information
+ * - ignore_item_callbacks: ignores the callback inside the item, it just calls the options.callback
+ * - event: you can pass a MouseEvent, this way the ContextMenu appears in that position
+ */
 export function ContextMenu(values, options) {
 	options = options || {};
 	this.options = options;
@@ -84,15 +85,19 @@ export function ContextMenu(values, options) {
 		if (options.parentMenu.constructor !== this.constructor) {
 			console.error("parentMenu must be of class ContextMenu, ignoring it");
 			options.parentMenu = null;
-		}
-		else {
+		} else {
 			this.parentMenu = options.parentMenu;
 			this.parentMenu.lock = true;
 			this.parentMenu.current_submenu = this;
 		}
 	}
 
-	if (options.event && options.event.constructor.name !== "MouseEvent" && options.event.constructor.name !== "PointerEvent" && options.event.constructor.name !== "CustomEvent") {
+	if (
+		options.event &&
+		options.event.constructor.name !== "MouseEvent" &&
+		options.event.constructor.name !== "PointerEvent" &&
+		options.event.constructor.name !== "CustomEvent"
+	) {
 		console.error("Event passed to ContextMenu is not of type MouseEvent or CustomEvent. Ignoring it.");
 		options.event = null;
 	}
@@ -102,26 +107,42 @@ export function ContextMenu(values, options) {
 	root.style.minWidth = 100;
 	root.style.minHeight = 100;
 	root.style.pointerEvents = "none";
-	setTimeout(function () { root.style.pointerEvents = "auto"; }, 100); //delay so the mouse up event is not caugh by this element
+	setTimeout(function () {
+		root.style.pointerEvents = "auto";
+	}, 100); //delay so the mouse up event is not caugh by this element
 
-	//this prevents the default context browser menu to open in case this menu was created when pressing right button 
-	root.addEventListener("mouseup", function (e) {
-		e.preventDefault(); return true;
-	}, true);
-	root.addEventListener("contextmenu", function (e) {
-		if (e.button != 2) //right button
+	//this prevents the default context browser menu to open in case this menu was created when pressing right button
+	root.addEventListener(
+		"mouseup",
+		function (e) {
+			e.preventDefault();
+			return true;
+		},
+		true
+	);
+	root.addEventListener(
+		"contextmenu",
+		function (e) {
+			if (e.button != 2)
+				//right button
+				return false;
+			e.preventDefault();
 			return false;
-		e.preventDefault();
-		return false;
-	}, true);
+		},
+		true
+	);
 
-	root.addEventListener("mousedown", function (e) {
-		if (e.button == 2) {
-			that.close();
-			e.preventDefault(); return true;
-		}
-	}, true);
-
+	root.addEventListener(
+		"mousedown",
+		function (e) {
+			if (e.button == 2) {
+				that.close();
+				e.preventDefault();
+				return true;
+			}
+		},
+		true
+	);
 
 	this.root = root;
 
@@ -137,8 +158,7 @@ export function ContextMenu(values, options) {
 	var num = 0;
 	for (var i in values) {
 		var name = values.constructor == Array ? values[i] : i;
-		if (name != null && name.constructor !== String)
-			name = name.content === undefined ? String(name) : name.content;
+		if (name != null && name.constructor !== String) name = name.content === undefined ? String(name) : name.content;
 		var value = values[i];
 		this.addItem(name, value, options);
 		num++;
@@ -146,17 +166,14 @@ export function ContextMenu(values, options) {
 
 	//close on leave
 	root.addEventListener("mouseleave", function (e) {
-		if (that.lock)
-			return;
-		if (root.closing_timer)
-			clearTimeout(root.closing_timer);
+		if (that.lock) return;
+		if (root.closing_timer) clearTimeout(root.closing_timer);
 		root.closing_timer = setTimeout(that.close.bind(that, e), 500);
 		//that.close(e);
 	});
 
 	root.addEventListener("mouseenter", function (e) {
-		if (root.closing_timer)
-			clearTimeout(root.closing_timer);
+		if (root.closing_timer) clearTimeout(root.closing_timer);
 	});
 
 	function on_mouse_wheel(e) {
@@ -169,29 +186,28 @@ export function ContextMenu(values, options) {
 	root.addEventListener("wheel", on_mouse_wheel, true);
 	root.addEventListener("mousewheel", on_mouse_wheel, true);
 
-
 	//insert before checking position
 	var root_document = document;
-	if (options.event)
-		root_document = options.event.target.ownerDocument;
+	if (options.event) root_document = options.event.target.ownerDocument;
 
-	if (!root_document)
-		root_document = document;
+	if (!root_document) root_document = document;
 	root_document.body.appendChild(root);
 
 	//compute best position
 	var left = options.left || 0;
 	var top = options.top || 0;
 	if (options.event) {
-		if (options.event.constructor.name !== "MouseEvent" && options.event.constructor.name !== "PointerEvent" && options.event.constructor.name !== "CustomEvent") {
+		if (
+			options.event.constructor.name !== "MouseEvent" &&
+			options.event.constructor.name !== "PointerEvent" &&
+			options.event.constructor.name !== "CustomEvent"
+		) {
 			console.warn("Event passed to ContextMenu is not of type MouseEvent");
 			options.event = null;
-		}
-		else {
-			left = (options.event.pageX - 10);
-			top = (options.event.pageY - 10);
-			if (options.title)
-				top -= 20;
+		} else {
+			left = options.event.pageX - 10;
+			top = options.event.pageY - 10;
+			if (options.title) top -= 20;
 
 			if (options.parentMenu) {
 				var rect = options.parentMenu.root.getBoundingClientRect();
@@ -201,10 +217,8 @@ export function ContextMenu(values, options) {
 			var body_rect = document.body.getBoundingClientRect();
 			var root_rect = root.getBoundingClientRect();
 
-			if (left > (body_rect.width - root_rect.width - 10))
-				left = (body_rect.width - root_rect.width - 10);
-			if (top > (body_rect.height - root_rect.height - 10))
-				top = (body_rect.height - root_rect.height - 10);
+			if (left > body_rect.width - root_rect.width - 10) left = body_rect.width - root_rect.width - 10;
+			if (top > body_rect.height - root_rect.height - 10) top = body_rect.height - root_rect.height - 10;
 		}
 	}
 
@@ -225,8 +239,7 @@ ContextMenu.prototype.addItem = function (name, value, options) {
 		element.classList.add("separator");
 		//element.innerHTML = "<hr/>"
 		//continue;
-	}
-	else {
+	} else {
 		element.innerHTML = value && value.title ? value.title : name;
 		element.value = value;
 
@@ -235,28 +248,22 @@ ContextMenu.prototype.addItem = function (name, value, options) {
 				disabled = true;
 				element.classList.add("disabled");
 			}
-			if (value.submenu || value.has_submenu)
-				element.classList.add("has_submenu");
+			if (value.submenu || value.has_submenu) element.classList.add("has_submenu");
 		}
 
-		if (typeof (value) == "function") {
+		if (typeof value == "function") {
 			element.dataset["value"] = name;
 			element.onclick_callback = value;
-		}
-		else
-			element.dataset["value"] = value;
+		} else element.dataset["value"] = value;
 	}
 
 	this.root.appendChild(element);
-	if (!disabled)
-		element.addEventListener("click", inner_onclick);
-	if (options.autoopen)
-		element.addEventListener("mouseenter", inner_over);
+	if (!disabled) element.addEventListener("click", inner_onclick);
+	if (options.autoopen) element.addEventListener("mouseenter", inner_over);
 
 	function inner_over(e) {
 		var value = this.value;
-		if (!value || !value.has_submenu)
-			return;
+		if (!value || !value.has_submenu) return;
 		inner_onclick.call(this, e);
 	}
 
@@ -265,27 +272,23 @@ ContextMenu.prototype.addItem = function (name, value, options) {
 		var value = this.value;
 		var close_parent = true;
 
-		if (that.current_submenu)
-			that.current_submenu.close(e);
+		if (that.current_submenu) that.current_submenu.close(e);
 
 		//global callback
 		if (options.callback) {
 			var r = options.callback.call(that, value, options, e);
-			if (r === true)
-				close_parent = false;
+			if (r === true) close_parent = false;
 		}
 
 		//special cases
 		if (value) {
-			if (value.callback && !options.ignore_item_callbacks && value.disabled !== true)  //item callback
-			{
+			if (value.callback && !options.ignore_item_callbacks && value.disabled !== true) {
+				//item callback
 				var r = value.callback.call(this, value, options, e, that);
-				if (r === true)
-					close_parent = false;
+				if (r === true) close_parent = false;
 			}
 			if (value.submenu) {
-				if (!value.submenu.options)
-					throw ("ContextMenu submenu needs options");
+				if (!value.submenu.options) throw "ContextMenu submenu needs options";
 				var submenu = new LiteGUI.ContextMenu(value.submenu.options, {
 					callback: value.submenu.callback,
 					event: e,
@@ -298,56 +301,48 @@ ContextMenu.prototype.addItem = function (name, value, options) {
 			}
 		}
 
-		if (close_parent && !that.lock)
-			that.close();
+		if (close_parent && !that.lock) that.close();
 	}
 
 	return element;
-}
+};
 
 ContextMenu.prototype.close = function (e, ignore_parent_menu) {
-	if (this.root.parentNode)
-		this.root.parentNode.removeChild(this.root);
+	if (this.root.parentNode) this.root.parentNode.removeChild(this.root);
 	if (this.parentMenu && !ignore_parent_menu) {
 		this.parentMenu.lock = false;
 		this.parentMenu.current_submenu = null;
-		if (e === undefined)
-			this.parentMenu.close();
+		if (e === undefined) this.parentMenu.close();
 		else if (e && !LiteGUI.isCursorOverElement(e, this.parentMenu.root))
 			LiteGUI.trigger(this.parentMenu.root, "mouseleave", e);
 	}
-	if (this.current_submenu)
-		this.current_submenu.close(e, true);
-	if (this.root.closing_timer)
-		clearTimeout(this.root.closing_timer);
-}
+	if (this.current_submenu) this.current_submenu.close(e, true);
+	if (this.root.closing_timer) clearTimeout(this.root.closing_timer);
+};
 
 //returns the top most menu
 ContextMenu.prototype.getTopMenu = function () {
-	if (this.options.parentMenu)
-		return this.options.parentMenu.getTopMenu();
+	if (this.options.parentMenu) return this.options.parentMenu.getTopMenu();
 	return this;
-}
+};
 
 ContextMenu.prototype.getFirstEvent = function () {
-	if (this.options.parentMenu)
-		return this.options.parentMenu.getFirstEvent();
+	if (this.options.parentMenu) return this.options.parentMenu.getFirstEvent();
 	return this.options.event;
-}
+};
 
 // LiteGUI.ContextMenu = ContextMenu;
 // LiteGUI.ContextualMenu = ContextMenu; //LEGACY: REMOVE
-
 
 export function Checkbox(value, on_change) {
 	var that = this;
 	this.value = value;
 
-	var root = this.root = document.createElement("span");
+	var root = (this.root = document.createElement("span"));
 	root.className = "litecheckbox inputfield";
 	root.dataset["value"] = value;
 
-	var element = this.element = document.createElement("span");
+	var element = (this.element = document.createElement("span"));
 	element.className = "fixed flag checkbox " + (value ? "on" : "off");
 	root.appendChild(element);
 
@@ -360,51 +355,45 @@ export function Checkbox(value, on_change) {
 	}
 
 	this.setValue = function (v) {
-		if (this.value === v)
-			return;
+		if (this.value === v) return;
 
-		if (this.root.dataset["value"] == v.toString())
-			return;
+		if (this.root.dataset["value"] == v.toString()) return;
 
 		this.root.dataset["value"] = v;
 		if (v) {
 			this.element.classList.remove("off");
 			this.element.classList.add("on");
-		}
-		else {
+		} else {
 			this.element.classList.remove("on");
 			this.element.classList.add("off");
 		}
 		var old_value = this.value;
 		this.value = v;
 
-		if (on_change)
-			on_change(v, old_value);
-	}
+		if (on_change) on_change(v, old_value);
+	};
 
 	this.getValue = function () {
 		return this.value;
 		//return this.root.dataset["value"] == "true";
-	}
+	};
 }
 
 // LiteGUI.Checkbox = Checkbox;
 
-
-
 /**
-* List 
-*
-* @class List
-* @constructor
-* @param {String} id
-* @param {Array} values
-* @param {Object} options
-*/
+ * List
+ *
+ * @class List
+ * @constructor
+ * @param {String} id
+ * @param {Array} values
+ * @param {Object} options
+ */
 export function List(id, items, options) {
 	options = options || {};
 
-	var root = this.root = document.createElement("ul");
+	var root = (this.root = document.createElement("ul"));
 	root.id = id;
 	root.className = "litelist";
 	this.items = [];
@@ -420,41 +409,33 @@ export function List(id, items, options) {
 		item.dataset["value"] = items[i];
 
 		var content = "";
-		if (typeof (items[i]) == "string")
-			content = items[i] + "<span class='arrow'></span>";
+		if (typeof items[i] == "string") content = items[i] + "<span class='arrow'></span>";
 		else {
 			content = (items[i].name || items[i].title || "") + "<span class='arrow'></span>";
-			if (items[i].id)
-				item.id = items[i].id;
+			if (items[i].id) item.id = items[i].id;
 		}
 		item.innerHTML = content;
 
 		item.addEventListener("click", function () {
-
 			var list = root.querySelectorAll(".list-item.selected");
-			for (var j = 0; j < list.length; ++j)
-				list[j].classList.remove("selected");
+			for (var j = 0; j < list.length; ++j) list[j].classList.remove("selected");
 			this.classList.add("selected");
 			LiteGUI.trigger(that.root, "wchanged", this);
-			if (that.callback)
-				that.callback(this.data);
+			if (that.callback) that.callback(this.data);
 		});
 
 		root.appendChild(item);
 	}
 
-
 	if (options.parent) {
-		if (options.parent.root)
-			options.parent.root.appendChild(root);
-		else
-			options.parent.appendChild(root);
+		if (options.parent.root) options.parent.root.appendChild(root);
+		else options.parent.appendChild(root);
 	}
 }
 
 List.prototype.getSelectedItem = function () {
 	return this.root.querySelector(".list-item.selected");
-}
+};
 
 List.prototype.setSelectedItem = function (name) {
 	var items = this.root.querySelectorAll(".list-item");
@@ -465,21 +446,21 @@ List.prototype.setSelectedItem = function (name) {
 			break;
 		}
 	}
-}
+};
 
 // LiteGUI.List = List;
 
 /**
-* Slider 
-*
-* @class Slider
-* @constructor
-* @param {Number} value
-* @param {Object} options
-*/
+ * Slider
+ *
+ * @class Slider
+ * @constructor
+ * @param {Number} value
+ * @param {Object} options
+ */
 export function Slider(value, options) {
 	options = options || {};
-	var root = this.root = document.createElement("div");
+	var root = (this.root = document.createElement("div"));
 	var that = this;
 	this.value = value;
 	root.className = "liteslider";
@@ -494,22 +475,21 @@ export function Slider(value, options) {
 		var norm = (value - min) / range;
 		var percentage = (norm * 100).toFixed(1) + "%";
 		var percentage2 = (norm * 100 + 2).toFixed(1) + "%";
-		root.style.background = "linear-gradient(to right, #999 " + percentage + ", #FC0 " + percentage2 + ", #333 " + percentage2 + ")";
+		root.style.background =
+			"linear-gradient(to right, #999 " + percentage + ", #FC0 " + percentage2 + ", #333 " + percentage2 + ")";
 
 		if (value != this.value) {
 			this.value = value;
 			if (!skip_event) {
 				LiteGUI.trigger(this.root, "change", value);
-				if (this.onChange)
-					this.onChange(value);
+				if (this.onChange) this.onChange(value);
 			}
 		}
-	}
+	};
 
 	function setFromX(x) {
 		var rect = root.getBoundingClientRect();
-		if (!rect)
-			return;
+		if (!rect) return;
 		var width = rect.width;
 		var norm = x / width;
 		var min = options.min || 0.0;
@@ -522,8 +502,13 @@ export function Slider(value, options) {
 
 	root.addEventListener("mousedown", function (e) {
 		var mouseX, mouseY;
-		if (e.offsetX) { mouseX = e.offsetX; mouseY = e.offsetY; }
-		else if (e.layerX) { mouseX = e.layerX; mouseY = e.layerY; }
+		if (e.offsetX) {
+			mouseX = e.offsetX;
+			mouseY = e.offsetY;
+		} else if (e.layerX) {
+			mouseX = e.layerX;
+			mouseY = e.layerY;
+		}
 		setFromX(mouseX);
 		doc_binded = root.ownerDocument;
 		doc_binded.addEventListener("mousemove", onMouseMove);
@@ -534,8 +519,7 @@ export function Slider(value, options) {
 
 	function onMouseMove(e) {
 		var rect = root.getBoundingClientRect();
-		if (!rect)
-			return;
+		if (!rect) return;
 		var x = e.x === undefined ? e.pageX : e.x;
 		var mouseX = x - rect.left;
 		setFromX(mouseX);
@@ -556,7 +540,6 @@ export function Slider(value, options) {
 }
 
 // LiteGUI.Slider = Slider;
-
 
 export function LineEditor(value, options) {
 	options = options || {};
@@ -588,8 +571,7 @@ export function LineEditor(value, options) {
 	element.addEventListener("mousedown", onmousedown);
 
 	element.getValueAt = function (x) {
-		if (x < element.xrange[0] || x > element.xrange[1])
-			return element.defaulty;
+		if (x < element.xrange[0] || x > element.xrange[1]) return element.defaulty;
 
 		var last = [element.xrange[0], element.defaulty];
 		var f = 0;
@@ -606,7 +588,7 @@ export function LineEditor(value, options) {
 		v = [element.xrange[1], element.defaulty];
 		f = (x - last[0]) / (v[0] - last[0]);
 		return last[1] * (1 - f) + v[1] * f;
-	}
+	};
 
 	element.resample = function (samples) {
 		var r = [];
@@ -615,7 +597,7 @@ export function LineEditor(value, options) {
 			r.push(element.getValueAt(i));
 		}
 		return r;
-	}
+	};
 
 	element.addValue = function (v) {
 		for (var i = 0; i < element.value; i++) {
@@ -628,26 +610,29 @@ export function LineEditor(value, options) {
 
 		element.value.push(v);
 		redraw();
-	}
+	};
 
 	//value to canvas
 	function convert(v) {
-		return [canvas.width * ((element.xrange[1] - element.xrange[0]) * v[0] + element.xrange[0]),
-		canvas.height * ((element.yrange[1] - element.yrange[0]) * v[1] + element.yrange[0])];
+		return [
+			canvas.width * ((element.xrange[1] - element.xrange[0]) * v[0] + element.xrange[0]),
+			canvas.height * ((element.yrange[1] - element.yrange[0]) * v[1] + element.yrange[0])
+		];
 	}
 
 	//canvas to value
 	function unconvert(v) {
-		return [(v[0] / canvas.width - element.xrange[0]) / (element.xrange[1] - element.xrange[0]),
-		(v[1] / canvas.height - element.yrange[0]) / (element.yrange[1] - element.yrange[0])];
+		return [
+			(v[0] / canvas.width - element.xrange[0]) / (element.xrange[1] - element.xrange[0]),
+			(v[1] / canvas.height - element.yrange[0]) / (element.yrange[1] - element.yrange[0])
+		];
 	}
 
 	var selected = -1;
 
 	element.redraw = function () {
 		var rect = canvas.parentNode.getBoundingClientRect();
-		if (rect && canvas.width != rect.width && rect.width && rect.width < 1000)
-			canvas.width = rect.width;
+		if (rect && canvas.width != rect.width && rect.width && rect.width < 1000) canvas.width = rect.width;
 		// if (rect && canvas.height != rect.height && rect.height && rect.height < 1000)
 		// 	canvas.height = rect.height;
 
@@ -680,10 +665,8 @@ export function LineEditor(value, options) {
 		for (var i = 0; i < element.value.length; i += 1) {
 			var value = element.value[i];
 			pos = convert(value);
-			if (selected == i)
-				ctx.fillStyle = "white";
-			else
-				ctx.fillStyle = element.pointscolor;
+			if (selected == i) ctx.fillStyle = "white";
+			else ctx.fillStyle = element.pointscolor;
 			ctx.beginPath();
 			ctx.arc(pos[0], pos[1], selected == i ? 4 : 2, 0, Math.PI * 2);
 			ctx.fill();
@@ -693,15 +676,18 @@ export function LineEditor(value, options) {
 			var samples = element.resample(element.show_samples);
 			ctx.fillStyle = "#888";
 			for (var i = 0; i < samples.length; i += 1) {
-				var value = [i * ((element.xrange[1] - element.xrange[0]) / element.show_samples) + element.xrange[0], samples[i]];
+				var value = [
+					i * ((element.xrange[1] - element.xrange[0]) / element.show_samples) + element.xrange[0],
+					samples[i]
+				];
 				pos = convert(value);
 				ctx.beginPath();
 				ctx.arc(pos[0], pos[1], 2, 0, Math.PI * 2);
 				ctx.fill();
 			}
 		}
-	}
-	window.onresize = () => element.redraw()
+	};
+	window.onresize = () => element.redraw();
 	var last_mouse = [0, 0];
 	function onmousedown(evt) {
 		document.addEventListener("mousemove", onmousemove);
@@ -722,7 +708,7 @@ export function LineEditor(value, options) {
 
 		last_mouse = [mousex, mousey];
 		element.redraw();
-	
+
 		evt.preventDefault();
 		evt.stopPropagation();
 	}
@@ -738,7 +724,10 @@ export function LineEditor(value, options) {
 		else if (mousey > canvas.height) mousey = canvas.height;
 
 		//dragging to remove
-		if (selected != -1 && distance([evt.clientX - rect.left, evt.clientY - rect.top], [mousex, mousey]) > canvas.height * 0.5) {
+		if (
+			selected != -1 &&
+			distance([evt.clientX - rect.left, evt.clientY - rect.top], [mousex, mousey]) > canvas.height * 0.5
+		) {
 			element.value.splice(selected, 1);
 			onmouseup(evt);
 			return;
@@ -753,7 +742,7 @@ export function LineEditor(value, options) {
 
 			if (element.no_trespassing) {
 				if (selected > 0) minx = element.value[selected - 1][0];
-				if (selected < (element.value.length - 1)) maxx = element.value[selected + 1][0];
+				if (selected < element.value.length - 1) maxx = element.value[selected + 1][0];
 			}
 
 			var v = element.value[selected];
@@ -790,13 +779,13 @@ export function LineEditor(value, options) {
 	}
 
 	function onchange() {
-		if (options.callback)
-			options.callback.call(element, element.value);
-		else
-			LiteGUI.trigger(element, "change");
+		if (options.callback) options.callback.call(element, element.value);
+		else LiteGUI.trigger(element, "change");
 	}
 
-	function distance(a, b) { return Math.sqrt(Math.pow(b[0] - a[0], 2) + Math.pow(b[1] - a[1], 2)); };
+	function distance(a, b) {
+		return Math.sqrt(Math.pow(b[0] - a[0], 2) + Math.pow(b[1] - a[1], 2));
+	}
 
 	function computeSelected(x, y) {
 		var min_dist = 100000;
@@ -816,11 +805,11 @@ export function LineEditor(value, options) {
 
 	function sortValues() {
 		var v = null;
-		if (selected != -1)
-			v = element.value[selected];
-		element.value.sort(function (a, b) { return a[0] - b[0]; });
-		if (v)
-			selected = element.value.indexOf(v);
+		if (selected != -1) v = element.value[selected];
+		element.value.sort(function (a, b) {
+			return a[0] - b[0];
+		});
+		if (v) selected = element.value.indexOf(v);
 	}
 
 	element.redraw();
@@ -829,17 +818,21 @@ export function LineEditor(value, options) {
 
 // LiteGUI.LineEditor = LineEditor;
 
-
 export function ComplexList(options) {
 	options = options || {};
 
 	this.root = document.createElement("div");
 	this.root.className = "litecomplexlist";
 
-	this.item_code = options.item_code || "<div class='listitem'><span class='tick'><span>" + LiteGUI.special_codes.tick + "</span></span><span class='title'></span><button class='trash'>" + LiteGUI.special_codes.close + "</button></div>";
+	this.item_code =
+		options.item_code ||
+		"<div class='listitem'><span class='tick'><span>" +
+			LiteGUI.special_codes.tick +
+			"</span></span><span class='title'></span><button class='trash'>" +
+			LiteGUI.special_codes.close +
+			"</button></div>";
 
-	if (options.height)
-		this.root.style.height = LiteGUI.sizeToCSS(options.height);
+	if (options.height) this.root.style.height = LiteGUI.sizeToCSS(options.height);
 
 	this.selected = null;
 	this.onItemSelected = null;
@@ -851,80 +844,73 @@ ComplexList.prototype.addTitle = function (text) {
 	var elem = LiteGUI.createElement("div", ".listtitle", text);
 	this.root.appendChild(elem);
 	return elem;
-}
+};
 
 ComplexList.prototype.addHTML = function (html, on_click) {
 	var elem = LiteGUI.createElement("div", ".listtext", html);
-	if (on_click)
-		elem.addEventListener("mousedown", on_click);
+	if (on_click) elem.addEventListener("mousedown", on_click);
 	this.root.appendChild(elem);
 	return elem;
-}
+};
 
 ComplexList.prototype.clear = function () {
 	this.root.innerHTML = "";
-}
+};
 
 ComplexList.prototype.addItem = function (item, text, is_enabled, can_be_removed) {
 	var title = text || item.content || item.name;
 	var elem = LiteGUI.createListItem(this.item_code, { ".title": title });
 	elem.item = item;
 
-	if (is_enabled)
-		elem.classList.add("enabled");
+	if (is_enabled) elem.classList.add("enabled");
 
-	if (!can_be_removed)
-		elem.querySelector(".trash").style.display = "none";
+	if (!can_be_removed) elem.querySelector(".trash").style.display = "none";
 
 	var that = this;
 	elem.addEventListener("mousedown", function (e) {
 		e.preventDefault();
 		this.setSelected(true);
-		if (that.onItemSelected)
-			that.onItemSelected(item, elem);
+		if (that.onItemSelected) that.onItemSelected(item, elem);
 	});
 	elem.querySelector(".tick").addEventListener("mousedown", function (e) {
 		e.preventDefault();
 		elem.classList.toggle("enabled");
-		if (that.onItemToggled)
-			that.onItemToggled(item, elem, elem.classList.contains("enabled"));
+		if (that.onItemToggled) that.onItemToggled(item, elem, elem.classList.contains("enabled"));
 	});
 
 	elem.querySelector(".trash").addEventListener("mousedown", function (e) {
 		e.preventDefault();
 		e.stopPropagation();
 		e.stopImmediatePropagation();
-		if (that.onItemRemoved)
-			that.onItemRemoved(item, elem);
+		if (that.onItemRemoved) that.onItemRemoved(item, elem);
 	});
 
 	elem.setContent = function (v, is_html) {
-		if (is_html)
-			elem.querySelector(".title").innerHTML = v;
-		else
-			elem.querySelector(".title").innerText = v;
-	}
+		if (is_html) elem.querySelector(".title").innerHTML = v;
+		else elem.querySelector(".title").innerText = v;
+	};
 
 	elem.toggleEnabled = function (v) {
 		elem.classList.toggle("enabled");
-	}
+	};
 
 	elem.setSelected = function (v) {
 		LiteGUI.removeClass(that.root, "selected");
-		if (v)
-			this.classList.add("selected");
-		else
-			this.classList.remove("selected");
+		if (v) this.classList.add("selected");
+		else this.classList.remove("selected");
 		that.selected = elem.item;
-	}
+	};
 
-	elem.show = function () { this.style.display = ""; }
-	elem.hide = function () { this.style.display = "none"; }
+	elem.show = function () {
+		this.style.display = "";
+	};
+	elem.hide = function () {
+		this.style.display = "none";
+	};
 
 	this.root.appendChild(elem);
 	return elem;
-}
-
+};
 
 //the tiny box to expand the children of a node
 export function createLitebox(state, on_change) {
@@ -936,51 +922,45 @@ export function createLitebox(state, on_change) {
 	element.on_change_callback = on_change;
 
 	element.setEmpty = function (v) {
-		if (v)
-			this.classList.add("empty");
-		else
-			this.classList.remove("empty");
-	}
+		if (v) this.classList.add("empty");
+		else this.classList.remove("empty");
+	};
 
 	element.expand = function () {
 		this.setValue(true);
-	}
+	};
 
 	element.collapse = function () {
 		this.setValue(false);
-	}
+	};
 
 	element.setValue = function (v) {
-		if (this.dataset["value"] == (v ? "open" : "closed"))
-			return;
+		if (this.dataset["value"] == (v ? "open" : "closed")) return;
 
 		if (!v) {
 			this.dataset["value"] = "closed";
 			this.innerHTML = "&#9658;";
 			this.classList.remove("listopen");
 			this.classList.add("listclosed");
-		}
-		else {
+		} else {
 			this.dataset["value"] = "open";
 			this.innerHTML = "&#9660;";
 			this.classList.add("listopen");
 			this.classList.remove("listclosed");
 		}
 
-		if (on_change)
-			on_change(this.dataset["value"]);
-	}
+		if (on_change) on_change(this.dataset["value"]);
+	};
 
 	element.getValue = function () {
 		return this.dataset["value"];
-	}
+	};
 
 	function onClick(e) {
 		//console.log("CLICK");
 		var box = e.target;
 		box.setValue(this.dataset["value"] == "open" ? false : true);
-		if (this.stopPropagation)
-			e.stopPropagation();
+		if (this.stopPropagation) e.stopPropagation();
 	}
 
 	return element;

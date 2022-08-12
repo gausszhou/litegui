@@ -8,12 +8,11 @@
 	box-sizing: border-box;
 }
 
-
 /* Here goes the css related to look and feel (buttons, lists, titles) */
 body {
-	font-family: 'Arial';
+	font-family: "Arial";
 	font-size: 14px;
-	color: #AAA;
+	color: #aaa;
 }
 
 h1,
@@ -42,7 +41,7 @@ a:hover {
 }
 
 #menu-bar {
-	// background-color: #3d3d3d; 
+	// background-color: #3d3d3d;
 	background-color: #523074;
 }
 
@@ -81,7 +80,7 @@ a:hover {
 .lite-menu li:hover {
 	// background-color: #777;
 	background-color: #553e6d;
-	color: #EEE;
+	color: #eee;
 }
 
 .lite-menu-panel {
@@ -100,7 +99,7 @@ a:hover {
 .lite-menu-entry,
 .litemenu-title {
 	font-size: 14px;
-	color: #AAA;
+	color: #aaa;
 	padding: 2px;
 	margin: 2px;
 	padding-left: 2px;
@@ -119,7 +118,7 @@ a:hover {
 }
 
 .lite-menu-entry.checked .icon {
-	background-color: #AAF;
+	background-color: #aaf;
 }
 
 .lite-menu-entry .more {
@@ -149,7 +148,7 @@ a:hover {
 }
 
 .litemenu-title {
-	color: #DDE;
+	color: #dde;
 	background-color: #111;
 	margin: 0;
 	padding: 2px;
@@ -158,7 +157,7 @@ a:hover {
 
 .lite-menu-entry:hover:not(.disabled):not(.separator) {
 	background-color: #555;
-	color: #EEE;
+	color: #eee;
 }
 
 .litecontextmenu {
@@ -166,10 +165,10 @@ a:hover {
 	top: 100px;
 	left: 100px;
 	min-width: 100px;
-	color: #AAF;
+	color: #aaf;
 	padding: 0;
 	box-shadow: 0 0 10px black !important;
-	background-color: #2E2E2E !important;
+	background-color: #2e2e2e !important;
 }
 
 .litecontextmenu .litemenu-title img {
@@ -184,17 +183,17 @@ a:hover {
 }
 
 .litecontextmenu .lite-menu-entry.submenu {
-	background-color: #2E2E2E !important;
+	background-color: #2e2e2e !important;
 }
 
 button.litebutton {
-	background: -webkit-linear-gradient(#32302D, #4B4947) repeat scroll 0 0 transparent;
-	background: -moz-linear-gradient(#32302D, #4B4947) repeat scroll 0 0 transparent;
-	background: linear-gradient(#32302D, #4B4947) repeat scroll 0 0 transparent;
+	background: -webkit-linear-gradient(#32302d, #4b4947) repeat scroll 0 0 transparent;
+	background: -moz-linear-gradient(#32302d, #4b4947) repeat scroll 0 0 transparent;
+	background: linear-gradient(#32302d, #4b4947) repeat scroll 0 0 transparent;
 	border: 0 none;
 	border-radius: 2px 2px 2px 2px;
-	box-shadow: 0 1px 0 #5B5957 inset, 0 -1px 0 black, 0 1px 0 black, -1px 0 0 black, 1px 0 0 black, 0 1px 1px #111111;
-	color: #CCC;
+	box-shadow: 0 1px 0 #5b5957 inset, 0 -1px 0 black, 0 1px 0 black, -1px 0 0 black, 1px 0 0 black, 0 1px 1px #111111;
+	color: #ccc;
 	display: inline-block;
 	margin: 2px;
 	padding: 2px;
@@ -203,7 +202,7 @@ button.litebutton {
 }
 
 button.litebutton.flat {
-	background: #32302D;
+	background: #32302d;
 	box-shadow: 0 0 0 transparent;
 	border: 0;
 }
@@ -269,7 +268,7 @@ button.litebutton.close-button {
 	box-sizing: border-box;
 }
 
-.litetabs.vertical>ul.wtabcontainer {
+.litetabs.vertical > ul.wtabcontainer {
 	vertical-align: top;
 	padding-left: 0;
 	border-bottom: 0;
@@ -278,7 +277,7 @@ button.litebutton.close-button {
 }
 
 .litetabs li.wtab {
-	color: #AAA;
+	color: #aaa;
 	text-align: center;
 	user-select: none;
 	-moz-user-select: none;
@@ -293,7 +292,7 @@ button.litebutton.close-button {
 	white-space: nowrap;
 }
 
-.litetabs.horizontal>ul.wtabcontainer>li.wtab {
+.litetabs.horizontal > ul.wtabcontainer > li.wtab {
 	display: inline-block;
 	min-width: 50px;
 	min-height: 20px;
@@ -305,7 +304,7 @@ button.litebutton.close-button {
 	border-radius: 3px 3px 0 0;
 }
 
-.litetabs.vertical>ul.wtabcontainer>li.wtab {
+.litetabs.vertical > ul.wtabcontainer > li.wtab {
 	position: relative;
 	display: block;
 	min-height: 64px;
@@ -317,7 +316,7 @@ button.litebutton.close-button {
 	border-radius: 3px 0 0 3px;
 }
 
-.litetabs.vertical>ul.wtabcontainer>li.wtab .tabbigicon {
+.litetabs.vertical > ul.wtabcontainer > li.wtab .tabbigicon {
 	opacity: 0.5;
 }
 
@@ -326,7 +325,7 @@ button.litebutton.close-button {
 }
 
 .litetabs li.wtab.selected {
-	color: #EEE !important;
+	color: #eee !important;
 	background-color: #777;
 	/*border: 1px solid #888;*/
 	border-bottom: 0;
@@ -334,14 +333,14 @@ button.litebutton.close-button {
 }
 
 .litetabs li.wtab.button {
-	color: #EEE;
+	color: #eee;
 	background-color: #333;
 	border-bottom: 2px;
 }
 
 .litetabs li.wtab:hover:not(.selected) {
 	background-color: #555;
-	color: #DDD;
+	color: #ddd;
 }
 
 .litetabs li.wtab.selected .tabbigicon,
@@ -349,7 +348,7 @@ button.litebutton.close-button {
 	opacity: 1;
 }
 
-.litetabs.vertical>ul.wtabcontainer>li.wtab .tabtitle {
+.litetabs.vertical > ul.wtabcontainer > li.wtab .tabtitle {
 	position: absolute;
 	bottom: 2px;
 	left: 0;
@@ -383,16 +382,15 @@ button.litebutton.close-button {
 	display: inline-block;
 }
 
-.litetabs.horizontal>.wtabcontent {
+.litetabs.horizontal > .wtabcontent {
 	padding-left: 2px;
 	padding-right: 2px;
 }
 
-.litetabs.vertical>.wtabcontent {
+.litetabs.vertical > .wtabcontent {
 	padding: 0;
 	height: 100%;
 }
-
 
 /** split ****/
 
@@ -444,34 +442,30 @@ li.ltreeitem.root_item {
 }
 
 li.ltreeitem div.ltreeitemtitle {
-	color: #AAA;
+	color: #aaa;
 	min-width: 100px;
 	white-space: nowrap;
 }
-
-
 
 li.ltreeitem div.ltreeitemtitle .incontent:hover {
 	color: white;
 }
 
 li.ltreeitem.selected div.ltreeitemtitle .incontent {
-	color: #EC6;
+	color: #ec6;
 }
 
 li.ltreeitem.semiselected div.ltreeitemtitle .incontent {
-	color: #A96;
+	color: #a96;
 }
 
-
 li.ltreeitem div.ltreeitemtitle.dragover .incontent {
-	background-color: #EC6;
+	background-color: #ec6;
 	color: black;
 	padding: 3px;
 	border-radius: 2px;
 	font-size: 2em;
 }
-
 
 ul.ltreeitemchildren {
 	margin: 0;
@@ -490,7 +484,6 @@ li.ltreeitem .ltreeitemtitle .postcontent {
 	margin-left: 4px;
 }
 
-
 li.ltreeitem.hidden,
 li.ltreeitem.filtered {
 	display: none;
@@ -507,14 +500,14 @@ li.ltreeitem.filtered {
 	display: inline-block;
 	/*outline: 1px solid #678;*/
 	text-align: center;
-	color: #79A;
+	color: #79a;
 }
 
 .listbox.empty {
 	margin-left: 2px;
 	width: 0.4em;
 	height: 0.4em;
-	color: #36A;
+	color: #36a;
 	background-color: #467;
 	/* Hide the text. */
 	text-indent: 100%;
@@ -550,8 +543,8 @@ ul.litelist li:hover {
 }
 
 ul.litelist li.selected {
-	color: #EEE;
-	background-color: #48A;
+	color: #eee;
+	background-color: #48a;
 }
 
 ul.litelist li.selected {
@@ -652,7 +645,7 @@ ul.file-list li.file-item button {
 	text-shadow: none;
 	display: none;
 	padding: 3px;
-	border: 1px solid #EEE;
+	border: 1px solid #eee;
 }
 
 ul.file-list li.file-item:hover button {
@@ -665,7 +658,7 @@ ul.file-list li.file-item:hover {
 }
 
 ul.file-list li.file-item.selected {
-	outline: 1px dashed #EEE;
+	outline: 1px dashed #eee;
 }
 
 ul.file-list li.file-item img {
@@ -683,7 +676,6 @@ ul.file-list li.file-item span.info {
 	background-color: #222;
 	display: inline-block;
 }
-
 
 .litesplitbar:hover {
 	background-color: #888;
@@ -704,7 +696,7 @@ ul.file-list li.file-item span.info {
 }
 
 input {
-	color: #55AAFF;
+	color: #55aaff;
 	background-color: #222;
 	border: 0;
 	border-top: 1px solid #000;
@@ -717,7 +709,7 @@ input {
 }
 
 textarea.textfield {
-	color: #55AAFF;
+	color: #55aaff;
 	background-color: #222;
 	border: 0;
 	border-top: 1px solid #000;
@@ -736,10 +728,9 @@ textarea.textfield {
 }
 
 .tinybox.ok {
-	background-color: #33FF99;
+	background-color: #33ff99;
 	opacity: 1;
 }
-
 
 .litepad {
 	position: relative;
@@ -753,13 +744,12 @@ textarea.textfield {
 	width: 10px;
 	height: 10px;
 	background-color: #660;
-	border: 2px solid #AAF;
+	border: 2px solid #aaf;
 	border-radius: 10px;
 	top: 0;
 	left: 0;
 	pointer-events: none;
 }
-
 
 .ellipsis {
 	width: 250px;
@@ -784,7 +774,6 @@ table.litetable td {
 	display: inline-block;
 	border-right: 1px solid rgba(0, 0, 0, 0.2);
 }
-
 
 table.litetable th {
 	color: #6c7ba7;
