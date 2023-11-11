@@ -1,6 +1,6 @@
-import { isFunction, isArray, isString } from "lodash-es";
-import mitt from "mitt";
+import { isArray, isFunction, isString } from "lodash-es";
 import type { Handler } from "mitt";
+import mitt from "mitt";
 const emitter = mitt();
 
 interface MonitorableObject {
@@ -8,10 +8,14 @@ interface MonitorableObject {
   [key: string]: any
 }
 
+import { LiteComponent } from "../types";
 import Area from "./Area";
+import Button from "./Button";
+import Checkbox from "./Checkbox";
 import Console from "./Console";
 import Dialog from "./Dialog";
 import Dragger from "./Dragger";
+import EventMitter from "./EventMitter";
 import Inspector from "./Inspector";
 import Menu from "./Menu";
 import Panel from "./Panel";
@@ -19,11 +23,7 @@ import Split from "./Split";
 import Table from "./Table";
 import Tabs from "./Tabs";
 import Tree from "./Tree";
-import Checkbox from "./Checkbox";
-import Button from "./Button";
-import { Widget, SearchBox, ContextMenu, List, LineEditor, Slider, ComplexList, createLitebox } from "./Widgets";
-import { LiteComponent } from "../types";
-import EventMitter from "./EventMitter";
+import { ComplexList, ContextMenu, LineEditor, List, SearchBox, Slider, Widget, createLitebox } from "./Widgets";
 
 interface LiteGUIOptions {
   container?: string;
@@ -77,8 +77,20 @@ export default class LiteGUI {
   static __events = []
   static _safe_cliboard: any = null;
   // undo redo
-  static undo_steps = []
-  static redo_steps = []
+  static undo_steps = [];
+  static redo_steps = [];
+
+  // those useful HTML unicode codes that I never remeber but I always need
+  special_codes = {
+    close: "&#10005;",
+    navicon: "&#9776;",
+    refresh: "&#8634;",
+    gear: "&#9881;",
+    open_folder: "&#128194;",
+    download: "&#11123;",
+    tick: "&#10003;",
+    trash: "&#128465;"
+  }
 
 
   /**
@@ -185,7 +197,7 @@ export default class LiteGUI {
    * @param {String} event the string defining the event
    * @param {Function} callback where to call
    */
-  public bind(element: string | NodeList | HTMLElement | MonitorableObject, event: string, callback: EventListener) {
+  static bind(element: string | NodeList | HTMLElement | MonitorableObject | any, event: string, callback: EventListener) {
     if (!element) throw "Cannot bind to null";
     if (!event) throw "Event bind missing";
     if (!callback) throw "Bind callback missing";
@@ -790,7 +802,7 @@ export default class LiteGUI {
    * @param {Function} callback when the button is pressed
    * @param {Object|String} style
    **/
-  createButton(id_class: string, content: string, callback: EventListener, style: string | Record<string, string>) {
+  static createButton(id_class: string, content: string, callback: EventListener, style: string | Record<string, string>) {
     var elem = document.createElement("button");
     elem.className = "litegui litebutton button";
     if (id_class) {
@@ -826,52 +838,66 @@ export default class LiteGUI {
     return elements;
   }
 
-  //used to create a window that retains all the CSS info or the scripts.
-  newWindow(title, width, height, options) {
-    options = options || {};
-    var new_window = window.open(
+  // used to create a window that retains all the CSS info or the scripts.
+  static newWindow(title: string, width: number, height: number, options: any = {
+    scripts: false,
+    content: ""
+  }) {
+    const new_window = window.open(
       "",
       "",
-      "width=" + width + ", height=" + height + ", location=no, status=no, menubar=no, titlebar=no, fullscreen=yes"
+      `width=${width}, height=${height}, location=no, status=no, menubar=no, titlebar=no, fullscreen=yes`
     );
-    new_window.document.write("<html><head><title>" + title + "</title>");
-
-    //transfer style
-    var styles = document.querySelectorAll("link[rel='stylesheet'],style");
-    for (var i = 0; i < styles.length; i++) new_window.document.write(styles[i].outerHTML);
-
-    //transfer scripts (optional because it can produce some errors)
+    if (!new_window) return null;
+    const styleTextList: string[] = [];
+    const scriptTextList: string[] = [];
+    // transfer/copy style to new window
+    const styles = document.querySelectorAll("link[rel='stylesheet'],style");
+    styles.forEach(style => {
+      styleTextList.push(style.outerHTML)
+    })
+    // transfer scripts (optional because it can produce some errors)
     if (options.scripts) {
-      var scripts = document.querySelectorAll("script");
-      for (var i = 0; i < scripts.length; i++) {
-        if (scripts[i].src)
-          //avoid inline scripts, otherwise a cloned website would be created
-          new_window.document.write(scripts[i].outerHTML);
-      }
+      const scripts = document.querySelectorAll("script");
+      scripts.forEach(script => {
+        scriptTextList.push(script.outerHTML)
+      })
     }
-
-    var content = options.content || "";
-    new_window.document.write("</head><body>" + content + "</body></html>");
+    const content = options.content || "";
+    const html = `
+    <html>
+      <head>
+         ${styleTextList.join('\n')}
+         ${scriptTextList.join('\n')}
+        <title>${title}</title>
+      </head>
+      <body>
+        ${content}
+      </body>
+    </html>`
+    new_window.document.write(html);
     new_window.document.close();
     return new_window;
-  },
+  }
 
   //* DIALOGS *******************
-  showModalBackground(v) {
-    if (LiteGUI.modalbg_div) LiteGUI.modalbg_div.style.display = v ? "block" : "none";
-  },
+  static showModalBackground(v: boolean) {
+    if (LiteGUI.modalbg_div) {
+      LiteGUI.modalbg_div.style.display = v ? "block" : "none";
+    }
+  }
 
-  showMessage(content, options) {
-    options = options || {};
-
+  static showMessage(content: string, options: any = {}) {
     options.title = options.title || "Attention";
     options.content = content;
     options.close = "fade";
-    var dialog = new LiteGUI.Dialog(options);
-    if (!options.noclose) dialog.addButton("Close", { close: true });
+    var dialog = new LiteGUI.Dialog(options, false);
+    if (!options.noclose) {
+      dialog.addButtonToFooter("Close", { name: "Close", close: true });
+    }
     dialog.makeModal("fade");
     return dialog;
-  },
+  }
 
   /**
    * Shows a dialog with a message
@@ -879,20 +905,20 @@ export default class LiteGUI {
    * @param {String} content
    * @param {Object} options ( min_height, content, noclose )
    **/
-  popup(content, options) {
-    options = options || {};
-
+  static popup(content = "", options: any = {}) {
     options.min_height = 140;
-    if (typeof content == "string") content = "<p>" + content + "</p>";
-
-    options.content = content;
     options.close = "fade";
-
-    var dialog = new LiteGUI.Dialog(options);
-    if (!options.noclose) dialog.addButton("Close", { close: true });
+    if (typeof content == "string") {
+      content = "<p>" + content + "</p>";
+    }
+    options.content = content;
+    const dialog = new LiteGUI.Dialog(options);
+    if (!options.noclose) {
+      dialog.addButtonToFooter("Close", { name: "Close", close: true });
+    }
     dialog.show();
     return dialog;
-  },
+  }
 
   /**
    * Shows an alert dialog with a message
@@ -900,9 +926,7 @@ export default class LiteGUI {
    * @param {String} content
    * @param {Object} options ( title, width, height, content, noclose )
    **/
-  alert(content, options) {
-    options = options || {};
-
+  static alert(content: string, options: any = {}) {
     options.className = "alert";
     options.title = options.title || "Alert";
     options.width = options.width || 280;
@@ -910,7 +934,7 @@ export default class LiteGUI {
     if (typeof content == "string") content = "<p>" + content + "</p>";
     LiteGUI.remove(".litepanel.alert"); //kill other panels
     return LiteGUI.showMessage(content, options);
-  },
+  }
 
   /**
    * Shows a confirm dialog with a message
@@ -919,32 +943,35 @@ export default class LiteGUI {
    * @param {Function} callback
    * @param {Object} options ( title, width, height, content, noclose )
    **/
-  confirm(content, callback, options) {
-    options = options || {};
+  static confirm(content: string, callback: Function, options: any = {}) {
+
     options.className = "alert";
     options.title = options.title || "Confirm";
     options.width = options.width || 280;
-    //options.height = 100;
-    if (typeof content == "string") content = "<p>" + content + "</p>";
-
+    // options.height = 100;
+    if (typeof content == "string") {
+      content = "<p>" + content + "</p>";
+    }
     content +=
-      "<button class='litebutton' data-value='yes' style='width:45%; margin-left: 10px'>Yes</button><button class='litebutton' data-value='no' style='width:45%'>No</button>";
+      `<button class='litebutton' data-value='yes' style='width:45%; margin-left: 10px'>Yes</button>
+       <button class='litebutton' data-value='no' style='width:45%' margin-left: 10px'>No</button>`;
     options.noclose = true;
 
-    var dialog = this.showMessage(content, options);
+    const dialog = this.showMessage(content, options);
     dialog.content.style.paddingBottom = "10px";
-    var buttons = dialog.content.querySelectorAll("button");
-    for (var i = 0; i < buttons.length; i++) buttons[i].addEventListener("click", inner);
+    const buttons = dialog.content.querySelectorAll("button");
+    buttons.forEach(button => {
+      button.addEventListener("click", () => {
+        const v = button.dataset.value === "yes";
+        dialog.close(); //close before callback
+        if (callback) {
+          callback(v);
+        }
+      });
+    })
     buttons[0].focus();
-
-    function inner(v) {
-      var v = this.dataset["value"] == "yes";
-      dialog.close(); //close before callback
-      if (callback) callback(v);
-    }
-
     return dialog;
-  },
+  }
 
   /**
    * Shows a prompt dialog with a message
@@ -953,7 +980,7 @@ export default class LiteGUI {
    * @param {Function} callback
    * @param {Object} options ( title, width, height, content, noclose )
    **/
-  prompt(content, callback, options) {
+  static prompt(content: string, callback: Function, options: any = {}) {
     options = options || {};
     options.className = "alert";
     options.title = options.title || "Prompt";
@@ -971,34 +998,30 @@ export default class LiteGUI {
       textinput +
       "</p><button class='litebutton' data-value='accept' style='width:45%; margin-left: 10px; margin-bottom: 10px'>Accept</button><button class='litebutton' data-value='cancel' style='width:45%'>Cancel</button>";
     options.noclose = true;
+
     var dialog = this.showMessage(content, options);
-
+    var input = dialog.content.querySelector("input,textarea") as HTMLInputElement;
     var buttons = dialog.content.querySelectorAll("button");
-    for (var i = 0; i < buttons.length; i++) buttons[i].addEventListener("click", inner);
-
-    var input = dialog.content.querySelector("input,textarea");
-    input.addEventListener("keydown", inner_key, true);
-
-    function inner() {
-      var value = input.value;
-      if (this.dataset && this.dataset["value"] == "cancel") value = null;
-      dialog.close(); //close before callback
-      if (callback) callback(value);
-    }
-
-    function inner_key(e) {
-      if (!e) e = window.event;
-      var keyCode = e.keyCode || e.which;
-      if (keyCode == "13") {
-        inner();
-        return false;
-      }
-      if (keyCode == "29") dialog.close();
-    }
-
-    input.focus();
+    // TODO
+    // input?.addEventListener("keydown", (e: KeyboardEvent)=> {
+    //   const keyCode = e.keyCode || e.which;
+    // }, true);
+    buttons.forEach(button => {
+      button.addEventListener("click", () => {
+        const value = input?.value;
+        dialog.close(); //close before callback
+        if (callback) {
+          if (button.dataset.value === 'cancel') {
+            callback(null);
+          } else {
+            callback(value);
+          }
+        }
+      });
+    })
+    input?.focus();
     return dialog;
-  },
+  }
 
   /**
    * Shows a choice dialog with a message
@@ -1007,12 +1030,11 @@ export default class LiteGUI {
    * @param {Function} callback
    * @param {Object} options ( title, width, height, content, noclose )
    **/
-  choice(content, choices, callback, options) {
-    options = options || {};
+  static choice(content: string, choices: string[] | any[], callback: Function, options: any = {}) {
     options.className = "alert";
     options.title = options.title || "Select one option";
     options.width = options.width || 280;
-    //options.height = 100;
+    // options.height = 100;
     if (typeof content == "string") content = "<p>" + content + "</p>";
 
     for (var i in choices) {
@@ -1025,30 +1047,30 @@ export default class LiteGUI {
     }
     options.noclose = true;
 
-    var dialog = this.showMessage(content, options);
+    const dialog = this.showMessage(content, options);
     dialog.content.style.paddingBottom = "10px";
-    var buttons = dialog.content.querySelectorAll("button");
-    for (var i = 0; i < buttons.length; i++) buttons[i].addEventListener("click", inner);
-
-    function inner(v) {
-      var v = choices[this.dataset["value"]];
-      dialog.close(); //close before callback
-      if (callback) callback(v);
-    }
+    const buttons = dialog.content.querySelectorAll("button");
+    buttons.forEach(button => {
+      button.addEventListener("click", () => {
+        const v = button.dataset.value;
+        dialog.close(); //close before callback
+        if (callback) callback(v);
+      });
+    })
 
     return dialog;
-  },
+  }
 
-  downloadURL(url, filename) {
+  static downloadURL(url: string, filename: string) {
     var link = document.createElement("a");
     link.href = url;
     link.download = filename;
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
-  },
+  }
 
-  downloadFile(filename, data, dataType) {
+  static downloadFile(filename: string, data: any, dataType: string) {
     if (!data) {
       console.warn("No file provided to download");
       return;
@@ -1074,35 +1096,33 @@ export default class LiteGUI {
     setTimeout(function () {
       URL.revokeObjectURL(url);
     }, 1000 * 60); //wait one minute to revoke url
-  },
+  }
 
   /**
    * Returns the URL vars ( ?foo=faa&foo2=etc )
    * @method getUrlVars
    **/
-  getUrlVars() {
-    var vars = [],
-      hash;
-    var hashes = window.location.href.slice(window.location.href.indexOf("?") + 1).split("&");
+  static getUrlVars() {
+    const vars: Record<string, string> = {}
+    const hashes = window.location.href.slice(window.location.href.indexOf("?") + 1).split("&");
     for (var i = 0; i < hashes.length; i++) {
-      hash = hashes[i].split("=");
-      vars.push(hash[0]);
+      const hash = hashes[i].split("=");
       vars[hash[0]] = hash[1];
     }
     return vars;
-  },
+  }
 
-  getUrlVar(name) {
+  static getUrlVar(name: string) {
     return LiteGUI.getUrlVars()[name];
-  },
+  }
 
-  focus(element) {
+  static focus(element: HTMLElement) {
     element.focus();
-  },
+  }
 
-  blur(element) {
+  static blur(element: HTMLElement) {
     element.blur();
-  },
+  }
 
   /**
    * Makes one element draggable
@@ -1110,7 +1130,13 @@ export default class LiteGUI {
    * @param {HTMLEntity} container the element that will be dragged
    * @param {HTMLEntity} dragger the area to start the dragging
    **/
-  draggable(container, dragger, on_start, on_finish, on_is_draggable) {
+  static draggable(
+    container: HTMLElement,
+    dragger: HTMLElement,
+    on_start: Function,
+    on_finish: Function,
+    on_is_draggable: Function
+  ) {
     dragger = dragger || container;
     dragger.addEventListener("mousedown", inner_mouse);
     dragger.style.cursor = "move";
@@ -1125,7 +1151,7 @@ export default class LiteGUI {
     container.style.left = x + "px";
     container.style.top = y + "px";
 
-    function inner_mouse(e) {
+    function inner_mouse(e: MouseEvent) {
       if (e.type == "mousedown") {
         if (!rect) {
           rect = container.getClientRects()[0];
@@ -1167,8 +1193,9 @@ export default class LiteGUI {
         container.style.left = x + "px";
         container.style.top = y + "px";
       }
+      return true;
     }
-  },
+  }
 
   /**
    * Clones object content
@@ -1176,7 +1203,7 @@ export default class LiteGUI {
    * @param {Object} object
    * @param {Object} target
    **/
-  cloneObject(object, target) {
+  static cloneObject(object: any, target: any) {
     var o = target || {};
     for (var i in object) {
       if (i[0] == "_" || i.substr(0, 6) == "jQuery")
@@ -1188,17 +1215,17 @@ export default class LiteGUI {
       else if (isFunction(v)) continue;
       else if (typeof v == "number" || typeof v == "string") o[i] = v;
       else if (v.constructor == Float32Array)
-        //typed arrays are ugly when serialized
-        o[i] = Array.apply([], v); //clone
+        // typed arrays are ugly when serialized
+        o[i] = Array.apply([], v as any); //clone
       else if (isArray(v)) {
         if (o[i] && o[i].constructor == Float32Array)
-          //reuse old container
+          // reuse old container
           o[i].set(v);
-        else o[i] = JSON.parse(JSON.stringify(v)); //v.slice(0); //not safe using slice because it doesnt clone content, only container
+        else o[i] = JSON.parse(JSON.stringify(v));
       } //slow but safe
       else {
         try {
-          //prevent circular recursions
+          // prevent circular recursions
           o[i] = JSON.parse(JSON.stringify(v));
         } catch (err) {
           console.error(err);
@@ -1206,38 +1233,27 @@ export default class LiteGUI {
       }
     }
     return o;
-  },
+  }
 
-  safeName(str) {
+  static safeName(str: string) {
     return String(str).replace(/[\s\.]/g, "");
-  },
+  }
 
-  //those useful HTML unicode codes that I never remeber but I always need
-  special_codes: {
-    close: "&#10005;",
-    navicon: "&#9776;",
-    refresh: "&#8634;",
-    gear: "&#9881;",
-    open_folder: "&#128194;",
-    download: "&#11123;",
-    tick: "&#10003;",
-    trash: "&#128465;"
-  },
 
-  //given a html entity string it returns the equivalent unicode character
-  htmlEncode(html_code) {
+
+  // given a html entity string it returns the equivalent unicode character
+  static htmlEncode(html_code: string) {
     var e = document.createElement("div");
     e.innerHTML = html_code;
     return e.innerText;
-  },
+  }
 
-  //given a unicode character it returns the equivalent html encoded string
-  htmlDecode(unicode_character: string) {
-    var e = document.createElement("div");
+  // given a unicode character it returns the equivalent html encoded string
+  static htmlDecode(unicode_character: string) {
+    const e = document.createElement("div");
     e.innerText = unicode_character;
     return e.innerHTML;
-  },
-
+  }
 
 
   /**
@@ -1246,10 +1262,9 @@ export default class LiteGUI {
    * @param {HTMLElement} v
    * @return {Window} the window element
    **/
-  getElementWindow(v: HTMLElement) {
-    var doc = v.ownerDocument;
-    return doc.defaultView || doc.parentWindow;
-  },
+  static getElementWindow(v: HTMLElement) {
+    return v.ownerDocument.defaultView;
+  }
 
   /**
    * Helper, makes drag and drop easier by enabling drag and drop in a given element
@@ -1258,20 +1273,26 @@ export default class LiteGUI {
    * @param {Function} callback_drop function to call when the user drops the item
    * @param {Function} callback_enter [optional] function to call when the user drags something inside
    **/
-  createDropArea(element, callback_drop, callback_enter, callback_exit) {
+  static createDropArea(element: HTMLElement, callback_drop: Function, callback_enter: Function, callback_exit: Function) {
     element.addEventListener("dragenter", onDragEvent);
 
-    function onDragEvent(evt) {
+    function onDragEvent(evt: Event) {
+      evt.stopPropagation();
+      evt.preventDefault();
+
       element.addEventListener("dragexit", onDragEvent);
       element.addEventListener("dragover", onDragEvent);
       element.addEventListener("drop", onDrop);
-      evt.stopPropagation();
-      evt.preventDefault();
-      if (evt.type == "dragenter" && callback_enter) callback_enter(evt, this);
-      if (evt.type == "dragexit" && callback_exit) callback_exit(evt, this);
+
+      if (evt.type == "dragenter" && callback_enter) {
+        callback_enter(evt, element);
+      }
+      if (evt.type == "dragexit" && callback_exit) {
+        callback_exit(evt, element);
+      }
     }
 
-    function onDrop(evt) {
+    function onDrop(evt: Event) {
       evt.stopPropagation();
       evt.preventDefault();
 
@@ -1279,12 +1300,13 @@ export default class LiteGUI {
       element.removeEventListener("dragover", onDragEvent);
       element.removeEventListener("drop", onDrop);
 
-      var r = undefined;
-      if (callback_drop) r = callback_drop(evt);
+      let r
+      if (callback_drop) {
+        r = callback_drop(evt);
+      }
       if (r) {
         evt.stopPropagation();
         evt.stopImmediatePropagation();
-        return true;
       }
     }
   }
