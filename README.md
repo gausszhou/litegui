@@ -11,6 +11,27 @@
 - [ ] 优化代码，全面使用 AnyScript
 - [ ] 优化代码，全面使用 TypeScript
 
+## Components 
+
+- [x] Area
+- [x] Button
+- [x] Checkbox
+- [x] Console
+- [x] Dialog
+- [x] Dragger
+- [x] EventMitter
+- [x] Core
+- [ ] Inspector
+- [ ] Menu TODO
+- [x] Panel
+- [x] Split
+- [x] Table
+- [ ] Tabs TODO
+- [ ] Tree
+- [x] Utils
+- [ ] Widgets
+
+
 ## Original Code
 
 ```bash
