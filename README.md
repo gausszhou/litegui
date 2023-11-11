@@ -22,11 +22,11 @@
 - [x] EventMitter
 - [x] Core
 - [ ] Inspector
-- [ ] Menu TODO
+- [x] Menu
 - [x] Panel
 - [x] Split
 - [x] Table
-- [ ] Tabs TODO
+- [x] Tabs
 - [ ] Tree
 - [x] Utils
 - [ ] Widgets
