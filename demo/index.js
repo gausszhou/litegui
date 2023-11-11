@@ -1,4 +1,4 @@
-// import LiteGUI from "./index"
+// import LiteGUI from "../src/index"
 import LiteGUI from "../lib/bundle.esm";
 
 let mainarea = null;
@@ -7,7 +7,7 @@ let rightPanel = null;
 
 window.onload = function () {
   LiteGUI.init();
-  createMenu();
+  // createMenu();
 
   mainarea = new LiteGUI.Area({
     id: "mainarea",
