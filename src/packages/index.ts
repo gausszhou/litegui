@@ -21,7 +21,7 @@ import Tabs from "./Tabs";
 import Tree from "./Tree";
 import Checkbox from "./Checkbox";
 import Button from "./Button";
-import { Widget ,SearchBox, ContextMenu, List, LineEditor, Slider, ComplexList, createLitebox } from "./Widgets";
+import { Widget, SearchBox, ContextMenu, List, LineEditor, Slider, ComplexList, createLitebox } from "./Widgets";
 import { LiteComponent } from "../types";
 import EventMitter from "./EventMitter";
 
@@ -75,6 +75,7 @@ export default class LiteGUI {
   static windows: Window[] = [];
   static panels = {}
   static __events = []
+  static _safe_cliboard: any = null;
   // undo redo
   static undo_steps = []
   static redo_steps = []
@@ -184,7 +185,7 @@ export default class LiteGUI {
    * @param {String} event the string defining the event
    * @param {Function} callback where to call
    */
-  public bind(element: string | NodeList | HTMLElement | MonitorableObject, event: string, callback: EventListenerOrEventListenerObject) {
+  public bind(element: string | NodeList | HTMLElement | MonitorableObject, event: string, callback: EventListener) {
     if (!element) throw "Cannot bind to null";
     if (!event) throw "Event bind missing";
     if (!callback) throw "Bind callback missing";
@@ -193,13 +194,13 @@ export default class LiteGUI {
       element = document.querySelectorAll(element);
     }
 
-    if (element instanceof Array  || element instanceof NodeList ) {
+    if (element instanceof Array || element instanceof NodeList) {
       element.forEach(ele => inner(ele));
     } else {
       inner(element);
     }
 
-    function inner(element: HTMLElement| MonitorableObject) {
+    function inner(element: HTMLElement | MonitorableObject) {
       if (element.addEventListener) {
         element.addEventListener(event, callback);
       } else if ((element as MonitorableObject).__events) {
@@ -217,10 +218,10 @@ export default class LiteGUI {
  * @param {String} event the string defining the event
  * @param {Function} callback where to call
  */
-  unbind(element: HTMLElement | MonitorableObject, event: string, callback: EventListenerOrEventListenerObject) {
+  unbind(element: HTMLElement | MonitorableObject, event: string, callback: EventListener) {
     if (element.removeEventListener) {
       element.removeEventListener(event, callback);
-    } else{
+    } else {
       (element as MonitorableObject).__events?.off(event, callback);
     }
   }
@@ -250,9 +251,9 @@ export default class LiteGUI {
       })
     } else if (element instanceof Array || element instanceof NodeList) {
       // as list
-       Array.from(element).forEach(ele=> {
-         LiteGUI.remove(ele);
-       })
+      Array.from(element).forEach(ele => {
+        LiteGUI.remove(ele);
+      })
     } else if (element instanceof Widget) {
       // as a ltiegui widget
       element.root.parentNode?.removeChild(element.root);
@@ -371,14 +372,14 @@ export default class LiteGUI {
     })
   }
 
-  
+
   /**
    * Test if the cursor is inside an element
    * @method isCursorOverElement
    * @param {String} cursor
    **/
 
-  static isCursorOverElement(event: MouseEvent, element:HTMLElement):boolean {
+  static isCursorOverElement(event: MouseEvent, element: HTMLElement): boolean {
     var left = event.pageX;
     var top = event.pageY;
     var rect = element.getBoundingClientRect();
@@ -392,24 +393,23 @@ export default class LiteGUI {
     return element.getBoundingClientRect();
   }
 
-  
+
   /**
    * Copy a string to the clipboard (it needs to be invoqued from a click event)
    * @method toClipboard
    * @param {String} data
    * @param {Boolean} force_local force to store the data in the browser clipboard (this one can be read back)
    **/
-  static toClipboard (object, force_local = false) {
+  static toClipboard(object: any, force_local = false) {
     if (object && object.constructor !== String) object = JSON.stringify(object);
 
     var input = null;
     var in_clipboard = false;
     if (!force_local)
       try {
-        var copySupported = document.queryCommandSupported("copy");
         input = document.createElement("input");
         input.type = "text";
-        input.style.opacity = 0;
+        input.style.opacity = '0';
         input.value = object;
         document.body.appendChild(input);
         input.select();
@@ -417,11 +417,13 @@ export default class LiteGUI {
         console.log(in_clipboard ? "saved to clipboard" : "problem saving to clipboard");
         document.body.removeChild(input);
       } catch (err) {
-        if (input) document.body.removeChild(input);
+        if (input) {
+          document.body.removeChild(input);
+        }
         console.warn("Oops, unable to copy using the true clipboard");
       }
 
-    //old system
+    // old system
     try {
       this._safe_cliboard = null;
       localStorage.setItem("litegui_clipboard", object);
@@ -436,7 +438,7 @@ export default class LiteGUI {
    * @method getLocalClipboard
    * @return {String} clipboard
    **/
-  static getLocalClipboard () {
+  static getLocalClipboard() {
     var data = localStorage.getItem("litegui_clipboard");
     if (!data && this._safe_cliboard) data = this._safe_cliboard;
     if (!data) return null;
@@ -444,47 +446,52 @@ export default class LiteGUI {
     return data;
   }
 
-  
 
   /**
    * Insert some CSS code to the website
    * @method addCSS
    * @param {String|Object} code it could be a string with CSS rules, or an object with the style syntax.
    **/
-  static addCSS (code: string) {
+  static addCSS(code: string | object) {
     if (!code) return;
 
-    if (code.constructor === String) {
-      var style = document.createElement("style");
+    if (typeof code === 'string') {
+      const style = document.createElement("style");
       style.type = "text/css";
       style.innerHTML = code;
       document.getElementsByTagName("head")[0].appendChild(style);
       return;
     } else {
-      for (var i in code) document.body.style[i] = code[i];
+      Object.entries(code).forEach(([key, value]) => {
+        document.body.style[key as any] = value;
+      })
     }
   }
 
-    /**
-   * Requires a new CSS
-   * @method requireCSS
-   * @param {String} url string with url or an array with several urls
-   * @param {Function} on_complete
-   **/
-    static requireCSS (url:string | string[], on_complete: Function) {
-      if (typeof url == "string") url = [url];
-  
-      while (url.length) {
-        const link = document.createElement("link");        
-        link.rel = "stylesheet";
-        link.type = "text/css";
-        link.href = url.shift(1);
-        link.media = "all";
-        const head = document.getElementsByTagName("head")[0];
-        head.appendChild(link);
-        if (url.length == 0) link.onload = on_complete;
+  /**
+ * Requires a new CSS
+ * @method requireCSS
+ * @param {String} url string with url or an array with several urls
+ * @param {Function} on_complete
+ **/
+  static requireCSS(url: string | string[], on_complete: ((this: GlobalEventHandlers, ev: Event) => any)) {
+    if (typeof url == "string") {
+      url = [url];
+    }
+
+    while (url.length) {
+      const link = document.createElement("link");
+      link.rel = "stylesheet";
+      link.type = "text/css";
+      link.href = url.shift() as string;
+      link.media = "all";
+      const head = document.getElementsByTagName("head")[0];
+      head.appendChild(link);
+      if (url.length == 0) {
+        link.onload = on_complete;
       }
-    },
+    }
+  }
 
 
   /**
@@ -493,7 +500,7 @@ export default class LiteGUI {
    * @param {Object} request object with all the parameters like data (for sending forms), dataType, success, error
    * @param {Function} on_complete
    **/
-  request (request) {
+  static request(request: any) {
     var dataType = request.dataType || "text";
     if (dataType == "json")
       //parse it locally
@@ -519,7 +526,7 @@ export default class LiteGUI {
       if (this.status != 200) {
         var err = "Error " + this.status;
         if (request.error) request.error(err);
-        LEvent.trigger(xhr, "fail", this.status);
+        LiteGUI.trigger(xhr, "fail", this.status);
         return;
       }
 
@@ -553,7 +560,7 @@ export default class LiteGUI {
 
     xhr.send(data);
     return xhr;
-  },
+  }
 
   /**
    * Request file from url
@@ -562,9 +569,9 @@ export default class LiteGUI {
    * @param {Function} on_complete
    * @param {Function} on_error
    **/
-  requestText (url, on_complete, on_error) {
+  static requestText(url: string, on_complete: Function, on_error: Function) {
     return this.request({ url: url, dataType: "text", success: on_complete, error: on_error });
-  },
+  }
 
   /**
    * Request file from url
@@ -573,9 +580,9 @@ export default class LiteGUI {
    * @param {Function} on_complete
    * @param {Function} on_error
    **/
-  requestJSON (url, on_complete, on_error) {
+  static requestJSON(url: string, on_complete: Function, on_error: Function) {
     return this.request({ url: url, dataType: "json", success: on_complete, error: on_error });
-  },
+  }
 
   /**
    * Request binary file from url
@@ -584,79 +591,110 @@ export default class LiteGUI {
    * @param {Function} on_complete
    * @param {Function} on_error
    **/
-  requestBinary (url, on_complete, on_error) {
+  static requestBinary(url: string, on_complete: Function, on_error: Function) {
     return this.request({ url: url, dataType: "binary", success: on_complete, error: on_error });
-  },
+  }
 
   /**
-   * Request script and inserts it in the DOM
+   * Request script and inserts it in the DOM 
+   * 一次性加载多个脚本元素
    * @method requireScript
    * @param {String|Array} url the url of the script or an array containing several urls
    * @param {Function} on_complete
    * @param {Function} on_error
    * @param {Function} on_progress (if several files are required, on_progress is called after every file is added to the DOM)
    **/
-  requireScript (url, on_complete, on_error, on_progress, version) {
+  static requireScript(
+    url: string | string[],
+    on_complete: Function,
+    on_error: Function,
+    on_progress: Function,
+    version: string | number
+  ) {
     if (!url) throw "invalid URL";
-
-    if (url.constructor === String) url = [url];
-
-    var total = url.length;
-    var size = total;
-    var loaded_scripts = [];
-
-    for (var i in url) {
-      var script = document.createElement("script");
-      script.num = i;
-      script.type = "text/javascript";
-      script.src = url[i] + (version ? "?version=" + version : "");
-      script.original_src = url[i];
-      script.async = false;
-      script.onload = function (e) {
-        total--;
-        loaded_scripts.push(this);
-        if (total) {
-          if (on_progress) on_progress(this.original_src, this.num);
-        } else if (on_complete) on_complete(loaded_scripts);
-      };
-      if (on_error)
-        script.onerror = function (err) {
-          on_error(err, this.original_src, this.num);
-        };
-      document.getElementsByTagName("head")[0].appendChild(script);
+    let urls = [];
+    if (typeof url === 'string') {
+      urls = [url];
+    } else {
+      urls = url
     }
-  },
 
-  //old version, it loads one by one, so it is slower
-  requireScriptSerial (url, on_complete, on_progress) {
-    if (typeof url == "string") url = [url];
+    let total = url.length;
+    const loaded_scripts: HTMLScriptElement[] = [];
+    urls.forEach((url, i) => {
+      const script = document.createElement("script");
+      script.setAttribute('script_index', i.toString());
+      script.setAttribute('original_src', url);
+      script.async = false;
+      script.type = "text/javascript";
+      script.src = url + (version ? "?version=" + version : "");
+      script.onload = () => {
+        total--;
+        loaded_scripts.push(script);
+        if (total) {
+          if (on_progress) {
+            on_progress(
+              script.getAttribute("original_src"),
+              script.getAttribute("script_index")
+            );
+          }
+        } else if (on_complete) {
+          on_complete(loaded_scripts);
+        }
+      };
 
-    var loaded_scripts = [];
+      script.onerror = (err) => {
+        if (on_error) {
+          on_error(err, script.getAttribute("original_src"),
+            script.getAttribute("script_index"));
+        }
+      };
+      document.getElementsByTagName("head")[0].appendChild(script);
+    })
+  }
+
+  /**
+   * old version, it loads one by one, so it is slower
+   * 
+   * @param url 
+   * @param on_complete 
+   * @param on_progress 
+   */
+  static requireScriptSerial(url: string, on_complete: Function, on_progress: Function) {
+    let urls: string[] = [];
+    if (typeof url == "string") {
+      urls = [url];
+    } else {
+      urls = url;
+    }
+
+    const loaded_scripts: HTMLScriptElement[] = [];
     function addScript() {
       var script = document.createElement("script");
       script.type = "text/javascript";
-      script.src = url.shift(1);
-      script.onload = function (e) {
-        if (url.length) {
-          if (on_progress) on_progress(url[0], url.length);
-
+      script.src = urls.shift() as string;
+      script.onload = () => {
+        loaded_scripts.push(script);
+        if (urls.length) {
+          if (on_progress) {
+            on_progress(urls[0], url.length);
+          }
           addScript();
-          return;
+          return false;
         }
-
-        loaded_scripts.push(this);
-
-        if (on_complete) on_complete(loaded_scripts);
+        if (on_complete) {
+          on_complete(loaded_scripts);
+        }
+        return true;
       };
       document.getElementsByTagName("head")[0].appendChild(script);
     }
 
     addScript();
-  },
 
-  newDiv (id, code) {
-    return this.createElement("div", id, code);
-  },
+  }
+
+
 
   /**
    * Request script and inserts it in the DOM
@@ -666,8 +704,15 @@ export default class LiteGUI {
    * @param {String} content
    * @param {Object} style
    **/
-  static createElement (tag, id_class, content, style, events) {
-    var elem = document.createElement(tag);
+  static createElement(
+    tag: string,
+    id_class: string,
+    content: string,
+    style: string | object = "",
+    events: Record<string, EventListenerOrEventListenerObject> = {}
+  ) {
+
+    const elem = document.createElement(tag);
     if (id_class) {
       var t = id_class.split(" ");
       for (var i = 0; i < t.length; i++) {
@@ -676,43 +721,66 @@ export default class LiteGUI {
         else elem.id = t[i];
       }
     }
-    elem.root = elem;
-    if (content) elem.innerHTML = content;
-    elem.add = function (v) {
-      this.appendChild(v.root || v);
-    };
+
+    if (content) {
+      elem.innerHTML = content;
+    }
+
 
     if (style) {
-      if (style.constructor === String) elem.setAttribute("style", style);
-      else for (var i in style) elem.style[i] = style[i];
+      if (typeof style === 'string') {
+        elem.setAttribute("style", style);
+      } else {
+        Object.entries(style).forEach(([key, value]) => {
+          elem.style[key as any] = value;
+        })
+      }
     }
 
     if (events) {
-      for (var i in events) elem.addEventListener(i, events[i]);
+      Object.entries(events).forEach(([event, callback]) => {
+        elem.addEventListener(event as keyof HTMLElementEventMap, callback);
+      })
+
     }
     return elem;
-  },
+  }
+
+  static craeteDivElement(id: string, code: string) {
+    return LiteGUI.createElement("div", id, code);
+  }
 
   /**
-   * Useful to create elements from a text like '<div><span class="title"></span></div>' and an object like { ".title":"mytitle" }
+   * Useful to create elements from a text like '<div><span class="title"></span></div>' 
+   * and an object like { ".title":"mytitle" }
    * @method createListItem
    * @param {String} code
    * @param {Object} values it will use innerText in the elements that matches that selector
    * @param {Object} style
    * @return {HTMLElement}
    **/
-  createListItem (code, values, style) {
-    var elem = document.createElement("span");
+  static createListItem(code: string, values: Record<string, string>, style: string | Record<string, string>) {
+    const elem = document.createElement("span");
     elem.innerHTML = code;
-    elem = elem.childNodes[0]; //to get the node
     if (values)
       for (var i in values) {
-        var subelem = elem.querySelector(i);
-        if (subelem) subelem.innerText = values[i];
+        const subelem = elem.querySelector(i) as HTMLElement;
+        if (subelem) {
+          subelem.innerText = values[i];
+        }
       }
-    if (style) for (var i in style) elem.style[i] = style[i];
+    if (style) {
+      if (typeof style === 'string') {
+
+      } else {
+        Object.entries(style).forEach(([key, value]) => {
+          elem.style[key as any] = value;
+        })
+      }
+
+    }
     return elem;
-  },
+  }
 
   /**
    * Request script and inserts it in the DOM
@@ -722,7 +790,7 @@ export default class LiteGUI {
    * @param {Function} callback when the button is pressed
    * @param {Object|String} style
    **/
-  createButton (id_class, content, callback, style) {
+  createButton(id_class: string, content: string, callback: EventListener, style: string | Record<string, string>) {
     var elem = document.createElement("button");
     elem.className = "litegui litebutton button";
     if (id_class) {
@@ -733,27 +801,33 @@ export default class LiteGUI {
         else elem.id = t[i];
       }
     }
-    elem.root = elem;
+
     if (content !== undefined) elem.innerHTML = content;
     if (callback) elem.addEventListener("click", callback);
     if (style) {
-      if (style.constructor === String) elem.setAttribute("style", style);
-      else for (var i in style) elem.style[i] = style[i];
+      if (typeof style === 'string') {
+        elem.setAttribute("style", style);
+      } else {
+        Object.entries(style).forEach(([key, value]) => {
+          elem.style[key as any] = value;
+        })
+      }
     }
     return elem;
-  },
+  }
 
-  getParents (element) {
-    var elements = [];
-    while ((element = element.parentElement) !== null) {
+  static getParents(element: HTMLElement) {
+    const elements: HTMLElement[] = [];
+    while ((element.parentElement) !== null) {
+      element = element.parentElement
       if (element.nodeType !== Node.ELEMENT_NODE) continue;
-      elements.push(elem);
+      elements.push(element);
     }
     return elements;
-  },
+  }
 
   //used to create a window that retains all the CSS info or the scripts.
-  newWindow (title, width, height, options) {
+  newWindow(title, width, height, options) {
     options = options || {};
     var new_window = window.open(
       "",
@@ -783,11 +857,11 @@ export default class LiteGUI {
   },
 
   //* DIALOGS *******************
-  showModalBackground (v) {
+  showModalBackground(v) {
     if (LiteGUI.modalbg_div) LiteGUI.modalbg_div.style.display = v ? "block" : "none";
   },
 
-  showMessage (content, options) {
+  showMessage(content, options) {
     options = options || {};
 
     options.title = options.title || "Attention";
@@ -805,7 +879,7 @@ export default class LiteGUI {
    * @param {String} content
    * @param {Object} options ( min_height, content, noclose )
    **/
-  popup (content, options) {
+  popup(content, options) {
     options = options || {};
 
     options.min_height = 140;
@@ -826,7 +900,7 @@ export default class LiteGUI {
    * @param {String} content
    * @param {Object} options ( title, width, height, content, noclose )
    **/
-  alert (content, options) {
+  alert(content, options) {
     options = options || {};
 
     options.className = "alert";
@@ -845,7 +919,7 @@ export default class LiteGUI {
    * @param {Function} callback
    * @param {Object} options ( title, width, height, content, noclose )
    **/
-  confirm (content, callback, options) {
+  confirm(content, callback, options) {
     options = options || {};
     options.className = "alert";
     options.title = options.title || "Confirm";
@@ -879,7 +953,7 @@ export default class LiteGUI {
    * @param {Function} callback
    * @param {Object} options ( title, width, height, content, noclose )
    **/
-  prompt (content, callback, options) {
+  prompt(content, callback, options) {
     options = options || {};
     options.className = "alert";
     options.title = options.title || "Prompt";
@@ -933,7 +1007,7 @@ export default class LiteGUI {
    * @param {Function} callback
    * @param {Object} options ( title, width, height, content, noclose )
    **/
-  choice (content, choices, callback, options) {
+  choice(content, choices, callback, options) {
     options = options || {};
     options.className = "alert";
     options.title = options.title || "Select one option";
@@ -965,7 +1039,7 @@ export default class LiteGUI {
     return dialog;
   },
 
-  downloadURL (url, filename) {
+  downloadURL(url, filename) {
     var link = document.createElement("a");
     link.href = url;
     link.download = filename;
@@ -974,7 +1048,7 @@ export default class LiteGUI {
     document.body.removeChild(link);
   },
 
-  downloadFile (filename, data, dataType) {
+  downloadFile(filename, data, dataType) {
     if (!data) {
       console.warn("No file provided to download");
       return;
@@ -1006,7 +1080,7 @@ export default class LiteGUI {
    * Returns the URL vars ( ?foo=faa&foo2=etc )
    * @method getUrlVars
    **/
-  getUrlVars () {
+  getUrlVars() {
     var vars = [],
       hash;
     var hashes = window.location.href.slice(window.location.href.indexOf("?") + 1).split("&");
@@ -1018,15 +1092,15 @@ export default class LiteGUI {
     return vars;
   },
 
-  getUrlVar (name) {
+  getUrlVar(name) {
     return LiteGUI.getUrlVars()[name];
   },
 
-  focus (element) {
+  focus(element) {
     element.focus();
   },
 
-  blur (element) {
+  blur(element) {
     element.blur();
   },
 
@@ -1036,7 +1110,7 @@ export default class LiteGUI {
    * @param {HTMLEntity} container the element that will be dragged
    * @param {HTMLEntity} dragger the area to start the dragging
    **/
-  draggable (container, dragger, on_start, on_finish, on_is_draggable) {
+  draggable(container, dragger, on_start, on_finish, on_is_draggable) {
     dragger = dragger || container;
     dragger.addEventListener("mousedown", inner_mouse);
     dragger.style.cursor = "move";
@@ -1102,7 +1176,7 @@ export default class LiteGUI {
    * @param {Object} object
    * @param {Object} target
    **/
-  cloneObject (object, target) {
+  cloneObject(object, target) {
     var o = target || {};
     for (var i in object) {
       if (i[0] == "_" || i.substr(0, 6) == "jQuery")
@@ -1134,7 +1208,7 @@ export default class LiteGUI {
     return o;
   },
 
-  safeName (str) {
+  safeName(str) {
     return String(str).replace(/[\s\.]/g, "");
   },
 
@@ -1151,14 +1225,14 @@ export default class LiteGUI {
   },
 
   //given a html entity string it returns the equivalent unicode character
-  htmlEncode (html_code) {
+  htmlEncode(html_code) {
     var e = document.createElement("div");
     e.innerHTML = html_code;
     return e.innerText;
   },
 
   //given a unicode character it returns the equivalent html encoded string
-  htmlDecode (unicode_character: string) {
+  htmlDecode(unicode_character: string) {
     var e = document.createElement("div");
     e.innerText = unicode_character;
     return e.innerHTML;
@@ -1184,7 +1258,7 @@ export default class LiteGUI {
    * @param {Function} callback_drop function to call when the user drops the item
    * @param {Function} callback_enter [optional] function to call when the user drags something inside
    **/
-  createDropArea (element, callback_drop, callback_enter, callback_exit) {
+  createDropArea(element, callback_drop, callback_enter, callback_exit) {
     element.addEventListener("dragenter", onDragEvent);
 
     function onDragEvent(evt) {
