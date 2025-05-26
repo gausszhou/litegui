@@ -1,4 +1,42 @@
 import LiteGUI from ".";
+import { LiteComponent } from "../types";
+
+class Tab {
+  id: string;
+  content: HTMLElement;
+  title: HTMLElement;
+  onclose?: Function;
+  selected?: boolean;
+
+  constructor() {
+    this.id = '';
+    this.content = document.createElement("div");
+    this.title = document.createElement("span");
+    this.selected = false;
+  }
+
+  // 添加内容到标签页
+  add(v: LiteComponent) {
+    this.content.appendChild(v.root || v);
+  }
+
+  // 设置标签页标题
+  setTitle(title: string) {
+    this.title.innerHTML = title;
+  }
+
+  // 触发标签页点击事件
+  click() {
+    LiteGUI.trigger(this, "click");
+  }
+
+  // 销毁当前标签页
+  destroy() {
+    // 这里的 that 需要从外部传入,暂时注释掉
+    // that.removeTab(this.id);
+  }
+}
+
 /**
  * Widget that contains several tabs and their content
  * - 包含多个选项卡及其内容的小部件
@@ -6,17 +44,20 @@ import LiteGUI from ".";
  * - - mode: "vertical","horizontal"
  * - - size
  * - - width,height
- * - - autoswitch: allow autoswitch (switch when mouse over)
+ * - - trigger: hover,click
  * @class Tabs
  * @constructor
  */
 
-class Tabs {
+export class Tabs {
   options: any;
   mode: any;
   root: any;
   current_tab: any;
-  list: any;
+  previous_tab: any;
+  plus_tab: any;
+  _timeout_mouseover: any;
+  list: HTMLUListElement;
   tabs_root: any;
   tabs: any;
 
@@ -28,67 +69,67 @@ class Tabs {
 
 
   constructor(options: any = {}, legacy: any = {}) {
+    // 处理旧版本的参数传递方式
     if (legacy || (options && options.constructor === String)) {
-      var id = options;
+      const id = options;
       options = legacy || {};
       options.id = id;
       console.warn("LiteGUI.Tabs legacy parameter, use options as first parameter instead of id.");
     }
 
-    options = options || {};
     this.options = options;
+    this.mode = options.mode || "horizontal";
 
-    var mode = (this.mode = options.mode || "horizontal");
-
-    var root = document.createElement("DIV");
+    // 创建根元素
+    const root = document.createElement("div");
     if (options.id) root.id = options.id;
-
-    root.className = "litetabs " + mode;
+    root.className = "litetabs " + this.mode;
     this.root = root;
     this.root.tabs = this;
 
-    this.current_tab = null; //current tab array [id, tab, content]
+    this.current_tab = null; // 当前选中的标签页 [id, tab, content]
 
-    if (mode == "horizontal") {
+    // 设置尺寸
+    if (this.mode === "horizontal") {
       if (options.size) {
-        if (options.size == "full") this.root.style.height = "100%";
-        else this.root.style.height = options.size;
+        this.root.style.height = options.size === "full" ? "100%" : options.size;
       }
-    } else if (mode == "vertical") {
+    } else if (this.mode === "vertical") {
       if (options.size) {
-        if (options.size == "full") this.root.style.width = "100%";
-        else this.root.style.width = options.size;
+        this.root.style.width = options.size === "full" ? "100%" : options.size;
       }
     }
 
-    if (options.width)
-      this.root.style.width = options.width.constructor === Number ? options.width.toFixed(0) + "px" : options.width;
-    if (options.height)
-      this.root.style.height = options.height.constructor === Number ? options.height.toFixed(0) + "px" : options.height;
+    // 设置宽高
+    if (options.width) {
+      this.root.style.width = typeof options.width === "number" ?
+        `${options.width.toFixed(0)}px` : options.width;
+    }
+    if (options.height) {
+      this.root.style.height = typeof options.height === "number" ?
+        `${options.height.toFixed(0)}px` : options.height;
+    }
 
-    //container of tab elements
-    var list = document.createElement("UL");
+    // 创建标签页容器
+    const list = document.createElement("ul");
     list.className = "wtabcontainer";
-    if (mode == "vertical") list.style.width = Tabs.tabs_width + "px";
-    else list.style.height = Tabs.tabs_height + "px";
-
-    //allows to use the wheel to see hidden tabs
-    list.addEventListener("wheel", onMouseWheel);
-    list.addEventListener("mousewheel", onMouseWheel);
-    function onMouseWheel(e) {
-      if (e.deltaY) list.scrollLeft += e.deltaY;
+    if (this.mode === "vertical") {
+      list.style.width = `${Tabs.tabs_width}px`;
+    } else {
+      list.style.height = `${Tabs.tabs_height}px`;
     }
 
     this.list = list;
-    this.root.appendChild(this.list);
+    this.root.appendChild(list);
     this.tabs_root = list;
 
+    // 初始化标签页相关属性
     this.tabs = {};
     this.tabs_by_index = [];
     this.selected = null;
-
     this.onchange = options.callback;
 
+    // 添加到父元素
     if (options.parent) {
       this.appendTo(options.parent);
     }
@@ -129,7 +170,7 @@ class Tabs {
     return this.tabs[this.previous_tab[0]];
   };
 
-  appendTo(parent, at_front) {
+  appendTo(parent: HTMLElement, at_front = false) {
     if (at_front) parent.prepend(this.root);
     else parent.appendChild(this.root);
   };
@@ -151,7 +192,7 @@ class Tabs {
    * @param {Number} index
    * @return {Object} the tab in the form of an object with {id,tab,content}
    */
-  getTabByIndex(index) {
+  getTabByIndex(index: number) {
     return this.tabs_by_index[index];
   };
 
@@ -214,7 +255,7 @@ class Tabs {
  * @param {bool} skip_event prevent dispatching events
  * @return {Object} an object containing { id, tab, content }
  */
-  addTab(id: string, options: any, skip_event: any) {
+  addTab(id: string, options: any, skip_event?: any) {
     options = options || {};
     if (typeof options == "function") options = { callback: options };
 
@@ -234,7 +275,7 @@ class Tabs {
     if (options.bigicon)
       element.innerHTML = "<img class='tabbigicon' src='" + options.bigicon + "'/>" + element.innerHTML;
     if (options.closable) {
-      element.innerHTML += "<span class='tabclose'>" + LiteGUI.special_codes.close + "</span>";
+      element.innerHTML += "<span class='tabclose'>Close</span>";
       element.querySelector("span.tabclose")!.addEventListener(
         "click",
         function (e) {
@@ -267,7 +308,7 @@ class Tabs {
         if (that._timeout_mouseover) clearTimeout(that._timeout_mouseover);
         that._timeout_mouseover = setTimeout(
           function () {
-            LiteGUI.trigger(this, "click");
+            LiteGUI.trigger(element, "click");
             that._timeout_mouseover = null;
           }.bind(this),
           500
@@ -338,30 +379,12 @@ class Tabs {
         if (options.callback) options.callback(tab_id, e);
       });
 
-    element.options = options;
-    element.tabs = this;
+
 
     var title = element.querySelector("span.tabtitle");
 
     //tab object
-    var tab_info = {
-      id: id,
-      tab: element,
-      content: content,
-      title: title,
-      add: function (v) {
-        this.content.appendChild(v.root || v);
-      },
-      setTitle: function (title) {
-        this.title.innerHTML = title;
-      },
-      click: function () {
-        LiteGUI.trigger(this.tab, "click");
-      },
-      destroy: function () {
-        that.removeTab(this.id);
-      }
-    };
+    var tab_info = new Tab()
 
     if (options.onclose) tab_info.onclose = options.onclose;
     this.tabs[id] = tab_info;
@@ -371,14 +394,14 @@ class Tabs {
     //context menu
     element.addEventListener(
       "contextmenu",
-      function (e) {
+      (e)  => {
         if (e.button != 2)
           //right button
           return false;
         e.preventDefault();
         if (options.callback_context) options.callback_context.call(tab_info);
         return false;
-      }.bind(this)
+      }
     );
 
     if (options.selected == true || this.selected == null) this.selectTab(id, options.skip_callbacks);
@@ -386,8 +409,19 @@ class Tabs {
     return tab_info;
   };
 
-  addPlusTab(callback) {
-    if (this.plus_tab) console.warn("There is already a plus tab created in this tab widget");
+  /**
+   * 添加一个加号标签页
+   * @param callback 点击加号标签页时的回调函数
+   * @returns 返回创建的加号标签页对象
+   */
+  addPlusTab(callback: Function) {
+    // 检查是否已存在加号标签页
+    if (this.plus_tab) {
+      console.warn("该标签组件中已存在加号标签页");
+      return;
+    }
+
+    // 创建并保存加号标签页
     this.plus_tab = this.addTab("plus_tab", {
       title: "+",
       tab_width: 20,
@@ -395,38 +429,62 @@ class Tabs {
       callback: callback,
       skip_callbacks: true
     });
-  };
+
+    return this.plus_tab;
+  }
 
 
-  addButtonTab(id, title, callback) {
-    return this.addTab(id, { title: title, tab_width: 20, button: true, callback: callback, skip_callbacks: true });
-  };
+  /**
+   * 添加一个按钮类型的标签页
+   * @param id 标签页ID
+   * @param title 标签页标题
+   * @param callback 点击按钮时的回调函数
+   * @returns 返回创建的标签页对象
+   */
+  addButtonTab(id: string, title: string, callback: Function) {
+    return this.addTab(id, {
+      title: title,
+      tab_width: 20,
+      button: true,
+      callback: callback,
+      skip_callbacks: true
+    });
+  }
   //this is tab
-  onTabClicked(e) {
-    //skip if already selected
-    if (this.classList.contains("selected")) return;
+  onTabClicked(e: any) {
+    // 如果标签页已经被选中则跳过
+    if (this.root.classList.contains("selected")) return;
 
-    if (!this.parentNode) return; //this could happend if it gets removed while being clicked (not common)
+    // 如果标签页已被移除则跳过
+    if (!this.root.parentNode) return;
 
-    var options = this.options;
-    var tabs = this.parentNode.parentNode.tabs;
+    const options = (this as any).options;
+    const tabs = (this.root.parentNode.parentNode as any).tabs;
     if (!tabs) throw "tabs not found";
-    var that = tabs;
+    const that = tabs;
 
-    //check if this tab is available
-    if (options.callback_canopen && options.callback_canopen() == false) return;
+    // 检查标签页是否可用
+    if (options.callback_canopen && options.callback_canopen() === false) return;
 
-    //launch leaving current tab event
-    if (that.current_tab && that.current_tab[0] != tab_id && that.current_tab[2] && that.current_tab[2].callback_leave)
-      that.current_tab[2].callback_leave(that.current_tab[0], that.current_tab[1], that.current_tab[2]);
+    const tab_id = this.root.dataset["id"];
 
-    var tab_id = this.dataset["id"];
-    var tab_content = null;
+    // 触发离开当前标签页事件
+    if (that.current_tab &&
+      that.current_tab[0] !== tab_id &&
+      that.current_tab[2]?.callback_leave) {
+      that.current_tab[2].callback_leave(
+        that.current_tab[0],
+        that.current_tab[1],
+        that.current_tab[2]
+      );
+    }
 
-    //iterate tab labels
-    for (var i in that.tabs) {
-      var tab_info = that.tabs[i];
-      if (i == tab_id) {
+    let tab_content = null;
+
+    // 更新所有标签页状态
+    for (const i in that.tabs) {
+      const tab_info = that.tabs[i];
+      if (i === tab_id) {
         tab_info.selected = true;
         tab_info.content.style.display = "";
         tab_content = tab_info.content;
@@ -436,47 +494,63 @@ class Tabs {
       }
     }
 
-    var list = that.list.querySelectorAll("li.wtab");
-    for (var i = 0; i < list.length; ++i) list[i].classList.remove("selected");
-    this.classList.add("selected");
+    // 更新标签页样式
+    const list = this.list.querySelectorAll("li.wtab");
+    list.forEach(tab => tab.classList.remove("selected"));
+    this.root.classList.add("selected");
 
-    //change tab
+    // 更新当前标签页
     that.previous_tab = that.current_tab;
     that.current_tab = [tab_id, tab_content, options];
 
+    // 触发回调和事件
     if (e) {
-      //user clicked
-      //launch callback
-      if (options.callback) options.callback(tab_id, tab_content, e);
+      if (options.callback) {
+        options.callback(tab_id, tab_content, e);
+      }
 
       LiteGUI.trigger(that, "wchange", [tab_id, tab_content]);
-      if (that.onchange) that.onchange(tab_id, tab_content);
+      if (that.onchange) {
+        that.onchange(tab_id, tab_content);
+      }
     }
 
-    //change afterwards in case the user wants to know the previous one
+    // 更新选中状态
     that.selected = tab_id;
-  };
+  }
 
-  selectTab(id, skip_events) {
+  selectTab(id: string | Tab, skip_events?: boolean) {
+    // 如果没有传入id则直接返回
     if (!id) return;
 
-    if (id.constructor != String) id = id.id; //in case id is the object referencing the tab
+    // 如果传入的是Tab对象,则获取其id
+    if (typeof id !== 'string') {
+      id = id.id;
+    }
 
-    var tabs = this.list.querySelectorAll("li.wtab");
-    for (var i = 0; i < tabs.length; i++)
-      if (id == tabs[i].dataset["id"]) {
-        this.onTabClicked.call(tabs[i], !skip_events);
+    // 查找对应id的tab元素并触发点击
+    const tabs = Array.from(this.list.querySelectorAll("li.wtab")) as HTMLElement[];
+    for (const tab of tabs) {
+      if (id === tab.dataset["id"]) {
+        this.onTabClicked.call(tab, !skip_events);
         break;
       }
-  };
+    }
+  }
 
-  setTabVisibility(id, v) {
-    var tab = this.tabs[id];
+  /**
+   * 设置标签页的可见性
+   * @param id 标签页ID
+   * @param visible 是否可见
+   */
+  setTabVisibility(id: string, visible: boolean) {
+    const tab = this.tabs[id];
     if (!tab) return;
 
-    tab.tab.style.display = v ? "none" : null;
-    tab.content.style.display = v ? "none" : null;
-  };
+    // 修复显示逻辑,visible为true时显示,false时隐藏
+    tab.tab.style.display = visible ? null : "none";
+    tab.content.style.display = visible ? null : "none";
+  }
 
 
 
@@ -495,7 +569,7 @@ class Tabs {
     }
   };
 
-  removeTab(id) {
+  removeTab(id: string) {
     var tab = this.tabs[id];
     if (!tab) {
       console.warn("tab not found: " + id);
@@ -529,86 +603,101 @@ class Tabs {
     this.removeAllTabs();
   };
 
-  showTab(id) {
+  showTab(id: string) {
     this.setTabVisibility(id, true);
   };
 
-  hideTab(id) {
+  hideTab(id: string) {
     this.setTabVisibility(id, false);
   };
 
-  
-  transferTab(id, target_tabs, index) {
-    var tab = this.tabs[id];
+
+  /**
+   * 将标签页从当前标签组转移到目标标签组
+   * @param id 要转移的标签页ID
+   * @param target_tabs 目标标签组
+   * @param index 可选,插入的位置索引
+   */
+  transferTab(id: string, target_tabs: Tabs, index?: number) {
+    // 获取要转移的标签页
+    const tab = this.tabs[id];
     if (!tab) return;
 
+    // 将标签页添加到目标标签组
     target_tabs.tabs[id] = tab;
 
-    if (index !== undefined) target_tabs.list.insertBefore(tab.tab, target_tabs.list.childNodes[index]);
-    else target_tabs.list.appendChild(tab.tab);
-    target_tabs.root.appendChild(tab.content);
-    delete this.tabs[id];
-
-    var newtab = null;
-    for (var i in this.tabs) {
-      newtab = i;
-      break;
+    // 根据index决定插入位置
+    if (index !== undefined) {
+      target_tabs.list.insertBefore(tab.tab, target_tabs.list.childNodes[index]);
+    } else {
+      target_tabs.list.appendChild(tab.tab);
     }
 
-    if (newtab) this.selectTab(newtab);
+    // 移动内容区域
+    target_tabs.root.appendChild(tab.content);
 
+    // 从原标签组中删除
+    delete this.tabs[id];
+
+    // 在原标签组中选择新的标签页
+    const remainingTabs = Object.keys(this.tabs);
+    if (remainingTabs.length > 0) {
+      this.selectTab(remainingTabs[0]);
+    }
+
+    // 更新样式和选中状态
     tab.tab.classList.remove("selected");
     target_tabs.selectTab(id);
   };
 
-  detachTab(id, on_complete, on_close) {
-    var tab = this.tabs[id];
+  detachTab(id: string, on_complete?: Function, on_close?: Function) {
+    const tab = this.tabs[id];
     if (!tab) return;
 
-    var index = this.getTabIndex(id);
+    const index = this.getTabIndex(id);
+    const that = this;
 
-    //create window
-    var w = 800;
-    var h = 600;
-    var tab_window = window.open(
+    // 创建新窗口
+    const w = 800;
+    const h = 600;
+    const tab_window = window.open(
       "",
       "",
-      "width=" + w + ", height=" + h + ", location=no, status=no, menubar=no, titlebar=no, fullscreen=yes"
+      `width=${w}, height=${h}, location=no, status=no, menubar=no, titlebar=no, fullscreen=yes`
     );
-    tab_window.document.write("<head><title>" + id + "</title>");
+    if (!tab_window) return;
 
-    //transfer style
-    var styles = document.querySelectorAll("link[rel='stylesheet'],style");
-    for (var i = 0; i < styles.length; i++) tab_window.document.write(styles[i].outerHTML);
+    // 写入头部和标题
+    tab_window.document.write(`<head><title>${id}</title>`);
+
+    // 转移样式表
+    const styles = Array.from(document.querySelectorAll("link[rel='stylesheet'],style"));
+    for (const style of styles) {
+      tab_window.document.write(style.outerHTML);
+    }
     tab_window.document.write("</head><body></body>");
     tab_window.document.close();
 
-    var that = this;
+    // 创建新的标签页组件
+    const newtabs = new LiteGUI.Tabs(null, this.options);
+    
 
-    //transfer content after a while so the window is propertly created
-    var newtabs = new LiteGUI.Tabs(null, this.options);
-    tab_window.tabs = newtabs;
-
-    //closing event
+    // 设置关闭事件
     tab_window.onbeforeunload = function () {
       newtabs.transferTab(id, that, index);
       if (on_close) on_close();
     };
 
-    //move the content there
+    // 移动内容到新窗口
     newtabs.list.style.height = "20px";
     tab_window.document.body.appendChild(newtabs.root);
-    that.transferTab(id, newtabs);
+    this.transferTab(id, newtabs);
     newtabs.tabs[id].tab.classList.add("selected");
     this.recomputeTabsByIndex();
 
     if (on_complete) on_complete();
 
     return tab_window;
-  };
-
-
+  }
 }
 
-
-export default Tabs;
