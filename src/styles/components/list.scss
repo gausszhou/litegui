@@ -1,0 +1,60 @@
+
+/**** LiteList ***/
+
+ul.litelist {
+	height: 100%;
+	width: 100%;
+	background-color: #111;
+	margin: 0;
+	padding: 0;
+}
+
+ul.litelist li {
+	margin: 0;
+	padding: 2px;
+	padding-left: 10px;
+	list-style-type: none;
+	cursor: pointer;
+}
+
+ul.litelist li:hover {
+	background-color: #333;
+}
+
+ul.litelist li.selected {
+	color: #eee;
+	background-color: #48a;
+}
+
+ul.litelist li.selected {
+	position: relative;
+	background: #88b7d5;
+	border: 1px solid #c2e1f5;
+}
+
+ul.litelist li.selected:after,
+ul.litelist li.selected:before {
+	left: 100%;
+	border: solid transparent;
+	content: " ";
+	height: 0;
+	width: 0;
+	position: absolute;
+	pointer-events: none;
+}
+
+ul.litelist li.selected:after {
+	border-color: rgba(136, 183, 213, 0);
+	border-left-color: #88b7d5;
+	border-width: 10px;
+	top: 50%;
+	margin-top: -10px;
+}
+
+ul.litelist li.selected:before {
+	border-color: rgba(194, 225, 245, 0);
+	border-left-color: #c2e1f5;
+	border-width: 11px;
+	top: 50%;
+	margin-top: -11px;
+}
