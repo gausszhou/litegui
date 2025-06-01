@@ -1,0 +1,40 @@
+button.litebutton {
+	background: -webkit-linear-gradient(#32302d, #4b4947) repeat scroll 0 0 transparent;
+	background: -moz-linear-gradient(#32302d, #4b4947) repeat scroll 0 0 transparent;
+	background: linear-gradient(#32302d, #4b4947) repeat scroll 0 0 transparent;
+	border: 0 none;
+	border-radius: 2px 2px 2px 2px;
+	box-shadow: 0 1px 0 #5b5957 inset, 0 -1px 0 black, 0 1px 0 black, -1px 0 0 black, 1px 0 0 black, 0 1px 1px #111111;
+	color: #ccc;
+	display: inline-block;
+	margin: 2px;
+	padding: 2px;
+	text-shadow: 0 1px 1px black;
+	vertical-align: top;
+}
+
+button.litebutton.flat {
+	background: #32302d;
+	box-shadow: 0 0 0 transparent;
+	border: 0;
+}
+
+button.litebutton:hover:not(:disabled) {
+	background: #aab !important;
+}
+
+button.litebutton:active:not(:disabled) {
+	background: #fff !important;
+}
+
+button.litebutton:focus:not(:disabled) {
+	outline: 1px solid #777;
+}
+
+button.litebutton:disabled {
+	opacity: 0.5;
+}
+
+button.litebutton.close-button {
+	background-size: 100% auto;
+}

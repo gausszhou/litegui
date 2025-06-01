@@ -1,0 +1,75 @@
+
+ul.file-list {
+	overflow: auto;
+	padding: 0 1em;
+	margin: 0;
+	background-color: #222;
+	box-shadow: inset 0 0 3px black;
+	height: 100%;
+}
+
+ul.file-list li.file-item {
+	width: 10em;
+	height: 11.2em;
+	display: inline-block;
+	vertical-align: top;
+	margin: 0.5em;
+	padding: 0;
+	box-shadow: 0 0 2px black;
+	overflow: hidden;
+	background-color: #555;
+	cursor: pointer;
+	text-align: center;
+	border-radius: 2px;
+	position: relative;
+}
+
+ul.file-list li.file-item.filtered {
+	display: none;
+}
+
+ul.file-list li.file-item .title {
+	display: block;
+	height: 20px;
+	padding: 0.1em;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+	background-color: black;
+}
+
+ul.file-list li.file-item button {
+	position: absolute;
+	bottom: 2px;
+	left: 2px;
+	background: #333;
+	box-shadow: none;
+	text-shadow: none;
+	display: none;
+	padding: 3px;
+	border: 1px solid #eee;
+}
+
+ul.file-list li.file-item:hover button {
+	display: block;
+}
+
+ul.file-list li.file-item:hover {
+	color: white;
+	background-color: #888;
+}
+
+ul.file-list li.file-item.selected {
+	outline: 1px dashed #eee;
+}
+
+ul.file-list li.file-item img {
+	max-width: 10em;
+	max-height: 10em;
+}
+
+ul.file-list li.file-item span.info {
+	font-size: 2em;
+	display: block;
+	margin-top: 1.8em;
+}

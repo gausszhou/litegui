@@ -1,0 +1,111 @@
+.lite-menu ul {
+  font-family: Tahoma, sans-serif;
+  margin: 0;
+  padding: 2px 0;
+  height: 2em;
+  display: flex;
+  align-items: center;
+  background-color: #232323;
+}
+
+.lite-menu li {
+  font-size: 14px;
+  height: 24px;
+  line-height: 24px;
+  color: #999;
+  display: inline-block;
+  min-width: 50px;
+  padding-left: 10px;
+  padding-right: 10px;
+  user-select: none;
+  -moz-user-select: none;
+  -webkit-user-select: none;
+  cursor: pointer;
+}
+
+.lite-menu li:hover {
+  color: #eee;
+  background-color: #343740;
+}
+
+.lite-menu-panel {
+  position: absolute;
+  z-index: 10;
+  top: 5px;
+  left: 5px;
+  min-width: 200px;
+  padding: 4px 0;
+  border-radius: 0 0 2px 2px;
+  box-shadow: 0 0 3px black;
+  background-color: #212121;
+}
+
+
+.lite-menu-panel-item {
+	font-size: 14px;
+	color: #aaa;
+	padding: 2px;
+	margin: 2px;
+	padding-left: 2px;
+	-moz-user-select: none;
+	-webkit-user-select: none;
+	user-select: none;
+	cursor: pointer;
+  display: flex;
+  align-items: center;
+  white-space: nowrap;
+}
+
+.lite-menu-panel-item .icon {
+	display: inline-block;
+	width: 12px;
+	height: 12px;
+	margin: 2px;
+	vertical-align: top;
+}
+.lite-menu-panel-item .name {
+  flex: 1;
+}
+
+.lite-menu-panel-item.checked .icon {
+	background-color: #aaf;
+}
+
+.lite-menu-panel-item .more {
+	float: right;
+	padding-right: 5px;
+}
+
+.lite-menu-panel-item.disabled {
+	opacity: 0.5;
+	cursor: default;
+}
+
+.lite-menu-panel-item.separator {
+	display: block;
+	border-top: 1px solid #333;
+	border-bottom: 1px solid #666;
+	width: 100%;
+	height: 0px;
+	margin: 3px 0 2px 0;
+	background-color: transparent;
+	padding: 0 !important;
+	cursor: default !important;
+}
+
+.lite-menu-panel-item.has_submenu {
+	border-right: 2px solid cyan;
+}
+
+.litemenu-title {
+	color: #dde;
+	background-color: #111;
+	margin: 0;
+	padding: 2px;
+	cursor: default;
+}
+
+.lite-menu-panel-item:hover:not(.disabled):not(.separator) {
+	background-color: #555;
+	color: #eee;
+}
