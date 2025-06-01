@@ -1,11 +1,5 @@
 /* Here goes all the CSS related to layout the web (panels, windows, bars, etc) */
 
-html,
-body {
-	height: 100%;
-	background-color: #111;
-}
-
 div {
 	margin: 0;
 	padding: 0;
@@ -28,6 +22,7 @@ div {
 	width: 100%;
 	height: 100%;
 	overflow: hidden;
+	background-color: #181818;
 }
 
 .litearea {

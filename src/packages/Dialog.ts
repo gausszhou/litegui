@@ -1,6 +1,5 @@
-import type { LiteComponent } from "../types";
-import type { ButtonOptions } from "./Button";
-import Button from "./Button";
+import type { LiteComponent } from "../types/index";
+import { type ButtonOptions, Button } from "./Button";
 import EventMitter from "./EventMitter";
 import LiteGUI from "./index";
 import { createElementFromString } from "./utils";
@@ -16,19 +15,58 @@ interface DialogOptions {
   hide?: boolean;
   detachable?: boolean;
   closable?: boolean;
+  width?: number | string;
+  height?: number | string;
+  minWidth?: number;
+  minHeight?: number;
+  scroll?: boolean;
+  id?: string;
+  title?: string;
+  content?: string;
+  buttons?: ButtonsItemOptions[];
+  onClose?: () => void;
+  onEnter?: () => void;
+  onEscape?: () => void;
+  onKeyDown?: () => void;
+  onKeyUp?: () => void;
 }
 
-export default class Dialog extends EventMitter implements LiteComponent {
+export class Dialog extends EventMitter implements LiteComponent {
   static INSTANCE_LIST: Dialog[];
   static MINIMIZED_WIDTH: number = 200;
   static MIN_WIDTH: number = 150;
   static MIN_HEIGHT: number = 150;
   static TITLE_HEIGHT: string = "20px";
 
+  draggable: boolean = false;
+  resizable: boolean = false;
+  minimized: boolean = false;
+  maximized: boolean = false;
+  
+  top: number = 0;
+  bottom: number = 0;
+  old_box: any;
+
+  on_resize: any;
+  on_hide: any;
+  on_show: any;
+  on_minimize: any;
+  on_maximize: any;
+  on_detach: any;
+  on_attach: any;
+  on_close: any;
+  on_enter: any;
+  on_escape: any;
+  on_keydown: any;
+  on_keyup: any;
+
+  static minimized: any;
+  static maximized: any;
+
   public left: number = 0;
   public right: number = 0;
-  public width: number = 0;
-  public height: number = 0;
+  public width: number | string = 0;
+  public height: number | string = 0;
 
   public minWidth: number = 150;
   public minHeight: number = 150;
@@ -45,19 +83,19 @@ export default class Dialog extends EventMitter implements LiteComponent {
   public oldStyleWidth: string = "0px";
   public oldStyleHeight: string = "0px";
 
-  constructor(options: any, legacy: any) {
+  constructor(options: DialogOptions | string) {
     super();
-    if (legacy || options.constructor === String) {
+    if (typeof options === "string") {
       const id: string = options;
-      options = legacy || {};
+      options = {};
       options.id = id;
     }
     this.options = options || {};
     this.id = this.options.id;
     this.left = 0;
     this.right = 0;
-    this.width = options.width;
-    this.height = options.height;
+    this.width = options.width || Dialog.MIN_WIDTH;
+    this.height = options.height || Dialog.MIN_HEIGHT;
     this.minWidth = options.minWidth || Dialog.MIN_WIDTH;
     this.minHeight = options.minHeight || Dialog.MIN_HEIGHT;
     this.root = this.createElementRoot();
@@ -181,52 +219,6 @@ export default class Dialog extends EventMitter implements LiteComponent {
     return true;
   }
 
-  detachWindow(onComplete: Function, onClose: Function) {
-    if (this.dialogWindow) return false;
-    const rect = this.root.getClientRects()[0];
-    const w = rect.width;
-    const h = rect.height;
-    const header = this.header;
-    const title = header.textContent || "Window";
-    const dialogWindow = window.open(
-      "",
-      "",
-      `window=${w}, height=${h}, location=no, status=no, menubar=no,  titlebar=no, fullscreen=yes`
-    );
-    dialogWindow?.document.write()
-    const styles = document.querySelectorAll("link[rel='stylesheet'], style");
-    const html = `
-    <head>
-      <title>${title}</title>
-      ${Array.from(styles).map(style => {
-      return style.outerHTML;
-    })
-      }
-      </head>
-     <body></body>
-    `
-    dialogWindow?.document.write(html);
-    dialogWindow?.document.close();
-    // show content in new window
-    dialogWindow?.document.body.appendChild(this.content);
-    // hide in old window
-    this.root.style.display = "none";
-    // store 
-    this.oldStyleWidth = this.content.style.width;
-    this.oldStyleHeight = this.content.style.height;
-    // fullscreen
-    this.content.style.width = "100%";
-    this.content.style.height = "100%";
-    // add window
-    dialogWindow && LiteGUI.windows.push(dialogWindow);
-    // remove window
-    dialogWindow && dialogWindow?.addEventListener("onbeforeunload", () => {
-      LiteGUI.windows = LiteGUI.windows.filter((window: Window) => window !== dialogWindow);
-      onClose && onClose();
-    })
-    onComplete && onComplete();
-    return true;
-  }
   getDialogById(id: string) {
     const dialog = Dialog.INSTANCE_LIST.find(dialog => dialog.id === id);
     if (!dialog) return null;
@@ -234,9 +226,7 @@ export default class Dialog extends EventMitter implements LiteComponent {
   }
 
   static getDialog(id: string) {
-    var element = document.getElementById(id);
-    if (!element) return null;
-    return element.dialog;
+    return Dialog.INSTANCE_LIST.find(item => item.id === id);
   };
 
   static showAll() {
@@ -257,333 +247,435 @@ export default class Dialog extends EventMitter implements LiteComponent {
     });
   }
 
-  //takes the info from the parent to
-  enableProperties(options = {}) {
+  /**
+   * 启用对话框的属性设置
+   * @param options 配置选项
+   */
+  enableProperties(options: { draggable?: boolean; resizable?: boolean } = {}) {
+    const panel = this.root;
 
-    var that = this;
-
-    var panel = this.root;
+    // 设置基础样式
     panel.style.position = "absolute";
-    //panel.style.display = "none";
-
-    panel.style.minWidth = this.minWidth + "px";
-    panel.style.minHeight = this.minHeight + "px";
-
-    if (this.width) panel.style.width = this.width + "px";
-
-    if (this.height) {
-      if (typeof this.height == "number") {
-        panel.style.height = this.height + "px";
-      } else {
-        if (this.height.indexOf("%") != -1) panel.style.height = this.height;
-      }
-
-      this.content.style.height = "calc( " + this.height + "px - 24px )";
-    }
-
+    panel.style.minWidth = `${this.minWidth}px`;
+    panel.style.minHeight = `${this.minHeight}px`;
     panel.style.boxShadow = "0 0 3px black";
 
+    // 设置宽度
+    if (this.width) {
+      panel.style.width = typeof this.width === "number" ? `${this.width}px` : this.width;
+    }
+
+    // 设置高度
+    if (this.height) {
+      if (typeof this.height === "number") {
+        panel.style.height = `${this.height}px`;
+      } else if (this.height.includes("%")) {
+        panel.style.height = this.height;
+      }
+
+      // 设置内容区域高度
+      this.content.style.height = `calc(${this.height}px - 24px)`;
+    }
+
+    // 启用拖拽
     if (options.draggable) {
       this.draggable = true;
       LiteGUI.draggable(
         panel,
-        panel.querySelector(".panel-header"),
-        function () {
-          that.bringToFront();
-        },
-        null,
-        function () {
-          return !that.minimized;
-        }
+        panel.querySelector(".panel-header") as HTMLElement,
+        () => {},
+        () => !this.minimized
       );
     }
 
-    if (options.resizable) this.setResizable();
-  };
+    // 启用大小调整
+    if (options.resizable) {
+      this.setResizable();
+    }
+  }
 
 
   setResizable() {
+    // 如果已经可调整大小则返回
     if (this.resizable) return;
 
-    var root = this.root;
     this.resizable = true;
-    var footer = this.footer;
+    const root = this.root;
+    const footer = this.footer;
+
+    // 设置页脚最小高度和添加可调整类
     footer.style.minHeight = "4px";
     footer.classList.add("resizable");
 
-    var corner = document.createElement("div");
+    // 创建右下角调整大小的元素
+    const corner = document.createElement("div");
     corner.className = "resizable-corner";
-    this.root.appendChild(corner);
+    root.appendChild(corner);
 
-    footer.addEventListener("mousedown", inner_mouse);
-    corner.addEventListener("mousedown", inner_mouse, true);
+    // 记录鼠标位置
+    let mousePos = { x: 0, y: 0 };
+    let isCornerDrag = false;
 
-    var mouse = [0, 0];
-    var that = this;
+    const handleMouseEvents = (e: MouseEvent) => {
+      switch (e.type) {
+        case "mousedown":
+          // 开始拖拽
+          document.body.addEventListener("mousemove", handleMouseEvents);
+          document.body.addEventListener("mouseup", handleMouseEvents);
+          isCornerDrag = (e.target === corner);
+          mousePos = { x: e.pageX, y: e.pageY };
+          break;
 
-    var is_corner = false;
+        case "mousemove":
+          // 计算新的尺寸
+          const rect = root.getBoundingClientRect();
+          const newWidth = rect.width - (mousePos.x - e.pageX);
+          const newHeight = rect.height - (mousePos.y - e.pageY);
 
-    function inner_mouse(e) {
-      //console.log( getTime(), is_corner );
+          // 更新尺寸
+          if (isCornerDrag) {
+            root.style.width = `${Math.max(this.minWidth, newWidth)}px`;
+          }
+          root.style.height = `${Math.max(this.minHeight, newHeight)}px`;
 
-      if (e.type == "mousedown") {
-        document.body.addEventListener("mousemove", inner_mouse);
-        document.body.addEventListener("mouseup", inner_mouse);
-        is_corner = this == corner;
-        mouse[0] = e.pageX;
-        mouse[1] = e.pageY;
-      } else if (e.type == "mousemove") {
-        var rect = LiteGUI.getRect(root);
-        var w = rect.width;
-        var neww = w - (mouse[0] - e.pageX);
+          // 更新内容区域高度
+          this.content.style.height = "calc(100% - 24px)";
 
-        var h = rect.height;
-        var newh = h - (mouse[1] - e.pageY);
+          // 更新鼠标位置
+          mousePos = { x: e.pageX, y: e.pageY };
 
-        if (is_corner) root.style.width = neww + "px";
-        root.style.height = newh + "px";
+          // 触发resize事件
+          if (this.on_resize && (rect.width !== newWidth || rect.height !== newHeight)) {
+            this.on_resize(e, newWidth, newHeight);
+          }
+          break;
 
-        mouse[0] = e.pageX;
-        mouse[1] = e.pageY;
-        that.content.style.height = "calc( 100% - 24px )";
-
-        if (that.on_resize && (w != neww || h != newh)) that.on_resize(e, neww, newh);
-      } else if (e.type == "mouseup") {
-        document.body.removeEventListener("mousemove", inner_mouse);
-        document.body.removeEventListener("mouseup", inner_mouse);
-        is_corner = false;
+        case "mouseup":
+          // 结束拖拽
+          document.body.removeEventListener("mousemove", handleMouseEvents);
+          document.body.removeEventListener("mouseup", handleMouseEvents);
+          isCornerDrag = false;
+          break;
       }
+
       e.preventDefault();
       e.stopPropagation();
-      return false;
-    }
-  };
+    };
+
+    // 添加事件监听
+    footer.addEventListener("mousedown", handleMouseEvents);
+    corner.addEventListener("mousedown", handleMouseEvents);
+  }
 
 
-  dockTo(parent, dock_type) {
+  /**
+   * 将对话框停靠到指定的父元素
+   * @param parent 父元素或选择器
+   * @param dockType 停靠类型: 'full' | 'left' | 'right' | 'top' | 'bottom'
+   */
+  dockTo(parent: HTMLElement | string, dockType: 'full' | 'left' | 'right' | 'top' | 'bottom' = 'full') {
     if (!parent) return;
-    var panel = this.root;
+    const panel = this.root;
 
-    dock_type = dock_type || "full";
-    parent = parent.content || parent;
+    // 获取实际的父元素
+    const targetParent = (parent as any).content || parent;
 
-    panel.style.top = 0;
-    panel.style.left = 0;
+    // 重置基础样式
+    panel.style.top = '0';
+    panel.style.left = '0';
+    panel.style.boxShadow = 'none';
 
-    panel.style.boxShadow = "0 0 0";
+    // 根据停靠类型设置样式
+    switch (dockType) {
+      case 'full':
+        panel.style.position = 'relative';
+        panel.style.width = '100%';
+        panel.style.height = '100%';
+        this.content.style.width = '100%';
+        this.content.style.height = `calc(100% - ${Dialog.TITLE_HEIGHT})`;
+        this.content.style.overflow = 'auto';
+        break;
 
-    if (dock_type == "full") {
-      panel.style.position = "relative";
-      panel.style.width = "100%";
-      panel.style.height = "100%";
-      this.content.style.width = "100%";
-      this.content.style.height = "calc(100% - " + LiteGUI.Panel.title_height + ")"; //title offset: 20px
-      this.content.style.overflow = "auto";
-    } else if (dock_type == "left" || dock_type == "right") {
-      panel.style.position = "absolute";
-      panel.style.top = 0;
-      panel.style[dock_type] = 0;
+      case 'left':
+      case 'right':
+        panel.style.position = 'absolute';
+        panel.style.top = '0';
+        panel.style[dockType] = '0';
+        panel.style.width = `${this.width}px`;
+        panel.style.height = '100%';
+        this.content.style.height = `calc(100% - ${Dialog.TITLE_HEIGHT})`;
+        this.content.style.overflow = 'auto';
 
-      panel.style.width = this.width + "px";
-      panel.style.height = "100%";
-      this.content.style.height = "calc(100% - " + LiteGUI.Panel.title_height + ")";
-      this.content.style.overflow = "auto";
+        if (dockType === 'right') {
+          panel.style.left = 'auto';
+          panel.style.right = '0';
+        }
+        break;
 
-      if (dock_type == "right") {
-        panel.style.left = "auto";
-        panel.style.right = 0;
-      }
-    } else if (dock_type == "bottom" || dock_type == "top") {
-      panel.style.width = "100%";
-      panel.style.height = this.height + "px";
-      if (dock_type == "bottom") {
-        panel.style.bottom = 0;
-        panel.style.top = "auto";
-      }
+      case 'top':
+      case 'bottom':
+        panel.style.width = '100%';
+        panel.style.height = `${this.height}px`;
+
+        if (dockType === 'bottom') {
+          panel.style.bottom = '0';
+          panel.style.top = 'auto';
+        }
+        break;
     }
 
+    // 如果启用了拖拽，重新绑定拖拽事件
     if (this.draggable) {
       LiteGUI.draggable(panel);
     }
 
-    if (parent.content) parent.content.appendChild(panel);
-    else if (typeof parent == "string") {
-      parent = document.querySelector(parent);
-      if (parent) parent.appendChild(panel);
-    } else parent.appendChild(panel);
-  };
-
-
-
-  highlight(time) {
-    time = time || 100;
-    this.root.style.outline = "1px solid white";
-    var doc = this.root.ownerDocument;
-    var w = doc.defaultView || doc.parentWindow;
-    w.focus();
-    setTimeout(
-      function () {
-        this.root.style.outline = null;
-      }.bind(this),
-      time
-    );
-  };
-
-
-  minimize() {
-    if (this.minimized) return;
-
-    this.minimized = true;
-    this.old_box = this.root.getBoundingClientRect();
-
-    this.root.querySelector(".content").style.display = "none";
-
-    var minimize_button = this.root.querySelector(".minimize-button");
-    if (minimize_button) minimize_button.style.display = "none";
-
-    var maximize_button = this.root.querySelector(".maximize-button");
-    if (maximize_button) maximize_button.style.display = "";
-
-    this.root.style.width = LiteGUI.Dialog.MINIMIZED_WIDTH + "px";
-
-    LiteGUI.bind(this, "closed", function () {
-      LiteGUI.Dialog.minimized.splice(LiteGUI.Dialog.minimized.indexOf(this), 1);
-      LiteGUI.Dialog.arrangeMinimized();
-    });
-
-    LiteGUI.Dialog.minimized.push(this);
-    LiteGUI.Dialog.arrangeMinimized();
-
-    LiteGUI.trigger(this, "minimizing");
-  };
-
-
-
-  static arrangeMinimized() {
-    for (var i in LiteGUI.Dialog.minimized) {
-      var dialog = LiteGUI.Dialog.minimized[i];
-      var parent = dialog.root.parentNode;
-      var pos = parent.getBoundingClientRect().height - 20;
-      dialog.root.style.left = LiteGUI.Dialog.MINIMIZED_WIDTH * i;
-      dialog.root.style.top = pos + "px";
+    // 将面板添加到父元素
+    if (typeof parent === 'string') {
+      const parentElement = document.querySelector(parent);
+      if (parentElement) {
+        parentElement.appendChild(panel);
+      }
+    } else if ((parent as any).content) {
+      (parent as any).content.appendChild(panel);
+    } else {
+      (parent as HTMLElement).appendChild(panel);
     }
-  };
+  }
 
-
-
-  maximize() {
-    if (!this.minimized) return;
-    this.minimized = false;
-
-    this.root.querySelector(".content").style.display = "";
-    LiteGUI.draggable(this.root);
-    this.root.style.left = this.old_box.left + "px";
-    this.root.style.top = this.old_box.top + "px";
-    this.root.style.width = this.old_box.width + "px";
-    this.root.style.height = this.old_box.height + "px";
-
-    var minimize_button = this.root.querySelector(".minimize-button");
-    if (minimize_button) minimize_button.style.display = "";
-
-    var maximize_button = this.root.querySelector(".maximize-button");
-    if (maximize_button) maximize_button.style.display = "none";
-
-    LiteGUI.Dialog.minimized.splice(LiteGUI.Dialog.minimized.indexOf(this), 1);
-    LiteGUI.Dialog.arrangeMinimized();
-    LiteGUI.trigger(this, "maximizing");
-  };
-
-
-
-  makeModal() {
-    LiteGUI.showModalBackground(true);
-    LiteGUI.modalbg_div.appendChild(this.root); //add panel
-    this.show();
-    this.center();
-
-    LiteGUI.bind(this, "closed", inner);
-
-    function inner(e) {
-      LiteGUI.showModalBackground(false);
-    }
-  };
-
-
-
-  fadeIn(time) {
-    time = time || 1000;
-    this.root.style.display = "";
-    this.root.style.opacity = 0;
-    var that = this;
-    setTimeout(function () {
-      that.root.style.transition = "opacity " + time + "ms";
-      that.root.style.opacity = 1;
-    }, 100);
-  };
-
-
-  setPosition(x, y) {
-    if (!this.root.parentNode) console.warn("LiteGUI.Dialog: Cannot set position of dialog if it is not in the DOM");
-    this.root.position = "absolute";
-    this.root.style.left = x + "px";
-    this.root.style.top = y + "px";
-  };
-
-
-  // TODO change prop
-  center() {
-    if (!this.root.parentNode) return;
-
-    this.root.position = "absolute";
-    var width = this.root.offsetWidth;
-    var height = this.root.offsetHeight;
-    var parent_width = this.root.parentNode.offsetWidth;
-    var parent_height = this.root.parentNode.offsetHeight;
-    this.root.style.left = Math.floor((parent_width - width) * 0.5) + "px";
-    this.root.style.top = Math.floor((parent_height - height) * 0.5) + "px";
-  };
 
 
   /**
-   * Adjust the size of the dialog to the size of the content
-   * @method adjustSize
-   * @param {number} margin
+   * 高亮显示对话框
+   * @param time 高亮持续时间(毫秒)，默认100ms
    */
-  adjustSize(margin, skip_timeout) {
-    margin = margin || 0;
+  highlight(time: number = 100): void {
+    // 设置白色轮廓
+    this.root.style.outline = "1px solid white";
+
+    // 延时清除轮廓
+    setTimeout(() => {
+      this.root.style.outline = 'null';
+    }, time);
+  }
+
+
+  minimize() {
+    // 如果已经最小化则返回
+    if (this.minimized) return;
+
+    // 设置最小化状态并保存当前位置信息
+    this.minimized = true;
+    this.old_box = this.root.getBoundingClientRect();
+
+    // 隐藏内容区域
+    this.content.style.display = "none";
+
+    // 更新最小化/最大化按钮显示状态
+    const minimizeButton = this.root.querySelector(".minimize-button") as HTMLElement;
+    const maximizeButton = this.root.querySelector(".maximize-button") as HTMLElement;
+    if (minimizeButton) minimizeButton.style.display = "none";
+    if (maximizeButton) maximizeButton.style.display = "";
+
+    // 设置最小化宽度
+    this.root.style.width = `${Dialog.MINIMIZED_WIDTH}px`;
+
+    // 监听关闭事件
+    this.on("closed", () => {
+      const index = Dialog.INSTANCE_LIST.indexOf(this);
+      if (index !== -1) {
+        Dialog.INSTANCE_LIST.splice(index, 1);
+        Dialog.arrangeMinimized();
+      }
+    });
+
+    // 添加到最小化列表并重新排列
+    Dialog.INSTANCE_LIST.push(this);
+    Dialog.arrangeMinimized();
+
+    // 触发最小化事件
+    if (this.on_minimize) {
+      this.on_minimize();
+    }
+  }
+
+
+  static arrangeMinimized() {
+    Dialog.minimized.forEach((dialog: Dialog, index: number) => {
+      const parent = dialog.root.parentElement as HTMLElement;
+      const pos = parent.getBoundingClientRect().height - 20;
+      dialog.root.style.left = Dialog.MINIMIZED_WIDTH * index +  'px';
+      dialog.root.style.top = pos + "px";
+    });
+    
+  };
+
+
+
+  /**
+   * 将最小化的对话框恢复到原始大小
+   */
+  maximize() {
+    // 如果对话框未最小化则返回
+    if (!this.minimized) return;
+    
+    // 重置最小化状态
+    this.minimized = false;
+
+    // 显示内容区域
+    this.content.style.display = "";
+
+    // 恢复原始位置和尺寸
+    if (this.old_box) {
+      this.root.style.left = `${this.old_box.left}px`;
+      this.root.style.top = `${this.old_box.top}px`;
+      this.root.style.width = `${this.old_box.width}px`;
+      this.root.style.height = `${this.old_box.height}px`;
+    }
+
+    // 更新按钮显示状态
+    const minimizeButton = this.root.querySelector(".minimize-button") as HTMLElement;
+    const maximizeButton = this.root.querySelector(".maximize-button") as HTMLElement;
+    if (minimizeButton) minimizeButton.style.display = "";
+    if (maximizeButton) maximizeButton.style.display = "none";
+
+    // 从最小化列表中移除并重新排列
+    const index = Dialog.INSTANCE_LIST.indexOf(this);
+    if (index !== -1) {
+      Dialog.INSTANCE_LIST.splice(index, 1);
+      Dialog.arrangeMinimized();
+    }
+
+    // 如果启用了拖拽，重新绑定拖拽事件
+    if (this.draggable) {
+      LiteGUI.draggable(this.root);
+    }
+
+    // 触发最大化事件
+    if (this.on_maximize) {
+      this.on_maximize();
+    }
+  }
+
+
+
+  /**
+   * 将对话框设置为模态对话框
+   */
+  makeModal(): void {
+    // 显示模态背景
+    LiteGUI.showModalBackground(true);
+    // 将对话框添加到模态背景层
+    LiteGUI.modalbg_div?.appendChild(this.root);
+    // 显示并居中对话框
+    this.show();
+    this.center();
+
+    // 监听关闭事件，关闭时隐藏模态背景
+    const handleClose = () => {
+      LiteGUI.showModalBackground(false);
+    };
+    LiteGUI.bind(this, "closed", handleClose);
+  }
+
+  /**
+   * 淡入显示对话框
+   * @param time 淡入动画时长(毫秒)，默认1000ms
+   */
+  fadeIn(time: number = 1000): void {
+    // 先显示对话框但透明度为0
+    this.root.style.display = "";
+    this.root.style.opacity = "0";
+
+    // 延迟设置过渡效果和透明度，确保初始状态已应用
+    requestAnimationFrame(() => {
+      this.root.style.transition = `opacity ${time}ms`;
+      this.root.style.opacity = "1";
+    });
+  }
+
+  /**
+   * 设置对话框位置
+   * @param x X坐标
+   * @param y Y坐标
+   */
+  setPosition(x: number, y: number): void {
+    // 检查对话框是否在DOM中
+    if (!this.root.parentNode) {
+      console.warn("LiteGUI.Dialog: Cannot set position of dialog if it is not in the DOM");
+      return;
+    }
+
+    // 设置绝对定位和坐标
+    this.root.style.position = "absolute";
+    this.root.style.left = `${x}px`;
+    this.root.style.top = `${y}px`;
+  }
+
+
+  // TODO change prop
+  /**
+   * 将对话框居中显示在父元素中
+   */
+  center(): void {
+    // 如果对话框没有父元素则返回
+    if (!this.root.parentNode) return;
+
+    // 设置定位方式为绝对定位
+    this.root.style.position = "absolute";
+
+    // 获取对话框和父元素的尺寸
+    const width = this.root.offsetWidth;
+    const height = this.root.offsetHeight;
+    const parentWidth = this.root.parentElement!.offsetWidth;
+    const parentHeight = this.root.parentElement!.offsetHeight;
+
+    // 计算居中位置并设置
+    this.root.style.left = `${Math.floor((parentWidth - width) * 0.5)}px`;
+    this.root.style.top = `${Math.floor((parentHeight - height) * 0.5)}px`;
+  }
+
+
+  /**
+   * 根据内容自动调整对话框大小
+   * @param margin 额外边距，默认为0
+   * @param skipTimeout 是否跳过延时检查，默认为false
+   */
+  adjustSize(margin: number = 0, skipTimeout: boolean = false): void {
+    // 设置内容高度为自动
     this.content.style.height = "auto";
 
-    if (this.content.offsetHeight == 0 && !skip_timeout) {
-      //happens sometimes if the dialog is not yet visible
-      var that = this;
-      setTimeout(function () {
-        that.adjustSize(margin, true);
+    // 如果内容高度为0且未跳过延时，等待DOM更新后重试
+    if (this.content.offsetHeight === 0 && !skipTimeout) {
+      setTimeout(() => {
+        this.adjustSize(margin, true);
       }, 1);
       return;
     }
 
-    var extra = 0;
-    var footer = this.root.querySelector(".panel-footer");
-    if (footer) extra += footer.offsetHeight;
+    // 计算额外高度(页脚)
+    let extraHeight = 0;
+    const footer = this.root.querySelector(".panel-footer") as HTMLDivElement;
+    if (footer) {
+      extraHeight += footer.offsetHeight;
+    }
 
-    var width = this.content.offsetWidth;
-    var height = this.content.offsetHeight + 20 + margin + extra;
+    // 计算新的宽度和高度
+    const newWidth = this.content.offsetWidth;
+    const newHeight = this.content.offsetHeight + 20 + margin + extraHeight;
 
-    this.setSize(width, height);
-  };
+    // 设置对话框大小
+    this.setSize(newWidth, newHeight);
+  }
 
-
-  reattachWindow(on_complete) {
-    if (!this.dialog_window) return;
+  reattachWindow() {
+    if (!this.dialogWindow) return;
 
     this.root.appendChild(this.content);
     this.root.style.display = ""; //show
-    this.content.style.height = this._old_height;
-    delete this._old_height;
-    this.dialog_window.close();
-    var index = LiteGUI.windows.indexOf(this.dialog_window);
+    this.dialogWindow.close();
+    var index = LiteGUI.windows.indexOf(this.dialogWindow);
     if (index != -1) LiteGUI.windows.splice(index, 1);
-    this.dialog_window = null;
+    this.dialogWindow = null;
   };
 
 }
