@@ -1,7 +1,7 @@
 import EventMitter from "./EventMitter";
 import { createElementFromString } from "./utils";
 
-class Console extends EventMitter {
+export class Console extends EventMitter {
   options: any;
   _prompt: any;
   history: any;
@@ -153,4 +153,3 @@ class Console extends EventMitter {
   }
 }
 
-export default Console;

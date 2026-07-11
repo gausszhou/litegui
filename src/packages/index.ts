@@ -1,6 +1,29 @@
 import { isArray, isFunction, isString } from "lodash-es";
 import type { Handler } from "mitt";
 import mitt from "mitt";
+import { LiteComponent } from "../types/index";
+import { Area } from "./Area";
+import { Button } from "./Button";
+import { Checkbox } from "./Checkbox";
+import { ComplexList } from "./ComplexList";
+import { Console } from "./Console";
+import { ContextMenu } from "./ContextMenu";
+import { Dialog } from "./Dialog";
+import { Dragger } from "./Dragger";
+import EventMitter from "./EventMitter";
+import { Inspector } from "./Inspector";
+import { LineEditor } from "./LineEditor";
+import { List } from "./List";
+import { Menu } from "./Menu";
+import { Panel } from "./Panel";
+import { SearchBox } from "./SearchBox";
+import { Slider } from "./Slider";
+import { Split } from "./Split";
+import { Table } from "./Table";
+import { Widget } from "./Widget";
+import { Tabs } from "./Tabs";
+import { Tree } from "./Tree";
+
 const emitter = mitt();
 
 interface MonitorableObject {
@@ -8,29 +31,10 @@ interface MonitorableObject {
   [key: string]: any
 }
 
-import { LiteComponent } from "../types";
-import Area from "./Area";
-import Button from "./Button";
-import Checkbox from "./Checkbox";
-import Console from "./Console";
-import Dialog from "./Dialog";
-import Dragger from "./Dragger";
-import EventMitter from "./EventMitter";
-import Inspector from "./Inspector";
-import Menu from "./Menu";
-import Panel from "./Panel";
-import Split from "./Split";
-import Table from "./Table";
-import Tabs from "./Tabs";
-import Tree from "./Tree";
-import { ComplexList, ContextMenu, LineEditor, List, SearchBox, Slider, Widget, createLitebox } from "./Widgets";
-
 interface LiteGUIOptions {
   container?: string;
   width?: number;
   height?: number;
-  wrapped?: boolean;
-  menubar?: boolean;
 }
 
 /**
@@ -40,7 +44,7 @@ interface LiteGUIOptions {
  * @constructor
  */
 
-export default class LiteGUI {
+export class LiteGUI {
   // component
   static Area = Area;
   static Button = Button;
@@ -61,7 +65,6 @@ export default class LiteGUI {
   static LineEditor = LineEditor;
   static Slider = Slider;
   static ComplexList = ComplexList;
-  static createLitebox = createLitebox
 
   static root: HTMLElement
   // the top menu
@@ -101,19 +104,24 @@ export default class LiteGUI {
 
   static init(options: LiteGUIOptions = {}) {
 
+    console.log(options);
+    
+
     // choose main container
     this.container = null;
 
     if (options.container) {
-      this.container = document.getElementById(options.container);
+      this.container = document.querySelector(options.container);
     }
     if (!this.container) {
       this.container = document.body;
     }
 
+  
     if (options.wrapped) {
       //create litegui root element
       const root = document.createElement("div");
+      root.classList.add("litegui-root");
       root.style.position = "relative";
       root.style.overflow = "hidden";
       this.root = root;
@@ -149,8 +157,7 @@ export default class LiteGUI {
     this.modalbg_div.style.display = "none";
     this.root.appendChild(this.modalbg_div);
 
-    //create menubar
-    if (options.menubar) this.createMenu();
+  
 
     //called before anything
     // if (options.gui_callback) options.gui_callback();
@@ -166,8 +173,7 @@ export default class LiteGUI {
 
 
   static createMenu() {
-    LiteGUI.menubar = new Menu("mainmenubar");
-    LiteGUI.add(LiteGUI.menubar);
+    
   }
 
   static setWindowSize(w?: number, h?: number) {
@@ -215,11 +221,6 @@ export default class LiteGUI {
     function inner(element: HTMLElement | MonitorableObject) {
       if (element.addEventListener) {
         element.addEventListener(event, callback);
-      } else if ((element as MonitorableObject).__events) {
-        (element as MonitorableObject).__events.on(event, callback);
-      } else {
-        (element as MonitorableObject)._events = new EventMitter();
-        (element as MonitorableObject).__events.on(event, callback);
       }
     }
   }
@@ -252,7 +253,7 @@ export default class LiteGUI {
    * @method remove
    * @param {Object} litegui_element it also supports HTMLentity, selector string or Array of elements
    */
-  static remove(element: HTMLElement | string) {
+  static remove(element: Widget | HTMLElement | string) {
     if (!element) return false;
 
     if (typeof element === 'string') {
@@ -533,7 +534,7 @@ export default class LiteGUI {
     if (request.mimeType) xhr.overrideMimeType(request.mimeType);
     if (request.nocache) xhr.setRequestHeader("Cache-Control", "no-cache");
 
-    xhr.onload = function (load) {
+    xhr.onload = function () {
       var response = this.response;
       if (this.status != 200) {
         var err = "Error " + this.status;
@@ -771,7 +772,7 @@ export default class LiteGUI {
    * @param {Object} style
    * @return {HTMLElement}
    **/
-  static createListItem(code: string, values: Record<string, string>, style: string | Record<string, string>) {
+  static createListItem(code: string, values: Record<string, string>, style?: string | Record<string, string>) {
     const elem = document.createElement("span");
     elem.innerHTML = code;
     if (values)
@@ -891,11 +892,11 @@ export default class LiteGUI {
     options.title = options.title || "Attention";
     options.content = content;
     options.close = "fade";
-    var dialog = new LiteGUI.Dialog(options, false);
+    var dialog = new LiteGUI.Dialog(options);
     if (!options.noclose) {
       dialog.addButtonToFooter("Close", { name: "Close", close: true });
     }
-    dialog.makeModal("fade");
+    dialog.makeModal();
     return dialog;
   }
 
@@ -912,7 +913,7 @@ export default class LiteGUI {
       content = "<p>" + content + "</p>";
     }
     options.content = content;
-    const dialog = new LiteGUI.Dialog(options);
+    const dialog = new Dialog(options);
     if (!options.noclose) {
       dialog.addButtonToFooter("Close", { name: "Close", close: true });
     }
@@ -1132,10 +1133,10 @@ export default class LiteGUI {
    **/
   static draggable(
     container: HTMLElement,
-    dragger: HTMLElement,
-    on_start: Function,
-    on_finish: Function,
-    on_is_draggable: Function
+    dragger?: HTMLElement,
+    on_start?: Function,
+    on_finish?: Function,
+    on_is_draggable?: Function
   ) {
     dragger = dragger || container;
     dragger.addEventListener("mousedown", inner_mouse);
@@ -1310,4 +1311,10 @@ export default class LiteGUI {
       }
     }
   }
+
+  static createLitebox() {
+    return new LiteBox()
+  }
 };
+
+export default LiteGUI;

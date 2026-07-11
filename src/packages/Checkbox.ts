@@ -5,7 +5,7 @@ interface CheckboxOptions {
   onChange?: Callback;
 }
 
-class Checkbox {
+export class Checkbox {
   value: boolean;
   options: CheckboxOptions;
   root: HTMLSpanElement;

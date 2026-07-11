@@ -52,12 +52,12 @@ class Tab {
 export class Tabs {
   options: any;
   mode: any;
-  root: any;
+  root: HTMLElement = document.createElement("div");
   current_tab: any;
   previous_tab: any;
   plus_tab: any;
   _timeout_mouseover: any;
-  list: HTMLUListElement;
+  list: HTMLUListElement = document.createElement("ul");
   tabs_root: any;
   tabs: any;
 
@@ -82,10 +82,12 @@ export class Tabs {
 
     // 创建根元素
     const root = document.createElement("div");
-    if (options.id) root.id = options.id;
+    if (options.id) {
+      root.id = options.id;
+    }
     root.className = "litetabs " + this.mode;
     this.root = root;
-    this.root.tabs = this;
+    
 
     this.current_tab = null; // 当前选中的标签页 [id, tab, content]
 
@@ -372,7 +374,11 @@ export class Tabs {
     this.root.appendChild(content);
 
     //when clicked
-    if (!options.button) element.addEventListener("click", Tabs.prototype.onTabClicked);
+    if (!options.button) {
+      element.addEventListener("click", () => {
+        this.onTabClicked(element);
+      });
+    } 
     else
       element.addEventListener("click", function (e) {
         var tab_id = this.dataset["id"];
@@ -450,8 +456,11 @@ export class Tabs {
       skip_callbacks: true
     });
   }
+
   //this is tab
   onTabClicked(e: any) {
+    console.log(this, this.root);
+    
     // 如果标签页已经被选中则跳过
     if (this.root.classList.contains("selected")) return;
 
@@ -530,12 +539,12 @@ export class Tabs {
 
     // 查找对应id的tab元素并触发点击
     const tabs = Array.from(this.list.querySelectorAll("li.wtab")) as HTMLElement[];
-    for (const tab of tabs) {
-      if (id === tab.dataset["id"]) {
-        this.onTabClicked.call(tab, !skip_events);
-        break;
-      }
-    }
+    // for (const tab of tabs) {
+    //   if (id === tab.dataset["id"]) {
+    //     this.onTabClicked.call(tab, !skip_events);
+    //     break;
+    //   }
+    // }
   }
 
   /**
@@ -554,20 +563,26 @@ export class Tabs {
 
 
 
+  /**
+   * 重新计算标签页的索引顺序
+   * 根据标签页在DOM中的实际位置更新tabs_by_index数组
+   */
   recomputeTabsByIndex() {
+    // 清空原有索引数组
     this.tabs_by_index = [];
 
-    for (var i in this.tabs) {
-      var tab = this.tabs[i];
+    // 获取所有标签页元素
+    const tabElements = Array.from(this.list.children);
 
-      //compute index
-      var index = 0;
-      var child = tab.tab;
-      while ((child = child.previousSibling) != null) index++;
-
-      this.tabs_by_index[index] = tab;
-    }
-  };
+    // 遍历所有标签页元素
+    tabElements.forEach((tabElement, index) => {
+      const tabId = tabElement.getAttribute('data-id');
+      if (tabId && this.tabs[tabId]) {
+        // 将标签页对象按DOM中的顺序存入索引数组
+        this.tabs_by_index[index] = this.tabs[tabId];
+      }
+    });
+  }
 
   removeTab(id: string) {
     var tab = this.tabs[id];
@@ -649,55 +664,5 @@ export class Tabs {
     tab.tab.classList.remove("selected");
     target_tabs.selectTab(id);
   };
-
-  detachTab(id: string, on_complete?: Function, on_close?: Function) {
-    const tab = this.tabs[id];
-    if (!tab) return;
-
-    const index = this.getTabIndex(id);
-    const that = this;
-
-    // 创建新窗口
-    const w = 800;
-    const h = 600;
-    const tab_window = window.open(
-      "",
-      "",
-      `width=${w}, height=${h}, location=no, status=no, menubar=no, titlebar=no, fullscreen=yes`
-    );
-    if (!tab_window) return;
-
-    // 写入头部和标题
-    tab_window.document.write(`<head><title>${id}</title>`);
-
-    // 转移样式表
-    const styles = Array.from(document.querySelectorAll("link[rel='stylesheet'],style"));
-    for (const style of styles) {
-      tab_window.document.write(style.outerHTML);
-    }
-    tab_window.document.write("</head><body></body>");
-    tab_window.document.close();
-
-    // 创建新的标签页组件
-    const newtabs = new LiteGUI.Tabs(null, this.options);
-    
-
-    // 设置关闭事件
-    tab_window.onbeforeunload = function () {
-      newtabs.transferTab(id, that, index);
-      if (on_close) on_close();
-    };
-
-    // 移动内容到新窗口
-    newtabs.list.style.height = "20px";
-    tab_window.document.body.appendChild(newtabs.root);
-    this.transferTab(id, newtabs);
-    newtabs.tabs[id].tab.classList.add("selected");
-    this.recomputeTabsByIndex();
-
-    if (on_complete) on_complete();
-
-    return tab_window;
-  }
 }
 

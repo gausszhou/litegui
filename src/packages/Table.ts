@@ -16,7 +16,7 @@ interface TableOptions {
   scrollable?: boolean;
 }
 
-class Table extends EventMitter {
+export class Table extends EventMitter {
   root: HTMLTableElement;
   header: any;
   data: Object[] | Array<any>[] = [];
@@ -180,6 +180,3 @@ class Table extends EventMitter {
     return true;
   };
 }
-
-
-export default Table;

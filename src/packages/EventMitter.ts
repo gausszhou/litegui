@@ -10,4 +10,7 @@ export default class EventMitter {
   on(eventName: string, callback: Handler) {
     emitter.on(eventName, callback);
   }
+  off(eventName: string, callback: Handler) {
+    emitter.off(eventName, callback);
+  }
 }

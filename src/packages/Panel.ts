@@ -1,8 +1,8 @@
 import LiteGUI from ".";
-import type { LiteComponent } from "../types";
+import type { LiteComponent } from "../types/index";
 import { createElementFromString } from "./utils";
 
-class Panel {
+export class Panel {
   static TITLE_HEIGHT = "20px";
 
   public id: string;
@@ -16,7 +16,7 @@ class Panel {
       options = id;
     }
     this.id = id;
-    options = options || {};
+    this.options = options || {};
     this.content = options.content || "";
     this.root = this.createElementRoot();
     this.header = this.createElementHeader();
@@ -83,5 +83,3 @@ class Panel {
     this.content.innerHTML = "";
   }
 }
-
-export default Panel;

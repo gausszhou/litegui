@@ -1,10 +1,19 @@
-import { uglify } from "rollup-plugin-uglify";
 import typescript from '@rollup/plugin-typescript';
 import postcss from 'rollup-plugin-postcss';
-// import scss from 'rollup-plugin-scss';
+
 export default [
   {
-    input: "src/index",
+    input: 'src/styles/index.scss',
+    output: { file: 'lib/index.css' },
+    plugins: [
+      postcss({
+        extract: true,
+        use: ['sass']
+      })
+    ]
+  },
+  {
+    input: "src/index.ts",
     output: [
       {
         format: "umd",
@@ -16,6 +25,10 @@ export default [
         file: "lib/bundle.esm.js"
       }
     ],
-    plugins: [uglify(), typescript(), postcss()]
+    plugins: [typescript()],
+    onwarn() {
+      // 完全忽略所有警告
+      return;
+    }
   }
 ];

@@ -4,9 +4,7 @@ import EventMitter from "./EventMitter";
 const KEY_CODE_UP = 38;
 const KEY_CODE_DOWN = 40;
 
-/***** DRAGGER **********/
-
-class Dragger extends EventMitter {
+export class Dragger extends EventMitter {
   options: any;
   value: number;
   precision: number;
@@ -187,4 +185,3 @@ class Dragger extends EventMitter {
   }
 }
 
-export default Dragger;

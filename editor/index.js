@@ -1,5 +1,5 @@
-// import LiteGUI from "../src/index"
-import LiteGUI from "../lib/bundle.esm";
+import "../lib/index.css"
+import LiteGUI from "../src/index"
 
 let mainarea = null;
 let bottomPanel = null;

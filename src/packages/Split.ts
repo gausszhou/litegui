@@ -21,7 +21,7 @@ interface Section {
  * @class Split
  * @constructor new Split([50, 50], { vertical: true })
  */
-class Split {
+export class Split {
   root: HTMLDivElement;
   sections: Section[] = [];
 
@@ -100,5 +100,3 @@ class Split {
   }
 
 }
-
-export default Split;
