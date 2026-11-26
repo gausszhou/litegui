@@ -1,5 +1,6 @@
 import "../src/styles/index.scss"
 import LiteGUI from "../src/index"
+import { Inspector, Tree } from "../src/experimental"
 
 let mainarea = null;
 let bottomPanel = null;
@@ -216,7 +217,7 @@ function updateSidePanel(root) {
     ]
   };
 
-  const litetree = new LiteGUI.Tree(mytree, { allow_rename: true });
+  const litetree = new Tree(mytree, { allow_rename: true });
   LiteGUI.bind(litetree.root, "item_selected", function (e) {
     console.log("Node selected: ", e.detail);
   });
@@ -229,7 +230,7 @@ function updateSidePanel(root) {
   root.add(tabs_widget);
 
   //side panel widget
-  const widgets = new LiteGUI.Inspector();
+  const widgets = new Inspector();
   widgets.onchange = function (name, value, widget) {
     console.log("Widget change: " + name + " -> " + value);
   };
@@ -397,7 +398,7 @@ function createWidgetsDialog() {
   });
   minimenu.attachToPanel(dialog);
 
-  var widgets = new LiteGUI.Inspector();
+  var widgets = new Inspector();
   widgets.addButton("button", "Update", {
     callback: function () {
       updateSidePanel();

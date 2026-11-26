@@ -1,6 +1,8 @@
 // TODO(phase-1): 将 prototype API 收敛到 class 类型声明后移除 @ts-nocheck
 // @ts-nocheck
+import { deprecate } from "../core/deprecated";
 import LiteGUI from ".";
+import { Tree } from "./Tree";
 import { purgeElement } from "./utils";
 /**
 * Inspector 允许轻松创建一个小部件列表,它还提供了自动创建小部件的方法。<br/>
@@ -64,7 +66,7 @@ export class Inspector {
       const id = options;
       options = arguments[1] || {};
       options.id = id;
-      console.warn("LiteGUI.Inspector legacy parameter, use options as first parameter instead of id.");
+      deprecate("inspector-legacy-args", "Inspector(id, options) is deprecated; use Inspector(options).");
     }
 
     // 创建根元素
@@ -678,14 +680,14 @@ Inspector.prototype.add = function (type, name, value, options) {
         value = options.value;
     }
 
-    var func = LiteGUI.Inspector.widget_constructors[type.toLowerCase()];
+    var func = Inspector.widget_constructors[type.toLowerCase()];
     if (!func) {
-        console.warn("LiteGUI.Inspector do not have a widget called", type);
+        console.warn("Inspector do not have a widget called", type);
         return;
     }
 
     if (func.constructor === String)
-        func = LiteGUI.Inspector.prototype[func];
+        func = Inspector.prototype[func];
     if (!func)
         return;
     if (func.constructor !== Function)
@@ -2486,7 +2488,7 @@ Inspector.prototype.addColor = function (name, value, options) {
         input_element.addEventListener("change", function (e) {
             var rgbelement = element.querySelector(".rgb-color");
             if (rgbelement)
-                rgbelement.innerHTML = LiteGUI.Inspector.parseColor(myColor.rgb);
+                rgbelement.innerHTML = Inspector.parseColor(myColor.rgb);
         });
 
         myColor.onImmediateChange = function () {
@@ -2528,7 +2530,7 @@ Inspector.prototype.addColor = function (name, value, options) {
         input_element.addEventListener("change", function (e) {
             var rgbelement = element.querySelector(".rgb-color");
             if (rgbelement)
-                rgbelement.innerHTML = LiteGUI.Inspector.parseColor(myColor.rgb);
+                rgbelement.innerHTML = Inspector.parseColor(myColor.rgb);
         });
     }
 
@@ -2628,7 +2630,7 @@ Inspector.prototype.addTree = function (name, value, options) {
 
     var current = value;
 
-    var tree = element.tree = new LiteGUI.Tree(value, options.tree_options);
+    var tree = element.tree = new Tree(value, options.tree_options);
     tree.onItemSelected = function (node, data) {
         if (options.callback)
             options.callback.call(element, node, data);
@@ -2793,7 +2795,7 @@ Inspector.prototype.addArray = function (name, value, options) {
 //creates an empty container but it is not set active
 Inspector.prototype.addContainer = function (name, options) {
     if (name && name.constructor !== String)
-        console.warn("LiteGUI.Inspector.addContainer first parameter must be a string with the name");
+        console.warn("Inspector.addContainer first parameter must be a string with the name");
     var element = this.startContainer(null, options);
     this.endContainer();
     return element;

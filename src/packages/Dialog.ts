@@ -1,6 +1,7 @@
 import type { LiteComponent } from "../types/index";
 import { type ButtonOptions, Button } from "./Button";
 import EventMitter from "./EventMitter";
+import { deprecate } from "../core/deprecated";
 import { draggable } from "../core/dom";
 import { coreState, getContent, getModalBackground, getRoot, showModalBackground } from "../core/state";
 
@@ -95,6 +96,9 @@ export class Dialog extends EventMitter implements LiteComponent {
 
   constructor(options: DialogOptions | string = {}) {
     super();
+    if (typeof options === "string") {
+      deprecate("dialog-string-arg", "Dialog(id) is deprecated; use Dialog({ id }).");
+    }
     const opts: DialogOptions = typeof options === "string" ? { id: options } : options;
     this.options = opts;
     this.id = opts.id ?? "";

@@ -1,3 +1,4 @@
+import { deprecate } from "../core/deprecated";
 import { bind, trigger } from "../core/events";
 import { sizeToCSS } from "../core/dom";
 import { coreState } from "../core/state";
@@ -40,7 +41,7 @@ export class Area extends EventMitter {
       const id = options;
       options = legacy || {};
       options.id = id;
-      console.warn("LiteGUI.Area legacy parameter, use options as first parameter instead of id.");
+      deprecate("area-legacy-args", "Area(id, options) is deprecated; use Area(options).");
     }
     this.options = options || {};
     /* the root element containing all sections */

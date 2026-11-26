@@ -60,5 +60,17 @@ export default [
     onwarn() {
       return;
     }
+  },
+  {
+    input: "src/experimental.ts",
+    output: {
+      format: "es",
+      file: "lib/experimental.esm.js",
+      sourcemap: true
+    },
+    plugins: [typescript()],
+    onwarn() {
+      return;
+    }
   }
 ];

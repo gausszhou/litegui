@@ -8,7 +8,8 @@ export default defineConfig({
     nav: [
       { text: "指南", link: "/getting-started" },
       { text: "组件", link: "/components" },
-      { text: "示例", link: "/examples" }
+      { text: "示例", link: "/examples" },
+      { text: "API 稳定性", link: "/api-stability" }
     ],
     sidebar: [
       {
@@ -16,7 +17,8 @@ export default defineConfig({
         items: [
           { text: "快速开始", link: "/getting-started" },
           { text: "示例", link: "/examples" },
-          { text: "组件", link: "/components" }
+          { text: "组件", link: "/components" },
+          { text: "API 稳定性", link: "/api-stability" }
         ]
       }
     ],

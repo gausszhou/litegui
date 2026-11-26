@@ -44,7 +44,15 @@ v0.1 只承诺 **12 个核心组件**；`Inspector`、`Tree`、`ContextMenu` 等
   - 13 个按组件 ESM 入口与 `exports` 子路径
   - VitePress 文档站与 GitHub Pages 部署工作流
   - 视觉回归/完整浏览器矩阵顺延到 Phase 3
-- [ ] **Phase 3**：API 冻结、性能/安全与 v1.0.0
+- [x] **Phase 3（2026-11-27）**：安全、性能、API 治理与 v1.0.0
+  - [x] 安全：`escapeHTML`、Table 默认纯文本、Menu 标签文本化
+  - [x] 性能：Table 1000 行基准、Dialog/Panel 生命周期泄漏检查
+  - [x] API 稳定性与弃用文档、`deprecate` 一次性告警
+  - [x] Playwright Chrome + Firefox 页面/主题测试
+  - [x] Inspector/Tree 拆分到 `litegui/experimental`，主入口移除
+  - [x] ContextMenu 移除 `@ts-nocheck`
+  - [x] v1.0.0 冻结与发布
+  - 视觉截图基线与 WebKit 矩阵列入 post-1.0 backlog
 
 ---
 

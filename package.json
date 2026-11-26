@@ -1,7 +1,7 @@
 {
   "name": "litegui",
   "private": false,
-  "version": "0.2.0",
+  "version": "1.0.0",
   "type": "module",
   "files": [
     "lib"
@@ -67,6 +67,10 @@
     "./console": {
       "types": "./lib/types/entries/console.d.ts",
       "import": "./lib/entries/console.js"
+    },
+    "./experimental": {
+      "types": "./lib/types/experimental.d.ts",
+      "import": "./lib/experimental.esm.js"
     }
   },
   "scripts": {
@@ -82,9 +86,12 @@
     "test:watch": "vitest",
     "docs:dev": "vitepress dev docs",
     "docs:build": "vitepress build docs",
-    "docs:preview": "vitepress preview docs"
+    "docs:preview": "vitepress preview docs",
+    "bench": "vitest bench --run",
+    "test:e2e": "playwright test"
   },
   "devDependencies": {
+    "@playwright/test": "^1.65.1",
     "@rollup/plugin-typescript": "^8.5.0",
     "@types/lodash-es": "^4.17.12",
     "@types/node": "^22.10.2",

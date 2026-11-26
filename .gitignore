@@ -38,3 +38,7 @@ pnpm-lock.yaml
 # test / build artifacts
 coverage
 *.tsbuildinfo
+
+# playwright
+test-results
+playwright-report

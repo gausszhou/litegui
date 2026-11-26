@@ -1,5 +1,28 @@
 # Changelog
 
+## 1.0.0 (2026-11-27)
+
+首个稳定核心版本。
+
+### Added
+
+- `litegui/experimental` 子路径：`Inspector`、`Tree` 从主入口拆出。
+- HTML 安全默认值：`escapeHTML`、Table `allowHTML` 开关、Menu 标签文本化。
+- API 稳定性与弃用文档、`deprecate` 一次性告警。
+- Playwright 页面测试（Chrome + Firefox）与性能基准、生命周期泄漏检查。
+
+### Changed
+
+- 主 ESM 包体从约 141 KB 降到约 82 KB（Inspector/Tree 移至 experimental）。
+- 主入口不再暴露 `LiteGUI.Inspector`、`LiteGUI.Tree`；请改用 `litegui/experimental`。
+- ContextMenu 移除 `@ts-nocheck`。
+
+### Known limitations
+
+- 视觉截图基线与 WebKit 矩阵尚未纳入 CI。
+- `Inspector`、`Tree` 仍为 experimental，内部保留 `@ts-nocheck`。
+- 尚未发布 npm registry；仓库内版本号为 1.0.0。
+
 ## 0.2.0 (2026-11-27)
 
 ### Added

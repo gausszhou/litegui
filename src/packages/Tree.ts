@@ -29,7 +29,9 @@
 * @constructor
 */
 
-import LiteGUI from ".";
+import { deprecate } from "../core/deprecated";
+import { trigger } from "../core/events";
+import { LiteBox } from "./Box";
 
 /*********** LiteTree *****************************/
 interface TreeOptions {
@@ -62,7 +64,7 @@ export class Tree {
             data = options;
             options = legacy || {};
             options.id = id;
-            console.warn("LiteGUI.Tree legacy parameter, use data as first parameter instead of id.");
+            deprecate("tree-legacy-args", "Tree(id, data, options) is deprecated; use Tree(data, options).");
         }
 
         // 初始化配置项
@@ -447,15 +449,15 @@ Tree.prototype.createTreeItem = function (data, options, level) {
             //check if selected
             if (that.isNodeSelected(node)) {
                 node.classList.remove("selected");
-                LiteGUI.trigger(that, "item_remove_from_selection", { item: node, data: node.data });
-                LiteGUI.trigger(that.root, "item_remove_from_selection", { item: node, data: node.data }); //LEGACY
+                trigger(that, "item_remove_from_selection", { item: node, data: node.data });
+                trigger(that.root, "item_remove_from_selection", { item: node, data: node.data }); //LEGACY
                 return;
             }
 
             //mark as selected
             that.markAsSelected(node, true);
-            LiteGUI.trigger(that, "item_add_to_selection", { item: node, data: node.data });
-            LiteGUI.trigger(that.root, "item_add_to_selection", { item: node, data: node.data }); //LEGACY
+            trigger(that, "item_add_to_selection", { item: node, data: node.data });
+            trigger(that.root, "item_add_to_selection", { item: node, data: node.data }); //LEGACY
             var r = false;
             if (data.callback)
                 r = data.callback.call(that, node);
@@ -483,8 +485,8 @@ Tree.prototype.createTreeItem = function (data, options, level) {
                 //console.log(item);
                 //mark as selected
                 that.markAsSelected(item, true);
-                LiteGUI.trigger(that, "item_add_to_selection", { item: item, data: item.data });
-                LiteGUI.trigger(that.root, "item_add_to_selection", { item: item, data: item.data }); //LEGACY
+                trigger(that, "item_add_to_selection", { item: item, data: item.data });
+                trigger(that.root, "item_add_to_selection", { item: item, data: item.data }); //LEGACY
             }
         }
         else {
@@ -492,8 +494,8 @@ Tree.prototype.createTreeItem = function (data, options, level) {
             that.markAsSelected(node);
 
             that._skip_scroll = true; //avoid scrolling while user clicks something
-            LiteGUI.trigger(that, "item_selected", { item: node, data: node.data });
-            LiteGUI.trigger(that.root, "item_selected", { item: node, data: node.data }); //LEGACY
+            trigger(that, "item_selected", { item: node, data: node.data });
+            trigger(that.root, "item_selected", { item: node, data: node.data }); //LEGACY
             var r = false;
             if (data.callback)
                 r = data.callback.call(that, node);
@@ -508,8 +510,8 @@ Tree.prototype.createTreeItem = function (data, options, level) {
         var node = this; //this.parentNode;
         var title = node.title_element.querySelector(".incontent");
 
-        LiteGUI.trigger(that, "item_dblclicked", node);
-        LiteGUI.trigger(that.root, "item_dblclicked", node); //LEGACY
+        trigger(that, "item_dblclicked", node);
+        trigger(that.root, "item_dblclicked", node); //LEGACY
 
         if (!title._editing && that.options.allow_rename) {
             title._editing = true;
@@ -524,7 +526,7 @@ Tree.prototype.createTreeItem = function (data, options, level) {
                 setTimeout(function () { that2.innerHTML = new_name; }, 1); //bug fix, if I destroy input inside the event, it produce a NotFoundError
                 //item.node_name = new_name;
                 delete that2._editing;
-                LiteGUI.trigger(that.root, "item_renamed", { old_name: that2._old_name, new_name: new_name, item: node, data: node.data });
+                trigger(that.root, "item_renamed", { old_name: that2._old_name, new_name: new_name, item: node, data: node.data });
                 delete that2._old_name;
             });
 
@@ -604,7 +606,7 @@ Tree.prototype.createTreeItem = function (data, options, level) {
 
         //var data = ev.dataTransfer.getData("Text");
         if (!item_id) {
-            LiteGUI.trigger(that.root, "drop_on_item", { item: this, event: ev });
+            trigger(that.root, "drop_on_item", { item: this, event: ev });
             if (that.onDropItem)
                 that.onDropItem(ev, this.parentNode.data);
             return;
@@ -616,7 +618,7 @@ Tree.prototype.createTreeItem = function (data, options, level) {
 
             if (!that.onMoveItem || (that.onMoveItem && that.onMoveItem(that.getItem(item_id), that.getItem(parent_id)) != false)) {
                 if (that.moveItem(item_id, parent_id))
-                    LiteGUI.trigger(that.root, "item_moved", { item: that.getItem(item_id), parent_item: that.getItem(parent_id) });
+                    trigger(that.root, "item_moved", { item: that.getItem(item_id), parent_item: that.getItem(parent_id) });
             }
         }
         /*
@@ -693,7 +695,7 @@ Tree.prototype.filterByRule = function (callback_to_filter, param) {
                 if (name)
                     indent.style.paddingLeft = 0;
                 else
-                    indent.style.paddingLeft = paddingLeft = ((parseInt(childNode.dataset["level"]) + this.indent_offset) * LiteGUI.Tree.INDENT) + "px";
+                    indent.style.paddingLeft = paddingLeft = ((parseInt(childNode.dataset["level"]) + this.indent_offset) * Tree.INDENT) + "px";
             }
         }
         else {
@@ -856,7 +858,7 @@ Tree.prototype.setSelectedItem = function (id, scroll, send_event) {
     this.expandItem(node, true);
 
     if (send_event)
-        LiteGUI.trigger(node, "click");
+        trigger(node, "click");
 
     return node;
 }
@@ -1219,7 +1221,7 @@ Tree.prototype._updateListBox = function (node, options, current_level) {
 
     if (!node.listbox) {
         var pre = node.title_element.querySelector(".collapsebox");
-        var box = LiteGUI.createLitebox();
+        var box = new LiteBox();
         box.stopPropagation = true;
         box.setEmpty(true);
         pre.appendChild(box.root);

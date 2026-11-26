@@ -1,5 +1,3 @@
-// TODO(phase-1): 将 prototype API 收敛到 class 类型声明后移除 @ts-nocheck
-// @ts-nocheck
 import { trigger } from "../core/events";
 import { isCursorOverElement } from "../core/dom";
 
@@ -72,20 +70,17 @@ export class ContextMenu {
         // 阻止默认右键菜单
         root.addEventListener("mouseup", (e) => {
             e.preventDefault();
-            return true;
         }, true);
 
         root.addEventListener("contextmenu", (e) => {
-            if (e.button !== 2) return false;
+            if (e.button !== 2) return;
             e.preventDefault();
-            return false;
         }, true);
 
         root.addEventListener("mousedown", (e) => {
             if (e.button === 2) {
                 this.close();
                 e.preventDefault();
-                return true;
             }
         }, true);
 
@@ -98,12 +93,10 @@ export class ContextMenu {
         }
 
         // 添加菜单项
-        for (const i in values) {
-            let name = Array.isArray(values) ? values[i] : i;
-            if (name != null && typeof name !== "string") {
-                name = name.content === undefined ? String(name) : name.content;
-            }
-            const value = values[i];
+        const entries: Array<[any, any]> = Array.isArray(values)
+            ? values.map((value) => [value?.title ?? value?.content ?? String(value), value])
+            : Object.entries(values);
+        for (const [name, value] of entries) {
             this.addItem(name, value, options);
         }
 
@@ -116,7 +109,7 @@ export class ContextMenu {
             (root as any).closing_timer = setTimeout(() => this.close(e), 500);
         });
 
-        root.addEventListener("mouseenter", (e) => {
+        root.addEventListener("mouseenter", () => {
             if ((root as any).closing_timer) {
                 clearTimeout((root as any).closing_timer);
             }
@@ -131,7 +124,7 @@ export class ContextMenu {
         };
 
         root.addEventListener("wheel", onMouseWheel, true);
-        root.addEventListener("mousewheel", onMouseWheel, true);
+        root.addEventListener("mousewheel" as any, onMouseWheel, true);
 
         // 添加到文档
         const rootDocument = options.event ?
@@ -154,8 +147,9 @@ export class ContextMenu {
                 console.warn("Event passed to ContextMenu is not of type MouseEvent");
                 this.options.event = undefined;
             } else {
-                left = (this.options.event.pageX - 10);
-                top = (this.options.event.pageY - 10);
+                const event = this.options.event as MouseEvent;
+                left = (event.pageX - 10);
+                top = (event.pageY - 10);
 
                 if (this.options.title) {
                     top -= 20;
@@ -181,94 +175,79 @@ export class ContextMenu {
         this.root.style.left = `${left}px`;
         this.root.style.top = `${top}px`;
     }
-    addItem(name, value, options) {
-        var that = this;
-        options = options || {};
+    addItem(name: any, value: any, options: ContextMenuOptions = {}) {
+        const that = this;
 
-        var element = document.createElement("div");
+        const element = document.createElement("div");
         element.className = "litemenu-entry submenu";
 
-        var disabled = false;
+        let disabled = false;
 
         if (value === null) {
             element.classList.add("separator");
-            //element.innerHTML = "<hr/>"
-            //continue;
-        }
-        else {
-            element.innerHTML = value && value.title ? value.title : name;
-            element.value = value;
+        } else {
+            element.innerHTML = value && value.title ? value.title : String(name ?? "");
+            (element as any).value = value;
 
             if (value) {
                 if (value.disabled) {
                     disabled = true;
                     element.classList.add("disabled");
                 }
-                if (value.submenu || value.has_submenu)
+                if (value.submenu || value.has_submenu) {
                     element.classList.add("has_submenu");
+                }
             }
 
-            if (typeof (value) == "function") {
-                element.dataset["value"] = name;
-                element.onclick_callback = value;
+            if (typeof value === "function") {
+                element.dataset["value"] = String(name);
+                (element as any).onclick_callback = value;
+            } else {
+                element.dataset["value"] = String(value);
             }
-            else
-                element.dataset["value"] = value;
         }
 
         this.root.appendChild(element);
-        if (!disabled)
-            element.addEventListener("click", inner_onclick);
-        if (options.autoopen)
-            element.addEventListener("mouseenter", inner_over);
+        if (!disabled) element.addEventListener("click", inner_onclick);
+        if (options.autoopen) element.addEventListener("mouseenter", inner_over);
 
-        function inner_over(e) {
-            var value = this.value;
-            if (!value || !value.has_submenu)
-                return;
+        function inner_over(this: HTMLDivElement, e: Event) {
+            const item = (this as any).value;
+            if (!item || !item.has_submenu) return;
             inner_onclick.call(this, e);
         }
 
-        //menu option clicked
-        function inner_onclick(e) {
-            var value = this.value;
-            var close_parent = true;
+        function inner_onclick(this: HTMLDivElement, e: Event) {
+            const item = (this as any).value;
+            let close_parent = true;
 
-            if (that.current_submenu)
-                that.current_submenu.close(e);
+            if (that.current_submenu) that.current_submenu.close(e);
 
-            //global callback
             if (options.callback) {
-                var r = options.callback.call(that, value, options, e);
-                if (r === true)
-                    close_parent = false;
+                const result = options.callback.call(that, item, options, e);
+                if (result === true) close_parent = false;
             }
 
-            //special cases
-            if (value) {
-                if (value.callback && !options.ignore_item_callbacks && value.disabled !== true)  //item callback
-                {
-                    var r = value.callback.call(this, value, options, e, that);
-                    if (r === true)
-                        close_parent = false;
+            if (item) {
+                if (item.callback && !options.ignore_item_callbacks && item.disabled !== true) {
+                    const result = item.callback.call(this, item, options, e, that);
+                    if (result === true) close_parent = false;
                 }
-                if (value.submenu) {
-                    if (!value.submenu.options)
-                        throw ("ContextMenu submenu needs options");
-                    var submenu = new ContextMenu(value.submenu.options, {
-                        callback: value.submenu.callback,
-                        event: e,
+                if (item.submenu) {
+                    if (!item.submenu.options) throw new Error("ContextMenu submenu needs options");
+                    new ContextMenu(item.submenu.options, {
+                        callback: item.submenu.callback,
+                        event: e as MouseEvent,
                         parentMenu: that,
-                        ignore_item_callbacks: value.submenu.ignore_item_callbacks,
-                        title: value.submenu.title,
+                        ignore_item_callbacks: item.submenu.ignore_item_callbacks,
+                        title: item.submenu.title,
                         autoopen: options.autoopen
                     });
                     close_parent = false;
                 }
             }
 
-            if (close_parent && !that.lock)
-                that.close();
+            if (close_parent && !that.lock) that.close();
         }
 
         return element;
@@ -286,7 +265,7 @@ export class ContextMenu {
 
         if (this.parentMenu && !ignore_parent_menu) {
             this.parentMenu.lock = false;
-            this.parentMenu.current_submenu = null;
+            this.parentMenu.current_submenu = undefined;
             if (e === undefined) {
                 this.parentMenu.close();
             } else if (e && !isCursorOverElement(e as MouseEvent, this.parentMenu.root)) {
