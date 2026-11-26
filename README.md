@@ -72,6 +72,7 @@ npm run build:pages
 npm run typecheck
 npm test
 npm run test:watch
+npm run bench
 ```
 
 ## 作为依赖使用

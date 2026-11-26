@@ -82,7 +82,8 @@
     "test:watch": "vitest",
     "docs:dev": "vitepress dev docs",
     "docs:build": "vitepress build docs",
-    "docs:preview": "vitepress preview docs"
+    "docs:preview": "vitepress preview docs",
+    "bench": "vitest bench --run"
   },
   "devDependencies": {
     "@rollup/plugin-typescript": "^8.5.0",
