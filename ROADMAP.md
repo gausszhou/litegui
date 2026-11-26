@@ -21,6 +21,21 @@ LiteGUI 是一个**无框架、原生 DOM + TypeScript 的桌面风格 Web UI �
 
 v0.1 只承诺 **12 个核心组件**；`Inspector`、`Tree`、`ContextMenu` 等大组件先标记为 experimental，等核心稳定后再逐个转正。
 
+### 0.1 实施进度
+
+- [x] **Phase 0（2026-11-27）**：绿色基线
+  - 依赖可安装，`package-lock.json` 入库
+  - `tsc --noEmit` 0 错误（Inspector/Tree/ContextMenu 临时 `@ts-nocheck`）
+  - Vitest + jsdom：9 个测试文件、30 个用例通过
+  - `npm run build` 通过，产出 `lib/litegui.esm.js`、`lib/litegui.umd.cjs`、`lib/litegui.css`、`lib/types`
+  - `npm pack` 产物可在临时项目安装并 import
+  - 核心修复：EventMitter 实例化、Dialog、Button、Checkbox、Dragger、Table、Tabs、LiteGUI.bind/createMenu
+  - demo/editor 冒烟测试通过
+  - 补充 MIT LICENSE、README 状态表、GitHub Actions CI
+- [ ] **Phase 1**：核心组件验收与 v0.1.0
+- [ ] **Phase 2**：主题、可访问性、文档站与 v0.2.0
+- [ ] **Phase 3**：API 冻结、性能/安全与 v1.0.0
+
 ---
 
 ## 1. 项目是什么
@@ -355,24 +370,24 @@ shells/deploy.sh           # gh-pages 部署脚本
 
 ## 6. 未来 7 天任务清单
 
-- [ ] 确认分支策略：`master` 冻结，`develop` 作为集成分支；为当前工作开 PR。
-- [ ] 修复 `npm install`：移除 `rollup-plugin-uglify`，升级构建链，提交锁文件。
-- [ ] 统一库构建与 `package.json` 出口；`npm pack` 冒烟。
-- [ ] 对 `Inspector`/`Tree`/`ContextMenu` 加临时 `@ts-nocheck`，修完其余类型错误，`tsc` 归零。
-- [ ] 重写 `EventMitter` 为实例级事件总线，补测试。
-- [ ] 修 `Dialog` 的 show/挂载、按钮、`INSTANCE_LIST`、close/modal。
-- [ ] 修 `Button` 的 click 事件、`Checkbox`/`Dragger` 的初始化、`Table` 的字符串列。
-- [ ] 修 `LiteGUI.bind`、`createMenu`、`showMessage/popup` 的依赖链。
-- [ ] 加 MIT LICENSE（保留上游版权）与 README 状态表。
-- [ ] 建 Vitest + jsdom + GitHub Actions 最小流水线。
+- [x] 确认分支策略：`master` 冻结，`develop` 作为集成分支；为当前工作开 PR。
+- [x] 修复 `npm install`：移除 `rollup-plugin-uglify`，升级构建链，提交锁文件。
+- [x] 统一库构建与 `package.json` 出口；`npm pack` 冒烟。
+- [x] 对 `Inspector`/`Tree`/`ContextMenu` 加临时 `@ts-nocheck`，修完其余类型错误，`tsc` 归零。
+- [x] 重写 `EventMitter` 为实例级事件总线，补测试。
+- [x] 修 `Dialog` 的 show/挂载、按钮、`INSTANCE_LIST`、close/modal。
+- [x] 修 `Button` 的 click 事件、`Checkbox`/`Dragger` 的初始化、`Table` 的字符串列。
+- [x] 修 `LiteGUI.bind`、`createMenu`、`showMessage/popup` 的依赖链。
+- [x] 加 MIT LICENSE（保留上游版权）与 README 状态表。
+- [x] 建 Vitest + jsdom + GitHub Actions 最小流水线。
 
 ---
 
 ## 7. 需要确认的决策
 
-1. **提交历史**：`origin/develop` 已指向 amend 后的 `6953f3d`，本地/远端一致；是否接受这次历史改写（需通知其他协作者重新同步），并在基线转绿前冻结历史改写？
-2. **默认分支**：继续用 `master`，还是把 `develop` 设为默认分支？（当前 `master` 是坏的，容易误用。）
-3. **包名/发布**：直接用 `litegui`，还是用 scope（如 `@gausszhou/litegui`）？是否发布到公共 npm？
+1. **提交历史**：已确认；`origin/develop` 指向 amend 后的 `6953f3d`，后续基线转绿前冻结历史改写。
+2. **默认分支**：已确认；`master` 保持默认分支，`develop` 作为开发分支，阶段完成后合并到 `master`。
+3. **包名/发布**：已确认使用 `litegui`（registry 当前未占用）；是否发布公共 npm 在 0.1.0 前决定。
 4. **兼容性**：是否必须兼容上游 litegui.js 的旧签名/全局 `LiteGUI` 用法？兼容一个 minor 还是长期保留？
 5. **大组件归属**：`Inspector`/`Tree`/`ContextMenu` 是 v0.1 必须可用，还是允许 experimental 到 0.2？
 6. **浏览器基线**：只支持现代浏览器（推荐），还是需要兼容旧版/IE？
