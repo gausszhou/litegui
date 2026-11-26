@@ -15,6 +15,12 @@ LiteGUI 面向编辑器、调试器、工具台这类需要菜单、面板、分
 
 Phase 0 已完成：依赖可安装、类型检查归零、核心回归修复、测试与库构建打通。Phase 1 会逐个组件补验收测试和文档。
 
+## 文档
+
+- [Getting Started](./docs/getting-started.md)
+- [示例](./docs/examples.md)
+- [路线图](./ROADMAP.md)
+
 ## 快速开始
 
 ```bash
