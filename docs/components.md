@@ -1,22 +1,22 @@
-# 组件
+# 组件概览
 
 ## 核心
 
-| 组件 | 说明 |
-| --- | --- |
-| `Area` | 可分割的布局容器 |
-| `Panel` | 带标题/关闭按钮的面板 |
-| `Split` | 固定比例分栏 |
-| `Tabs` | 标签页 |
-| `Dialog` | 浮动/模态窗口 |
-| `Menu` | 菜单栏与子菜单 |
-| `Button` | 按钮 |
-| `Checkbox` | 复选框 |
-| `Slider` | 滑块 |
-| `SearchBox` | 搜索输入框 |
-| `List` | 列表 |
-| `Table` | 表格 |
-| `Console` | 控制台输出 |
+| 组件 | 说明 | 文档 |
+| --- | --- | --- |
+| `Area` | 可分割的布局容器 | [布局](/components/layout) |
+| `Panel` | 带标题/关闭按钮的面板 | [布局](/components/layout) |
+| `Split` | 固定比例分栏 | [布局](/components/layout) |
+| `Tabs` | 标签页 | [布局](/components/layout) |
+| `Dialog` | 浮动/模态窗口 | [浮层](/components/overlays) |
+| `Menu` | 菜单栏与子菜单 | [浮层](/components/overlays) |
+| `Button` | 按钮 | [表单](/components/forms) |
+| `Checkbox` | 复选框 | [表单](/components/forms) |
+| `Slider` | 滑块 | [表单](/components/forms) |
+| `SearchBox` | 搜索输入框 | [表单](/components/forms) |
+| `List` | 列表 | [数据展示](/components/data) |
+| `Table` | 表格 | [数据展示](/components/data) |
+| `Console` | 控制台输出 | [数据展示](/components/data) |
 
 ## Experimental
 

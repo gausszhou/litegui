@@ -4,16 +4,14 @@ LiteGUI 是一个无框架的 DOM UI 组件库。它不依赖 React/Vue，适合
 
 ## 安装
 
-```bash
-npm install litegui
-```
-
-或者直接使用仓库源码：
+> 当前 1.0.1 尚未发布到 npm registry；以下为仓库内开发方式。发布后可改为 `npm install litegui`。
 
 ```bash
 npm install
 npm run dev
 ```
+
+打开 `/demo/` 或 `/editor/` 查看示例。
 
 ## 初始化
 
