@@ -88,7 +88,7 @@ export class Console extends EventMitter {
     e.stopPropagation();
   }
 
-  addMessage(text: string | string[], className: string, as_text?: boolean) {
+  addMessage(text: string | string[] | Record<string, unknown>, className: string, as_text?: boolean) {
     const content = this.$log;
     let element: HTMLPreElement | null = null; //contains the last message sent
 

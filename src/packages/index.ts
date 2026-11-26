@@ -323,7 +323,7 @@ export class LiteGUI {
    * @param {String} selector
    * @param {String} class_name
    */
-  static removeClass(root: HTMLElement, selector: string, class_name: string) {
+  static removeClass(root: HTMLElement, selector: string, class_name?: string) {
     if (!class_name) {
       class_name = selector;
       selector = "." + selector;
@@ -1096,16 +1096,16 @@ export class LiteGUI {
 
   // given a html entity string it returns the equivalent unicode character
   static htmlEncode(html_code: string) {
-    var e = document.createElement("div");
-    e.innerHTML = html_code;
-    return e.innerText;
+    const element = document.createElement("div");
+    element.innerHTML = html_code;
+    return element.textContent ?? "";
   }
 
   // given a unicode character it returns the equivalent html encoded string
   static htmlDecode(unicode_character: string) {
-    const e = document.createElement("div");
-    e.innerText = unicode_character;
-    return e.innerHTML;
+    const element = document.createElement("div");
+    element.textContent = unicode_character;
+    return element.innerHTML;
   }
 
 

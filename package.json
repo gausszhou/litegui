@@ -1,7 +1,7 @@
 {
   "name": "litegui",
   "private": false,
-  "version": "1.0.0",
+  "version": "1.0.1",
   "type": "module",
   "files": [
     "lib"
@@ -88,7 +88,8 @@
     "docs:build": "vitepress build docs",
     "docs:preview": "vitepress preview docs",
     "bench": "vitest bench --run",
-    "test:e2e": "playwright test"
+    "test:e2e": "playwright test",
+    "test:coverage": "vitest run --coverage"
   },
   "devDependencies": {
     "@playwright/test": "^1.65.1",

@@ -71,3 +71,37 @@ describe("Area autoresize", () => {
     expect(onResize).toHaveBeenCalledTimes(1);
   });
 });
+
+describe("Area merge and helpers", () => {
+  it("merges back to a single content area", () => {
+    const area = new Area();
+    area.split("horizontal", [200, null], true);
+    const content = area.content;
+    content.innerHTML = "<b>kept</b>";
+
+    area.merge(0);
+
+    expect(area.sections).toHaveLength(0);
+    expect(area.content).toBe(content);
+    expect(area.root.contains(content)).toBe(true);
+    expect(area.root.textContent).toContain("kept");
+    expect(area.splitbar).toBeUndefined();
+  });
+
+  it("sets section sizes and queries content", () => {
+    const area = new Area();
+    area.split("vertical", [null, 100], true);
+    area.setAreaSize(0, "50%");
+
+    expect(area.sections[0].root.style.width).toContain("calc");
+    expect(area.query(".liteareacontent")).toBe(area.content);
+  });
+
+  it("hides and shows the whole area", () => {
+    const area = new Area();
+    area.hide();
+    expect(area.root.style.display).toBe("none");
+    area.show();
+    expect(area.root.style.display).toBe("block");
+  });
+});

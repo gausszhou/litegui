@@ -42,3 +42,45 @@ describe("Tabs", () => {
     expect(tabs.getNumOfTabs()).toBe(2);
   });
 });
+
+import { describe as describeTabs, expect as expectTabs, it as itTabs, vi as viTabs } from "vitest";
+
+describeTabs("Tabs lifecycle", () => {
+  itTabs("removes a tab and its content", () => {
+    const tabs = new Tabs();
+    const tab = tabs.addTab("one", { content: "One", closable: true });
+    tabs.removeTab("one");
+
+    expectTabs(tabs.getNumOfTabs()).toBe(0);
+    expectTabs(tab.content.parentElement).toBeNull();
+  });
+
+  itTabs("supports plus and button tabs", () => {
+    const tabs = new Tabs();
+    const onPlus = viTabs.fn();
+    const onButton = viTabs.fn();
+
+    tabs.addPlusTab(onPlus);
+    tabs.addButtonTab("action", "Action", onButton);
+
+    const buttons = tabs.list.querySelectorAll<HTMLElement>("li.wtab.button");
+    expectTabs(buttons.length).toBe(2);
+    buttons[0].click();
+    buttons[1].click();
+
+    expectTabs(onPlus).toHaveBeenCalledTimes(1);
+    expectTabs(onButton).toHaveBeenCalledTimes(1);
+  });
+
+  itTabs("shows and hides a tab", () => {
+    const tabs = new Tabs();
+    tabs.addTab("one", { content: "One" });
+    tabs.addTab("two", { content: "Two" });
+
+    tabs.hideTab("two");
+    expectTabs(tabs.getTab("two")?.tab?.style.display).toBe("none");
+
+    tabs.showTab("two");
+    expectTabs(tabs.getTab("two")?.tab?.style.display).toBe("");
+  });
+});

@@ -21,3 +21,16 @@ describe("Split", () => {
     expect(split.sections[0].element.contains(child)).toBe(true);
   });
 });
+
+import { describe as describeSplitExtra, expect as expectSplitExtra, it as itSplitExtra } from "vitest";
+
+describeSplitExtra("Split sections", () => {
+  itSplitExtra("adds a section with the parent orientation", () => {
+    const split = new Split([50, 50], { vertical: true });
+    split.addSection({ id: "extra", height: "30%" } as never);
+
+    const section = split.sections[2];
+    expectSplitExtra(section.element.id).toBe("extra");
+    expectSplitExtra(section.element.style.height).toBe("30%");
+  });
+});

@@ -1,5 +1,24 @@
 # Changelog
 
+## 1.0.1 (2026-11-27)
+
+测试与交互修复版本。
+
+### Fixed
+
+- `Dragger` 键盘/滚轮修改后同步 `value`，`getValue()` 不再返回旧值。
+- `Tabs.addTab` 在存在 plus tab 时向正确的 DOM 节点插入。
+- `Area.merge()` 正确保留选中区域内容并清理分栏。
+- `ContextMenu` 子菜单记录到 `current_submenu`，关闭链路完整。
+- `LiteGUI.htmlEncode/htmlDecode` 改用 `textContent/innerHTML`，兼容 jsdom。
+- `Console.addMessage` 支持对象消息类型；`removeClass` 的 `class_name` 改为可选。
+
+### Tests
+
+- 单元/集成测试：29 个文件 / 120 个用例。
+- 覆盖率：约 72.8%（core 78.8%），并设置 70% 覆盖率门槛。
+- Playwright：Chrome + Firefox，10 个交互/移动端用例。
+
 ## 1.0.0 (2026-11-27)
 
 首个稳定核心版本。
