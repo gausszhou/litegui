@@ -14,7 +14,9 @@ lib
 *.local
 
 .vitepress/dist
+docs/.vitepress/dist
 .vitepress/cache
+docs/.vitepress/cache
 .vitepress/temp
 
 

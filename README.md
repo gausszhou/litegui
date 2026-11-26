@@ -32,6 +32,15 @@ npm run dev
 - `/demo/`：最小示例
 - `/editor/`：综合示例
 
+## 文档站
+
+```bash
+npm run docs:dev
+npm run docs:build
+```
+
+VitePress 配置位于 `docs/.vitepress/`，构建产物输出到 `docs/.vitepress/dist`。
+
 ## 构建
 
 ```bash
