@@ -1,5 +1,6 @@
 // TODO(phase-1): 将 prototype API 收敛到 class 类型声明后移除 @ts-nocheck
 // @ts-nocheck
+import { deprecate } from "../core/deprecated";
 import LiteGUI from ".";
 import { purgeElement } from "./utils";
 /**
@@ -64,7 +65,7 @@ export class Inspector {
       const id = options;
       options = arguments[1] || {};
       options.id = id;
-      console.warn("LiteGUI.Inspector legacy parameter, use options as first parameter instead of id.");
+      deprecate("inspector-legacy-args", "Inspector(id, options) is deprecated; use Inspector(options).");
     }
 
     // 创建根元素

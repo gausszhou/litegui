@@ -1,3 +1,4 @@
+import { deprecate } from "../core/deprecated";
 import { trigger } from "../core/events";
 import { LiteComponent } from "../types";
 
@@ -76,7 +77,7 @@ export class Tabs {
       const id = options;
       options = legacy || {};
       options.id = id;
-      console.warn("LiteGUI.Tabs legacy parameter, use options as first parameter instead of id.");
+      deprecate("tabs-legacy-args", "Tabs(id, options) is deprecated; use Tabs(options).");
     }
 
     this.options = options;

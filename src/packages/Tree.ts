@@ -29,6 +29,7 @@
 * @constructor
 */
 
+import { deprecate } from "../core/deprecated";
 import LiteGUI from ".";
 
 /*********** LiteTree *****************************/
@@ -62,7 +63,7 @@ export class Tree {
             data = options;
             options = legacy || {};
             options.id = id;
-            console.warn("LiteGUI.Tree legacy parameter, use data as first parameter instead of id.");
+            deprecate("tree-legacy-args", "Tree(id, data, options) is deprecated; use Tree(data, options).");
         }
 
         // 初始化配置项
