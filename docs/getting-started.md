@@ -91,7 +91,18 @@ LiteGUI.add(menu);
 
 ## 主题
 
-在引入 `litegui/style.css` 之前覆盖 CSS 变量或选择器即可。当前版本仍是全局样式，`lg-` 前缀与主题变量在 Phase 2 完成。
+```ts
+LiteGUI.setTheme("light");
+LiteGUI.getTheme(); // "light"
+```
+
+也可以在初始化时传入：
+
+```ts
+LiteGUI.init({ container: "#app", theme: "light" });
+```
+
+主题通过 `<html data-lg-theme="...">` 与 CSS 变量实现，可在 `litegui/style.css` 之后覆盖 `--lg-color-*` 变量。
 
 ## 构建与测试
 

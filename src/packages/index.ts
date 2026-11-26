@@ -4,7 +4,7 @@ import mitt from "mitt";
 import { LiteComponent } from "../types/index";
 import { createElement as coreCreateElement, createListItem as coreCreateListItem, draggable as coreDraggable, remove as coreRemove, sizeToCSS as coreSizeToCSS } from "../core/dom";
 import { bind as coreBind, trigger as coreTrigger, unbind as coreUnbind } from "../core/events";
-import { coreState, showModalBackground as coreShowModalBackground } from "../core/state";
+import { coreState, getTheme, setTheme, showModalBackground as coreShowModalBackground, type LiteTheme } from "../core/state";
 import { Area } from "./Area";
 import { LiteBox } from "./Box";
 import { Button } from "./Button";
@@ -41,6 +41,7 @@ interface LiteGUIOptions {
   height?: number;
   wrapped?: boolean;
   menubar?: boolean;
+  theme?: LiteTheme;
   gui_callback?: Function;
 }
 
@@ -155,6 +156,7 @@ export class LiteGUI {
     coreState.modalbg = this.modalbg_div;
     this.root.appendChild(this.modalbg_div);
 
+    if (options.theme) LiteGUI.setTheme(options.theme);
     if (options.menubar) this.createMenu();
 
     if (options.gui_callback) options.gui_callback();
@@ -784,6 +786,14 @@ export class LiteGUI {
   //* DIALOGS *******************
   static showModalBackground(v: boolean) {
     coreShowModalBackground(v);
+  }
+
+  static setTheme(theme: LiteTheme): LiteTheme {
+    return setTheme(theme);
+  }
+
+  static getTheme(): LiteTheme {
+    return getTheme();
   }
 
 
