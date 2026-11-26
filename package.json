@@ -4,20 +4,25 @@
   "version": "0.0.0",
   "type": "module",
   "files": [
-    "dist"
+    "lib"
   ],
-  "main": "./lib/bundle.umd.cjs",
-  "module": "./lib/bundle.esm.js",
+  "main": "./lib/litegui.umd.cjs",
+  "module": "./lib/litegui.esm.js",
   "exports": {
     ".": {
-      "import": "./dist/bundle.esm.js",
-      "require": "./dist/bundle.umd.cjs"
-    }
+      "types": "./lib/types/index.d.ts",
+      "import": "./lib/litegui.esm.js",
+      "require": "./lib/litegui.umd.cjs"
+    },
+    "./style.css": "./lib/litegui.css",
+    "./package.json": "./package.json"
   },
   "scripts": {
     "dev": "vite",
-    "build": "tsc && vite build --base=/litegui/",
-    "lib": "rollup -c rollup.config.js",
+    "build": "npm run typecheck && npm run build:lib && npm run build:pages",
+    "build:lib": "rollup -c rollup.config.js && tsc -p tsconfig.build.json",
+    "build:pages": "vite build --base=/litegui/",
+    "lib": "npm run build:lib",
     "format": "prettier --write src/**/*.{js,ts,css,scss}",
     "preview": "vite preview",
     "typecheck": "tsc --noEmit",
@@ -44,5 +49,11 @@
   "dependencies": {
     "lodash-es": "^4.17.21",
     "mitt": "^3.0.0"
-  }
+  },
+  "types": "./lib/types/index.d.ts",
+  "sideEffects": [
+    "*.css",
+    "**/*.css",
+    "**/*.scss"
+  ]
 }

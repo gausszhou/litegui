@@ -1,4 +1,4 @@
-import "../lib/index.css"
+import "../src/styles/index.scss"
 import LiteGUI from "../src/index"
 
 let mainarea = null;
