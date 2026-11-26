@@ -33,5 +33,32 @@ export default [
       // Keep the build output focused; type checking is a separate step.
       return;
     }
+  },
+  {
+    input: {
+      area: "src/entries/area.ts",
+      panel: "src/entries/panel.ts",
+      split: "src/entries/split.ts",
+      tabs: "src/entries/tabs.ts",
+      dialog: "src/entries/dialog.ts",
+      menu: "src/entries/menu.ts",
+      button: "src/entries/button.ts",
+      checkbox: "src/entries/checkbox.ts",
+      slider: "src/entries/slider.ts",
+      searchbox: "src/entries/searchbox.ts",
+      list: "src/entries/list.ts",
+      table: "src/entries/table.ts",
+      console: "src/entries/console.ts"
+    },
+    output: {
+      format: "es",
+      dir: "lib/entries",
+      entryFileNames: "[name].js",
+      chunkFileNames: "chunks/[name]-[hash].js"
+    },
+    plugins: [typescript()],
+    onwarn() {
+      return;
+    }
   }
 ];

@@ -104,6 +104,17 @@ LiteGUI.init({ container: "#app", theme: "light" });
 
 主题通过 `<html data-lg-theme="...">` 与 CSS 变量实现，可在 `litegui/style.css` 之后覆盖 `--lg-color-*` 变量。
 
+## 按组件引入
+
+```ts
+import { Button } from "litegui/button";
+import { Table } from "litegui/table";
+
+import "litegui/style.css";
+```
+
+可用子路径：`area`、`panel`、`split`、`tabs`、`dialog`、`menu`、`button`、`checkbox`、`slider`、`searchbox`、`list`、`table`、`console`。
+
 ## 构建与测试
 
 ```bash
