@@ -4,7 +4,7 @@
 
 LiteGUI 面向编辑器、调试器、工具台这类需要菜单、面板、分栏、对话框、属性检查器、树和表格的 Web 应用。项目从 [jagenjo/litegui.js](https://github.com/jagenjo/litegui.js)（MIT）重构而来。
 
-当前处于 **Phase 0（基线修复）**，路线图见 [ROADMAP.md](./ROADMAP.md)。
+当前处于 **Phase 1（核心组件验收）**，路线图见 [ROADMAP.md](./ROADMAP.md)。
 
 ## 状态
 
@@ -13,7 +13,7 @@ LiteGUI 面向编辑器、调试器、工具台这类需要菜单、面板、分
 | 核心 | `Area`、`Panel`、`Split`、`Tabs`、`Dialog`、`Menu`、`Button`、`Checkbox`、`Slider`、`SearchBox`、`List`、`Table`、`Console` | 可用性修复中 |
 | Experimental | `Inspector`、`Tree`、`ContextMenu`、`Dragger`、`LineEditor`、`ComplexList` | 暂不承诺稳定性 |
 
-Phase 0 已完成：依赖可安装、类型检查归零、核心回归修复、测试与库构建打通。Phase 1 会逐个组件补验收测试和文档。
+Phase 0 已完成：依赖可安装、类型检查归零、核心回归修复、测试与库构建打通。Phase 1 正在逐个组件补验收测试与文档，已完成 Panel、Slider、List、Menu、Area、Split、Console。
 
 ## 文档
 

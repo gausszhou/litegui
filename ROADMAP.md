@@ -32,7 +32,7 @@ v0.1 只承诺 **12 个核心组件**；`Inspector`、`Tree`、`ContextMenu` 等
   - 核心修复：EventMitter 实例化、Dialog、Button、Checkbox、Dragger、Table、Tabs、LiteGUI.bind/createMenu
   - demo/editor 冒烟测试通过
   - 补充 MIT LICENSE、README 状态表、GitHub Actions CI
-- [ ] **Phase 1**：核心组件验收与 v0.1.0
+- [ ] **Phase 1**：核心组件验收与 v0.1.0（进行中：Panel/Slider/List/Menu/Area/Split/Console 已验收；剩余 core 抽取、类型收敛、v0.1.0）
 - [ ] **Phase 2**：主题、可访问性、文档站与 v0.2.0
 - [ ] **Phase 3**：API 冻结、性能/安全与 v1.0.0
 
