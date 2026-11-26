@@ -1,4 +1,4 @@
-import LiteGUI from ".";
+import { trigger } from "../core/events";
 import EventMitter from "./EventMitter";
 
 interface LineEditorOptions {
@@ -219,7 +219,7 @@ export class LineEditor extends EventMitter  {
         if (this.options.callback) {
             this.options.callback.call(this, this.value);
         } else {
-            LiteGUI.trigger(this, "change");
+            trigger(this, "change");
         }
     }
 

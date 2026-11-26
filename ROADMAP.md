@@ -32,7 +32,12 @@ v0.1 只承诺 **12 个核心组件**；`Inspector`、`Tree`、`ContextMenu` 等
   - 核心修复：EventMitter 实例化、Dialog、Button、Checkbox、Dragger、Table、Tabs、LiteGUI.bind/createMenu
   - demo/editor 冒烟测试通过
   - 补充 MIT LICENSE、README 状态表、GitHub Actions CI
-- [ ] **Phase 1**：核心组件验收与 v0.1.0
+- [x] **Phase 1（2026-11-27）**：核心组件验收与 v0.1.0
+  - 抽取 `src/core/`，面板/表格/输入/布局/对话框等不再依赖入口
+  - Panel、Slider、List、Menu、Area、Split、Console、ComplexList 验收修复
+  - 18 个测试文件、62 个用例通过
+  - Getting Started 与示例文档、CHANGELOG、0.1.0 版本号
+  - Inspector/Tree/ContextMenu 明确标记 experimental
 - [ ] **Phase 2**：主题、可访问性、文档站与 v0.2.0
 - [ ] **Phase 3**：API 冻结、性能/安全与 v1.0.0
 
@@ -117,7 +122,7 @@ shells/deploy.sh           # gh-pages 部署脚本
 | 命令 | 结果 | 说明 |
 | --- | --- | --- |
 | `npm install` | ❌ | `rollup-plugin-uglify@6` 的 peer 要求 `rollup < 2`，与 `rollup@2` 冲突；需 `--legacy-peer-deps` 才能装 |
-| `npm run lib` | ✅ | Rollup 产出 `lib/bundle.esm.js`（300 KB）、`lib/bundle.umd.js`（332 KB）、`lib/index.css`（40 KB）；ESM gzip 约 61 KB |
+| `npm run build:lib` | ✅ | Rollup 产出 `lib/litegui.esm.js`（约 300 KB，gzip 约 61 KB）、`lib/litegui.umd.cjs`、`lib/litegui.css`；`tsc` 另产 `lib/types` |
 | `npx tsc --noEmit` | ❌ | **1192 个错误**（见 2.3） |
 | `npm run build` | ❌ | 在 `tsc` 阶段失败，走不到 Vite 构建 |
 | `npx vite build` | ⚠️ | 先执行 `npm run lib` 后可以成功；产物约 131 KB JS + 28 KB CSS；**新克隆直接构建会因缺少 `lib/index.css` 失败**（`editor/index.js` 直接 import 构建产物） |

@@ -1,7 +1,8 @@
 import type { LiteComponent } from "../types/index";
 import { type ButtonOptions, Button } from "./Button";
 import EventMitter from "./EventMitter";
-import LiteGUI from "./index";
+import { draggable } from "../core/dom";
+import { coreState, getContent, getModalBackground, getRoot, showModalBackground } from "../core/state";
 
 interface ButtonsItemOptions extends ButtonOptions {
   name: string;
@@ -117,7 +118,7 @@ export class Dialog extends EventMitter implements LiteComponent {
         typeof opts.parent === "string"
           ? document.querySelector<HTMLElement>(opts.parent)
           : opts.parent;
-      (parent || LiteGUI.root || document.body).appendChild(this.root);
+      (parent || getRoot()).appendChild(this.root);
       this.center();
     }
   }
@@ -263,7 +264,7 @@ export class Dialog extends EventMitter implements LiteComponent {
 
   show() {
     if (!this.root.parentNode) {
-      const parent = LiteGUI.content || LiteGUI.root || document.body;
+      const parent = getContent();
       parent.appendChild(this.root);
       this.center();
     }
@@ -297,7 +298,7 @@ export class Dialog extends EventMitter implements LiteComponent {
 
     if (this.isModal) {
       this.isModal = false;
-      LiteGUI.showModalBackground(false);
+      showModalBackground(false);
     }
 
     if (this.dialogWindow) {
@@ -385,7 +386,7 @@ export class Dialog extends EventMitter implements LiteComponent {
     if (options.draggable) {
       this.draggable = true;
       const header = panel.querySelector<HTMLElement>(".panel-header");
-      LiteGUI.draggable(
+      draggable(
         panel,
         header || panel,
         () => {},
@@ -528,7 +529,7 @@ export class Dialog extends EventMitter implements LiteComponent {
 
     // 如果启用了拖拽，重新绑定拖拽事件
     if (this.draggable) {
-      LiteGUI.draggable(panel);
+      draggable(panel);
     }
 
     // 将面板添加到父元素
@@ -653,9 +654,9 @@ export class Dialog extends EventMitter implements LiteComponent {
    */
   makeModal(): void {
     this.isModal = true;
-    LiteGUI.showModalBackground(true);
+    showModalBackground(true);
 
-    const parent = LiteGUI.modalbg_div || document.body;
+    const parent = getModalBackground() || document.body;
     if (this.root.parentNode !== parent) parent.appendChild(this.root);
 
     this.show();
@@ -758,8 +759,8 @@ export class Dialog extends EventMitter implements LiteComponent {
     this.root.appendChild(this.content);
     this.root.style.display = ""; //show
     this.dialogWindow.close();
-    var index = LiteGUI.windows.indexOf(this.dialogWindow);
-    if (index != -1) LiteGUI.windows.splice(index, 1);
+    var index = coreState.windows.indexOf(this.dialogWindow);
+    if (index != -1) coreState.windows.splice(index, 1);
     this.dialogWindow = null;
   };
 

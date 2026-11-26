@@ -4,16 +4,22 @@
 
 LiteGUI 面向编辑器、调试器、工具台这类需要菜单、面板、分栏、对话框、属性检查器、树和表格的 Web 应用。项目从 [jagenjo/litegui.js](https://github.com/jagenjo/litegui.js)（MIT）重构而来。
 
-当前处于 **Phase 0（基线修复）**，路线图见 [ROADMAP.md](./ROADMAP.md)。
+当前版本 **0.1.0**（Phase 1 完成），路线图见 [ROADMAP.md](./ROADMAP.md)。
 
 ## 状态
 
 | 范围 | 组件 | 状态 |
 | --- | --- | --- |
-| 核心 | `Area`、`Panel`、`Split`、`Tabs`、`Dialog`、`Menu`、`Button`、`Checkbox`、`Slider`、`SearchBox`、`List`、`Table`、`Console` | 可用性修复中 |
+| 核心 | `Area`、`Panel`、`Split`、`Tabs`、`Dialog`、`Menu`、`Button`、`Checkbox`、`Slider`、`SearchBox`、`List`、`Table`、`Console` | 可用，有验收测试 |
 | Experimental | `Inspector`、`Tree`、`ContextMenu`、`Dragger`、`LineEditor`、`ComplexList` | 暂不承诺稳定性 |
 
-Phase 0 已完成：依赖可安装、类型检查归零、核心回归修复、测试与库构建打通。Phase 1 会逐个组件补验收测试和文档。
+Phase 0/1 已完成：依赖可安装、类型检查归零、核心回归修复、core 模块抽取、18 个测试文件 / 62 个用例、库构建与 npm 包冒烟。
+
+## 文档
+
+- [Getting Started](./docs/getting-started.md)
+- [示例](./docs/examples.md)
+- [路线图](./ROADMAP.md)
 
 ## 快速开始
 

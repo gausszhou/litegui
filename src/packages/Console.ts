@@ -130,22 +130,16 @@ export class Console extends EventMitter {
     return message;
   }
 
-  log() {
-    const args = Array.prototype.slice.call(arguments);
-    const msg = args.join(",");
-    return this.addMessage(msg, "msglog");
+  log(...args: unknown[]) {
+    return this.addMessage(args.join(","), "msglog");
   }
 
-  warn() {
-    const args = Array.prototype.slice.call(arguments);
-    const msg = args.join(",");
-    return this.addMessage(msg, "msgwarn");
+  warn(...args: unknown[]) {
+    return this.addMessage(args.join(","), "msgwarn");
   }
 
-  error() {
-    const args = Array.prototype.slice.call(arguments);
-    const msg = args.join(",");
-    return this.addMessage(msg, "msgerror");
+  error(...args: unknown[]) {
+    return this.addMessage(args.join(","), "msgerror");
   }
 
   clear() {

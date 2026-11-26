@@ -24,8 +24,10 @@ interface Section {
 export class Split {
   root: HTMLDivElement;
   sections: Section[] = [];
+  private vertical: boolean;
 
   constructor(sections: any[], options: any = {}) {
+    this.vertical = Boolean(options.vertical);
     this.root = this.createRoot(options);
     this.sections = [];
     sections.forEach((sectionInfo, index) => {
@@ -44,7 +46,7 @@ export class Split {
   }
   // 
   addSection(sectionInfo: SectionInfo) {
-    const section = this.createSection({}, sectionInfo);
+    const section = this.createSection({ vertical: this.vertical }, sectionInfo);
     this.root.appendChild(section.element);
     this.sections.push(section);
   }
@@ -82,8 +84,10 @@ export class Split {
         element.id = sectionInfo.id;
       }
       if (options.vertical) {
-        element.style.height = typeof sectionInfo.height === "number" ? sectionInfo.height.toFixed(1) + "%" : sectionInfo.height;
-      } else {
+        if (sectionInfo.height !== undefined) {
+          element.style.height = typeof sectionInfo.height === "number" ? sectionInfo.height.toFixed(1) + "%" : sectionInfo.height;
+        }
+      } else if (sectionInfo.width !== undefined) {
         element.style.width = typeof sectionInfo.width === "number" ? sectionInfo.width.toFixed(1) + "%" : sectionInfo.width;
       }
     }

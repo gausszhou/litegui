@@ -1,4 +1,4 @@
-import LiteGUI from ".";
+import { trigger } from "../core/events";
 import EventMitter from "./EventMitter";
 
 const KEY_CODE_UP = 38;
@@ -96,7 +96,7 @@ export class Dragger extends EventMitter {
       if (options.units) {
         this.input.value += options.units;
       }
-      LiteGUI.trigger(this.input, "change");
+      trigger(this.input, "change");
     };
 
     const onMouseDown = (e: MouseEvent) => {
@@ -111,20 +111,20 @@ export class Dragger extends EventMitter {
         ownerDocument.addEventListener("mousemove", onMouseMove);
         ownerDocument.addEventListener("mouseup", onMouseUp);
         pos = [e.screenX, e.screenY];
-        LiteGUI.trigger(this.root, "start_dragging");
+        trigger(this.root, "start_dragging");
       }
       e.stopPropagation();
       e.preventDefault();
     };
 
     const onMouseUp = (e: MouseEvent) => {
-      LiteGUI.trigger(this.root, "stop_dragging");
+      trigger(this.root, "stop_dragging");
       const doc = ownerDocument || document;
       ownerDocument = null;
       doc.removeEventListener("mousemove", onMouseMove);
       doc.removeEventListener("mouseup", onMouseUp);
       if (doc.exitPointerLock) doc.exitPointerLock();
-      LiteGUI.trigger(this.dragger, "blur");
+      trigger(this.dragger, "blur");
       e.stopPropagation();
       e.preventDefault();
       return false;
@@ -180,7 +180,7 @@ export class Dragger extends EventMitter {
     if (this.options.precision) v = value.toFixed(this.options.precision);
     if (this.options.units) v += this.options.units;
     this.input.value = v.toString();
-    if (!skip_event) LiteGUI.trigger(this.input, "change");
+    if (!skip_event) trigger(this.input, "change");
   }
   getValue() {
     return this.value;
