@@ -67,6 +67,10 @@
     "./console": {
       "types": "./lib/types/entries/console.d.ts",
       "import": "./lib/entries/console.js"
+    },
+    "./experimental": {
+      "types": "./lib/types/experimental.d.ts",
+      "import": "./lib/experimental.esm.js"
     }
   },
   "scripts": {

@@ -20,7 +20,7 @@
 
 ## Experimental
 
-`Inspector`、`Tree`、`ContextMenu`、`Dragger`、`LineEditor`、`ComplexList` 暂不承诺 API 稳定性。
+`Inspector`、`Tree` 通过 `litegui/experimental` 单独引入；`ContextMenu`、`Dragger`、`LineEditor`、`ComplexList` 暂不承诺 API 稳定性。
 
 ## 公共约定
 

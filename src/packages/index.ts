@@ -15,7 +15,6 @@ import { ContextMenu } from "./ContextMenu";
 import { Dialog } from "./Dialog";
 import { Dragger } from "./Dragger";
 import EventMitter from "./EventMitter";
-import { Inspector } from "./Inspector";
 import { LineEditor } from "./LineEditor";
 import { List } from "./List";
 import { Menu } from "./Menu";
@@ -26,7 +25,6 @@ import { Split } from "./Split";
 import { Table } from "./Table";
 import { Widget } from "./Widget";
 import { Tabs } from "./Tabs";
-import { Tree } from "./Tree";
 
 const emitter = mitt();
 
@@ -61,13 +59,11 @@ export class LiteGUI {
   static Console = Console;
   static Dialog = Dialog;
   static Dragger = Dragger;
-  static Inspector = Inspector;
   static Panel = Panel;
   static Split = Split;
   static Table = Table;
   static Menu = Menu;
   static Tabs = Tabs;
-  static Tree = Tree;
   static SearchBox = SearchBox;
   static ContextMenu = ContextMenu;
   static List = List;
