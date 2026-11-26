@@ -126,7 +126,7 @@ export class ComplexList {
         };
 
         elem.setSelected = (v: boolean) => {
-            this.root.classList.remove("selected");
+            this.root.querySelectorAll(".listitem.selected").forEach((item) => item.classList.remove("selected"));
             if (v) {
                 elem.classList.add("selected");
             } else {
@@ -140,5 +140,9 @@ export class ComplexList {
 
         this.root.appendChild(elem);
         return elem;
+    }
+
+    public getSelected(): any {
+        return this.selected;
     }
 }

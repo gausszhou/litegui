@@ -1,3 +1,5 @@
+// TODO(phase-1): 将 prototype API 收敛到 class 类型声明后移除 @ts-nocheck
+// @ts-nocheck
 
 /**
 * 创建交互式树形结构(适用于文件夹或层级结构)。<br>

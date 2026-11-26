@@ -227,7 +227,7 @@ export class Menu {
     return $item;
   };
 
-  createPanelItemElement(item: MenuItem) {
+  createPanelItemElement(_item: MenuItem) {
     const $item = document.createElement("p");
     return $item;
   }
@@ -347,7 +347,7 @@ export class Menu {
         }
       });
 
-      $menu_item.addEventListener("mouseenter", function (e) {
+      $menu_item.addEventListener("mouseenter", function (_e) {
 
       });
       // append menu element
