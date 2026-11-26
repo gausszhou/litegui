@@ -46,5 +46,7 @@ export class Button  extends Widget {
     click() {
         const callback = this.options.callback;
         callback && callback.call(this);
+        this.emit("click", this);
+        return this;
     }
 }

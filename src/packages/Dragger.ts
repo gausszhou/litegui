@@ -26,6 +26,8 @@ export class Dragger extends EventMitter {
     this.wrap = this.createWrap();
     this.input = this.createInput();
     this.dragger = this.createDragger();
+    this.initDom();
+    this.initEvent();
   }
   createRoot() {
     const options = this.options;
@@ -172,7 +174,7 @@ export class Dragger extends EventMitter {
     this.options.max = max;
   }
 
-  setValue(v: string | number, skip_event: boolean) {
+  setValue(v: string | number, skip_event: boolean = false) {
     const value: number = typeof v === "string" ? parseFloat(v) : v;
     this.value = value;
     if (this.options.precision) v = value.toFixed(this.options.precision);

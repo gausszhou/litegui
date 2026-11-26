@@ -18,6 +18,8 @@ export class Checkbox {
     this.root = this.createElementRoot();
     this.element = this.createElementContent();
     this.root.dataset["value"] = value.toString();
+    this.initDom();
+    this.initEvent();
   }
   createElementRoot() {
     const root = (this.root = document.createElement("span"));
