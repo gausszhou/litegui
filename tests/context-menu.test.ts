@@ -29,3 +29,28 @@ describe("ContextMenu", () => {
     menu.close();
   });
 });
+
+import { describe as describeSubmenu, expect as expectSubmenu, it as itSubmenu, vi as viSubmenu } from "vitest";
+
+describeSubmenu("ContextMenu submenu", () => {
+  itSubmenu("opens a submenu and runs its callback", () => {
+    const childCallback = viSubmenu.fn();
+    const menu = new ContextMenu([
+      {
+        title: "More",
+        submenu: {
+          options: [{ title: "Child", callback: childCallback }]
+        }
+      }
+    ]);
+
+    menu.root.querySelector<HTMLElement>(".litemenu-entry")?.click();
+
+    expectSubmenu(menu.current_submenu).toBeDefined();
+    const child = menu.current_submenu?.root.querySelector<HTMLElement>(".litemenu-entry");
+    expectSubmenu(child?.textContent).toContain("Child");
+
+    child?.click();
+    expectSubmenu(childCallback).toHaveBeenCalledTimes(1);
+  });
+});

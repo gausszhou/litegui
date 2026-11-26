@@ -298,7 +298,7 @@ export class Tabs {
       var after = this.list.childNodes[options.index];
       if (after) this.list.insertBefore(element, after);
       else this.list.appendChild(element);
-    } else if (this.plus_tab) this.list.insertBefore(element, this.plus_tab);
+    } else if (this.plus_tab?.tab) this.list.insertBefore(element, this.plus_tab.tab);
     else this.list.appendChild(element);
 
     if (options.tab_width) {

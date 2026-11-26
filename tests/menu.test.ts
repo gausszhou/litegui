@@ -53,3 +53,40 @@ describe("Menu", () => {
     expect(menu.menus).toHaveLength(0);
   });
 });
+
+import { describe as describeMenuExtra, expect as expectMenuExtra, it as itMenuExtra, vi as viMenuExtra } from "vitest";
+
+describeMenuExtra("Menu extras", () => {
+  itMenuExtra("adds separators and removes entries", () => {
+    const menu = new Menu("main");
+    menu.add("File/New");
+    menu.add("File/Open");
+    menu.separator("File", 1);
+
+    expectMenuExtra(menu.findMenu("File")?.children).toHaveLength(3);
+
+    menu.remove("File/Open");
+    expectMenuExtra(menu.findMenu("File/Open")).toBeNull();
+  });
+
+  itMenuExtra("opens submenus and runs callbacks", () => {
+    const callback = viMenuExtra.fn();
+    const menu = new Menu("main");
+    menu.add("File/Export/JSON", { callback });
+    document.body.appendChild(menu.root);
+    LiteGUI.root = document.body;
+
+    menu.root.querySelector<HTMLElement>(".lite-menu-item")?.click();
+    const exportItem = Array.from(document.querySelectorAll<HTMLElement>(".lite-menu-panel-item")).find((item) =>
+      item.textContent?.includes("Export")
+    );
+    exportItem?.click();
+
+    const jsonItem = Array.from(document.querySelectorAll<HTMLElement>(".lite-menu-panel-item")).find((item) =>
+      item.textContent?.includes("JSON")
+    );
+    jsonItem?.click();
+
+    expectMenuExtra(callback).toHaveBeenCalledTimes(1);
+  });
+});

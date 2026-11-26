@@ -92,6 +92,7 @@ export class Dragger extends EventMitter {
       if (options.max != null && value > options.max) value = options.max;
       if (options.min != null && value < options.min) value = options.min;
 
+      this.value = value;
       this.input.value = value.toFixed(precision);
       if (options.units) {
         this.input.value += options.units;

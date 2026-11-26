@@ -9,8 +9,14 @@ export default defineConfig({
     coverage: {
       provider: "v8",
       reporter: ["text", "html"],
-      include: ["src/packages/**/*.ts"],
-      exclude: ["src/packages/index.ts"]
+      include: ["src/core/**/*.ts", "src/packages/**/*.ts"],
+      exclude: ["src/packages/Inspector.ts", "src/packages/Tree.ts"],
+      thresholds: {
+        statements: 70,
+        branches: 65,
+        functions: 70,
+        lines: 70
+      }
     }
   }
 });

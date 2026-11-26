@@ -414,14 +414,18 @@ export class Area extends EventMitter {
    * @param sectionIndex 
    */
   merge(sectionIndex: number) {
-    if (this.sections.length == 0) throw new Error("not splitted");
+    if (this.sections.length === 0) throw new Error("not splitted");
+
     const section = this.sections[sectionIndex || 0];
-    this.root.appendChild(section.root);
-    this.content = section.content;
-    // remove all section
-    this.root.removeChild(this.sections[0].root);
-    this.root.removeChild(this.sections[1].root);
+    if (!section) throw new Error("section not found");
+
+    const content = section.content;
+    this.root.innerHTML = "";
+    this.root.appendChild(content);
+    this.content = content;
     this.sections = [];
+    this.dynamic_section = undefined;
+    this.splitbar = undefined;
     this._rootComputedSize = [];
     this.onResize();
   }

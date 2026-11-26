@@ -81,3 +81,53 @@ describe("Dialog", () => {
     expect(Dialog.minimized).not.toContain(dialog);
   });
 });
+
+import { describe as describeDialogExtra, expect as expectDialogExtra, it as itDialogExtra, vi as viDialogExtra } from "vitest";
+import { coreState } from "../src/core/state";
+
+describeDialogExtra("Dialog extras", () => {
+  itDialogExtra("updates title and size", () => {
+    const dialog = new Dialog({ title: "Old" });
+    dialog.setTitle("New");
+    dialog.setSize(320, 240);
+    dialog.show();
+    dialog.setPosition(10, 20);
+
+    expectDialogExtra(dialog.header.textContent).toBe("New");
+    expectDialogExtra(dialog.root.style.width).toBe("320px");
+    expectDialogExtra(dialog.root.style.height).toBe("240px");
+    expectDialogExtra(dialog.root.style.left).toBe("10px");
+  });
+
+  itDialogExtra("makes a modal and restores the background", () => {
+    coreState.modalbg = document.createElement("div");
+    document.body.appendChild(coreState.modalbg);
+
+    const dialog = new Dialog({ title: "Modal" });
+    dialog.makeModal();
+
+    expectDialogExtra(dialog.root.getAttribute("aria-modal")).toBe("true");
+    expectDialogExtra(coreState.modalbg.contains(dialog.root)).toBe(true);
+    expectDialogExtra(coreState.modalbg.style.display).toBe("block");
+
+    dialog.close();
+    expectDialogExtra(coreState.modalbg.style.display).toBe("none");
+  });
+
+  itDialogExtra("runs footer callbacks without closing when not requested", () => {
+    const callback = viDialogExtra.fn();
+    const dialog = new Dialog({ title: "Footer" });
+    const button = dialog.addButtonToFooter("Apply", { name: "Apply", callback });
+    dialog.show();
+
+    button.content.click();
+
+    expectDialogExtra(callback).toHaveBeenCalledTimes(1);
+    expectDialogExtra(document.body.contains(dialog.root)).toBe(true);
+  });
+});
+
+import { afterEach as afterDialog } from "vitest";
+afterDialog(() => {
+  coreState.modalbg = null;
+});

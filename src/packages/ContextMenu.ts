@@ -235,7 +235,7 @@ export class ContextMenu {
                 }
                 if (item.submenu) {
                     if (!item.submenu.options) throw new Error("ContextMenu submenu needs options");
-                    new ContextMenu(item.submenu.options, {
+                    that.current_submenu = new ContextMenu(item.submenu.options, {
                         callback: item.submenu.callback,
                         event: e as MouseEvent,
                         parentMenu: that,

@@ -88,7 +88,8 @@
     "docs:build": "vitepress build docs",
     "docs:preview": "vitepress preview docs",
     "bench": "vitest bench --run",
-    "test:e2e": "playwright test"
+    "test:e2e": "playwright test",
+    "test:coverage": "vitest run --coverage"
   },
   "devDependencies": {
     "@playwright/test": "^1.65.1",

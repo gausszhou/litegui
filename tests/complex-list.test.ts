@@ -37,3 +37,32 @@ describe("ComplexList", () => {
     expect(list.root.children).toHaveLength(0);
   });
 });
+
+import { describe as describeComplexExtra, expect as expectComplexExtra, it as itComplexExtra } from "vitest";
+
+describeComplexExtra("ComplexList extras", () => {
+  itComplexExtra("updates content, toggles and hides items", () => {
+    const list = new ComplexList();
+    const item = list.addItem({}, "Old", true, true);
+
+    item.setContent?.("New");
+    expectComplexExtra(item.querySelector(".title")?.textContent).toBe("New");
+
+    item.toggleEnabled?.();
+    expectComplexExtra(item.classList.contains("enabled")).toBe(false);
+
+    item.hide?.();
+    expectComplexExtra(item.style.display).toBe("none");
+    item.show?.();
+    expectComplexExtra(item.style.display).toBe("");
+  });
+
+  itComplexExtra("adds HTML and clears", () => {
+    const list = new ComplexList();
+    list.addHTML("<b>hello</b>");
+    expectComplexExtra(list.root.textContent).toContain("hello");
+
+    list.clear();
+    expectComplexExtra(list.root.children).toHaveLength(0);
+  });
+});
