@@ -1,7 +1,6 @@
 import "../src/styles/index.scss"
 import LiteGUI from "../src/index"
 
-console.log(LiteGUI);
 
 window.onload = function () {
   LiteGUI.init({

@@ -3,6 +3,7 @@ import type { Handler } from "mitt";
 import mitt from "mitt";
 import { LiteComponent } from "../types/index";
 import { Area } from "./Area";
+import { LiteBox } from "./Box";
 import { Button } from "./Button";
 import { Checkbox } from "./Checkbox";
 import { ComplexList } from "./ComplexList";
@@ -50,6 +51,7 @@ interface LiteGUIOptions {
 export class LiteGUI {
   // component
   static Area = Area;
+  static Box = LiteBox;
   static Button = Button;
   static Checkbox = Checkbox;
   static Console = Console;

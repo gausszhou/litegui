@@ -1,4 +1,4 @@
-class LiteBox {
+export class LiteBox {
     root = document.createElement('div');
     stopPropagation = false;
     constructor() {

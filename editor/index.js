@@ -25,8 +25,8 @@ window.onload = function () {
   canvas.times = 0;
   canvas.redraw = function () {
     const rect = canvas.parentNode.getClientRects()[0];
-    canvas.width = rect.width;
-    canvas.height = rect.height;
+    canvas.width = rect ? rect.width : 300;
+    canvas.height = rect ? rect.height : 150;
     const ctx = canvas.getContext("2d");
     ctx.clearRect(0, 0, this.width, this.height);
     ctx.lineWidth = 1;
@@ -164,8 +164,8 @@ function createMenu() {
         content: "This is an example of modal dialog"
       });
       dialog.makeModal();
-      dialog.addButton("Accept", { close: true });
-      dialog.addButton("Cancel", { close: "fade" });
+      dialog.addButtonToFooter("Accept", { name: "Accept", close: true });
+      dialog.addButtonToFooter("Cancel", { name: "Cancel", close: true });
     }
   });
 }
@@ -314,7 +314,7 @@ function createTableDialog() {
   });
   dialog.show();
   dialog.setPosition(100, 200);
-  dialog.addButton("Randomize", inner);
+  dialog.addButtonToFooter("Randomize", { name: "Randomize", callback: inner });
 
   dialog.show();
   const table = new LiteGUI.Table({ scrollable: true });

@@ -1222,7 +1222,7 @@ Tree.prototype._updateListBox = function (node, options, current_level) {
         var box = LiteGUI.createLitebox();
         box.stopPropagation = true;
         box.setEmpty(true);
-        pre.appendChild(box);
+        pre.appendChild(box.root);
         node.listbox = box;
     }
 
