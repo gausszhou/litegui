@@ -205,7 +205,13 @@ export class Menu {
     $item.className = MENU_ITEM_CLASS_NAME;
     $item.setAttribute("role", "menuitem");
     $item.setAttribute("aria-haspopup", "true");
-    $item.innerHTML = `<span class='icon'></span><span class='name'>${item.name}</span>`;
+
+    const icon = document.createElement("span");
+    icon.className = "icon";
+    const name = document.createElement("span");
+    name.className = "name";
+    name.textContent = item.name;
+    $item.append(icon, name);
     /* ON CLICK TOP MAIN MENU ITEM */
     $item.addEventListener("click", (e) => {
       const main_menu_item = item;
@@ -296,7 +302,18 @@ export class Menu {
       }
       if (menu_item.name) {
         // is a menu item
-        $menu_item.innerHTML =`<span class='icon'></span><span class='name'>${menu_item.name}</span>${has_submenu ? "<span class='more'>+</span>" : ""}`
+        const icon = document.createElement("span");
+        icon.className = "icon";
+        const name = document.createElement("span");
+        name.className = "name";
+        name.textContent = menu_item.name;
+        $menu_item.append(icon, name);
+        if (has_submenu) {
+          const more = document.createElement("span");
+          more.className = "more";
+          more.textContent = "+";
+          $menu_item.appendChild(more);
+        }
       } else {
         // is a menu separator
         $menu_item.classList.add("separator");

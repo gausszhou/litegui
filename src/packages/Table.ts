@@ -11,11 +11,13 @@ export interface TableColumnOption {
 
 export type TableColumn = TableColumnOption | string | number;
 
-interface TableOptions {
+export interface TableOptions {
   rows?: any[];
   columns?: TableColumn[];
   height?: number | string;
   scrollable?: boolean;
+  /** 默认 false：单元格按纯文本渲染；显式开启后才允许 HTML。 */
+  allowHTML?: boolean;
 }
 
 export class Table extends EventMitter {
@@ -26,9 +28,11 @@ export class Table extends EventMitter {
   columns: TableColumnOption[] = [];
   column_fields: string[] = [];
   private _must_update_header = true;
+  private allowHTML = false;
 
   constructor(options: TableOptions = {}) {
     super();
+    this.allowHTML = Boolean(options.allowHTML);
     this.root = this.createRoot();
     this.header = document.createElement("tr");
 
@@ -54,7 +58,7 @@ export class Table extends EventMitter {
     for (let j = 0; j < this.column_fields.length; ++j) {
       const td = document.createElement("td");
       const value = Array.isArray(row) ? row[j] : row[this.column_fields[j]];
-      td.innerHTML = value === undefined || value === null ? "" : String(value);
+      this.setCellValue(td, value);
 
       const column = this.columns[j];
       if (!column) break;
@@ -81,7 +85,7 @@ export class Table extends EventMitter {
       const column = this.columns[j];
       if (!column) continue;
       const value = Array.isArray(row) ? row[j] : row[column.field as string];
-      cells[j].innerHTML = value === undefined || value === null ? "" : String(value);
+      this.setCellValue(cells[j] as HTMLElement, value);
     }
     return tr;
   }
@@ -91,8 +95,14 @@ export class Table extends EventMitter {
     if (!tr) return null;
     const cell = tr.children[cellIndex] as HTMLElement | undefined;
     if (!cell) return null;
-    cell.innerHTML = data;
+    this.setCellValue(cell, data);
     return cell;
+  }
+
+  private setCellValue(cell: HTMLElement, value: unknown) {
+    const text = value === undefined || value === null ? "" : String(value);
+    if (this.allowHTML) cell.innerHTML = text;
+    else cell.textContent = text;
   }
 
   setColumns(columns: TableColumn[]) {
@@ -145,7 +155,7 @@ export class Table extends EventMitter {
         const column = this.columns[i];
         const th = document.createElement("th");
         th.scope = "col";
-        th.innerHTML = column.name ?? "";
+        th.textContent = column.name ?? "";
         if (column.width) th.style.width = String(column.width);
         column.th = th;
         this.header.appendChild(th);

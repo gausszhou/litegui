@@ -27,3 +27,10 @@
 - 组件都暴露 `root: HTMLElement`。
 - 值类组件提供 `getValue()` / `setValue()`。
 - 交互类组件通过实例事件或回调通知变化。
+
+## 安全
+
+- `Table` 默认用 `textContent` 渲染单元格；只有显式 `allowHTML: true` 才解析 HTML。
+- `List`、`ComplexList` 标题、`Menu` 标签使用文本节点，不解析 HTML。
+- `Panel.content`、`Dialog.content`、`ComplexList.addHTML`、`Console` 的 HTML 接口按“可信内容”处理，传入用户输入前请先转义。
+- `LiteGUI.escapeHTML(value)` 可用于转义用户输入。

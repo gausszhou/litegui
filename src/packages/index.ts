@@ -2,7 +2,7 @@ import { isArray, isFunction } from "lodash-es";
 import type { Handler } from "mitt";
 import mitt from "mitt";
 import { LiteComponent } from "../types/index";
-import { createElement as coreCreateElement, createListItem as coreCreateListItem, draggable as coreDraggable, remove as coreRemove, sizeToCSS as coreSizeToCSS } from "../core/dom";
+import { createElement as coreCreateElement, createListItem as coreCreateListItem, draggable as coreDraggable, escapeHTML, remove as coreRemove, sizeToCSS as coreSizeToCSS } from "../core/dom";
 import { bind as coreBind, trigger as coreTrigger, unbind as coreUnbind } from "../core/events";
 import { coreState, getTheme, setTheme, showModalBackground as coreShowModalBackground, type LiteTheme } from "../core/state";
 import { Area } from "./Area";
@@ -794,6 +794,10 @@ export class LiteGUI {
 
   static getTheme(): LiteTheme {
     return getTheme();
+  }
+
+  static escapeHTML(value: unknown): string {
+    return escapeHTML(value);
   }
 
 
