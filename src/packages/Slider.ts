@@ -3,6 +3,7 @@ import { trigger } from "../core/events";
 interface SliderOptions {
   min?: number;
   max?: number;
+  step?: number;
 }
 
 /**
@@ -23,8 +24,11 @@ export class Slider {
     this.root = document.createElement("div");
     this.value = value;
     this.root.className = "liteslider";
+    this.root.setAttribute("role", "slider");
+    this.root.tabIndex = 0;
 
     this.root.addEventListener("mousedown", this.handleMouseDown);
+    this.root.addEventListener("keydown", this.handleKeyDown);
     this.setValue(value, true);
   }
 
@@ -47,6 +51,23 @@ export class Slider {
     this.setFromX(x - rect.left);
 
     e.preventDefault();
+  };
+
+  private handleKeyDown = (e: KeyboardEvent): void => {
+    const min = this.options.min ?? 0;
+    const max = this.options.max ?? 1;
+    const step = this.options.step ?? (max - min) / 100;
+    let next: number | null = null;
+
+    if (e.key === "ArrowRight" || e.key === "ArrowUp") next = this.value + step;
+    else if (e.key === "ArrowLeft" || e.key === "ArrowDown") next = this.value - step;
+    else if (e.key === "Home") next = min;
+    else if (e.key === "End") next = max;
+
+    if (next === null) return;
+    this.setValue(next);
+    e.preventDefault();
+    e.stopPropagation();
   };
 
   private handleMouseUp = (e: MouseEvent): void => {
@@ -81,6 +102,9 @@ export class Slider {
     const percentage2 = `${(norm * 100 + 2).toFixed(1)}%`;
 
     this.root.style.background = `linear-gradient(to right, #999 ${percentage}, #FC0 ${percentage2}, #333 ${percentage2})`;
+    this.root.setAttribute("aria-valuemin", String(min));
+    this.root.setAttribute("aria-valuemax", String(max));
+    this.root.setAttribute("aria-valuenow", String(value));
 
     if (value !== this.value) {
       this.value = value;
@@ -99,6 +123,11 @@ export class Slider {
     this.options.min = min;
     this.options.max = max;
     this.setValue(this.value, true);
+    return this;
+  }
+
+  public focus(): this {
+    this.root.focus();
     return this;
   }
 }

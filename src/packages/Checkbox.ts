@@ -24,6 +24,9 @@ export class Checkbox {
   createElementRoot() {
     const root = (this.root = document.createElement("span"));
     root.className = "lite-checkbox inputfield";
+    root.setAttribute("role", "checkbox");
+    root.setAttribute("aria-checked", this.value.toString());
+    root.tabIndex = 0;
     return root;
   }
   createElementContent() {
@@ -36,11 +39,22 @@ export class Checkbox {
     this.root.appendChild(this.element);
   }
   initEvent() {
-    this.root.addEventListener("click", e => {
-      this.setValue(this.root.dataset["value"] != "true");
+    this.root.addEventListener("click", (e) => {
+      this.toggle();
       e.preventDefault();
       e.stopPropagation();
     });
+    this.root.addEventListener("keydown", (e) => {
+      if (e.key === " " || e.key === "Enter") {
+        this.toggle();
+        e.preventDefault();
+        e.stopPropagation();
+      }
+    });
+  }
+
+  private toggle() {
+    this.setValue(this.root.dataset["value"] !== "true");
   }
   setValue(v: boolean) {
     if (this.value === v) return false;
@@ -48,6 +62,7 @@ export class Checkbox {
     const oldValue = this.value;
     this.value = v;
     this.root.dataset["value"] = this.value.toString();
+    this.root.setAttribute("aria-checked", this.value.toString());
     const onChange = this.options?.onChange;
     onChange && onChange(v, oldValue);
     return true;
