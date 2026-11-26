@@ -1,7 +1,7 @@
 {
   "name": "litegui",
   "private": false,
-  "version": "0.1.0",
+  "version": "0.2.0",
   "type": "module",
   "files": [
     "lib"
@@ -15,7 +15,59 @@
       "require": "./lib/litegui.umd.cjs"
     },
     "./style.css": "./lib/litegui.css",
-    "./package.json": "./package.json"
+    "./package.json": "./package.json",
+    "./area": {
+      "types": "./lib/types/entries/area.d.ts",
+      "import": "./lib/entries/area.js"
+    },
+    "./panel": {
+      "types": "./lib/types/entries/panel.d.ts",
+      "import": "./lib/entries/panel.js"
+    },
+    "./split": {
+      "types": "./lib/types/entries/split.d.ts",
+      "import": "./lib/entries/split.js"
+    },
+    "./tabs": {
+      "types": "./lib/types/entries/tabs.d.ts",
+      "import": "./lib/entries/tabs.js"
+    },
+    "./dialog": {
+      "types": "./lib/types/entries/dialog.d.ts",
+      "import": "./lib/entries/dialog.js"
+    },
+    "./menu": {
+      "types": "./lib/types/entries/menu.d.ts",
+      "import": "./lib/entries/menu.js"
+    },
+    "./button": {
+      "types": "./lib/types/entries/button.d.ts",
+      "import": "./lib/entries/button.js"
+    },
+    "./checkbox": {
+      "types": "./lib/types/entries/checkbox.d.ts",
+      "import": "./lib/entries/checkbox.js"
+    },
+    "./slider": {
+      "types": "./lib/types/entries/slider.d.ts",
+      "import": "./lib/entries/slider.js"
+    },
+    "./searchbox": {
+      "types": "./lib/types/entries/searchbox.d.ts",
+      "import": "./lib/entries/searchbox.js"
+    },
+    "./list": {
+      "types": "./lib/types/entries/list.d.ts",
+      "import": "./lib/entries/list.js"
+    },
+    "./table": {
+      "types": "./lib/types/entries/table.d.ts",
+      "import": "./lib/entries/table.js"
+    },
+    "./console": {
+      "types": "./lib/types/entries/console.d.ts",
+      "import": "./lib/entries/console.js"
+    }
   },
   "scripts": {
     "dev": "vite",
@@ -27,7 +79,10 @@
     "preview": "vite preview",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
-    "test:watch": "vitest"
+    "test:watch": "vitest",
+    "docs:dev": "vitepress dev docs",
+    "docs:build": "vitepress build docs",
+    "docs:preview": "vitepress preview docs"
   },
   "devDependencies": {
     "@rollup/plugin-typescript": "^8.5.0",

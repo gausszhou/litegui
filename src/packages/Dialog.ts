@@ -47,6 +47,7 @@ export class Dialog extends EventMitter implements LiteComponent {
   static TITLE_HEIGHT: string = "20px";
   static minimized: Dialog[] = [];
   static maximized: Dialog[] = [];
+  private static _uid = 0;
 
 
   draggable: boolean = false;
@@ -109,6 +110,7 @@ export class Dialog extends EventMitter implements LiteComponent {
     this.content = this.createElementContent();
     this.footer = this.createElementFooter();
     this.initDom();
+    this.initAccessibility();
     this.bindWindowButtons();
     this.enableProperties({ draggable: opts.draggable, resizable: opts.resizable });
     Dialog.INSTANCE_LIST.push(this);
@@ -194,6 +196,19 @@ export class Dialog extends EventMitter implements LiteComponent {
     this.root.appendChild(this.content);
     this.root.appendChild(this.footer);
     this.initStyle();
+  }
+
+  initAccessibility() {
+    this.root.setAttribute("role", "dialog");
+    this.root.tabIndex = -1;
+
+    const titleId = `litegui-dialog-title-${++Dialog._uid}`;
+    this.header.id = titleId;
+    this.root.setAttribute("aria-labelledby", titleId);
+
+    if (!this.options.title) {
+      this.root.setAttribute("aria-label", "Dialog");
+    }
   }
 
   bindWindowButtons() {
@@ -298,6 +313,7 @@ export class Dialog extends EventMitter implements LiteComponent {
 
     if (this.isModal) {
       this.isModal = false;
+      this.root.removeAttribute("aria-modal");
       showModalBackground(false);
     }
 
@@ -654,6 +670,7 @@ export class Dialog extends EventMitter implements LiteComponent {
    */
   makeModal(): void {
     this.isModal = true;
+    this.root.setAttribute("aria-modal", "true");
     showModalBackground(true);
 
     const parent = getModalBackground() || document.body;

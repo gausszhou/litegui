@@ -1,6 +1,7 @@
 @use "./components/button.scss";
 @use "./components/file-list.scss";
 @use "./components/inspector.scss";
+@use "./components/list.scss";
 @use "./components/menu.scss";
 @use "./components/scrollbar.scss";
 @use "./components/table.scss";
@@ -9,3 +10,4 @@
 @use "./normalize.scss";
 @use "./style.scss";
 @use "./widgets.scss";
+@use "./theme.scss";

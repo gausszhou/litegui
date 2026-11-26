@@ -144,6 +144,7 @@ export class Table extends EventMitter {
       for (let i = 0; i < this.columns.length; ++i) {
         const column = this.columns[i];
         const th = document.createElement("th");
+        th.scope = "col";
         th.innerHTML = column.name ?? "";
         if (column.width) th.style.width = String(column.width);
         column.th = th;

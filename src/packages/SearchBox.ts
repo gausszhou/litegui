@@ -19,13 +19,16 @@ export class SearchBox {
     createElementRoot() {
         const root = document.createElement("div");
         root.className = "litegui searchbox";
+        root.setAttribute("role", "search");
         return root;
     }
 
     createElementInput(value: string) {
         const input = document.createElement("input");
         input.value = value;
+        input.type = "search";
         input.placeholder = this.options.placeholder ?? "Search";
+        input.setAttribute("aria-label", this.options.placeholder ?? "Search");
         return input;
     }
 

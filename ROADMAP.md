@@ -38,7 +38,12 @@ v0.1 只承诺 **12 个核心组件**；`Inspector`、`Tree`、`ContextMenu` 等
   - 18 个测试文件、62 个用例通过
   - Getting Started 与示例文档、CHANGELOG、0.1.0 版本号
   - Inspector/Tree/ContextMenu 明确标记 experimental
-- [ ] **Phase 2**：主题、可访问性、文档站与 v0.2.0
+- [x] **Phase 2（2026-11-27）**：主题、可访问性、文档站与 v0.2.0
+  - 主题 token、亮/暗主题、`setTheme` API
+  - 核心组件基础 ARIA 与键盘操作
+  - 13 个按组件 ESM 入口与 `exports` 子路径
+  - VitePress 文档站与 GitHub Pages 部署工作流
+  - 视觉回归/完整浏览器矩阵顺延到 Phase 3
 - [ ] **Phase 3**：API 冻结、性能/安全与 v1.0.0
 
 ---

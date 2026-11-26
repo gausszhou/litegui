@@ -124,6 +124,7 @@ export class Tabs {
     }
 
     this.list = list;
+    list.setAttribute("role", "tablist");
     this.root.appendChild(list);
     this.tabs_root = list;
 
@@ -335,6 +336,11 @@ export class Tabs {
     content.className = "wtabcontent " + "wtabcontent-" + safe_id + " " + (options.className || "");
     content.dataset["id"] = id;
     content.style.display = "none";
+    content.setAttribute("role", "tabpanel");
+    content.setAttribute("aria-hidden", "true");
+    element.setAttribute("role", "tab");
+    element.setAttribute("aria-selected", "false");
+    element.tabIndex = -1;
 
     //adapt height
     if (this.mode == "horizontal") {
@@ -492,14 +498,19 @@ export class Tabs {
       if (id === tabId) {
         info.selected = true;
         info.content.style.display = "";
+        info.content.setAttribute("aria-hidden", "false");
       } else {
         delete info.selected;
         info.content.style.display = "none";
+        info.content.setAttribute("aria-hidden", "true");
       }
     }
 
-    this.list.querySelectorAll("li.wtab").forEach((tabElement) => {
-      tabElement.classList.toggle("selected", tabElement === element);
+    this.list.querySelectorAll<HTMLElement>("li.wtab").forEach((tabElement) => {
+      const selected = tabElement === element;
+      tabElement.classList.toggle("selected", selected);
+      tabElement.setAttribute("aria-selected", selected ? "true" : "false");
+      tabElement.tabIndex = selected ? 0 : -1;
     });
 
     this.previous_tab = this.current_tab;

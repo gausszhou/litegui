@@ -1,0 +1,112 @@
+/* LiteGUI theme tokens
+ * Dark is the default. Set data-lg-theme="light" on <html> for the light theme.
+ */
+
+:root {
+	--lg-font: "Arial", sans-serif;
+	--lg-color-bg: #181818;
+	--lg-color-bg-alt: #333;
+	--lg-color-panel: #444;
+	--lg-color-panel-2: #333;
+	--lg-color-header: #778;
+	--lg-color-header-2: #555;
+	--lg-color-text: #aaa;
+	--lg-color-text-strong: #fff;
+	--lg-color-text-muted: #888;
+	--lg-color-accent: #fc0;
+	--lg-color-border: #222;
+	--lg-color-button: #32302d;
+	--lg-color-button-hover: #aab;
+	--lg-color-button-text: #ccc;
+	--lg-color-overlay: rgba(0, 0, 0, 0.8);
+	--lg-radius: 2px;
+}
+
+:root[data-lg-theme="light"] {
+	--lg-color-bg: #f5f6f8;
+	--lg-color-bg-alt: #e8eaf0;
+	--lg-color-panel: #ffffff;
+	--lg-color-panel-2: #eef0f5;
+	--lg-color-header: #dce3f2;
+	--lg-color-header-2: #c9d2e6;
+	--lg-color-text: #333;
+	--lg-color-text-strong: #111;
+	--lg-color-text-muted: #666;
+	--lg-color-accent: #a85f00;
+	--lg-color-border: #c8ccd6;
+	--lg-color-button: #e6e8ee;
+	--lg-color-button-hover: #cfd7ef;
+	--lg-color-button-text: #222;
+	--lg-color-overlay: rgba(20, 24, 32, 0.45);
+}
+
+body {
+	background-color: var(--lg-color-bg);
+	color: var(--lg-color-text);
+	font-family: var(--lg-font);
+}
+
+.litegui-wrap,
+.litegui-maincontent {
+	background-color: var(--lg-color-bg);
+}
+
+.litepanel,
+.litedialog {
+	background-color: var(--lg-color-panel);
+	background-image: none;
+	color: var(--lg-color-text);
+}
+
+.litepanel .panel-header,
+.litedialog .panel-header {
+	background-color: var(--lg-color-header);
+	background-image: none;
+	color: var(--lg-color-text-strong);
+}
+
+.litepanel .panel-header button,
+.litedialog .panel-header button {
+	background-color: var(--lg-color-header-2);
+	color: var(--lg-color-text-strong);
+}
+
+.litepanel .panel-footer,
+.litedialog .panel-footer {
+	color: var(--lg-color-text-muted);
+}
+
+button.litebutton {
+	background: var(--lg-color-button);
+	border-radius: var(--lg-radius);
+	color: var(--lg-color-button-text);
+	text-shadow: none;
+}
+
+button.litebutton:hover:not(:disabled),
+button.litebutton:active:not(:disabled) {
+	background: var(--lg-color-button-hover) !important;
+	color: var(--lg-color-text-strong);
+}
+
+button.litebutton:focus-visible {
+	outline: 2px solid var(--lg-color-accent);
+	outline-offset: 1px;
+}
+
+.litemodalbg {
+	background-color: var(--lg-color-overlay);
+}
+
+.liteslider {
+	background-color: var(--lg-color-panel-2);
+}
+
+.litetable th {
+	color: var(--lg-color-accent);
+	background: var(--lg-color-panel-2);
+}
+
+a {
+	color: var(--lg-color-accent);
+}

@@ -35,3 +35,17 @@ export function showModalBackground(show: boolean) {
     coreState.modalbg.style.display = show ? "block" : "none";
   }
 }
+
+export type LiteTheme = "dark" | "light";
+
+let currentTheme: LiteTheme = "dark";
+
+export function setTheme(theme: LiteTheme): LiteTheme {
+  currentTheme = theme;
+  document.documentElement.dataset.lgTheme = theme;
+  return currentTheme;
+}
+
+export function getTheme(): LiteTheme {
+  return currentTheme;
+}

@@ -89,6 +89,7 @@ export class Menu {
 
     this.content = document.createElement("ul");
     this.content.className = MENU_LIST_CLASS_NAME;
+    this.content.setAttribute("role", "menubar");
     this.root.appendChild(this.content);
 
     this.is_open = false;
@@ -202,6 +203,8 @@ export class Menu {
   createMainMenuItemElement(item: MenuItem) {
     const $item = document.createElement("li");
     $item.className = MENU_ITEM_CLASS_NAME;
+    $item.setAttribute("role", "menuitem");
+    $item.setAttribute("aria-haspopup", "true");
     $item.innerHTML = `<span class='icon'></span><span class='name'>${item.name}</span>`;
     /* ON CLICK TOP MAIN MENU ITEM */
     $item.addEventListener("click", (e) => {
@@ -265,6 +268,7 @@ export class Menu {
     }
     const $menu_panel = document.createElement("div");
     $menu_panel.className = MENU_PANEL_CLASS_NAME;
+    $menu_panel.setAttribute("role", "menu");
 
     const sorted_entries = Array.from(menu.children);
 
@@ -285,6 +289,7 @@ export class Menu {
       const $menu_item = document.createElement("p");
       const menu_item = sorted_entries[i];
       $menu_item.className = MENU_PANEL_ITEM_CLASS_NAME;
+      $menu_item.setAttribute("role", "menuitem");
       const has_submenu = menu_item.children?.length;
       if (has_submenu) {
         $menu_item.classList.add("has_submenu");
@@ -295,6 +300,7 @@ export class Menu {
       } else {
         // is a menu separator
         $menu_item.classList.add("separator");
+        $menu_item.setAttribute("role", "separator");
       }
       //check if it has to show the item being 'checked'
       if (menu_item.data) {

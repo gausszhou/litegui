@@ -19,6 +19,7 @@ export class List {
     this.root = document.createElement("ul");
     this.root.id = id;
     this.root.className = "litelist";
+    this.root.setAttribute("role", "listbox");
     this.callback = options.callback;
     this.items = items;
 
@@ -41,10 +42,12 @@ export class List {
   }
 
   private selectElement(element: HTMLLIElement, emit: boolean) {
-    this.root.querySelectorAll(".list-item.selected").forEach((item) => {
+    this.root.querySelectorAll<HTMLElement>(".list-item").forEach((item) => {
       item.classList.remove("selected");
+      item.setAttribute("aria-selected", "false");
     });
     element.classList.add("selected");
+    element.setAttribute("aria-selected", "true");
 
     const value = element.dataset.value || "";
     this.items.forEach((item) => {
@@ -59,6 +62,8 @@ export class List {
   createItem(item: string | ListItem): HTMLLIElement {
     const li = document.createElement("li");
     li.className = "list-item";
+    li.setAttribute("role", "option");
+    li.setAttribute("aria-selected", "false");
     li.dataset.value = this.itemValue(item);
 
     if (typeof item !== "string" && item.id) {

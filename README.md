@@ -4,7 +4,7 @@
 
 LiteGUI 面向编辑器、调试器、工具台这类需要菜单、面板、分栏、对话框、属性检查器、树和表格的 Web 应用。项目从 [jagenjo/litegui.js](https://github.com/jagenjo/litegui.js)（MIT）重构而来。
 
-当前版本 **0.1.0**（Phase 1 完成），路线图见 [ROADMAP.md](./ROADMAP.md)。
+当前版本 **0.2.0**（Phase 2 完成），路线图见 [ROADMAP.md](./ROADMAP.md)。
 
 ## 状态
 
@@ -13,7 +13,7 @@ LiteGUI 面向编辑器、调试器、工具台这类需要菜单、面板、分
 | 核心 | `Area`、`Panel`、`Split`、`Tabs`、`Dialog`、`Menu`、`Button`、`Checkbox`、`Slider`、`SearchBox`、`List`、`Table`、`Console` | 可用，有验收测试 |
 | Experimental | `Inspector`、`Tree`、`ContextMenu`、`Dragger`、`LineEditor`、`ComplexList` | 暂不承诺稳定性 |
 
-Phase 0/1 已完成：依赖可安装、类型检查归零、核心回归修复、core 模块抽取、18 个测试文件 / 62 个用例、库构建与 npm 包冒烟。
+Phase 0/1 已完成：依赖可安装、类型检查归零、核心回归修复、core 模块抽取、库构建与 npm 包冒烟。Phase 2 增加主题 token、基础可访问性、按组件导出与 VitePress 文档站；当前 20 个测试文件 / 70 个用例。
 
 ## 文档
 
@@ -32,6 +32,15 @@ npm run dev
 - `/demo/`：最小示例
 - `/editor/`：综合示例
 
+## 文档站
+
+```bash
+npm run docs:dev
+npm run docs:build
+```
+
+VitePress 配置位于 `docs/.vitepress/`，构建产物输出到 `docs/.vitepress/dist`。
+
 ## 构建
 
 ```bash
@@ -42,9 +51,10 @@ npm run build
 
 ```text
 lib/
-  litegui.esm.js     # ESM
+  litegui.esm.js     # ESM 全量入口
   litegui.umd.cjs    # UMD / CommonJS
   litegui.css        # 样式
+  entries/           # 按组件 ESM 入口
   types/             # .d.ts
 dist/                # demo / editor 静态页面
 ```
