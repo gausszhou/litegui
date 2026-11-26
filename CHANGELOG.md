@@ -1,5 +1,25 @@
 # Changelog
 
+## 0.2.0 (2026-11-27)
+
+### Added
+
+- 主题系统：`--lg-color-*` CSS 变量、亮/暗主题、`LiteGUI.setTheme/getTheme`、`init({ theme })`。
+- 基础可访问性：Checkbox/Tabs/List/Slider/Dialog/Menu/SearchBox/Table 的 role、aria 属性与键盘操作。
+- 按组件导出：`litegui/button`、`litegui/table` 等 13 个子路径，`lib/entries` 与对应 `.d.ts`。
+- VitePress 文档站与 GitHub Pages 部署工作流，新增首页、组件页。
+
+### Changed
+
+- 样式入口加入 `theme.scss` 与遗漏的 `list.scss`。
+- 文档站脚本：`npm run docs:dev` / `docs:build` / `docs:preview`。
+- CI 增加 `npm run docs:build`。
+
+### Known limitations
+
+- 未做 Playwright 视觉回归与完整浏览器矩阵。
+- `Inspector`、`Tree`、`ContextMenu` 仍为 experimental。
+
 ## 0.1.0 (2026-11-27)
 
 首个可构建、可测试、可安装的基线版本。
