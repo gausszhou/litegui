@@ -27,7 +27,7 @@ import { Tree } from "./Tree";
 const emitter = mitt();
 
 interface MonitorableObject {
-  _events: EventMitter;
+  __events?: EventMitter;
   [key: string]: any
 }
 
@@ -35,6 +35,9 @@ interface LiteGUIOptions {
   container?: string;
   width?: number;
   height?: number;
+  wrapped?: boolean;
+  menubar?: boolean;
+  gui_callback?: Function;
 }
 
 /**
@@ -77,14 +80,14 @@ export class LiteGUI {
   // 
   static windows: Window[] = [];
   static panels = {}
-  static __events = []
+  static __events = new EventMitter();
   static _safe_cliboard: any = null;
   // undo redo
   static undo_steps = [];
   static redo_steps = [];
 
   // those useful HTML unicode codes that I never remeber but I always need
-  special_codes = {
+  static special_codes = {
     close: "&#10005;",
     navicon: "&#9776;",
     refresh: "&#8634;",
@@ -103,25 +106,22 @@ export class LiteGUI {
    */
 
   static init(options: LiteGUIOptions = {}) {
-
-    console.log(options);
-    
-
     // choose main container
     this.container = null;
 
     if (options.container) {
-      this.container = document.querySelector(options.container);
+      this.container =
+        document.getElementById(options.container) ||
+        document.querySelector<HTMLElement>(options.container);
     }
     if (!this.container) {
       this.container = document.body;
     }
 
-  
     if (options.wrapped) {
       //create litegui root element
       const root = document.createElement("div");
-      root.classList.add("litegui-root");
+      root.className = "litegui-root";
       root.style.position = "relative";
       root.style.overflow = "hidden";
       this.root = root;
@@ -133,47 +133,46 @@ export class LiteGUI {
       this.content = content;
       this.root.appendChild(content);
 
-      //maximize
-      if (this.root.classList.contains("fullscreen")) {
-        window.addEventListener("resize", () => {
-          LiteGUI.maximizeWindow();
-        });
-      }
-
+      window.addEventListener("resize", () => {
+        LiteGUI.maximizeWindow();
+      });
     } else {
       this.root = this.container;
       this.content = this.container;
     }
 
+    this.root.classList.add("litegui-wrap", "fullscreen");
+    this.content.classList.add("litegui-maincontent");
+
     if (options.width && options.height) {
       this.setWindowSize(options.width, options.height);
     }
-    this.root.className = "litegui-wrap fullscreen";
-    this.content.className = "litegui-maincontent";
 
     //create modal dialogs container
-    this.modalbg_div = document.createElement("div")
+    this.modalbg_div = document.createElement("div");
     this.modalbg_div.className = "litemodalbg";
     this.modalbg_div.style.display = "none";
     this.root.appendChild(this.modalbg_div);
 
-  
+    if (options.menubar) this.createMenu();
 
-    //called before anything
-    // if (options.gui_callback) options.gui_callback();
+    if (options.gui_callback) options.gui_callback();
 
     //external windows
-    window.addEventListener("beforeunload", function (e) {
-      for (var i in LiteGUI.windows) LiteGUI.windows[i].close();
+    window.addEventListener("beforeunload", function () {
+      for (const window of LiteGUI.windows) window.close();
       LiteGUI.windows = [];
     });
 
-    // Done
+    return this;
   }
 
 
   static createMenu() {
-    
+    const menubar = new Menu("mainmenubar");
+    LiteGUI.menubar = menubar;
+    LiteGUI.add(menubar);
+    return menubar;
   }
 
   static setWindowSize(w?: number, h?: number) {
@@ -203,27 +202,47 @@ export class LiteGUI {
    * @param {String} event the string defining the event
    * @param {Function} callback where to call
    */
-  static bind(element: string | NodeList | HTMLElement | MonitorableObject | any, event: string, callback: EventListener) {
+  static bind(
+    element: string | NodeList | ArrayLike<any> | HTMLElement | MonitorableObject | any,
+    event: string,
+    callback: EventListener
+  ) {
     if (!element) throw "Cannot bind to null";
     if (!event) throw "Event bind missing";
     if (!callback) throw "Bind callback missing";
 
-    if (typeof element === 'string') {
-      element = document.querySelectorAll(element);
-    }
-
-    if (element instanceof Array || element instanceof NodeList) {
-      element.forEach(ele => inner(ele));
-    } else {
-      inner(element);
-    }
-
-    function inner(element: HTMLElement | MonitorableObject) {
-      if (element.addEventListener) {
-        element.addEventListener(event, callback);
-      }
+    const targets = LiteGUI.toElementList(element);
+    for (const target of targets) {
+      LiteGUI.bindTarget(target, event, callback);
     }
   }
+
+  private static toElementList(element: any): any[] {
+    if (typeof element === "string") {
+      return Array.from(document.querySelectorAll(element));
+    }
+    if (element instanceof NodeList || element instanceof Array) {
+      return Array.from(element);
+    }
+    return [element];
+  }
+
+  private static bindTarget(target: any, event: string, callback: EventListener) {
+    if (target && typeof target.addEventListener === "function") {
+      target.addEventListener(event, callback);
+      return;
+    }
+
+    if (!(target.__events instanceof EventMitter)) {
+      Object.defineProperty(target, "__events", {
+        value: new EventMitter(),
+        enumerable: false,
+        configurable: true
+      });
+    }
+    target.__events.on(event, callback as any);
+  }
+
   /**
  * Unbinds an event in an object (similar to jQuery.unbind)
  * @method unbind
@@ -231,11 +250,18 @@ export class LiteGUI {
  * @param {String} event the string defining the event
  * @param {Function} callback where to call
  */
-  unbind(element: HTMLElement | MonitorableObject, event: string, callback: EventListener) {
-    if (element.removeEventListener) {
-      element.removeEventListener(event, callback);
-    } else {
-      (element as MonitorableObject).__events?.off(event, callback);
+  static unbind(
+    element: string | NodeList | ArrayLike<any> | HTMLElement | MonitorableObject,
+    event: string,
+    callback: EventListener
+  ) {
+    const targets = LiteGUI.toElementList(element);
+    for (const target of targets) {
+      if (typeof target.removeEventListener === "function") {
+        target.removeEventListener(event, callback);
+      } else if (target.__events instanceof EventMitter) {
+        target.__events.off(event, callback as any);
+      }
     }
   }
 
@@ -245,7 +271,8 @@ export class LiteGUI {
 * @param {Object} component
 */
   static add(component: LiteComponent) {
-    LiteGUI.content.appendChild(component.root || component);
+    const parent = LiteGUI.content || LiteGUI.root || document.body;
+    parent.appendChild(component.root || component);
   }
 
   /**
@@ -317,15 +344,15 @@ export class LiteGUI {
       bubbles: true,
       cancelable: true,
       detail: params
-    })
+    });
 
-    if ((element as any).fireEvent) {
-      (element as any).fireEvent(event)
+    if (element && typeof element.dispatchEvent === "function") {
+      element.dispatchEvent(event);
+    } else if (element && element.__events instanceof EventMitter) {
+      element.__events.emit(eventName, event);
+    } else if (element && typeof element.fireEvent === "function") {
+      element.fireEvent(event);
     }
-
-    if ((element as HTMLElement).dispatchEvent) {
-      (element as HTMLElement).dispatchEvent(event)
-    };
 
     return event;
   }
@@ -933,7 +960,7 @@ export class LiteGUI {
     options.width = options.width || 280;
     options.height = options.height || 140;
     if (typeof content == "string") content = "<p>" + content + "</p>";
-    LiteGUI.remove(".litepanel.alert"); //kill other panels
+    LiteGUI.remove(".litedialog.alert"); //kill other panels
     return LiteGUI.showMessage(content, options);
   }
 
