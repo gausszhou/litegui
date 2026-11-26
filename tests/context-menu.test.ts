@@ -1,0 +1,31 @@
+import { describe, expect, it, vi } from "vitest";
+import { ContextMenu } from "../src/packages/ContextMenu";
+
+describe("ContextMenu", () => {
+  it("renders items and invokes the item callback", () => {
+    const callback = vi.fn();
+    const menu = new ContextMenu([{ title: "Rename", callback }], { left: 10, top: 20 });
+
+    expect(menu.root.parentElement).toBe(document.body);
+    const entry = menu.root.querySelector<HTMLElement>(".litemenu-entry");
+    expect(entry?.textContent).toContain("Rename");
+
+    entry?.click();
+
+    expect(callback).toHaveBeenCalledTimes(1);
+  });
+
+  it("supports object values and closes manually", () => {
+    const menu = new ContextMenu({ Delete: { title: "Delete" } });
+    expect(menu.root.querySelector(".litemenu-entry")?.textContent).toContain("Delete");
+
+    menu.close();
+    expect(menu.root.parentElement).toBeNull();
+  });
+
+  it("returns the top-level menu", () => {
+    const menu = new ContextMenu(["One"]);
+    expect(menu.getTopMenu()).toBe(menu);
+    menu.close();
+  });
+});
