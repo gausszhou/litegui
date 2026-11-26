@@ -121,8 +121,9 @@ export class Menu {
         currentDepth++;
         menu = lastMenuItem.children;
       } else {
-        // 如果没有同名的菜单项，创建一个新的菜单项
-        const newMenuItem = MenuItem.create(tokens[currentDepth], lastMenuItem, data);
+        // 如果没有同名的菜单项，创建一个新的菜单项（仅末级节点挂载 data）
+        const isLastToken = currentDepth === tokens.length - 1;
+        const newMenuItem = MenuItem.create(tokens[currentDepth], lastMenuItem, isLastToken ? data : null);
         menu.push(newMenuItem);
         lastMenuItem = newMenuItem;
         currentDepth++;
@@ -217,11 +218,11 @@ export class Menu {
       }
     });
 
-    $item.addEventListener("mouseenter", (e) => {
+    $item.addEventListener("mouseenter", (_e) => {
       if (this.is_open  && this.currentMainMenuItem !== item) {
         this.hideMenuPanel();
         this.currentMainMenuItem = item;
-        this.showMenuPanel(item, e, $item);
+        this.showMenuPanel(item, _e, $item);
       }
     });
     return $item;
@@ -250,7 +251,7 @@ export class Menu {
    * @param is_submenu 
    * @returns 
    */
-  showMenuPanel(menu: MenuItem, e: Event, root: HTMLElement, is_submenu: boolean = false) {
+  showMenuPanel(menu: MenuItem, _e: Event, root: HTMLElement, is_submenu: boolean = false) {
     // if not a submenu close current menu panel 如果不是子菜单，则关闭当前的菜单面板
     if (!is_submenu) {
       this.hideMenuPanel();
@@ -311,36 +312,36 @@ export class Menu {
       }
 
       /* ON CLICK SUBMENU ITEM */
-      $menu_item.addEventListener("click", () => {
-        const item = menu_item.data;
-        if (item.data) {
-          if (item.data.disabled) return;
+      $menu_item.addEventListener("click", (e) => {
+        const data = menu_item.data;
+        if (data) {
+          if (data.disabled) return;
 
           //to change variables directly
-          if (item.data.instance && item.data.property) {
-            if (item.data.type == "checkbox") {
-              item.data.instance[item.data.property] = !item.data.instance[item.data.property];
-              if (item.data.instance[item.data.property]) $menu_item.classList.add("checked");
+          if (data.instance && data.property) {
+            if (data.type == "checkbox") {
+              data.instance[data.property] = !data.instance[data.property];
+              if (data.instance[data.property]) $menu_item.classList.add("checked");
               else $menu_item.classList.remove("checked");
-            } else if (item.data.hasOwnProperty("value")) {
-              item.data.instance[item.data.property] = item.data.value;
+            } else if (Object.prototype.hasOwnProperty.call(data, "value")) {
+              data.instance[data.property] = data.value;
             }
           }
 
           //to have a checkbox behaviour
-          if (item.data.checkbox != null) {
-            item.data.checkbox = !item.data.checkbox;
-            if (item.data.checkbox) $menu_item.classList.add("checked");
+          if (data.checkbox != null) {
+            data.checkbox = !data.checkbox;
+            if (data.checkbox) $menu_item.classList.add("checked");
             else $menu_item.classList.remove("checked");
           }
 
           //execute a function
-          if (item.data.callback && typeof item.data.callback == "function") item.data.callback(item.data);
+          if (data.callback && typeof data.callback == "function") data.callback(data);
         }
 
         // more menus
-        if (item.children && item.children.length) {
-          this.showMenuPanel(item, e, root, true);
+        if (menu_item.children && menu_item.children.length) {
+          this.showMenuPanel(menu_item as MenuItem, e, root, true);
         } else {
           this.is_open = false;
           this.hideMenuPanel();
