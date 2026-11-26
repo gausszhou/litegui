@@ -2,7 +2,6 @@ import type { LiteComponent } from "../types/index";
 import { type ButtonOptions, Button } from "./Button";
 import EventMitter from "./EventMitter";
 import LiteGUI from "./index";
-import { createElementFromString } from "./utils";
 
 interface ButtonsItemOptions extends ButtonOptions {
   name: string;
@@ -11,10 +10,15 @@ interface ButtonsItemOptions extends ButtonOptions {
 
 interface DialogOptions {
   fullscreen?: boolean;
+  fullcontent?: boolean;
   minimize?: boolean;
   hide?: boolean;
   detachable?: boolean;
+  /** 兼容旧写法：close 与 closable 等价 */
+  close?: boolean;
   closable?: boolean;
+  draggable?: boolean;
+  resizable?: boolean;
   width?: number | string;
   height?: number | string;
   minWidth?: number;
@@ -23,6 +27,9 @@ interface DialogOptions {
   id?: string;
   title?: string;
   content?: string;
+  className?: string;
+  parent?: HTMLElement | string;
+  attach?: boolean;
   buttons?: ButtonsItemOptions[];
   onClose?: () => void;
   onEnter?: () => void;
@@ -32,16 +39,20 @@ interface DialogOptions {
 }
 
 export class Dialog extends EventMitter implements LiteComponent {
-  static INSTANCE_LIST: Dialog[];
+  static INSTANCE_LIST: Dialog[] = [];
   static MINIMIZED_WIDTH: number = 200;
   static MIN_WIDTH: number = 150;
   static MIN_HEIGHT: number = 150;
   static TITLE_HEIGHT: string = "20px";
+  static minimized: Dialog[] = [];
+  static maximized: Dialog[] = [];
+
 
   draggable: boolean = false;
   resizable: boolean = false;
   minimized: boolean = false;
   maximized: boolean = false;
+  isModal: boolean = false;
   
   top: number = 0;
   bottom: number = 0;
@@ -59,9 +70,6 @@ export class Dialog extends EventMitter implements LiteComponent {
   on_escape: any;
   on_keydown: any;
   on_keyup: any;
-
-  static minimized: any;
-  static maximized: any;
 
   public left: number = 0;
   public right: number = 0;
@@ -83,63 +91,100 @@ export class Dialog extends EventMitter implements LiteComponent {
   public oldStyleWidth: string = "0px";
   public oldStyleHeight: string = "0px";
 
-  constructor(options: DialogOptions | string) {
+  constructor(options: DialogOptions | string = {}) {
     super();
-    if (typeof options === "string") {
-      const id: string = options;
-      options = {};
-      options.id = id;
-    }
-    this.options = options || {};
-    this.id = this.options.id;
+    const opts: DialogOptions = typeof options === "string" ? { id: options } : options;
+    this.options = opts;
+    this.id = opts.id ?? "";
     this.left = 0;
     this.right = 0;
-    this.width = options.width || Dialog.MIN_WIDTH;
-    this.height = options.height || Dialog.MIN_HEIGHT;
-    this.minWidth = options.minWidth || Dialog.MIN_WIDTH;
-    this.minHeight = options.minHeight || Dialog.MIN_HEIGHT;
+    this.width = opts.width ?? Dialog.MIN_WIDTH;
+    this.height = opts.height ?? Dialog.MIN_HEIGHT;
+    this.minWidth = opts.minWidth ?? Dialog.MIN_WIDTH;
+    this.minHeight = opts.minHeight ?? Dialog.MIN_HEIGHT;
     this.root = this.createElementRoot();
     this.header = this.createElementHeader();
-    this.buttons = this.createElementHeader();
+    this.buttons = this.createElementButtons();
     this.content = this.createElementContent();
     this.footer = this.createElementFooter();
     this.initDom();
+    this.bindWindowButtons();
+    this.enableProperties({ draggable: opts.draggable, resizable: opts.resizable });
+    Dialog.INSTANCE_LIST.push(this);
+
+    if (opts.attach || opts.parent) {
+      const parent =
+        typeof opts.parent === "string"
+          ? document.querySelector<HTMLElement>(opts.parent)
+          : opts.parent;
+      (parent || LiteGUI.root || document.body).appendChild(this.root);
+      this.center();
+    }
   }
 
   createElementRoot() {
     const options = this.options;
-    const element = createElementFromString(`<div class="lite-dialog"><div>`);
-    element.id = options.id;
-    options.className && element.classList.add(options.className);
+    const element = document.createElement("div");
+    element.className = "litedialog";
+    if (this.id) element.id = this.id;
+    if (options.className) element.className += " " + options.className;
     return element;
   }
 
   createElementHeader() {
     const options = this.options;
-    return createElementFromString(`<div class="dialog-header"> ${options.title}<div>`);
+    const header = document.createElement("div");
+    header.className = "panel-header";
+    header.textContent = options.title || "";
+    if (!options.title) header.style.display = "none";
+    return header;
   }
 
   createElementButtons() {
     const options = this.options;
-    const str = ` 
-    <div class="buttons"> 
-      ${options.minimize ? `<button class="lite-button mini-button minimize-button">-</button>` : ""}
-      ${options.minimize ? `<button class="lite-button mini-button maximize-button hidden"></button>` : ""}
-      ${options.hide ? `<button class='lite-button mini-button   hide-button'></button>` : ""}
-      ${options.detachable ? `<button class='lite-button mini-button detach-button'></button>` : ""}  
-      ${options.closable ? `<button class='litebutton mini-button close-button'></button>` : ""}  
-    </div>
-    `;
-    return createElementFromString(str);
+    const container = document.createElement("div");
+    container.className = "buttons";
+
+    const createMiniButton = (className: string, label: string, title: string) => {
+      const button = document.createElement("button");
+      button.type = "button";
+      button.className = `litebutton mini-button ${className}`;
+      button.textContent = label;
+      button.title = title;
+      return button;
+    };
+
+    if (options.minimize) {
+      container.appendChild(createMiniButton("minimize-button", "-", "Minimize"));
+      const maximize = createMiniButton("maximize-button", "□", "Maximize");
+      maximize.style.display = "none";
+      container.appendChild(maximize);
+    }
+    if (options.hide) {
+      container.appendChild(createMiniButton("hide-button", "", "Hide"));
+    }
+    if (options.detachable) {
+      container.appendChild(createMiniButton("detach-button", "", "Detach"));
+    }
+    if (options.close || options.closable) {
+      container.appendChild(createMiniButton("close-button", "×", "Close"));
+    }
+
+    return container;
   }
 
   createElementContent() {
     const options = this.options;
-    return createElementFromString(`<div class="dialog-content"> ${options.content}<div>`);
+    const content = document.createElement("div");
+    content.className = "content";
+    if (options.content) content.innerHTML = options.content;
+    return content;
   }
 
   createElementFooter() {
-    return createElementFromString(`<div class="dialog-footer"><div>`);
+    const footer = document.createElement("div");
+    footer.className = "panel-footer";
+    return footer;
   }
 
   initDom() {
@@ -149,9 +194,40 @@ export class Dialog extends EventMitter implements LiteComponent {
     this.root.appendChild(this.footer);
     this.initStyle();
   }
+
+  bindWindowButtons() {
+    const close = this.root.querySelector<HTMLButtonElement>(".close-button");
+    close?.addEventListener("click", (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      this.close();
+    });
+
+    const minimize = this.root.querySelector<HTMLButtonElement>(".minimize-button");
+    minimize?.addEventListener("click", (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      this.minimize();
+    });
+
+    const maximize = this.root.querySelector<HTMLButtonElement>(".maximize-button");
+    maximize?.addEventListener("click", (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      this.maximize();
+    });
+
+    const hide = this.root.querySelector<HTMLButtonElement>(".hide-button");
+    hide?.addEventListener("click", (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      this.hide();
+    });
+  }
+
   initStyle() {
     const options = this.options;
-    if (options.fullscreen) {
+    if (options.fullscreen || options.fullcontent) {
       this.content.style.width = "100%";
       this.content.style.height = options.title ? "calc( 100% - " + Dialog.TITLE_HEIGHT + " )" : "100%";
     }
@@ -170,11 +246,14 @@ export class Dialog extends EventMitter implements LiteComponent {
   }
 
   addButtonToFooter(name: string, options: ButtonsItemOptions) {
-    const button = new Button(name, options);
-    this.footer.appendChild(button.root);
-    button.on("click", () => {
-      options.close && this.close();
+    const button = new Button(name, {
+      size: options.size,
+      callback: () => {
+        options.callback?.(button);
+        if (options.close) this.close();
+      }
     });
+    this.footer.appendChild(button.root);
     return button;
   }
 
@@ -182,19 +261,45 @@ export class Dialog extends EventMitter implements LiteComponent {
     if (this.content) this.content.innerHTML = "";
   }
 
-  show() { }
+  show() {
+    if (!this.root.parentNode) {
+      const parent = LiteGUI.content || LiteGUI.root || document.body;
+      parent.appendChild(this.root);
+      this.center();
+    }
+    this.root.style.display = "";
+    this.emit("shown", this);
+    if (this.on_show) this.on_show();
+    return this;
+  }
+
   hide() {
     this.root.style.display = "none";
-    LiteGUI.trigger(this, "hidden");
+    this.emit("hidden", this);
+    if (this.on_hide) this.on_hide();
+    return this;
   }
 
   close() {
-    LiteGUI.remove(this.root);
-    LiteGUI.trigger(this, "closed", this);
-    Dialog.INSTANCE_LIST.filter(dialog => dialog.id !== this.id);
-    if (this.options.onClose) {
-      this.options.onClose()
-    };
+    const parent = this.root.parentNode;
+    parent?.removeChild(this.root);
+
+    this.emit("closed", this);
+    if (this.options.onClose) this.options.onClose();
+    if (this.on_close) this.on_close();
+
+    const instanceIndex = Dialog.INSTANCE_LIST.indexOf(this);
+    if (instanceIndex !== -1) Dialog.INSTANCE_LIST.splice(instanceIndex, 1);
+
+    const minimizedIndex = Dialog.minimized.indexOf(this);
+    if (minimizedIndex !== -1) Dialog.minimized.splice(minimizedIndex, 1);
+    Dialog.arrangeMinimized();
+
+    if (this.isModal) {
+      this.isModal = false;
+      LiteGUI.showModalBackground(false);
+    }
+
     if (this.dialogWindow) {
       this.dialogWindow.close();
       this.dialogWindow = null;
@@ -269,20 +374,20 @@ export class Dialog extends EventMitter implements LiteComponent {
     if (this.height) {
       if (typeof this.height === "number") {
         panel.style.height = `${this.height}px`;
+        this.content.style.height = "calc(100% - 24px)";
       } else if (this.height.includes("%")) {
         panel.style.height = this.height;
+        this.content.style.height = "calc(100% - 24px)";
       }
-
-      // 设置内容区域高度
-      this.content.style.height = `calc(${this.height}px - 24px)`;
     }
 
     // 启用拖拽
     if (options.draggable) {
       this.draggable = true;
+      const header = panel.querySelector<HTMLElement>(".panel-header");
       LiteGUI.draggable(
         panel,
-        panel.querySelector(".panel-header") as HTMLElement,
+        header || panel,
         () => {},
         () => !this.minimized
       );
@@ -377,9 +482,6 @@ export class Dialog extends EventMitter implements LiteComponent {
     if (!parent) return;
     const panel = this.root;
 
-    // 获取实际的父元素
-    const targetParent = (parent as any).content || parent;
-
     // 重置基础样式
     panel.style.top = '0';
     panel.style.left = '0';
@@ -454,7 +556,7 @@ export class Dialog extends EventMitter implements LiteComponent {
 
     // 延时清除轮廓
     setTimeout(() => {
-      this.root.style.outline = 'null';
+      this.root.style.outline = "";
     }, time);
   }
 
@@ -479,20 +581,12 @@ export class Dialog extends EventMitter implements LiteComponent {
     // 设置最小化宽度
     this.root.style.width = `${Dialog.MINIMIZED_WIDTH}px`;
 
-    // 监听关闭事件
-    this.on("closed", () => {
-      const index = Dialog.INSTANCE_LIST.indexOf(this);
-      if (index !== -1) {
-        Dialog.INSTANCE_LIST.splice(index, 1);
-        Dialog.arrangeMinimized();
-      }
-    });
-
     // 添加到最小化列表并重新排列
-    Dialog.INSTANCE_LIST.push(this);
+    if (!Dialog.minimized.includes(this)) Dialog.minimized.push(this);
     Dialog.arrangeMinimized();
 
     // 触发最小化事件
+    this.emit("minimize", this);
     if (this.on_minimize) {
       this.on_minimize();
     }
@@ -501,13 +595,13 @@ export class Dialog extends EventMitter implements LiteComponent {
 
   static arrangeMinimized() {
     Dialog.minimized.forEach((dialog: Dialog, index: number) => {
-      const parent = dialog.root.parentElement as HTMLElement;
+      const parent = dialog.root.parentElement;
+      if (!parent) return;
       const pos = parent.getBoundingClientRect().height - 20;
-      dialog.root.style.left = Dialog.MINIMIZED_WIDTH * index +  'px';
+      dialog.root.style.left = Dialog.MINIMIZED_WIDTH * index + "px";
       dialog.root.style.top = pos + "px";
     });
-    
-  };
+  }
 
 
 
@@ -539,18 +633,14 @@ export class Dialog extends EventMitter implements LiteComponent {
     if (maximizeButton) maximizeButton.style.display = "none";
 
     // 从最小化列表中移除并重新排列
-    const index = Dialog.INSTANCE_LIST.indexOf(this);
+    const index = Dialog.minimized.indexOf(this);
     if (index !== -1) {
-      Dialog.INSTANCE_LIST.splice(index, 1);
+      Dialog.minimized.splice(index, 1);
       Dialog.arrangeMinimized();
     }
 
-    // 如果启用了拖拽，重新绑定拖拽事件
-    if (this.draggable) {
-      LiteGUI.draggable(this.root);
-    }
-
     // 触发最大化事件
+    this.emit("maximize", this);
     if (this.on_maximize) {
       this.on_maximize();
     }
@@ -562,19 +652,14 @@ export class Dialog extends EventMitter implements LiteComponent {
    * 将对话框设置为模态对话框
    */
   makeModal(): void {
-    // 显示模态背景
+    this.isModal = true;
     LiteGUI.showModalBackground(true);
-    // 将对话框添加到模态背景层
-    LiteGUI.modalbg_div?.appendChild(this.root);
-    // 显示并居中对话框
+
+    const parent = LiteGUI.modalbg_div || document.body;
+    if (this.root.parentNode !== parent) parent.appendChild(this.root);
+
     this.show();
     this.center();
-
-    // 监听关闭事件，关闭时隐藏模态背景
-    const handleClose = () => {
-      LiteGUI.showModalBackground(false);
-    };
-    LiteGUI.bind(this, "closed", handleClose);
   }
 
   /**

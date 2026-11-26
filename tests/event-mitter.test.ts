@@ -45,7 +45,7 @@ describe("EventMitter", () => {
     const handler = vi.fn();
 
     emitter.on("change", handler);
-    emitter.clear();
+    emitter.removeAllListeners();
     emitter.emit("change", 1);
 
     expect(handler).not.toHaveBeenCalled();

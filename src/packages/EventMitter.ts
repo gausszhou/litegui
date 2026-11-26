@@ -50,7 +50,7 @@ export default class EventMitter {
   /**
    * 清空当前实例的所有订阅。
    */
-  clear(): this {
+  removeAllListeners(): this {
     this.emitter.all.clear();
     return this;
   }
