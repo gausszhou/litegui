@@ -5,7 +5,7 @@ interface CheckboxOptions {
   onChange?: Callback;
 }
 
-class Checkbox {
+export class Checkbox {
   value: boolean;
   options: CheckboxOptions;
   root: HTMLSpanElement;
@@ -18,6 +18,8 @@ class Checkbox {
     this.root = this.createElementRoot();
     this.element = this.createElementContent();
     this.root.dataset["value"] = value.toString();
+    this.initDom();
+    this.initEvent();
   }
   createElementRoot() {
     const root = (this.root = document.createElement("span"));

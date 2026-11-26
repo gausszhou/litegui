@@ -5,7 +5,7 @@ import { LiteGUIWidget } from "../types/core";
 
 export function createElementFromString(str: string) {
   const element = document.createElement("div");
-  element.outerHTML = str;
+  element.innerHTML = str;
   return element;
 }
 

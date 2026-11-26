@@ -4,9 +4,7 @@ import EventMitter from "./EventMitter";
 const KEY_CODE_UP = 38;
 const KEY_CODE_DOWN = 40;
 
-/***** DRAGGER **********/
-
-class Dragger extends EventMitter {
+export class Dragger extends EventMitter {
   options: any;
   value: number;
   precision: number;
@@ -28,6 +26,8 @@ class Dragger extends EventMitter {
     this.wrap = this.createWrap();
     this.input = this.createInput();
     this.dragger = this.createDragger();
+    this.initDom();
+    this.initEvent();
   }
   createRoot() {
     const options = this.options;
@@ -174,7 +174,7 @@ class Dragger extends EventMitter {
     this.options.max = max;
   }
 
-  setValue(v: string | number, skip_event: boolean) {
+  setValue(v: string | number, skip_event: boolean = false) {
     const value: number = typeof v === "string" ? parseFloat(v) : v;
     this.value = value;
     if (this.options.precision) v = value.toFixed(this.options.precision);
@@ -187,4 +187,3 @@ class Dragger extends EventMitter {
   }
 }
 
-export default Dragger;

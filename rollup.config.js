@@ -1,21 +1,37 @@
-import { uglify } from "rollup-plugin-uglify";
-import typescript from '@rollup/plugin-typescript';
-import postcss from 'rollup-plugin-postcss';
-// import scss from 'rollup-plugin-scss';
+import typescript from "@rollup/plugin-typescript";
+import postcss from "rollup-plugin-postcss";
+
 export default [
   {
-    input: "src/index",
+    input: "src/styles/index.scss",
+    output: { file: "lib/litegui.css" },
+    plugins: [
+      postcss({
+        extract: true,
+        use: ["sass"]
+      })
+    ]
+  },
+  {
+    input: "src/index.ts",
     output: [
       {
-        format: "umd",
-        file: "lib/bundle.umd.js",
-        name: "LiteGUI"
+        format: "es",
+        file: "lib/litegui.esm.js",
+        sourcemap: true
       },
       {
-        format: "esm",
-        file: "lib/bundle.esm.js"
+        format: "umd",
+        file: "lib/litegui.umd.cjs",
+        name: "LiteGUI",
+        exports: "default",
+        sourcemap: true
       }
     ],
-    plugins: [uglify(), typescript(), postcss()]
+    plugins: [typescript()],
+    onwarn() {
+      // Keep the build output focused; type checking is a separate step.
+      return;
+    }
   }
 ];

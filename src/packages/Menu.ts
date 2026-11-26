@@ -1,9 +1,11 @@
 import LiteGUI from ".";
-import Panel from "./Panel";
+import { Panel } from "./Panel";
 
 const MENU_CLASS_NAME = "lite-menu";
+const MENU_LIST_CLASS_NAME = "lite-menu-list";
+const MENU_ITEM_CLASS_NAME = "lite-menu-item";
 const MENU_PANEL_CLASS_NAME = "lite-menu-panel";
-const MENU_ITEM_CLASS_NAME = "lite-menu-entry";
+const MENU_PANEL_ITEM_CLASS_NAME = "lite-menu-panel-item";
 
 interface MenuOptions {
   auto_open?: boolean;
@@ -18,14 +20,42 @@ interface MenuSeparator {
   children?: []
 }
 
-interface MenuItem {
+class MenuItem {
   name: string; // 菜单项的名称，展示文字
   data: any;
-  order: number;
   separator: false;
-  element: HTMLElement;
-  parent: MenuItem;
-  children?: (MenuItem | MenuSeparator)[] // 子菜单，由菜单项和分割线组成
+  element: HTMLElement | null;
+  parent: MenuItem | null;
+  children: (MenuItem | MenuSeparator)[]; // 子菜单，由菜单项和分割线组成
+
+  constructor(name: string, parent: MenuItem | null = null, data: any = null) {
+    this.name = name;
+    this.parent = parent;
+    this.children = [];
+    this.data = data;
+    this.separator = false;
+    this.element = null;
+
+  }
+
+  // 禁用菜单项
+  disable(): void {
+    if (this.data) {
+      this.data.disabled = true;
+    }
+  }
+
+  // 启用菜单项
+  enable(): void {
+    if (this.data) {
+      this.data.disabled = false;
+    }
+  }
+
+  // 创建新的菜单项
+  static create(name: string, parent: MenuItem | null, data: any = null): MenuItem {
+    return new MenuItem(name, parent, data);
+  }
 }
 
 /**
@@ -34,10 +64,10 @@ interface MenuItem {
  * @param {*} options
  */
 
-class Menu {
-  menu: MenuItem[];
-  panels: HTMLDivElement[];
+export class Menu {
   root: HTMLDivElement;
+  menus: MenuItem[];
+  panels: HTMLDivElement[];
   content: HTMLUListElement;
   is_open: boolean = false;
   auto_open: boolean = false;
@@ -45,16 +75,19 @@ class Menu {
   closing_by_leave: any = null; // Timer
   static closing_time = 500;
 
+  currentMainMenuItem: MenuItem | null = null;
+
   constructor(id: string, options: MenuOptions = {}) {
     options = options || {};
-    this.menu= [];
+    this.menus = [];
     this.panels = [];
 
     this.root = document.createElement("div");
-    this.root.id = id;
     this.root.className = MENU_CLASS_NAME;
+    this.root.id = id;
 
     this.content = document.createElement("ul");
+    this.content.className = MENU_LIST_CLASS_NAME;
     this.root.appendChild(this.content);
 
     this.is_open = false;
@@ -62,81 +95,46 @@ class Menu {
     this.sort_entries = options.sort_entries || false;
   }
 
-
   /**
    * 添加一个路径到目录中
    * @param path example: "a/b/c"
    * @param data 
    */
   add(path: string, data: any = {}) {
+    const prev_length = this.menus.length;
+    const tokens = path.split("/");
+    // 检查菜单深度
+    if (tokens.length > 5) {
+      throw new Error("Menu too deep");
+    }
+    let currentDepth = 0;
+    let lastMenuItem: MenuItem | null = null;
+    let menu: (MenuItem | MenuSeparator)[] = this.menus;
 
-    if (typeof data == "function") data = { callback: data };
-
-    var prev_length = this.menu.length;
-
-    var tokens = path.split("/");
-    var current_token = 0; // 目录的最大深度
-    var current_pos = 0;
-    var menu: (MenuItem| MenuSeparator)[] = this.menu;
-    var last_item = null; // null => a => b => c
-
-    while (menu) {
-      if (current_token > 5) throw "Error: Menu too deep";
-      // token not found in this menu, create it
-      if (menu.length == current_pos) {
-        const v: any = { name: tokens[current_token], parent: last_item, children: [], data: null };
-        last_item = v;
-        if (current_token == tokens.length - 1) {
-          v.data = data;
-        }
-
-        v.disable = function () {
-          if (this.data) this.data.disabled = true;
-        };
-        v.enable = function () {
-          if (this.data) this.data.disabled = false;
-        };
-
-        menu.push(v);
-        // 递进
-        current_token += 1;
-        if (current_token == tokens.length) {
-          // 归
-          break;
-        }
-        // 递
-        menu = v.children;
-        current_pos = 0;
-        continue;
+    // 遍历路径
+    while (currentDepth < tokens.length) {
+      // 检查是否已经存在同名的菜单项
+      const existingMenuItem = menu.find(item => item.name === tokens[currentDepth]);
+      if (existingMenuItem) {
+        // 如果已经存在同名的菜单项，将其作为当前菜单
+        lastMenuItem = existingMenuItem as MenuItem;
+        currentDepth++;
+        menu = lastMenuItem.children;
+      } else {
+        // 如果没有同名的菜单项，创建一个新的菜单项
+        const newMenuItem = MenuItem.create(tokens[currentDepth], lastMenuItem, data);
+        menu.push(newMenuItem);
+        lastMenuItem = newMenuItem;
+        currentDepth++;
+        menu = lastMenuItem.children;
       }
-
-      // token found in this menu, get inside for next token
-      if (menu[current_pos]?.name === tokens[current_token]) {
-        // 找到了
-        if (current_token < tokens.length - 1) {
-          // 不是最后一层
-          last_item = menu[current_pos];
-          menu = menu[current_pos]?.children || [];
-          current_pos = 0;
-          current_token++;
-          continue;
-        } else {
-          // 最后一层
-          // last token but like File/ enable repeat
-          if (menu[current_pos]?.name !== "") {
-            console.warn("Warning: Adding menu that already exists: " + path);
-            break;
-          }
-        }
-      }
-      // 遍历
-      current_pos++;
     }
 
-    if (prev_length != this.menu.length) {
+    // 如果菜单结构发生变化,更新主菜单
+    if (prev_length !== this.menus.length) {
       this.updateMainMenu();
     }
-  };
+  }
 
   remove(path: string) {
     const menu = this.findMenu(path) as MenuItem;
@@ -144,98 +142,114 @@ class Menu {
     if (!menu.parent || !menu.parent.children) {
       return console.warn("menu without parent?");
     }
-
     var index = menu.parent.children.indexOf(menu);
     if (index != -1) menu.parent.children.splice(index, 1);
   }
 
 
+  /**
+   * 插入一个分隔符
+   * @param path
+   * @param order
+   */
   separator(path: string, order: number) {
     const menu = this.findMenu(path);
     if (!menu) return false;;
-    (menu.children as MenuSeparator[])?.push({ 
-      separator: true, 
-      order: order || 10 
+    (menu.children as MenuSeparator[])?.push({
+      separator: true,
+      order: order || 10
     });
     return true;
   }
 
-  //returns the menu entry that matches this path
-  findMenu(path: string): MenuItem | MenuSeparator  | null | undefined {
-    var tokens = path.split("/");
-    var current_token = 0;
-    var current_pos = 0;
-    var menu: (MenuItem | MenuSeparator)[] = this.menu;
+  // 根据路径查找对应的菜单项
+  findMenu(path: string): MenuItem | MenuSeparator | null {
+    const tokens = path.split("/");
+    let currentToken = 0;
+    let menu: (MenuItem | MenuSeparator)[] = this.menus;
 
-    while (menu) {
-      //no more tokens, return last found menu
-      if (current_token == tokens.length) return menu[current_pos];
-      
-      //this menu doesnt have more entries
-      if (menu.length <= current_pos) return null;
-      
-      if (tokens[current_token] == "*") return menu[current_pos];
+    // 递归查找菜单项
+    while (currentToken < tokens.length && menu.length > 0) {
+      // 在当前层级查找匹配的菜单项
+      const matchedItem = menu.find(item => item.name === tokens[currentToken]);
 
-      //token found in this menu, get inside for next token
-      if (tokens[current_token] == menu[current_pos].name) {
-        if (current_token == tokens.length - 1) {
-          //last token
-          return menu[current_pos];
-        } else {
-          menu = menu[current_pos].children || [];
-          current_pos = 0;
-          current_token++;
-          continue;
-        }
+      if (!matchedItem) {
+        return null;
       }
 
-      //check next entry in this menu
-      current_pos++;
+      // 找到最后一个token,返回匹配项
+      if (currentToken === tokens.length - 1) {
+        return matchedItem;
+      }
+
+      // 继续查找下一层
+      menu = matchedItem.children || [];
+      currentToken++;
     }
+
     return null;
-  };
+  }
 
 
   clear() {
     this.content.innerHTML = "";
-    this.menu = [];
+    this.menus = [];
     this.panels = [];
   };
 
+  createMainMenuItemElement(item: MenuItem) {
+    const $item = document.createElement("li");
+    $item.className = MENU_ITEM_CLASS_NAME;
+    $item.innerHTML = `<span class='icon'></span><span class='name'>${item.name}</span>`;
+    /* ON CLICK TOP MAIN MENU ITEM */
+    $item.addEventListener("click", (e) => {
+      const main_menu_item = item;
+      if (main_menu_item.data && main_menu_item.data.callback && typeof main_menu_item.data.callback == "function") {
+        main_menu_item.data.callback(main_menu_item.data);
+      }
+      if (!this.is_open) {
+        this.is_open = true;
+        this.currentMainMenuItem = main_menu_item;
+        this.showMenuPanel(main_menu_item, e, $item);
+      } else {
+        this.is_open = false;
+        this.hideMenuPanel();
+      }
+    });
+
+    $item.addEventListener("mouseenter", (e) => {
+      if (this.is_open  && this.currentMainMenuItem !== item) {
+        this.hideMenuPanel();
+        this.currentMainMenuItem = item;
+        this.showMenuPanel(item, e, $item);
+      }
+    });
+    return $item;
+  };
+
+  createPanelItemElement(_item: MenuItem) {
+    const $item = document.createElement("p");
+    return $item;
+  }
+  
   // update top main menu
   updateMainMenu() {
     this.content.innerHTML = "";
-    for (var i in this.menu) {
-      const $main_menu_item = document.createElement("li");
-      $main_menu_item.innerHTML = "<span class='icon'></span><span class='name'>" + this.menu[i].name + "</span>";
-      this.content.appendChild($main_menu_item);
-
-      this.menu[i].element = $main_menu_item;
-
-      /* ON CLICK TOP MAIN MENU ITEM */
-      $main_menu_item.addEventListener("click", (e) => {
-        const main_menu_item = this.menu[i];
-
-        if (main_menu_item.data && main_menu_item.data.callback && typeof main_menu_item.data.callback == "function") main_menu_item.data.callback(main_menu_item.data);
-        if (!this.is_open) {
-          this.is_open = true;
-          this.showMenuPanel(main_menu_item, e, this.content);
-        } else {
-          this.is_open = false;
-          this.hideMenuPanel();
-        }
-      });
-
-      $main_menu_item.addEventListener("mouseover", (e) => {
-        this.hideMenuPanel();
-        if (this.is_open || this.auto_open) {
-          this.showMenuPanel(this.menu[i].data, e, this.content);
-        }
-      });
-    }
+    this.menus.forEach((item) => {
+      const $item = this.createMainMenuItemElement(item);
+      item.element = $item;
+      this.content.appendChild($item);
+    });
   };
 
-  // Create the panel with the drop menu 创建下拉菜单面板
+  /**
+   * 
+   * @param menu 
+   * @param e 
+   * @param root 
+   * @param is_submenu 
+   * @returns 
+   */
   showMenuPanel(menu: MenuItem, e: Event, root: HTMLElement, is_submenu: boolean = false) {
     // if not a submenu close current menu panel 如果不是子菜单，则关闭当前的菜单面板
     if (!is_submenu) {
@@ -268,20 +282,14 @@ class Menu {
     for (var i in sorted_entries) {
       const $menu_item = document.createElement("p");
       const menu_item = sorted_entries[i];
-      $menu_item.className = MENU_ITEM_CLASS_NAME;
+      $menu_item.className = MENU_PANEL_ITEM_CLASS_NAME;
       const has_submenu = menu_item.children?.length;
-
       if (has_submenu) {
         $menu_item.classList.add("has_submenu");
       }
-
       if (menu_item.name) {
         // is a menu item
-        $menu_item.innerHTML =
-          "<span class='icon'></span><span class='name'>" +
-          menu_item.name +
-          (has_submenu ? "<span class='more'>+</span>" : "") +
-          "</span>";
+        $menu_item.innerHTML =`<span class='icon'></span><span class='name'>${menu_item.name}</span>${has_submenu ? "<span class='more'>+</span>" : ""}`
       } else {
         // is a menu separator
         $menu_item.classList.add("separator");
@@ -299,7 +307,6 @@ class Menu {
           (typeof data.isChecked == "function" && data.isChecked.call(data.instance, data));
 
         if (checked) $menu_item.className += " checked";
-
         if (data.disabled) $menu_item.className += " disabled";
       }
 
@@ -340,29 +347,25 @@ class Menu {
         }
       });
 
-      $menu_item.addEventListener("mouseenter", function (e) {
-        // TODO
-        /*
-        if( that.auto_open && this.classList.contains("has_submenu") )
-          LiteGUI.trigger( this, "click" );
-        */
+      $menu_item.addEventListener("mouseenter", function (_e) {
+
       });
       // append menu element
       $menu_panel.appendChild($menu_item);
     }
     // Event
     // 鼠标离开，再一段时间后关闭菜单面板
-    $menu_panel.addEventListener("mouseleave", (e) => {
-      if (this.closing_by_leave) {
-        clearInterval(this.closing_by_leave);
-      }
-      this.closing_by_leave = setTimeout(() => {
-        this.is_open = false;
-        this.hideMenuPanel();
-      }, LiteGUI.Menu.closing_time);
-    });
+    // $menu_panel.addEventListener("mouseleave", () => {
+    //   if (this.closing_by_leave) {
+    //     clearInterval(this.closing_by_leave);
+    //   }
+    //   this.closing_by_leave = setTimeout(() => {
+    //     this.is_open = false;
+    //     this.hideMenuPanel();
+    //   }, LiteGUI.Menu.closing_time);
+    // });
     // 鼠标进入
-    $menu_panel.addEventListener("mouseenter", (e) => {
+    $menu_panel.addEventListener("mouseenter", () => {
       if (this.closing_by_leave) {
         clearInterval(this.closing_by_leave);
       }
@@ -374,19 +377,8 @@ class Menu {
     $menu_panel.style.left = box.left + (is_submenu ? 200 : 0) + "px";
     $menu_panel.style.top = box.top + box.height + (is_submenu ? -20 : 10) + "px";
 
-    // TODO animation, not working well, flickers
-    /* 
-    element.style.opacity = "0.1";
-    element.style.transform = "translate(0,-10px)";
-    element.style.transition = "all 0.2s";
-    setTimeout( function(){ 
-      element.style.opacity = "1"; 
-      element.style.transform = "translate(0,0)";
-    },1);
-    */
-
     this.panels.push($menu_panel);
-    document.body.appendChild($menu_panel);
+    LiteGUI.root.appendChild($menu_panel);
     return true;
   };
 
@@ -403,11 +395,3 @@ class Menu {
     panel.content.insertBefore(this.root, panel.content.firstChild);
   };
 }
-
-
-
-
-
-
-
-export default Menu;

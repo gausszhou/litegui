@@ -1,20 +1,19 @@
 import LiteGUI from ".";
 import EventMitter from "./EventMitter";
-
-/****************** AREA **************/
-/** An Area is am streched container.
- * Areas can be split several times horizontally or vertically to fit different colums or rows
- *
- * @class Area
- * @constructor
- * @param {Object} options
- */
-
 const EVENT_KEY_ON_SPLIT_MOVED = "split_moved"
 
 type Direction = "horizontal" | "vertical";
 
-class Area extends EventMitter {
+/** 
+ * Area 是一个可伸缩的容器
+ * Area 可以被水平或垂直分割多次以适应不同的列或行
+ * 
+ * @class Area
+ * @constructor
+ * @param {Object} options 配置选项
+ */
+
+export class Area extends EventMitter {
   static VERTICAL = "vertical";
   static HORIZONTAL = "horizontal";
   static SPLITBAR_SIZE = 4;
@@ -436,5 +435,3 @@ class Area extends EventMitter {
     return this.root.querySelector(selector);
   }
 }
-
-export default Area;

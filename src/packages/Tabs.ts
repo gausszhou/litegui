@@ -5,6 +5,8 @@ class Tab {
   id: string;
   content: HTMLElement;
   title: HTMLElement;
+  tab?: HTMLElement;
+  options?: any;
   onclose?: Function;
   selected?: boolean;
 
@@ -52,12 +54,12 @@ class Tab {
 export class Tabs {
   options: any;
   mode: any;
-  root: any;
+  root: HTMLElement = document.createElement("div");
   current_tab: any;
   previous_tab: any;
   plus_tab: any;
   _timeout_mouseover: any;
-  list: HTMLUListElement;
+  list: HTMLUListElement = document.createElement("ul");
   tabs_root: any;
   tabs: any;
 
@@ -68,9 +70,9 @@ export class Tabs {
   onchange: any;
 
 
-  constructor(options: any = {}, legacy: any = {}) {
+  constructor(options: any = {}, legacy?: any) {
     // 处理旧版本的参数传递方式
-    if (legacy || (options && options.constructor === String)) {
+    if (legacy || typeof options === "string") {
       const id = options;
       options = legacy || {};
       options.id = id;
@@ -82,10 +84,12 @@ export class Tabs {
 
     // 创建根元素
     const root = document.createElement("div");
-    if (options.id) root.id = options.id;
+    if (options.id) {
+      root.id = options.id;
+    }
     root.className = "litetabs " + this.mode;
     this.root = root;
-    this.root.tabs = this;
+    
 
     this.current_tab = null; // 当前选中的标签页 [id, tab, content]
 
@@ -157,7 +161,7 @@ export class Tabs {
   };
 
   getCurrentTabId() {
-    return this.current_tab[0];
+    return this.current_tab ? this.current_tab[0] : null;
   };
 
   /**
@@ -255,7 +259,7 @@ export class Tabs {
  * @param {bool} skip_event prevent dispatching events
  * @return {Object} an object containing { id, tab, content }
  */
-  addTab(id: string, options: any, skip_event?: any) {
+  addTab(id: string, options: any, _skip_event?: any) {
     options = options || {};
     if (typeof options == "function") options = { callback: options };
 
@@ -303,7 +307,7 @@ export class Tabs {
 
     if (this.options.autoswitch) {
       element.classList.add("autoswitch");
-      element.addEventListener("dragenter", function (e) {
+      element.addEventListener("dragenter", function (_e) {
         //console.log("Enter",this.dataset["id"]);
         if (that._timeout_mouseover) clearTimeout(that._timeout_mouseover);
         that._timeout_mouseover = setTimeout(
@@ -315,7 +319,7 @@ export class Tabs {
         );
       });
 
-      element.addEventListener("dragleave", function (e) {
+      element.addEventListener("dragleave", function (_e) {
         //console.log("Leave",this.dataset["id"]);
         if (that._timeout_mouseover) {
           clearTimeout(that._timeout_mouseover);
@@ -372,7 +376,11 @@ export class Tabs {
     this.root.appendChild(content);
 
     //when clicked
-    if (!options.button) element.addEventListener("click", Tabs.prototype.onTabClicked);
+    if (!options.button) {
+      element.addEventListener("click", () => {
+        this.onTabClicked(element);
+      });
+    } 
     else
       element.addEventListener("click", function (e) {
         var tab_id = this.dataset["id"];
@@ -381,10 +389,15 @@ export class Tabs {
 
 
 
-    var title = element.querySelector("span.tabtitle");
+    const titleElement = element.querySelector<HTMLElement>("span.tabtitle");
 
     //tab object
-    var tab_info = new Tab()
+    const tab_info = new Tab();
+    tab_info.id = id;
+    tab_info.tab = element;
+    tab_info.content = content;
+    tab_info.title = titleElement || tab_info.title;
+    tab_info.options = options;
 
     if (options.onclose) tab_info.onclose = options.onclose;
     this.tabs[id] = tab_info;
@@ -450,92 +463,68 @@ export class Tabs {
       skip_callbacks: true
     });
   }
-  //this is tab
-  onTabClicked(e: any) {
-    // 如果标签页已经被选中则跳过
-    if (this.root.classList.contains("selected")) return;
 
-    // 如果标签页已被移除则跳过
-    if (!this.root.parentNode) return;
+  /**
+   * 激活一个标签页。
+   * @param element 标签页的 li 元素
+   * @param emit 是否触发回调与事件
+   */
+  onTabClicked(element: HTMLElement, emit: boolean = true) {
+    const tabId = element.dataset["id"];
+    if (!tabId) return;
 
-    const options = (this as any).options;
-    const tabs = (this.root.parentNode.parentNode as any).tabs;
-    if (!tabs) throw "tabs not found";
-    const that = tabs;
+    const tab = this.tabs[tabId];
+    if (!tab) return;
 
-    // 检查标签页是否可用
+    const options = tab.options || {};
     if (options.callback_canopen && options.callback_canopen() === false) return;
 
-    const tab_id = this.root.dataset["id"];
-
-    // 触发离开当前标签页事件
-    if (that.current_tab &&
-      that.current_tab[0] !== tab_id &&
-      that.current_tab[2]?.callback_leave) {
-      that.current_tab[2].callback_leave(
-        that.current_tab[0],
-        that.current_tab[1],
-        that.current_tab[2]
+    if (this.current_tab && this.current_tab[0] !== tabId && this.current_tab[2]?.callback_leave) {
+      this.current_tab[2].callback_leave(
+        this.current_tab[0],
+        this.current_tab[1],
+        this.current_tab[2]
       );
     }
 
-    let tab_content = null;
-
-    // 更新所有标签页状态
-    for (const i in that.tabs) {
-      const tab_info = that.tabs[i];
-      if (i === tab_id) {
-        tab_info.selected = true;
-        tab_info.content.style.display = "";
-        tab_content = tab_info.content;
+    for (const id in this.tabs) {
+      const info = this.tabs[id];
+      if (id === tabId) {
+        info.selected = true;
+        info.content.style.display = "";
       } else {
-        delete tab_info.selected;
-        tab_info.content.style.display = "none";
+        delete info.selected;
+        info.content.style.display = "none";
       }
     }
 
-    // 更新标签页样式
-    const list = this.list.querySelectorAll("li.wtab");
-    list.forEach(tab => tab.classList.remove("selected"));
-    this.root.classList.add("selected");
+    this.list.querySelectorAll("li.wtab").forEach((tabElement) => {
+      tabElement.classList.toggle("selected", tabElement === element);
+    });
 
-    // 更新当前标签页
-    that.previous_tab = that.current_tab;
-    that.current_tab = [tab_id, tab_content, options];
+    this.previous_tab = this.current_tab;
+    this.current_tab = [tabId, tab.content, options];
+    this.selected = tabId;
 
-    // 触发回调和事件
-    if (e) {
-      if (options.callback) {
-        options.callback(tab_id, tab_content, e);
-      }
+    if (!emit) return;
 
-      LiteGUI.trigger(that, "wchange", [tab_id, tab_content]);
-      if (that.onchange) {
-        that.onchange(tab_id, tab_content);
-      }
+    if (options.callback) {
+      options.callback(tabId, tab.content, element);
     }
-
-    // 更新选中状态
-    that.selected = tab_id;
+    LiteGUI.trigger(this, "wchange", [tabId, tab.content]);
+    if (this.onchange) {
+      this.onchange(tabId, tab.content);
+    }
   }
 
-  selectTab(id: string | Tab, skip_events?: boolean) {
-    // 如果没有传入id则直接返回
+  selectTab(id: string | Tab, skip_events: boolean = false) {
     if (!id) return;
+    if (typeof id !== "string") id = id.id;
 
-    // 如果传入的是Tab对象,则获取其id
-    if (typeof id !== 'string') {
-      id = id.id;
-    }
+    const tab = this.tabs[id];
+    if (!tab || !tab.tab) return;
 
-    // 查找对应id的tab元素并触发点击
-    const tabs = Array.from(this.list.querySelectorAll("li.wtab")) as HTMLElement[];
-    for (const tab of tabs) {
-      if (id === tab.dataset["id"]) {
-        this.onTabClicked.call(tab, !skip_events);
-        break;
-      }
-    }
+    this.onTabClicked(tab.tab, !skip_events);
   }
 
   /**
@@ -554,20 +543,26 @@ export class Tabs {
 
 
 
+  /**
+   * 重新计算标签页的索引顺序
+   * 根据标签页在DOM中的实际位置更新tabs_by_index数组
+   */
   recomputeTabsByIndex() {
+    // 清空原有索引数组
     this.tabs_by_index = [];
 
-    for (var i in this.tabs) {
-      var tab = this.tabs[i];
+    // 获取所有标签页元素
+    const tabElements = Array.from(this.list.children);
 
-      //compute index
-      var index = 0;
-      var child = tab.tab;
-      while ((child = child.previousSibling) != null) index++;
-
-      this.tabs_by_index[index] = tab;
-    }
-  };
+    // 遍历所有标签页元素
+    tabElements.forEach((tabElement, index) => {
+      const tabId = tabElement.getAttribute('data-id');
+      if (tabId && this.tabs[tabId]) {
+        // 将标签页对象按DOM中的顺序存入索引数组
+        this.tabs_by_index[index] = this.tabs[tabId];
+      }
+    });
+  }
 
   removeTab(id: string) {
     var tab = this.tabs[id];
@@ -649,55 +644,5 @@ export class Tabs {
     tab.tab.classList.remove("selected");
     target_tabs.selectTab(id);
   };
-
-  detachTab(id: string, on_complete?: Function, on_close?: Function) {
-    const tab = this.tabs[id];
-    if (!tab) return;
-
-    const index = this.getTabIndex(id);
-    const that = this;
-
-    // 创建新窗口
-    const w = 800;
-    const h = 600;
-    const tab_window = window.open(
-      "",
-      "",
-      `width=${w}, height=${h}, location=no, status=no, menubar=no, titlebar=no, fullscreen=yes`
-    );
-    if (!tab_window) return;
-
-    // 写入头部和标题
-    tab_window.document.write(`<head><title>${id}</title>`);
-
-    // 转移样式表
-    const styles = Array.from(document.querySelectorAll("link[rel='stylesheet'],style"));
-    for (const style of styles) {
-      tab_window.document.write(style.outerHTML);
-    }
-    tab_window.document.write("</head><body></body>");
-    tab_window.document.close();
-
-    // 创建新的标签页组件
-    const newtabs = new LiteGUI.Tabs(null, this.options);
-    
-
-    // 设置关闭事件
-    tab_window.onbeforeunload = function () {
-      newtabs.transferTab(id, that, index);
-      if (on_close) on_close();
-    };
-
-    // 移动内容到新窗口
-    newtabs.list.style.height = "20px";
-    tab_window.document.body.appendChild(newtabs.root);
-    this.transferTab(id, newtabs);
-    newtabs.tabs[id].tab.classList.add("selected");
-    this.recomputeTabsByIndex();
-
-    if (on_complete) on_complete();
-
-    return tab_window;
-  }
 }
 

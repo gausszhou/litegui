@@ -67,7 +67,4 @@ export class List {
     getSelectedItem(): HTMLLIElement | null {
         return this.root.querySelector(".list-item.selected");
     }
-
-    setSelectedItem(name: string): void {
-    }
 }
