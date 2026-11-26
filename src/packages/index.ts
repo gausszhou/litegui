@@ -808,7 +808,7 @@ export class LiteGUI {
       for (var i in values) {
         const subelem = elem.querySelector(i) as HTMLElement;
         if (subelem) {
-          subelem.innerText = values[i];
+          subelem.textContent = values[i];
         }
       }
     if (style) {

@@ -21,7 +21,7 @@ interface ExtendedHTMLElement extends HTMLElement {
 }
 
 export class ComplexList {
-    private root: HTMLElement;
+    public root: HTMLElement;
     private item_code: string;
     private selected: any;
     public onItemSelected: ((item: any, elem: ExtendedHTMLElement) => void) | null;
@@ -65,7 +65,7 @@ export class ComplexList {
 
     public addItem(item: ListItem, text?: string, is_enabled?: boolean, can_be_removed?: boolean): ExtendedHTMLElement {
         const title = text || item.content || item.name || '';
-        const elem = LiteGUI.createListItem(this.item_code, { title: title }) as ExtendedHTMLElement;
+        const elem = LiteGUI.createListItem(this.item_code, { ".title": title }) as ExtendedHTMLElement;
         elem.item = item;
 
         if (is_enabled) {
