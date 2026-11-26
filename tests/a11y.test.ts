@@ -2,6 +2,9 @@ import { afterEach, describe, expect, it } from "vitest";
 import { Checkbox } from "../src/packages/Checkbox";
 import { Dialog } from "../src/packages/Dialog";
 import { List } from "../src/packages/List";
+import { Menu } from "../src/packages/Menu";
+import { SearchBox } from "../src/packages/SearchBox";
+import { Table } from "../src/packages/Table";
 import { Slider } from "../src/packages/Slider";
 import { Tabs } from "../src/packages/Tabs";
 import { coreState } from "../src/core/state";
@@ -66,6 +69,20 @@ describe("accessibility attributes", () => {
 
     expect(slider.getValue()).toBeCloseTo(0.6);
     expect(slider.root.getAttribute("aria-valuenow")).toBe("0.6");
+  });
+
+  it("marks menus, search and table headers", () => {
+    const menu = new Menu("main");
+    menu.add("File/New");
+    expect(menu.content.getAttribute("role")).toBe("menubar");
+    expect(menu.root.querySelector(".lite-menu-item")?.getAttribute("role")).toBe("menuitem");
+
+    const search = new SearchBox("", { placeholder: "Find" });
+    expect(search.root.getAttribute("role")).toBe("search");
+    expect(search.input.getAttribute("aria-label")).toBe("Find");
+
+    const table = new Table({ columns: ["Name"] });
+    expect(table.root.querySelector("th")?.getAttribute("scope")).toBe("col");
   });
 
   it("marks dialogs and modal state", () => {
