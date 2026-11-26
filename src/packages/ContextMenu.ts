@@ -1,5 +1,7 @@
 // TODO(phase-1): 将 prototype API 收敛到 class 类型声明后移除 @ts-nocheck
 // @ts-nocheck
+import { trigger } from "../core/events";
+import { isCursorOverElement } from "../core/dom";
 
 /**
 * ContextMenu 
@@ -253,7 +255,7 @@ export class ContextMenu {
                 if (value.submenu) {
                     if (!value.submenu.options)
                         throw ("ContextMenu submenu needs options");
-                    var submenu = new LiteGUI.ContextMenu(value.submenu.options, {
+                    var submenu = new ContextMenu(value.submenu.options, {
                         callback: value.submenu.callback,
                         event: e,
                         parentMenu: that,
@@ -287,8 +289,8 @@ export class ContextMenu {
             this.parentMenu.current_submenu = null;
             if (e === undefined) {
                 this.parentMenu.close();
-            } else if (e && !LiteGUI.isCursorOverElement(e, this.parentMenu.root)) {
-                LiteGUI.trigger(this.parentMenu.root, "mouseleave", e);
+            } else if (e && !isCursorOverElement(e as MouseEvent, this.parentMenu.root)) {
+                trigger(this.parentMenu.root, "mouseleave", e);
             }
         }
 

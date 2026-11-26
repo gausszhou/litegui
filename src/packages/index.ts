@@ -1,7 +1,10 @@
-import { isArray, isFunction, isString } from "lodash-es";
+import { isArray, isFunction } from "lodash-es";
 import type { Handler } from "mitt";
 import mitt from "mitt";
 import { LiteComponent } from "../types/index";
+import { createElement as coreCreateElement, createListItem as coreCreateListItem, draggable as coreDraggable, remove as coreRemove, sizeToCSS as coreSizeToCSS } from "../core/dom";
+import { bind as coreBind, trigger as coreTrigger, unbind as coreUnbind } from "../core/events";
+import { coreState, showModalBackground as coreShowModalBackground } from "../core/state";
 import { Area } from "./Area";
 import { LiteBox } from "./Box";
 import { Button } from "./Button";
@@ -80,25 +83,16 @@ export class LiteGUI {
   // used for blacken when a modal dialog is shown
   static modalbg_div: HTMLDivElement | null = null
   // 
-  static windows: Window[] = [];
+  static windows: Window[] = coreState.windows;
   static panels = {}
-  static __events = new EventMitter();
+  static __events = coreState.events;
   static _safe_cliboard: any = null;
   // undo redo
   static undo_steps = [];
   static redo_steps = [];
 
   // those useful HTML unicode codes that I never remeber but I always need
-  static special_codes = {
-    close: "&#10005;",
-    navicon: "&#9776;",
-    refresh: "&#8634;",
-    gear: "&#9881;",
-    open_folder: "&#128194;",
-    download: "&#11123;",
-    tick: "&#10003;",
-    trash: "&#128465;"
-  }
+  static special_codes = coreState.specialCodes
 
 
   /**
@@ -127,12 +121,14 @@ export class LiteGUI {
       root.style.position = "relative";
       root.style.overflow = "hidden";
       this.root = root;
+      coreState.root = root;
 
       this.container.appendChild(root);
 
       //content: the main container for everything
       const content = document.createElement("div");
       this.content = content;
+      coreState.content = content;
       this.root.appendChild(content);
 
       window.addEventListener("resize", () => {
@@ -141,6 +137,8 @@ export class LiteGUI {
     } else {
       this.root = this.container;
       this.content = this.container;
+      coreState.root = this.root;
+      coreState.content = this.content;
     }
 
     this.root.classList.add("litegui-wrap", "fullscreen");
@@ -154,6 +152,7 @@ export class LiteGUI {
     this.modalbg_div = document.createElement("div");
     this.modalbg_div.className = "litemodalbg";
     this.modalbg_div.style.display = "none";
+    coreState.modalbg = this.modalbg_div;
     this.root.appendChild(this.modalbg_div);
 
     if (options.menubar) this.createMenu();
@@ -209,40 +208,7 @@ export class LiteGUI {
     event: string,
     callback: EventListener
   ) {
-    if (!element) throw "Cannot bind to null";
-    if (!event) throw "Event bind missing";
-    if (!callback) throw "Bind callback missing";
-
-    const targets = LiteGUI.toElementList(element);
-    for (const target of targets) {
-      LiteGUI.bindTarget(target, event, callback);
-    }
-  }
-
-  private static toElementList(element: any): any[] {
-    if (typeof element === "string") {
-      return Array.from(document.querySelectorAll(element));
-    }
-    if (element instanceof NodeList || element instanceof Array) {
-      return Array.from(element);
-    }
-    return [element];
-  }
-
-  private static bindTarget(target: any, event: string, callback: EventListener) {
-    if (target && typeof target.addEventListener === "function") {
-      target.addEventListener(event, callback);
-      return;
-    }
-
-    if (!(target.__events instanceof EventMitter)) {
-      Object.defineProperty(target, "__events", {
-        value: new EventMitter(),
-        enumerable: false,
-        configurable: true
-      });
-    }
-    target.__events.on(event, callback as any);
+    coreBind(element, event, callback);
   }
 
   /**
@@ -257,14 +223,7 @@ export class LiteGUI {
     event: string,
     callback: EventListener
   ) {
-    const targets = LiteGUI.toElementList(element);
-    for (const target of targets) {
-      if (typeof target.removeEventListener === "function") {
-        target.removeEventListener(event, callback);
-      } else if (target.__events instanceof EventMitter) {
-        target.__events.off(event, callback as any);
-      }
-    }
+    coreUnbind(element, event, callback);
   }
 
   /**
@@ -283,28 +242,7 @@ export class LiteGUI {
    * @param {Object} litegui_element it also supports HTMLentity, selector string or Array of elements
    */
   static remove(element: Widget | HTMLElement | string) {
-    if (!element) return false;
-
-    if (typeof element === 'string') {
-      // as a selector
-      const elements = document.querySelectorAll(element);
-      Array.from(elements).forEach(element => {
-        element.parentElement?.removeChild(element)
-      })
-    } else if (element instanceof Array || element instanceof NodeList) {
-      // as list
-      Array.from(element).forEach(ele => {
-        LiteGUI.remove(ele);
-      })
-    } else if (element instanceof Widget) {
-      // as a ltiegui widget
-      element.root.parentNode?.removeChild(element.root);
-    } else if (element.parentNode) {
-      // as regular HTML entity
-      element.parentNode.removeChild(element);
-    }
-
-    return true;
+    return coreRemove(element);
   }
 
   /**
@@ -342,21 +280,7 @@ export class LiteGUI {
 
 
   static trigger(element: HTMLElement | any, eventName: string, params?: any) {
-    const event = new CustomEvent(eventName, {
-      bubbles: true,
-      cancelable: true,
-      detail: params
-    });
-
-    if (element && typeof element.dispatchEvent === "function") {
-      element.dispatchEvent(event);
-    } else if (element && element.__events instanceof EventMitter) {
-      element.__events.emit(eventName, event);
-    } else if (element && typeof element.fireEvent === "function") {
-      element.fireEvent(event);
-    }
-
-    return event;
+    return coreTrigger(element, eventName, params);
   }
 
   /**
@@ -389,11 +313,9 @@ export class LiteGUI {
    **/
 
   static sizeToCSS(v: any): string {
-    if (v === undefined || v === null) return 'auto';
-    if (isString(v)) return v;
-    if (v >= 0) return (v | 0) + "px";
-    return "calc( 100% - " + Math.abs(v | 0) + "px )";
+    return coreSizeToCSS(v);
   }
+
 
 
   /**
@@ -753,39 +675,7 @@ export class LiteGUI {
     style: string | object = "",
     events: Record<string, EventListenerOrEventListenerObject> = {}
   ) {
-
-    const elem = document.createElement(tag);
-    if (id_class) {
-      var t = id_class.split(" ");
-      for (var i = 0; i < t.length; i++) {
-        if (t[i][0] == ".") elem.classList.add(t[i].substr(1));
-        else if (t[i][0] == "#") elem.id = t[i].substr(1);
-        else elem.id = t[i];
-      }
-    }
-
-    if (content) {
-      elem.innerHTML = content;
-    }
-
-
-    if (style) {
-      if (typeof style === 'string') {
-        elem.setAttribute("style", style);
-      } else {
-        Object.entries(style).forEach(([key, value]) => {
-          elem.style[key as any] = value;
-        })
-      }
-    }
-
-    if (events) {
-      Object.entries(events).forEach(([event, callback]) => {
-        elem.addEventListener(event as keyof HTMLElementEventMap, callback);
-      })
-
-    }
-    return elem;
+    return coreCreateElement(tag, id_class, content, style as any, events as any);
   }
 
   static craeteDivElement(id: string, code: string) {
@@ -802,26 +692,7 @@ export class LiteGUI {
    * @return {HTMLElement}
    **/
   static createListItem(code: string, values: Record<string, string>, style?: string | Record<string, string>) {
-    const elem = document.createElement("span");
-    elem.innerHTML = code;
-    if (values)
-      for (var i in values) {
-        const subelem = elem.querySelector(i) as HTMLElement;
-        if (subelem) {
-          subelem.textContent = values[i];
-        }
-      }
-    if (style) {
-      if (typeof style === 'string') {
-
-      } else {
-        Object.entries(style).forEach(([key, value]) => {
-          elem.style[key as any] = value;
-        })
-      }
-
-    }
-    return elem;
+    return coreCreateListItem(code, values, style);
   }
 
   /**
@@ -912,10 +783,9 @@ export class LiteGUI {
 
   //* DIALOGS *******************
   static showModalBackground(v: boolean) {
-    if (LiteGUI.modalbg_div) {
-      LiteGUI.modalbg_div.style.display = v ? "block" : "none";
-    }
+    coreShowModalBackground(v);
   }
+
 
   static showMessage(content: string, options: any = {}) {
     options.title = options.title || "Attention";
@@ -1167,64 +1037,7 @@ export class LiteGUI {
     on_finish?: Function,
     on_is_draggable?: Function
   ) {
-    dragger = dragger || container;
-    dragger.addEventListener("mousedown", inner_mouse);
-    dragger.style.cursor = "move";
-    var prev_x = 0;
-    var prev_y = 0;
-
-    var rect = container.getClientRects()[0];
-    var x = rect ? rect.left : 0;
-    var y = rect ? rect.top : 0;
-
-    container.style.position = "absolute";
-    container.style.left = x + "px";
-    container.style.top = y + "px";
-
-    function inner_mouse(e: MouseEvent) {
-      if (e.type == "mousedown") {
-        if (!rect) {
-          rect = container.getClientRects()[0];
-          x = rect ? rect.left : 0;
-          y = rect ? rect.top : 0;
-        }
-
-        if (on_is_draggable && on_is_draggable(container, e) == false) {
-          e.stopPropagation();
-          e.preventDefault();
-          return false;
-        }
-
-        prev_x = e.clientX;
-        prev_y = e.clientY;
-        document.addEventListener("mousemove", inner_mouse);
-        document.addEventListener("mouseup", inner_mouse);
-        if (on_start) on_start(container, e);
-        e.stopPropagation();
-        e.preventDefault();
-        return false;
-      }
-
-      if (e.type == "mouseup") {
-        document.removeEventListener("mousemove", inner_mouse);
-        document.removeEventListener("mouseup", inner_mouse);
-
-        if (on_finish) on_finish(container, e);
-        return;
-      }
-
-      if (e.type == "mousemove") {
-        var deltax = e.clientX - prev_x;
-        var deltay = e.clientY - prev_y;
-        prev_x = e.clientX;
-        prev_y = e.clientY;
-        x += deltax;
-        y += deltay;
-        container.style.left = x + "px";
-        container.style.top = y + "px";
-      }
-      return true;
-    }
+    coreDraggable(container, dragger, on_start, on_finish, on_is_draggable);
   }
 
   /**

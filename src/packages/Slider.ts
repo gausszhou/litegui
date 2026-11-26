@@ -1,4 +1,4 @@
-import LiteGUI from ".";
+import { trigger } from "../core/events";
 
 interface SliderOptions {
   min?: number;
@@ -85,7 +85,7 @@ export class Slider {
     if (value !== this.value) {
       this.value = value;
       if (!skipEvent) {
-        LiteGUI.trigger(this.root, "change", value);
+        trigger(this.root, "change", value);
         this.onChange?.(value);
       }
     }

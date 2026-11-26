@@ -1,4 +1,4 @@
-import LiteGUI from ".";
+import { trigger } from "../core/events";
 import { LiteComponent } from "../types";
 
 class Tab {
@@ -29,7 +29,7 @@ class Tab {
 
   // 触发标签页点击事件
   click() {
-    LiteGUI.trigger(this, "click");
+    trigger(this, "click");
   }
 
   // 销毁当前标签页
@@ -312,7 +312,7 @@ export class Tabs {
         if (that._timeout_mouseover) clearTimeout(that._timeout_mouseover);
         that._timeout_mouseover = setTimeout(
           function () {
-            LiteGUI.trigger(element, "click");
+            trigger(element, "click");
             that._timeout_mouseover = null;
           }.bind(this),
           500
@@ -342,9 +342,9 @@ export class Tabs {
         content.style.overflow = "auto";
         if (options.size == "full") {
           content.style.width = "100%";
-          content.style.height = "calc( 100% - " + LiteGUI.Tabs.tabs_height + "px )"; //minus title
-          content.style.height = "-moz-calc( 100% - " + LiteGUI.Tabs.tabs_height + "px )"; //minus title
-          content.style.height = "-webkit-calc( 100% - " + LiteGUI.Tabs.tabs_height + "px )"; //minus title
+          content.style.height = "calc( 100% - " + Tabs.tabs_height + "px )"; //minus title
+          content.style.height = "-moz-calc( 100% - " + Tabs.tabs_height + "px )"; //minus title
+          content.style.height = "-webkit-calc( 100% - " + Tabs.tabs_height + "px )"; //minus title
           //content.style.height = "-webkit-calc( 90% )"; //minus title
         } else content.style.height = options.size;
       }
@@ -353,9 +353,9 @@ export class Tabs {
         content.style.overflow = "auto";
         if (options.size == "full") {
           content.style.height = "100%";
-          content.style.width = "calc( 100% - " + LiteGUI.Tabs.tabs_width + "px )"; //minus title
-          content.style.width = "-moz-calc( 100% - " + LiteGUI.Tabs.tabs_width + "px )"; //minus title
-          content.style.width = "-webkit-calc( 100% - " + LiteGUI.Tabs.tabs_width + "px )"; //minus title
+          content.style.width = "calc( 100% - " + Tabs.tabs_width + "px )"; //minus title
+          content.style.width = "-moz-calc( 100% - " + Tabs.tabs_width + "px )"; //minus title
+          content.style.width = "-webkit-calc( 100% - " + Tabs.tabs_width + "px )"; //minus title
           //content.style.height = "-webkit-calc( 90% )"; //minus title
         } else content.style.width = options.size;
       }
@@ -511,7 +511,7 @@ export class Tabs {
     if (options.callback) {
       options.callback(tabId, tab.content, element);
     }
-    LiteGUI.trigger(this, "wchange", [tabId, tab.content]);
+    trigger(this, "wchange", [tabId, tab.content]);
     if (this.onchange) {
       this.onchange(tabId, tab.content);
     }

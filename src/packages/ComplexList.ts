@@ -1,4 +1,5 @@
-import LiteGUI from ".";
+import { sizeToCSS } from "../core/dom";
+import { createElement, createListItem } from "../core/dom";
 
 interface ComplexListOptions {
     item_code?: string;
@@ -35,7 +36,7 @@ export class ComplexList {
         this.item_code = options.item_code || `<div class='listitem'><span class='tick'><span>Tick</span></span><span class='title'></span><button class='trash'>Close</button></div>`;
 
         if (options.height) {
-            this.root.style.height = LiteGUI.sizeToCSS(options.height);
+            this.root.style.height = sizeToCSS(options.height);
         }
 
         this.selected = null;
@@ -45,13 +46,13 @@ export class ComplexList {
     }
 
     public addTitle(text: string): HTMLElement {
-        const elem = LiteGUI.createElement("div", ".listtitle", text);
+        const elem = createElement("div", ".listtitle", text);
         this.root.appendChild(elem);
         return elem;
     }
 
     public addHTML(html: string, on_click?: (e: MouseEvent) => void): HTMLElement {
-        const elem = LiteGUI.createElement("div", ".listtext", html);
+        const elem = createElement("div", ".listtext", html);
         if (on_click) {
             elem.addEventListener("mousedown", on_click);
         }
@@ -65,7 +66,7 @@ export class ComplexList {
 
     public addItem(item: ListItem, text?: string, is_enabled?: boolean, can_be_removed?: boolean): ExtendedHTMLElement {
         const title = text || item.content || item.name || '';
-        const elem = LiteGUI.createListItem(this.item_code, { ".title": title }) as ExtendedHTMLElement;
+        const elem = createListItem(this.item_code, { ".title": title }) as ExtendedHTMLElement;
         elem.item = item;
 
         if (is_enabled) {

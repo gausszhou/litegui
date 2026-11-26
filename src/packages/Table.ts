@@ -1,4 +1,4 @@
-import LiteGUI from ".";
+import { sizeToCSS } from "../core/dom";
 import EventMitter from "./EventMitter";
 
 export interface TableColumnOption {
@@ -35,7 +35,7 @@ export class Table extends EventMitter {
     if (options.columns) this.setColumns(options.columns); // must before setRows
     if (options.rows) this.setRows(options.rows, false);
     if (options.scrollable) this.root.style.overflow = "auto";
-    if (options.height) this.root.style.height = LiteGUI.sizeToCSS(options.height);
+    if (options.height) this.root.style.height = sizeToCSS(options.height);
   }
 
   createRoot() {
@@ -114,7 +114,7 @@ export class Table extends EventMitter {
 
       const column: TableColumnOption = {
         name,
-        width: LiteGUI.sizeToCSS(widthValue === undefined ? avgWidth : widthValue),
+        width: sizeToCSS(widthValue === undefined ? avgWidth : widthValue),
         field,
         className
       };

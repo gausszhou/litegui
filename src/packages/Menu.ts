@@ -1,4 +1,5 @@
-import LiteGUI from ".";
+import { remove as removeElement } from "../core/dom";
+import { getRoot } from "../core/state";
 import { Panel } from "./Panel";
 
 const MENU_CLASS_NAME = "lite-menu";
@@ -379,14 +380,14 @@ export class Menu {
     $menu_panel.style.top = box.top + box.height + (is_submenu ? -20 : 10) + "px";
 
     this.panels.push($menu_panel);
-    LiteGUI.root.appendChild($menu_panel);
+    getRoot().appendChild($menu_panel);
     return true;
   };
 
   hideMenuPanel() {
     if (!this.panels.length) return false;
     for (var i in this.panels) {
-      LiteGUI.remove(this.panels[i]);
+      removeElement(this.panels[i]);
     }
     this.panels = [];
     return true;

@@ -1,4 +1,6 @@
-import LiteGUI from ".";
+import { bind, trigger } from "../core/events";
+import { sizeToCSS } from "../core/dom";
+import { coreState } from "../core/state";
 import EventMitter from "./EventMitter";
 const EVENT_KEY_ON_SPLIT_MOVED = "split_moved"
 
@@ -119,15 +121,15 @@ export class Area extends EventMitter {
   }
   initEvent() {
     if (this.options.autoresize) {
-      LiteGUI.bind(LiteGUI, "resized", () => {
+      bind(coreState.events, "resized", () => {
         this.onResize();
       });
     }
   }
   initStyle() {
     const options = this.options;
-    this.root.style.width = LiteGUI.sizeToCSS(options.width ?? "100%");
-    this.root.style.height = LiteGUI.sizeToCSS(options.height ?? "100%");
+    this.root.style.width = sizeToCSS(options.width ?? "100%");
+    this.root.style.height = sizeToCSS(options.height ?? "100%");
   }
   add(v: any) {
     if (typeof v === "string") {
@@ -392,11 +394,11 @@ export class Area extends EventMitter {
       }
     }
 
-    LiteGUI.trigger(this.root, EVENT_KEY_ON_SPLIT_MOVED);
+    trigger(this.root, EVENT_KEY_ON_SPLIT_MOVED);
 
     //trigger split_moved event in all areas inside this area
     var areas = this.root.querySelectorAll(".litearea");
-    for (var i = 0; i < areas.length; ++i) LiteGUI.trigger(areas[i], EVENT_KEY_ON_SPLIT_MOVED);
+    for (var i = 0; i < areas.length; ++i) trigger(areas[i], EVENT_KEY_ON_SPLIT_MOVED);
     
     return true;
   }

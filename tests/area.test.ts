@@ -1,5 +1,6 @@
-import { describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import { Area } from "../src/packages/Area";
+import { LiteGUI } from "../src/packages/index";
 
 describe("Area", () => {
   it("creates the expected root and content", () => {
@@ -52,5 +53,21 @@ describe("Area", () => {
     area.split("vertical", [null, 100], false);
 
     expect(() => area.split("horizontal", [100, null], false)).toThrow();
+  });
+});
+
+
+afterEach(() => {
+  LiteGUI.__events.removeAllListeners();
+});
+
+describe("Area autoresize", () => {
+  it("responds to the global LiteGUI resized event", () => {
+    const area = new Area({ autoresize: true });
+    const onResize = vi.spyOn(area, "onResize");
+
+    LiteGUI.trigger(LiteGUI, "resized");
+
+    expect(onResize).toHaveBeenCalledTimes(1);
   });
 });
