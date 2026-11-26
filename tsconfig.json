@@ -19,5 +19,5 @@
   "typeRoots": [
     "./src/types"
   ],
-  "include": ["src", "src/packages"]
+  "include": ["src", "src/packages", "tests", "vitest.config.ts"]
 }
