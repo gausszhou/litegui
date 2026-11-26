@@ -19,22 +19,27 @@
     "build": "tsc && vite build --base=/litegui/",
     "lib": "rollup -c rollup.config.js",
     "format": "prettier --write src/**/*.{js,ts,css,scss}",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "test:watch": "vitest"
   },
   "devDependencies": {
-    "@rollup/plugin-typescript": "^8.3.4",
+    "@rollup/plugin-typescript": "^8.5.0",
     "@types/lodash-es": "^4.17.12",
-    "postcss": "^8.0.0",
-    "prettier": "^2.7.1",
-    "rollup": "^2.77.3",
+    "@types/node": "^22.10.2",
+    "@vitest/coverage-v8": "^2.1.8",
+    "jsdom": "^25.0.1",
+    "postcss": "^8.4.49",
+    "prettier": "^2.8.8",
+    "rollup": "^2.79.2",
     "rollup-plugin-postcss": "^4.0.2",
-    "rollup-plugin-scss": "^4.0.1",
-    "rollup-plugin-uglify": "^6.0.4",
-    "sass": "^1.54.4",
-    "tslib": "^2.4.0",
+    "sass": "^1.83.4",
+    "tslib": "^2.8.1",
     "typescript": "^5.8.3",
-    "vite": "^3.0.6",
-    "vitepress": "^1.6.3"
+    "vite": "^5.4.11",
+    "vitepress": "^1.6.3",
+    "vitest": "^2.1.8"
   },
   "dependencies": {
     "lodash-es": "^4.17.21",
