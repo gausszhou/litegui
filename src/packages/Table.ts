@@ -1,67 +1,65 @@
 import LiteGUI from ".";
 import EventMitter from "./EventMitter";
 
-interface TableColumnOption {
-  name: string;
-  width: string;
-  field: string;
-  className: string;
+export interface TableColumnOption {
+  name?: string;
+  width?: string | number;
+  field?: string;
+  className?: string;
   th?: HTMLTableCellElement;
 }
 
+export type TableColumn = TableColumnOption | string | number;
+
 interface TableOptions {
-  rows?: Object[] | Array<any>[];
-  columns?: TableColumnOption[];
-  height?: number;
+  rows?: any[];
+  columns?: TableColumn[];
+  height?: number | string;
   scrollable?: boolean;
 }
 
 export class Table extends EventMitter {
   root: HTMLTableElement;
-  header: any;
-  data: Object[] | Array<any>[] = [];
+  header: HTMLTableRowElement;
+  data: any[] = [];
   rows: HTMLTableRowElement[] = [];
-  columns: TableColumnOption[] = []
+  columns: TableColumnOption[] = [];
   column_fields: string[] = [];
   private _must_update_header = true;
-  constructor(options: TableOptions) {
+
+  constructor(options: TableOptions = {}) {
     super();
     this.root = this.createRoot();
+    this.header = document.createElement("tr");
 
     if (options.columns) this.setColumns(options.columns); // must before setRows
     if (options.rows) this.setRows(options.rows, false);
     if (options.scrollable) this.root.style.overflow = "auto";
     if (options.height) this.root.style.height = LiteGUI.sizeToCSS(options.height);
   }
+
   createRoot() {
     const root = document.createElement("table");
     root.classList.add("litetable");
     return root;
   }
-  setRows(data: any[], reuse: boolean) {
+
+  setRows(data: any[], reuse: boolean = false) {
     this.data = data;
     this.updateContent(reuse);
-  };
+  }
 
-  addRow(row: any, skip_add: boolean) {
+  addRow(row: any, skip_add: boolean = false) {
     const tr = document.createElement("tr");
-    // create cells
-    for (var j = 0; j < this.column_fields.length; ++j) {
+    for (let j = 0; j < this.column_fields.length; ++j) {
       const td = document.createElement("td");
-      // value
-      let value = null;
-      if (row instanceof Array) {
-        value = row[j];
-      } else {
-        value = row[this.column_fields[j]];
-      }
-      if (value === undefined) value = "";
-      td.innerHTML = value;
-      // style
+      const value = Array.isArray(row) ? row[j] : row[this.column_fields[j]];
+      td.innerHTML = value === undefined || value === null ? "" : String(value);
+
       const column = this.columns[j];
-      if (column === undefined) break;
+      if (!column) break;
       if (column.className) td.className = column.className;
-      if (column.width) td.style.width = column.width;
+      if (column.width) td.style.width = String(column.width);
       tr.appendChild(td);
     }
 
@@ -70,7 +68,7 @@ export class Table extends EventMitter {
     if (!skip_add) this.data.push(row);
 
     return tr;
-  };
+  }
 
   updateRow(index: number, row: any) {
     this.data[index] = row;
@@ -78,79 +76,76 @@ export class Table extends EventMitter {
     const tr = this.rows[index];
     if (!tr) return null;
 
-    var cells = tr.querySelectorAll("td");
-    for (var j = 0; j < cells.length; ++j) {
-      var column = this.columns[j];
-
-      var value = null;
-
-      if (row.constructor === Array) value = row[j];
-      else value = row[column.field];
-
-      if (value === undefined) value = "";
-
-      cells[j].innerHTML = value;
+    const cells = tr.querySelectorAll("td");
+    for (let j = 0; j < cells.length; ++j) {
+      const column = this.columns[j];
+      if (!column) continue;
+      const value = Array.isArray(row) ? row[j] : row[column.field as string];
+      cells[j].innerHTML = value === undefined || value === null ? "" : String(value);
     }
     return tr;
-  };
+  }
 
   updateCell(rowIndex: number, cellIndex: number, data: string) {
     const tr = this.rows[rowIndex];
     if (!tr) return null;
-    const cell = tr.childNodes[cellIndex] as HTMLElement;
+    const cell = tr.children[cellIndex] as HTMLElement | undefined;
     if (!cell) return null;
     cell.innerHTML = data;
     return cell;
-  };
+  }
 
-  setColumns(columns: TableColumnOption[]) {
+  setColumns(columns: TableColumn[]) {
     this.columns.length = 0;
     this.column_fields.length = 0;
 
-    var avg_width = Math.floor(100 / columns.length).toFixed(1) + "%";
+    const avgWidth = Math.floor(100 / columns.length).toFixed(1) + "%";
+    const usedWidths: string[] = [];
 
-    var rest = [];
-
-    for (var i = 0; i < columns.length; ++i) {
+    for (let i = 0; i < columns.length; ++i) {
       const c = columns[i];
-
       if (c === null || c === undefined) continue;
-      const cName = c.name
-      //allow to pass just strings or numbers instead of objects
-      if (c.constructor === String || c.constructor === Number) {
-        cName: String(c)
-      }
 
-      const column = {
-        name: cName || "",
-        width: LiteGUI.sizeToCSS(c.width || avg_width),
-        field: (c.field || cName || "").toLowerCase(),
-        className: c.className
+      const isPrimitive = typeof c === "string" || typeof c === "number";
+      const name = isPrimitive ? String(c) : c.name ?? "";
+      const field = isPrimitive ? String(c).toLowerCase() : (c.field ?? name).toLowerCase();
+      const widthValue = isPrimitive ? undefined : c.width;
+      const className = isPrimitive ? undefined : c.className;
+
+      const column: TableColumnOption = {
+        name,
+        width: LiteGUI.sizeToCSS(widthValue === undefined ? avgWidth : widthValue),
+        field,
+        className
       };
 
-      //last
-      if (i == columns.length - 1) column.width = " calc( 100% - ( " + rest.join(" + ") + " ) )";
-      else rest.push(column.width);
+      // Last column fills the remaining width.
+      if (i === columns.length - 1) {
+        column.width = usedWidths.length
+          ? `calc(100% - (${usedWidths.join(" + ")}))`
+          : "100%";
+      } else {
+        usedWidths.push(String(column.width));
+      }
 
       this.columns.push(column);
-      this.column_fields.push(column.field);
+      this.column_fields.push(field);
     }
 
     this._must_update_header = true;
     this.updateContent();
-  };
+  }
 
-  updateContent(reuse = false) {
+  updateContent(reuse: boolean = false) {
     this.root.innerHTML = "";
 
-    //update header
     if (this._must_update_header) {
       this.header = document.createElement("tr");
-      for (var i = 0; i < this.columns.length; ++i) {
+      for (let i = 0; i < this.columns.length; ++i) {
         const column = this.columns[i];
         const th = document.createElement("th");
-        th.innerHTML = column.name;
-        if (column.width) th.style.width = column.width;
+        th.innerHTML = column.name ?? "";
+        if (column.width) th.style.width = String(column.width);
         column.th = th;
         this.header.appendChild(th);
       }
@@ -159,24 +154,23 @@ export class Table extends EventMitter {
     this.root.appendChild(this.header);
 
     if (!this.data) return false;
-    if (this.data.length != this.rows.length) {
+    if (this.data.length !== this.rows.length) {
       reuse = false;
     }
 
     if (reuse) {
-      for (var i = 0; i < this.rows.length; ++i) {
-        const data_row = this.data[i];
-        const tr = this.updateRow(i, data_row);
-        tr && this.root.appendChild(tr);
+      for (let i = 0; i < this.rows.length; ++i) {
+        const tr = this.updateRow(i, this.data[i]);
+        if (tr) this.root.appendChild(tr);
       }
     } else {
       this.rows.length = 0;
-      //create rows
-      for (var i = 0; i < this.data.length; ++i) {
-        var row = this.data[i];
-        this.addRow(row, true);
+      for (let i = 0; i < this.data.length; ++i) {
+        this.addRow(this.data[i], true);
       }
     }
     return true;
-  };
+  }
 }
+
+export default Table;
