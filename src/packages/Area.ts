@@ -126,12 +126,8 @@ export class Area extends EventMitter {
   }
   initStyle() {
     const options = this.options;
-    let width = options.width || "100%";
-    let height = options.height || "100%";
-    if (width < 0) width = "calc( 100% - " + Math.abs(width) + "px)";
-    if (height < 0) height = "calc( 100% - " + Math.abs(height) + "px)";
-    this.root.style.width = width;
-    this.root.style.height = height;
+    this.root.style.width = LiteGUI.sizeToCSS(options.width ?? "100%");
+    this.root.style.height = LiteGUI.sizeToCSS(options.height ?? "100%");
   }
   add(v: any) {
     if (typeof v === "string") {
