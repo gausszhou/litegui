@@ -1,0 +1,28 @@
+/**** LiteContextMenu ***/
+.lg-context-menu {
+	position: fixed;
+	top: 100px;
+	left: 100px;
+	min-width: 100px;
+	color: #aaf;
+	padding: 0;
+	box-shadow: 0 0 10px black !important;
+	background-color: #2e2e2e !important;
+}
+
+.lg-context-menu .lg-context-menu__title img {
+	margin-top: 2px;
+	margin-left: 2px;
+	margin-right: 4px;
+}
+
+.lg-context-menu .lg-context-menu__item {
+	margin: 2px;
+	padding: 2px;
+}
+
+.lg-context-menu .lg-context-menu__item.lg-context-menu__item--has-submenu {
+	background-color: #2e2e2e !important;
+}
+
+

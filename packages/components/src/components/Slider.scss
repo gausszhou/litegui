@@ -1,0 +1,15 @@
+/**** LiteSlider ***/
+.lg-slider {
+	display: inline-block;
+	position: relative;
+	width: calc(100% - 50px);
+	height: 1.2em;
+	cursor: pointer;
+}
+
+.lg-slider__value {
+	width: 42px;
+	padding-left: 5px;
+}
+
+

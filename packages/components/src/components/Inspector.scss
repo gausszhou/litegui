@@ -703,3 +703,57 @@ button.wcombobutton.selected {
 .inspector .row-trash {
 	width: 30px;
 }
+
+/* legacy inspector widgets (moved from widgets.scss) */
+.widget .wcontent .inputfield {
+	display: flex;
+	height: 100%;
+	align-items: center;
+}
+
+.slider-container {
+	padding: 0 2px;
+	flex: 1;
+}
+
+.lg-slider {
+	display: block;
+	width: 100%;
+	border-radius: 2px;
+}
+
+.colorpicker-window {
+	position: absolute;
+	top: 50px;
+	left: 10px;
+	background-color: #333;
+	padding: 2px;
+	font-size: 0.8em;
+	color: #aaa;
+}
+
+.colorpicker-window input {
+	border: 0;
+}
+
+
+/* litepad (moved from style.scss) */
+.litepad {
+	position: relative;
+	background-color: #222;
+	cursor: pointer;
+}
+
+.litepad .litepad-handler {
+	position: absolute;
+	display: inline-block;
+	width: 10px;
+	height: 10px;
+	background-color: #660;
+	border: 2px solid #aaf;
+	border-radius: 10px;
+	top: 0;
+	left: 0;
+	pointer-events: none;
+}
+

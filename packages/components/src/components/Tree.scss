@@ -1,0 +1,110 @@
+/**** LiteTree ***/
+
+li.ltreeitem {
+	list-style-type: none;
+	cursor: pointer;
+	/*background: url("../imgs/tree_lines_16x16.png") no-repeat scroll 5px -8px transparent;*/
+	/*padding-left: 20px;*/
+	-moz-user-select: none;
+	-webkit-user-select: none;
+	user-select: none;
+}
+
+li.ltreeitem:nth-child(even) {
+	background-color: rgba(0, 0, 0, 0.1);
+}
+
+li.ltreeitem:hover {
+	background-color: #444;
+}
+
+/*
+li.ltreeitem:nth-child(even) div.ltreeitemtitle {
+	background-color: black;
+}
+*/
+
+li.ltreeitem.root_item {
+	background: transparent;
+	padding-left: 0px;
+}
+
+li.ltreeitem div.ltreeitemtitle {
+	color: #aaa;
+	min-width: 100px;
+	white-space: nowrap;
+}
+
+li.ltreeitem div.ltreeitemtitle .incontent:hover {
+	color: white;
+}
+
+li.ltreeitem.selected div.ltreeitemtitle .incontent {
+	color: #ec6;
+}
+
+li.ltreeitem.semiselected div.ltreeitemtitle .incontent {
+	color: #a96;
+}
+
+li.ltreeitem div.ltreeitemtitle.dragover .incontent {
+	background-color: #ec6;
+	color: black;
+	padding: 3px;
+	border-radius: 2px;
+	font-size: 2em;
+}
+
+ul.ltreeitemchildren {
+	margin: 0;
+	padding: 0;
+	margin-left: -2px;
+	list-style-type: none;
+	/*background: url("../imgs/tree_lines_16x16.png") repeat-y transparent;*/
+	/*outline: 1px #aaa dotted;*/
+}
+
+li.ltreeitem .ltreeitemtitle .precontent {
+	margin-right: 4px;
+}
+
+li.ltreeitem .ltreeitemtitle .postcontent {
+	margin-left: 4px;
+}
+
+li.ltreeitem.hidden,
+li.ltreeitem.filtered {
+	display: none;
+}
+
+.listbox {
+	font-size: 1em;
+	width: 0.9em;
+	height: 0.9em;
+	margin-left: -1px;
+	margin-right: 0.5em;
+	margin-bottom: 2px;
+	line-height: 1em;
+	display: inline-block;
+	/*outline: 1px solid #678;*/
+	text-align: center;
+	color: #79a;
+}
+
+.listbox.empty {
+	margin-left: 2px;
+	width: 0.4em;
+	height: 0.4em;
+	color: #36a;
+	background-color: #467;
+	/* Hide the text. */
+	text-indent: 100%;
+	white-space: nowrap;
+	overflow: hidden;
+}
+
+.listbox:hover {
+	color: white;
+	background-color: rgba(100, 100, 100, 0.5);
+}
+

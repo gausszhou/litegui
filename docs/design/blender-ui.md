@@ -293,6 +293,29 @@ description: LiteGUI 默认 Blender 风格的主题、尺寸、组件解剖与�
 
 > 目前 Top Bar、Workspace Tabs、Area Header、Timeline、Status Bar 在 `apps/editor`/workspace 组件内实现；后续抽到组件包时，class 和 token 保持本规范不变。
 
+## 6. 代码组织
+
+组件的交互逻辑和组件专属样式放在同一目录，文件名一一对应：
+
+```
+packages/components/src/components/
+  Button.ts
+  Button.scss
+  Checkbox.ts
+  Checkbox.scss
+  HeaderBar.ts
+  HeaderBar.scss
+```
+
+- 组件 SCSS 只写该组件的结构/状态；不要在这里放全局 token。
+- 共享样式仍放在 `packages/components/src/styles/`：
+  - `theme.scss`：颜色/字号/尺寸 token（Dark/Light）
+  - `blender.scss`：Blender 默认主题的跨组件覆盖
+  - `layout.scss`：应用壳/Area 根容器与 modal 遮罩
+  - `normalize.scss` / `scrollbar.scss` / `file-list.scss` / `style.scss`：全局基础样式
+- `styles/index.scss` 是唯一样式入口，负责按顺序引入组件 SCSS 和共享样式。
+- 新增组件时：先建 `PascalCase.ts`，再建同级 `PascalCase.scss`，最后在 `styles/index.scss` 中 `@use`。
+
 ## 6. 主题实现
 
 默认暗色（`packages/components/src/styles/blender.scss`）：

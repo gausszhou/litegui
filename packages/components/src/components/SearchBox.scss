@@ -1,0 +1,23 @@
+/**** LiteSearchBox ***/
+.lg-searchbox {
+	padding: 2px;
+	opacity: 0.5;
+	transition: all 0.5s;
+	width: 100%;
+}
+
+.lg-searchbox__input {
+	padding: 2px 4px;
+	outline: 0;
+	width: 100%;
+}
+
+.lg-searchbox__input:focus {
+	outline: 0;
+}
+
+.lg-searchbox:hover {
+	opacity: 1;
+}
+
+
