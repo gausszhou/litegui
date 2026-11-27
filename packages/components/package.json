@@ -28,7 +28,12 @@
     "./table": "./src/entries/table.ts",
     "./console": "./src/entries/console.ts",
     "./inspector": "./src/entries/inspector.ts",
-    "./tree": "./src/entries/tree.ts"
+    "./tree": "./src/entries/tree.ts",
+    "./box": "./src/entries/box.ts",
+    "./complex-list": "./src/entries/complex-list.ts",
+    "./context-menu": "./src/entries/context-menu.ts",
+    "./dragger": "./src/entries/dragger.ts",
+    "./line-editor": "./src/entries/line-editor.ts"
   },
   "sideEffects": [
     "*.css"
@@ -119,6 +124,26 @@
       "./tree": {
         "types": "./dist/types/entries/tree.d.ts",
         "import": "./dist/entries/tree.js"
+      },
+      "./box": {
+        "types": "./dist/types/entries/box.d.ts",
+        "import": "./dist/entries/box.js"
+      },
+      "./complex-list": {
+        "types": "./dist/types/entries/complex-list.d.ts",
+        "import": "./dist/entries/complex-list.js"
+      },
+      "./context-menu": {
+        "types": "./dist/types/entries/context-menu.d.ts",
+        "import": "./dist/entries/context-menu.js"
+      },
+      "./dragger": {
+        "types": "./dist/types/entries/dragger.d.ts",
+        "import": "./dist/entries/dragger.js"
+      },
+      "./line-editor": {
+        "types": "./dist/types/entries/line-editor.d.ts",
+        "import": "./dist/entries/line-editor.js"
       }
     },
     "unpkg": "./dist/index.umd.cjs",

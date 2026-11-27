@@ -28,7 +28,7 @@ export const LiteGuiList = defineComponent({
 
     const build = () => {
       if (!host.value) return;
-      const items = props.items.map((item) => {
+      const items = props.items.map(item => {
         if (typeof item === "string") return item;
         return { ...item, checked: item.checked ?? false };
       });

@@ -4,6 +4,8 @@ import { createApp, nextTick } from "vue";
 import LiteGuiVue, {
   LiteGuiButton,
   LiteGuiCheckbox,
+  LiteGuiConsole,
+  LiteGuiDragger,
   LiteGuiDialog,
   LiteGuiList,
   LiteGuiMenu,
@@ -11,6 +13,7 @@ import LiteGuiVue, {
   LiteGuiSearchBox,
   LiteGuiSplit,
   LiteGuiTable,
+  LiteGuiTabs,
   LiteGuiSlider
 } from "@gausszhou/litegui-vue";
 
@@ -99,6 +102,62 @@ describe("Vue bindings", () => {
 
     expect(wrapper.emitted("update:modelValue")?.[0]).toEqual([false]);
     expect(wrapper.emitted("close")).toHaveLength(1);
+
+    wrapper.unmount();
+  });
+
+  it("LiteGuiTabs switches tabs and emits v-model", async () => {
+    const wrapper = mount(LiteGuiTabs, {
+      props: {
+        tabs: [
+          { id: "a", title: "A" },
+          { id: "b", title: "B" }
+        ],
+        modelValue: "a"
+      },
+      slots: {
+        "tab-a": "<span class='tab-a'>A content</span>",
+        "tab-b": "<span class='tab-b'>B content</span>"
+      },
+      attachTo: document.body
+    });
+    await nextTick();
+
+    expect(wrapper.find(".tab-a").text()).toBe("A content");
+    await wrapper.findAll(".wtab")[1].trigger("click");
+    expect(wrapper.emitted("update:modelValue")?.at(-1)).toEqual(["b"]);
+
+    wrapper.unmount();
+  });
+
+  it("LiteGuiDragger emits number changes", async () => {
+    const wrapper = mount(LiteGuiDragger, {
+      props: { modelValue: 1, precision: 2 },
+      attachTo: document.body
+    });
+    await nextTick();
+
+    const input = wrapper.find("input");
+    await input.setValue("2.5");
+    await input.trigger("change");
+
+    expect(wrapper.emitted("update:modelValue")?.at(-1)).toEqual([2.5]);
+
+    wrapper.unmount();
+  });
+
+  it("LiteGuiConsole emits commands", async () => {
+    const wrapper = mount(LiteGuiConsole, {
+      props: { prompt: ">" },
+      attachTo: document.body
+    });
+    await nextTick();
+
+    const input = wrapper.find("input");
+    await input.setValue("help");
+    await input.trigger("keydown", { keyCode: 13 });
+
+    expect(wrapper.emitted("command")?.[0]).toEqual(["help"]);
 
     wrapper.unmount();
   });

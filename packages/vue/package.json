@@ -22,7 +22,10 @@
     "./list": "./src/components/list.ts",
     "./searchbox": "./src/components/searchbox.ts",
     "./split": "./src/components/split.ts",
-    "./table": "./src/components/table.ts"
+    "./table": "./src/components/table.ts",
+    "./tabs": "./src/components/tabs.ts",
+    "./dragger": "./src/components/dragger.ts",
+    "./console": "./src/components/console.ts"
   },
   "sideEffects": false,
   "scripts": {
@@ -91,6 +94,18 @@
       "./table": {
         "types": "./dist/types/components/table.d.ts",
         "import": "./dist/components/table.js"
+      },
+      "./tabs": {
+        "types": "./dist/types/components/tabs.d.ts",
+        "import": "./dist/components/tabs.js"
+      },
+      "./dragger": {
+        "types": "./dist/types/components/dragger.d.ts",
+        "import": "./dist/components/dragger.js"
+      },
+      "./console": {
+        "types": "./dist/types/components/console.d.ts",
+        "import": "./dist/components/console.js"
       }
     }
   },

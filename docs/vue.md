@@ -37,14 +37,17 @@ import { ref } from "vue";
 import {
   LiteGuiButton,
   LiteGuiCheckbox,
+  LiteGuiConsole,
   LiteGuiDialog,
+  LiteGuiDragger,
   LiteGuiList,
   LiteGuiMenu,
   LiteGuiPanel,
   LiteGuiSearchBox,
   LiteGuiSlider,
   LiteGuiSplit,
-  LiteGuiTable
+  LiteGuiTable,
+  LiteGuiTabs
 } from "@gausszhou/litegui-vue";
 
 const checked = ref(true);
@@ -58,6 +61,12 @@ const columns = [
 const rows = [
   { name: "Alpha", value: 1 },
   { name: "Beta", value: 2 }
+];
+const dragValue = ref(1.5);
+const activeTab = ref("a");
+const tabs = [
+  { id: "a", title: "概览" },
+  { id: "b", title: "详情" }
 ];
 const dialogOpen = ref(false);
 const menuItems = [
@@ -170,6 +179,36 @@ Split 用 `section-*` 命名插槽填充每个分区：
   <template #section-0><div>左侧</div></template>
   <template #section-1><div>右侧</div></template>
 </LiteGuiSplit>
+```
+
+Tabs、Dragger、Console：
+
+<div class="lg-demo">
+  <LiteGuiTabs v-model="activeTab" :tabs="tabs" :height="180" style="width: 100%">
+    <template #tab-a>
+      <div style="padding: 12px">概览内容</div>
+    </template>
+    <template #tab-b>
+      <div style="padding: 12px">详情内容</div>
+    </template>
+  </LiteGuiTabs>
+</div>
+
+```vue
+<LiteGuiTabs v-model="activeTab" :tabs="tabs" :height="180">
+  <template #tab-a><div>概览内容</div></template>
+  <template #tab-b><div>详情内容</div></template>
+</LiteGuiTabs>
+```
+
+<div class="lg-demo">
+  <LiteGuiDragger v-model="dragValue" :precision="2" />
+  <LiteGuiConsole prompt=">" style="width: 320px; height: 160px" />
+</div>
+
+```vue
+<LiteGuiDragger v-model="dragValue" :precision="2" />
+<LiteGuiConsole prompt=">" @command="onCommand" />
 ```
 
 ## 组件 API

@@ -118,6 +118,9 @@ test("vue bindings page mounts wrappers and v-model works", async ({ page }) => 
   await expect(page.locator(".lg-vue-list .list-item.selected")).toContainText("Alpha");
   await expect(page.locator(".lg-vue-split .split-section")).toHaveCount(2);
   await expect(page.locator(".lg-vue-searchbox input")).toBeVisible();
+  await expect(page.locator(".lg-vue-tabs .wtab")).toHaveCount(2);
+  await expect(page.locator(".lg-vue-dragger input")).toBeVisible();
+  await expect(page.locator(".lg-vue-console .liteconsole")).toBeVisible();
 
   expect(errors).toEqual([]);
 });

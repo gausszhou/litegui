@@ -14,7 +14,10 @@ const entry = {
   table: resolve(__dirname, "src/components/table.ts"),
   list: resolve(__dirname, "src/components/list.ts"),
   split: resolve(__dirname, "src/components/split.ts"),
-  searchbox: resolve(__dirname, "src/components/searchbox.ts")
+  searchbox: resolve(__dirname, "src/components/searchbox.ts"),
+  tabs: resolve(__dirname, "src/components/tabs.ts"),
+  dragger: resolve(__dirname, "src/components/dragger.ts"),
+  console: resolve(__dirname, "src/components/console.ts")
 };
 
 export default defineConfig({

@@ -1,5 +1,4 @@
 import { EventMitter } from "@gausszhou/litegui-core";
-import { createElementFromString } from "@gausszhou/litegui-core";
 
 export class Console extends EventMitter {
   options: any;
@@ -41,13 +40,19 @@ export class Console extends EventMitter {
     return root;
   }
   createLog() {
-    return createElementFromString(`<div class='log'></div>`) as HTMLDivElement;
+    const log = document.createElement("div");
+    log.className = "log";
+    return log;
   }
   createFooter() {
-    return createElementFromString(`<div class='foot'></div>`) as HTMLDivElement;
+    const footer = document.createElement("div");
+    footer.className = "foot";
+    return footer;
   }
   createInput() {
-    return createElementFromString(`<input type='text'/>`) as HTMLInputElement;
+    const input = document.createElement("input");
+    input.type = "text";
+    return input;
   }
   initDom() {
     this.root.appendChild(this.$log);
@@ -146,4 +151,3 @@ export class Console extends EventMitter {
     this.$log.innerHTML = "";
   }
 }
-
