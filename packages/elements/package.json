@@ -13,13 +13,35 @@
   "exports": {
     ".": "./src/index.ts",
     "./define": "./src/define.ts",
+    "./area": "./src/elements/area.ts",
+    "./box": "./src/elements/box.ts",
     "./button": "./src/elements/button.ts",
     "./checkbox": "./src/elements/checkbox.ts",
-    "./panel": "./src/elements/panel.ts",
+    "./complex-list": "./src/elements/complex-list.ts",
+    "./console": "./src/elements/console.ts",
+    "./context-menu": "./src/elements/context-menu.ts",
     "./dialog": "./src/elements/dialog.ts",
+    "./dragger": "./src/elements/dragger.ts",
+    "./header-bar": "./src/elements/header-bar.ts",
+    "./image-editor": "./src/elements/image-editor.ts",
+    "./inspector": "./src/elements/inspector.ts",
+    "./line-editor": "./src/elements/line-editor.ts",
+    "./list": "./src/elements/list.ts",
+    "./menu": "./src/elements/menu.ts",
+    "./node-editor": "./src/elements/node-editor.ts",
+    "./panel": "./src/elements/panel.ts",
+    "./searchbox": "./src/elements/searchbox.ts",
+    "./slider": "./src/elements/slider.ts",
+    "./split": "./src/elements/split.ts",
+    "./status-bar": "./src/elements/status-bar.ts",
+    "./table": "./src/elements/table.ts",
+    "./tabs": "./src/elements/tabs.ts",
+    "./text-editor": "./src/elements/text-editor.ts",
+    "./timeline": "./src/elements/timeline.ts",
+    "./toolbar": "./src/elements/toolbar.ts",
+    "./tree": "./src/elements/tree.ts",
     "./tokens.css": "./src/styles/generated/tokens.css",
-    "./package.json": "./package.json",
-    "./menu": "./src/elements/menu.ts"
+    "./package.json": "./package.json"
   },
   "sideEffects": [
     "*.css",
@@ -55,6 +77,14 @@
         "types": "./dist/types/define.d.ts",
         "import": "./dist/define.js"
       },
+      "./area": {
+        "types": "./dist/types/elements/area.d.ts",
+        "import": "./dist/elements/area.js"
+      },
+      "./box": {
+        "types": "./dist/types/elements/box.d.ts",
+        "import": "./dist/elements/box.js"
+      },
       "./button": {
         "types": "./dist/types/elements/button.d.ts",
         "import": "./dist/elements/button.js"
@@ -63,20 +93,100 @@
         "types": "./dist/types/elements/checkbox.d.ts",
         "import": "./dist/elements/checkbox.js"
       },
-      "./panel": {
-        "types": "./dist/types/elements/panel.d.ts",
-        "import": "./dist/elements/panel.js"
+      "./complex-list": {
+        "types": "./dist/types/elements/complex-list.d.ts",
+        "import": "./dist/elements/complex-list.js"
+      },
+      "./console": {
+        "types": "./dist/types/elements/console.d.ts",
+        "import": "./dist/elements/console.js"
+      },
+      "./context-menu": {
+        "types": "./dist/types/elements/context-menu.d.ts",
+        "import": "./dist/elements/context-menu.js"
       },
       "./dialog": {
         "types": "./dist/types/elements/dialog.d.ts",
         "import": "./dist/elements/dialog.js"
       },
-      "./tokens.css": "./dist/tokens.css",
-      "./package.json": "./package.json",
+      "./dragger": {
+        "types": "./dist/types/elements/dragger.d.ts",
+        "import": "./dist/elements/dragger.js"
+      },
+      "./header-bar": {
+        "types": "./dist/types/elements/header-bar.d.ts",
+        "import": "./dist/elements/header-bar.js"
+      },
+      "./image-editor": {
+        "types": "./dist/types/elements/image-editor.d.ts",
+        "import": "./dist/elements/image-editor.js"
+      },
+      "./inspector": {
+        "types": "./dist/types/elements/inspector.d.ts",
+        "import": "./dist/elements/inspector.js"
+      },
+      "./line-editor": {
+        "types": "./dist/types/elements/line-editor.d.ts",
+        "import": "./dist/elements/line-editor.js"
+      },
+      "./list": {
+        "types": "./dist/types/elements/list.d.ts",
+        "import": "./dist/elements/list.js"
+      },
       "./menu": {
         "types": "./dist/types/elements/menu.d.ts",
         "import": "./dist/elements/menu.js"
-      }
+      },
+      "./node-editor": {
+        "types": "./dist/types/elements/node-editor.d.ts",
+        "import": "./dist/elements/node-editor.js"
+      },
+      "./panel": {
+        "types": "./dist/types/elements/panel.d.ts",
+        "import": "./dist/elements/panel.js"
+      },
+      "./searchbox": {
+        "types": "./dist/types/elements/searchbox.d.ts",
+        "import": "./dist/elements/searchbox.js"
+      },
+      "./slider": {
+        "types": "./dist/types/elements/slider.d.ts",
+        "import": "./dist/elements/slider.js"
+      },
+      "./split": {
+        "types": "./dist/types/elements/split.d.ts",
+        "import": "./dist/elements/split.js"
+      },
+      "./status-bar": {
+        "types": "./dist/types/elements/status-bar.d.ts",
+        "import": "./dist/elements/status-bar.js"
+      },
+      "./table": {
+        "types": "./dist/types/elements/table.d.ts",
+        "import": "./dist/elements/table.js"
+      },
+      "./tabs": {
+        "types": "./dist/types/elements/tabs.d.ts",
+        "import": "./dist/elements/tabs.js"
+      },
+      "./text-editor": {
+        "types": "./dist/types/elements/text-editor.d.ts",
+        "import": "./dist/elements/text-editor.js"
+      },
+      "./timeline": {
+        "types": "./dist/types/elements/timeline.d.ts",
+        "import": "./dist/elements/timeline.js"
+      },
+      "./toolbar": {
+        "types": "./dist/types/elements/toolbar.d.ts",
+        "import": "./dist/elements/toolbar.js"
+      },
+      "./tree": {
+        "types": "./dist/types/elements/tree.d.ts",
+        "import": "./dist/elements/tree.js"
+      },
+      "./tokens.css": "./dist/tokens.css",
+      "./package.json": "./package.json"
     }
   },
   "license": "MIT",

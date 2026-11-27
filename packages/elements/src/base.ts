@@ -122,8 +122,33 @@ export abstract class LiteGuiElement extends HTMLElementBase {
   }
 
   protected numberAttr(name: string, fallback: number): number {
-    const value = Number(this.getAttribute(name));
+    const raw = this.getAttribute(name);
+    // 注意 Number(null) === 0：attribute 缺失时必须回退，否则 0 会覆盖默认值。
+    if (raw === null || raw.trim() === "") return fallback;
+    const value = Number(raw);
     return Number.isFinite(value) ? value : fallback;
+  }
+
+  /** 可选数字 attribute：缺失或非法时返回 undefined（用于区分“未设置”和 0） */
+  protected optionalNumberAttr(name: string): number | undefined {
+    const raw = this.getAttribute(name);
+    if (raw === null || raw.trim() === "") return undefined;
+    const value = Number(raw);
+    return Number.isFinite(value) ? value : undefined;
+  }
+
+  /**
+   * 安全解析 JSON attribute：缺失或解析失败时返回 fallback。
+   * 复杂数据（表格列、树、检查器项……）统一走这里，坏 JSON 不应让组件崩溃。
+   */
+  protected jsonAttr<T>(name: string, fallback: T): T {
+    const raw = this.getAttribute(name);
+    if (!raw) return fallback;
+    try {
+      return JSON.parse(raw) as T;
+    } catch {
+      return fallback;
+    }
   }
 
   protected boolAttr(name: string): boolean {

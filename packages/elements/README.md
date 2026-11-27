@@ -42,16 +42,18 @@ customElements.define("my-button", LiteGuiButtonElement);
 
 ## 元素
 
-| 标签            | 属性                                             | 事件             |
-| --------------- | ------------------------------------------------ | ---------------- |
-| `<lg-button>`   | `label`、`size`、`disabled`                      | `litegui-click`  |
-| `<lg-checkbox>` | `checked`、`disabled`                            | `litegui-change` |
-| `<lg-panel>`    | `heading`、`height`、`closable`                  | `litegui-close`  |
-| `<lg-dialog>`   | `heading`、`width`、`height`、`open`、`closable` | `litegui-close`  |
-| `<lg-menu>`     | 子元素 `<lg-menu-item label>`                    | `litegui-select` |
+已覆盖 `packages/components` 的全部组件（28 个标签）：
+
+| 分类             | 标签                                                                                                                                                                       |
+| ---------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 基础控件与数据   | `<lg-button>`、`<lg-checkbox>`、`<lg-slider>`、`<lg-searchbox>`、`<lg-dragger>`、`<lg-tabs>`、`<lg-list>`、`<lg-table>`、`<lg-console>`、`<lg-complex-list>`、`<lg-tree>`、`<lg-inspector>`、`<lg-line-editor>` |
+| 布局             | `<lg-area>`、`<lg-split>`、`<lg-box>`、`<lg-context-menu>`                                                                                                                 |
+| 面板与工作区     | `<lg-panel>`、`<lg-dialog>`、`<lg-menu>`、`<lg-menu-item>`、`<lg-header-bar>`、`<lg-status-bar>`、`<lg-timeline>`、`<lg-toolbar>`、`<lg-node-editor>`、`<lg-text-editor>`、`<lg-image-editor>` |
+
+属性 / 事件对照表和 JSON 数据示例见[文档](https://gausszhou.github.io/litegui/docs/web-components)。
 
 事件都是 `bubbles: true` + `composed: true` 的 `CustomEvent`，数据在 `event.detail`。
-标题属性使用 `heading`，避免与全局 `title`（tooltip）冲突。
+标题属性使用 `heading`，避免与全局 `title`（tooltip）冲突；HeaderBar / ImageEditor 的文案复用标准 `title`。
 
 ## 主题
 
@@ -60,7 +62,7 @@ CSS 变量会穿透 Shadow DOM。
 
 ## 单文件
 
-`dist/index.umd.cjs` 是自包含构建，加载后自动注册元素并注入 tokens：
+`dist/index.umd.cjs` 是自包含构建，加载后自动注册全部元素并注入 tokens：
 
 ```html
 <script src="./node_modules/@gausszhou/litegui-elements/dist/index.umd.cjs"></script>
@@ -71,6 +73,8 @@ CSS 变量会穿透 Shadow DOM。
 - 仅客户端：不支持 SSR / Declarative Shadow DOM；
 - 模态框尚未适配 Shadow DOM；
 - 浮层元素不能放在带 `transform` / `filter` / `contain` 的祖先里；
-- 当前覆盖 Button / Checkbox / Panel / Dialog / Menu，其余元素逐步补齐。
+- Canvas 元素（`<lg-line-editor>` / `<lg-timeline>`）需要真实 canvas，jsdom 下要 mock `getContext`；
+- 布局组件是薄适配：`<lg-area>` 用递归二分实现多 section，`<lg-split>` 用命名插槽分发子元素；
+- `<lg-node-editor>` 的 `nodes` / `links`、`<lg-complex-list>` 的删除、`<lg-text-editor>` 的输入不会自动回写 attribute，请监听事件维护状态。
 
 文档：https://gausszhou.github.io/litegui/docs/web-components
