@@ -1,7 +1,7 @@
 import { describe, expect, it, vi } from "vitest";
-import { Button } from "@gausszhou/litegui";
-import { Checkbox } from "@gausszhou/litegui";
-import { Dragger } from "@gausszhou/litegui";
+import { Button } from "@gausszhou/litegui-components";
+import { Checkbox } from "@gausszhou/litegui-components";
+import { Dragger } from "@gausszhou/litegui-components";
 
 describe("Button", () => {
   it("calls the callback and emits click", () => {

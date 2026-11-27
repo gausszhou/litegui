@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { onMounted, onUnmounted, ref } from "vue";
-import { ContextMenu } from "@gausszhou/litegui";
+import { ContextMenu } from "@gausszhou/litegui-components";
 
 const host = ref<HTMLElement>();
 const last = ref("（尚未操作）");

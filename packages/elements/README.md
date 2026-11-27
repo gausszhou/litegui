@@ -1,6 +1,6 @@
 # @gausszhou/litegui-elements
 
-LiteGUI 的可选 **Web Components 适配层**：用 Custom Elements + Shadow DOM 包装 `@gausszhou/litegui` 的类 API，让组件可以在纯 HTML 或任意框架里以标签使用。
+LiteGUI 的可选 **Web Components 适配层**：用 Custom Elements + Shadow DOM 包装 `@gausszhou/litegui-components` 的类 API，让组件可以在纯 HTML 或任意框架里以标签使用。
 
 ```html
 <litegui-button label="保存"></litegui-button>
@@ -18,7 +18,7 @@ LiteGUI 的可选 **Web Components 适配层**：用 Custom Elements + Shadow DO
 ## 安装
 
 ```bash
-pnpm add @gausszhou/litegui @gausszhou/litegui-elements
+pnpm add @gausszhou/litegui-components @gausszhou/litegui-elements
 ```
 
 ```ts

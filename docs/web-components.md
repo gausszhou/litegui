@@ -1,6 +1,6 @@
 # Web Components
 
-`@gausszhou/litegui-elements` 是 LiteGUI 的可选 **Web Components 适配层**：底层仍然是 `@gausszhou/litegui` 的类 API，外层用 Custom Elements + Shadow DOM 包一层，让你可以在任意页面里用标签直接使用组件。
+`@gausszhou/litegui-elements` 是 LiteGUI 的可选 **Web Components 适配层**：底层仍然是 `@gausszhou/litegui-components` 的类 API，外层用 Custom Elements + Shadow DOM 包一层，让你可以在任意页面里用标签直接使用组件。
 
 它适合：
 
@@ -13,7 +13,7 @@
 ## 安装
 
 ```bash
-pnpm add @gausszhou/litegui @gausszhou/litegui-elements
+pnpm add @gausszhou/litegui-components @gausszhou/litegui-elements
 ```
 
 ```ts

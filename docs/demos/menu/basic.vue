@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { onMounted, onUnmounted, ref } from "vue";
-import { Menu } from "@gausszhou/litegui";
+import { Menu } from "@gausszhou/litegui-components";
 
 const host = ref<HTMLElement>();
 const last = ref("（尚未选择）");

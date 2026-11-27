@@ -1,7 +1,7 @@
 /**
  * LiteGUI core：与具体组件无关的基础设施。
  *
- * 组件包 `@gausszhou/litegui` 从这里取
+ * 组件包 `@gausszhou/litegui-components` 从这里取
  * DOM 工具、事件总线、全局状态与 Widget 基类，保证全仓库只有一份 core 实例。
  */
 export * from "./dom";

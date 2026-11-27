@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { Table } from "@gausszhou/litegui";
+import { Table } from "@gausszhou/litegui-components";
 
 function textContents(root: ParentNode, selector: string) {
   return Array.from(root.querySelectorAll(selector)).map((element) => element.textContent);

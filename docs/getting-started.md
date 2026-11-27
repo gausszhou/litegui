@@ -8,7 +8,7 @@ LiteGUI 是一个无框架的 DOM UI 组件库。它不依赖 React/Vue，适合
 - pnpm（品牌版本见根 `package.json` 的 `packageManager`）
 
 > 当前 1.0.1 尚未发布到 npm registry；以下为仓库内开发方式。发布后安装命令为
-> `pnpm add @gausszhou/litegui`。
+> `pnpm add @gausszhou/litegui-components`。
 
 ```bash
 pnpm install
@@ -20,8 +20,8 @@ pnpm dev:editor   # 综合示例 http://127.0.0.1:5174/
 ## 初始化
 
 ```ts
-import LiteGUI from "@gausszhou/litegui";
-import "@gausszhou/litegui/style.css";
+import LiteGUI from "@gausszhou/litegui-components";
+import "@gausszhou/litegui-components/style.css";
 
 LiteGUI.init({
   container: "#app",
@@ -104,21 +104,21 @@ LiteGUI.getTheme(); // "light"
 LiteGUI.init({ container: "#app", theme: "light" });
 ```
 
-主题通过 `<html data-lg-theme="...">` 与 CSS 变量实现，可在 `@gausszhou/litegui/style.css` 之后覆盖 `--lg-color-*` 变量。
+主题通过 `<html data-lg-theme="...">` 与 CSS 变量实现，可在 `@gausszhou/litegui-components/style.css` 之后覆盖 `--lg-color-*` 变量。
 
 ## 按组件引入
 
 ```ts
-import { Button } from "@gausszhou/litegui/button";
-import { Table } from "@gausszhou/litegui/table";
+import { Button } from "@gausszhou/litegui-components/button";
+import { Table } from "@gausszhou/litegui-components/table";
 
-import "@gausszhou/litegui/style.css";
+import "@gausszhou/litegui-components/style.css";
 ```
 
 也可以从主入口按命名导出取组件：
 
 ```ts
-import LiteGUI, { Button, Table } from "@gausszhou/litegui";
+import LiteGUI, { Button, Table } from "@gausszhou/litegui-components";
 ```
 
 可用子路径：`area`、`panel`、`split`、`tabs`、`dialog`、`menu`、`button`、`checkbox`、`slider`、`searchbox`、`list`、`table`、`console`。

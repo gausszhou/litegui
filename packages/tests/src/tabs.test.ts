@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { Tabs } from "@gausszhou/litegui";
+import { Tabs } from "@gausszhou/litegui-components";
 
 describe("Tabs", () => {
   it("mounts tab content and selects the first tab", () => {

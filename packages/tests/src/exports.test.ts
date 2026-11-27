@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import LiteGUI, { Inspector, Tree } from "@gausszhou/litegui";
+import LiteGUI, { Inspector, Tree } from "@gausszhou/litegui-components";
 
 describe("main entry exports", () => {
   it("exposes Inspector and Tree on the LiteGUI namespace", () => {

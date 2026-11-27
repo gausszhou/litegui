@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { onMounted, onUnmounted, ref } from "vue";
-import { Button, Dialog, Panel } from "@gausszhou/litegui";
+import { Button, Dialog, Panel } from "@gausszhou/litegui-components";
 
 const host = ref<HTMLElement>();
 const status = ref("打开中");

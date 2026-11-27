@@ -1,4 +1,4 @@
-import { Menu } from "@gausszhou/litegui/menu";
+import { Menu } from "@gausszhou/litegui-components/menu";
 import { HTMLElementBase, LiteGuiElement } from "../base";
 
 let menuId = 0;

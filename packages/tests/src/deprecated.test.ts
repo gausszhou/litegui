@@ -1,7 +1,7 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { deprecate, resetDeprecationWarnings } from "@gausszhou/litegui-core";
-import { Area } from "@gausszhou/litegui";
-import { Tabs } from "@gausszhou/litegui";
+import { Area } from "@gausszhou/litegui-components";
+import { Tabs } from "@gausszhou/litegui-components";
 
 afterEach(() => {
   resetDeprecationWarnings();

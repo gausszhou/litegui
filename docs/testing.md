@@ -33,7 +33,7 @@ pnpm bench          # Table 基准
 
 ```ts
 import { describe, expect, it, vi } from "vitest";
-import { Button } from "@gausszhou/litegui";
+import { Button } from "@gausszhou/litegui-components";
 
 it("clicks", () => {
   const callback = vi.fn();

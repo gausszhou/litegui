@@ -11,7 +11,7 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@gausszhou/litegui": "workspace:*"
+    "@gausszhou/litegui-components": "workspace:*"
   },
   "devDependencies": {
     "typescript": "^5.8.3",

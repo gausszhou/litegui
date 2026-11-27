@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { Dialog } from "@gausszhou/litegui";
+import { Dialog } from "@gausszhou/litegui-components";
 
 afterEach(() => {
   Dialog.INSTANCE_LIST.length = 0;

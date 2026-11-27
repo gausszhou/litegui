@@ -11,7 +11,7 @@ description: LiteGUI 组件总览与在线示例
 
 ## 实验性组件
 
-`Inspector`、`Tree` 与其他组件一样从 `@gausszhou/litegui` 引入，但 API 不承诺稳定，
+`Inspector`、`Tree` 与其他组件一样从 `@gausszhou/litegui-components` 引入，但 API 不承诺稳定，
 详见[实验性组件](/experimental)。
 
 `ContextMenu`、`Dragger`、`LineEditor`、`ComplexList` 同样标记为 experimental。

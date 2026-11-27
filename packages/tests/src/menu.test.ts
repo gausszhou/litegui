@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { Menu } from "@gausszhou/litegui";
-import { LiteGUI } from "@gausszhou/litegui";
+import { Menu } from "@gausszhou/litegui-components";
+import { LiteGUI } from "@gausszhou/litegui-components";
 
 afterEach(() => {
   LiteGUI.root = document.body;

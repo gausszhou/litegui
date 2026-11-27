@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { onMounted, ref } from "vue";
-import { Button, Console } from "@gausszhou/litegui";
+import { Button, Console } from "@gausszhou/litegui-components";
 
 const host = ref<HTMLElement>();
 const toolbar = ref<HTMLElement>();

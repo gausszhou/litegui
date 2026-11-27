@@ -1,4 +1,4 @@
-import { Dialog } from "@gausszhou/litegui/dialog";
+import { Dialog } from "@gausszhou/litegui-components/dialog";
 import { LiteGuiElement } from "../base";
 
 /**

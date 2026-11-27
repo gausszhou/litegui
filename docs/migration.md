@@ -9,18 +9,18 @@ description: 0.2 到 1.0 的破坏性变更
 
 仓库从单包改为 pnpm monorepo，包名与引入路径随之变化：
 
-| 旧 | 新 |
-| --- | --- |
-| `litegui` | `@gausszhou/litegui` |
-| `litegui/style.css` | `@gausszhou/litegui/style.css` |
-| `litegui/experimental` | `@gausszhou/litegui`（或 `@gausszhou/litegui/<inspector\|tree>`） |
-| `litegui/<component>` | `@gausszhou/litegui/<component>` |
+| 旧                     | 新                                                                                      |
+| ---------------------- | --------------------------------------------------------------------------------------- |
+| `litegui`              | `@gausszhou/litegui-components`                                                         |
+| `litegui/style.css`    | `@gausszhou/litegui-components/style.css`                                               |
+| `litegui/experimental` | `@gausszhou/litegui-components`（或 `@gausszhou/litegui-components/<inspector\|tree>`） |
+| `litegui/<component>`  | `@gausszhou/litegui-components/<component>`                                             |
 
 其他变化：
 
 - 构建产物从根目录 `lib/` 改为各包的 `packages/*/dist`；
 - 仓库脚本从 npm 改为 pnpm（`pnpm build`、`pnpm test` 等），详见[包与导入](/packages)；
-- `@gausszhou/litegui` 新增命名导出（`import LiteGUI, { Table } from "@gausszhou/litegui"`），
+- `@gausszhou/litegui-components` 新增命名导出（`import LiteGUI, { Table } from "@gausszhou/litegui-components"`），
   原有默认导出与子路径引入方式保持不变；
 - UMD 产物仍是自包含单文件，`window.LiteGUI` 用法不变；
 - `Inspector`、`Tree` 不再单独成包：`litegui/experimental` 改为主包的命名导出或
@@ -31,7 +31,7 @@ description: 0.2 到 1.0 的破坏性变更
 0.2 与 1.0.1 的写法都继续可用：
 
 ```ts
-import LiteGUI, { Inspector, Tree } from "@gausszhou/litegui";
+import LiteGUI, { Inspector, Tree } from "@gausszhou/litegui-components";
 
 // 命名导出
 new Inspector();
@@ -42,13 +42,13 @@ new LiteGUI.Inspector();
 new LiteGUI.Tree(data);
 
 // 子路径写法
-// import { Inspector } from "@gausszhou/litegui/inspector";
-// import { Tree } from "@gausszhou/litegui/tree";
+// import { Inspector } from "@gausszhou/litegui-components/inspector";
+// import { Tree } from "@gausszhou/litegui-components/tree";
 ```
 
 拆分历史：1.0.0 曾把 `Inspector`、`Tree` 拆到 `litegui/experimental`，1.0.1 又拆成独立的
 `@gausszhou/litegui-experimental` 包；monorepo 版本取消这次拆分，组件统一放在
-`@gausszhou/litegui`，只保留“API 标记为 experimental”这一层稳定性约定。
+`@gausszhou/litegui-components`，只保留“API 标记为 experimental”这一层稳定性约定。
 
 ## Table 默认转义
 
@@ -65,8 +65,8 @@ new LiteGUI.Table({ columns, allowHTML: true });
 ## 按组件引入
 
 ```ts
-import { Button } from "@gausszhou/litegui/button";
-import { Table } from "@gausszhou/litegui/table";
+import { Button } from "@gausszhou/litegui-components/button";
+import { Table } from "@gausszhou/litegui-components/table";
 ```
 
 ## API 稳定性

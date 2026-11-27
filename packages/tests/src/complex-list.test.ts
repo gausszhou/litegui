@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from "vitest";
-import { ComplexList } from "@gausszhou/litegui";
+import { ComplexList } from "@gausszhou/litegui-components";
 
 describe("ComplexList", () => {
   it("adds titles and items with callbacks", () => {

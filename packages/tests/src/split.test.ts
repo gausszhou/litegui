@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { Split } from "@gausszhou/litegui";
+import { Split } from "@gausszhou/litegui-components";
 
 describe("Split", () => {
   it("creates vertical sections with percentage sizes", () => {

@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { onMounted, ref } from "vue";
-import { ComplexList } from "@gausszhou/litegui";
+import { ComplexList } from "@gausszhou/litegui-components";
 
 const host = ref<HTMLElement>();
 const selected = ref("（未选择）");

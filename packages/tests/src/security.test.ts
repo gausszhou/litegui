@@ -1,8 +1,8 @@
 import { describe, expect, it } from "vitest";
 import { escapeHTML } from "@gausszhou/litegui-core";
-import { Table } from "@gausszhou/litegui";
-import { Menu } from "@gausszhou/litegui";
-import { LiteGUI } from "@gausszhou/litegui";
+import { Table } from "@gausszhou/litegui-components";
+import { Menu } from "@gausszhou/litegui-components";
+import { LiteGUI } from "@gausszhou/litegui-components";
 
 describe("HTML escaping", () => {
   it("escapes the five HTML-sensitive characters", () => {

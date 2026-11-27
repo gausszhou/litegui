@@ -1,5 +1,5 @@
 import { bench, describe } from "vitest";
-import { Table } from "@gausszhou/litegui";
+import { Table } from "@gausszhou/litegui-components";
 
 const rows = Array.from({ length: 1000 }, (_, index) => ({
   id: index,

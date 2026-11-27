@@ -10,8 +10,8 @@ LiteGUI.Tree = Tree;
 
 export { LiteGUI };
 
-// 命名导出便于 `import LiteGUI, { Table } from "@gausszhou/litegui"`；
-// 按组件子路径（`@gausszhou/litegui/table`）仍然可用，适合只要单个组件的场景。
+// 命名导出便于 `import LiteGUI, { Table } from "@gausszhou/litegui-components"`；
+// 按组件子路径（`@gausszhou/litegui-components/table`）仍然可用，适合只要单个组件的场景。
 export { Area } from "./components/Area";
 export { LiteBox } from "./components/Box";
 export { Button } from "./components/Button";

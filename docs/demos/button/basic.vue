@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { onMounted, ref } from "vue";
-import { Button } from "@gausszhou/litegui";
+import { Button } from "@gausszhou/litegui-components";
 
 const host = ref<HTMLElement>();
 const clicks = ref(0);

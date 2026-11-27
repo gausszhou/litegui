@@ -5,14 +5,14 @@ description: Inspector 与 Tree
 
 # 实验性组件
 
-`Inspector` 与 `Tree` 和其余组件一样位于 `@gausszhou/litegui`，从主入口或按组件子路径引入：
+`Inspector` 与 `Tree` 和其余组件一样位于 `@gausszhou/litegui-components`，从主入口或按组件子路径引入：
 
 ```ts
-import { Inspector, Tree } from "@gausszhou/litegui";
+import { Inspector, Tree } from "@gausszhou/litegui-components";
 // 也可以按组件子路径引入
-// import { Inspector } from "@gausszhou/litegui/inspector";
-// import { Tree } from "@gausszhou/litegui/tree";
-import "@gausszhou/litegui/style.css";
+// import { Inspector } from "@gausszhou/litegui-components/inspector";
+// import { Tree } from "@gausszhou/litegui-components/tree";
+import "@gausszhou/litegui-components/style.css";
 
 const inspector = new Inspector();
 inspector.addString("name", "Untitled");

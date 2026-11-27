@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { onMounted, ref } from "vue";
-import { Checkbox } from "@gausszhou/litegui";
+import { Checkbox } from "@gausszhou/litegui-components";
 
 const host = ref<HTMLElement>();
 const checked = ref(true);

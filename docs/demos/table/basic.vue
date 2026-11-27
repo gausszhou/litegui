@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { onMounted, ref } from "vue";
-import { Table } from "@gausszhou/litegui";
+import { Table } from "@gausszhou/litegui-components";
 
 const host = ref<HTMLElement>();
 

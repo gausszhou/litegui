@@ -1,12 +1,12 @@
 import { afterEach, describe, expect, it } from "vitest";
-import { Checkbox } from "@gausszhou/litegui";
-import { Dialog } from "@gausszhou/litegui";
-import { List } from "@gausszhou/litegui";
-import { Menu } from "@gausszhou/litegui";
-import { SearchBox } from "@gausszhou/litegui";
-import { Table } from "@gausszhou/litegui";
-import { Slider } from "@gausszhou/litegui";
-import { Tabs } from "@gausszhou/litegui";
+import { Checkbox } from "@gausszhou/litegui-components";
+import { Dialog } from "@gausszhou/litegui-components";
+import { List } from "@gausszhou/litegui-components";
+import { Menu } from "@gausszhou/litegui-components";
+import { SearchBox } from "@gausszhou/litegui-components";
+import { Table } from "@gausszhou/litegui-components";
+import { Slider } from "@gausszhou/litegui-components";
+import { Tabs } from "@gausszhou/litegui-components";
 import { coreState } from "@gausszhou/litegui-core";
 
 afterEach(() => {

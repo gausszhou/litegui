@@ -17,7 +17,7 @@ LiteGUI 使用 [Semantic Versioning](https://semver.org/)：
 - 组件暴露 `root: HTMLElement`；
 - 值类组件提供 `getValue()` / `setValue()`；
 - 构造函数优先接收 options 对象；
-- 样式通过 `@gausszhou/litegui/style.css` 或子路径 `@gausszhou/litegui/<component>` 引入。
+- 样式通过 `@gausszhou/litegui-components/style.css` 或子路径 `@gausszhou/litegui-components/<component>` 引入。
 
 ## Experimental
 
@@ -27,14 +27,14 @@ LiteGUI 使用 [Semantic Versioning](https://semver.org/)：
 
 以下写法会输出一次性 `console.warn`，并计划在 1.0 前移除或转为正式 API：
 
-| 写法 | 替代 |
-| --- | --- |
-| `new Area(id, options)` | `new Area(options)` |
-| `new Tabs(id, options)` | `new Tabs(options)` |
-| `new Tree(id, data, options)` | `new Tree(data, options)` |
-| `new Inspector(id, options)` | `new Inspector(options)` |
-| `new Dialog(id)` | `new Dialog({ id })` |
-| `dialog.setPositon(x, y)` | `dialog.setPosition(x, y)` |
+| 写法                            | 替代                         |
+| ------------------------------- | ---------------------------- |
+| `new Area(id, options)`         | `new Area(options)`          |
+| `new Tabs(id, options)`         | `new Tabs(options)`          |
+| `new Tree(id, data, options)`   | `new Tree(data, options)`    |
+| `new Inspector(id, options)`    | `new Inspector(options)`     |
+| `new Dialog(id)`                | `new Dialog({ id })`         |
+| `dialog.setPositon(x, y)`       | `dialog.setPosition(x, y)`   |
 | `LiteGUI.craeteDivElement(...)` | `LiteGUI.createElement(...)` |
 
 ## 1.0 前的检查项

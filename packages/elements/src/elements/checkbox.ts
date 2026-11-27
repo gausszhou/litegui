@@ -1,4 +1,4 @@
-import { Checkbox } from "@gausszhou/litegui/checkbox";
+import { Checkbox } from "@gausszhou/litegui-components/checkbox";
 import { LiteGuiElement } from "../base";
 
 /**

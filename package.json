@@ -35,7 +35,7 @@
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
-    "@gausszhou/litegui": "workspace:*",
+    "@gausszhou/litegui-components": "workspace:*",
     "@gausszhou/litegui-core": "workspace:*",
     "@gausszhou/litegui-elements": "workspace:*",
     "eslint": "^10.15.0",

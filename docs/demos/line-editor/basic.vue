@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { onMounted, ref } from "vue";
-import { LineEditor } from "@gausszhou/litegui";
+import { LineEditor } from "@gausszhou/litegui-components";
 
 const host = ref<HTMLElement>();
 

@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from "vitest";
-import { Panel } from "@gausszhou/litegui";
-import { Button } from "@gausszhou/litegui";
+import { Panel } from "@gausszhou/litegui-components";
+import { Button } from "@gausszhou/litegui-components";
 
 describe("Panel", () => {
   it("constructs from an options object", () => {

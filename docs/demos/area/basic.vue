@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { onMounted, ref } from "vue";
-import { Area } from "@gausszhou/litegui";
+import { Area } from "@gausszhou/litegui-components";
 
 const host = ref<HTMLElement>();
 

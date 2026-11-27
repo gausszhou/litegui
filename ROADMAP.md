@@ -55,8 +55,8 @@ v0.1 只承诺 **12 个核心组件**；`Inspector`、`Tree`、`ContextMenu` 等
   - 视觉截图基线与 WebKit 矩阵列入 post-1.0 backlog
 - [x] **Phase 4（2026-11-27）**：monorepo 化
   - pnpm workspace：`packages/{core,litegui,tests}` + `apps/{demo,editor}`
-  - 包名 `@gausszhou/litegui`、`@gausszhou/litegui-core`，`publishConfig` 切换 `src`/`dist`
-  - `Inspector`、`Tree` 不单独拆包：并入 `@gausszhou/litegui`，恢复 `LiteGUI.Inspector/Tree` 静态成员与 `./inspector`、`./tree` 子路径
+  - 包名 `@gausszhou/litegui-components`、`@gausszhou/litegui-core`，`publishConfig` 切换 `src`/`dist`
+  - `Inspector`、`Tree` 不单独拆包：并入 `@gausszhou/litegui-components`，恢复 `LiteGUI.Inspector/Tree` 静态成员与 `./inspector`、`./tree` 子路径
   - 只保留“API 标记 experimental”的稳定性约定，不再维护独立包
   - ESM 外置 core（单一实例），UMD 保持自包含单文件
   - ESLint flat config、Typedoc API、size / verify-umd / verify-pack / pages:build 脚本
@@ -409,7 +409,7 @@ shells/                    # build.sh、gh-pages.sh
 2. **默认分支**：已确认；`master` 保持默认分支，`develop` 作为开发分支，阶段完成后合并到 `master`。
 3. **包名/发布**：已确认使用 `litegui`（registry 当前未占用）；是否发布公共 npm 在 0.1.0 前决定。
 4. **兼容性**：是否必须兼容上游 litegui.js 的旧签名/全局 `LiteGUI` 用法？兼容一个 minor 还是长期保留？
-5. **大组件归属**：`Inspector`/`Tree`/`ContextMenu` 是 v0.1 必须可用，还是允许 experimental 到 0.2？（已决：组件统一留在 `@gausszhou/litegui`，只标记 experimental）
+5. **大组件归属**：`Inspector`/`Tree`/`ContextMenu` 是 v0.1 必须可用，还是允许 experimental 到 0.2？（已决：组件统一留在 `@gausszhou/litegui-components`，只标记 experimental）
 6. **浏览器基线**：只支持现代浏览器（推荐），还是需要兼容旧版/IE？
 7. **投入节奏**：12 周是目标还是上限？是否有其他人可以分担测试/文档？
 

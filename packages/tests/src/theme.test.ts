@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it } from "vitest";
-import { LiteGUI } from "@gausszhou/litegui";
+import { LiteGUI } from "@gausszhou/litegui-components";
 
 afterEach(() => {
   delete document.documentElement.dataset.lgTheme;

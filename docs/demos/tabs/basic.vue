@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { onMounted, ref } from "vue";
-import { Tabs } from "@gausszhou/litegui";
+import { Tabs } from "@gausszhou/litegui-components";
 
 const host = ref<HTMLElement>();
 

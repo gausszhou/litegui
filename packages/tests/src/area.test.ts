@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { Area } from "@gausszhou/litegui";
-import { LiteGUI } from "@gausszhou/litegui";
+import { Area } from "@gausszhou/litegui-components";
+import { LiteGUI } from "@gausszhou/litegui-components";
 
 describe("Area", () => {
   it("creates the expected root and content", () => {

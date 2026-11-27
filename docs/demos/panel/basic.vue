@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { onMounted, ref } from "vue";
-import { Button, Panel } from "@gausszhou/litegui";
+import { Button, Panel } from "@gausszhou/litegui-components";
 
 const host = ref<HTMLElement>();
 const status = ref("待应用");

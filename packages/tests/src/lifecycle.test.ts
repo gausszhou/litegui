@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
-import { Dialog } from "@gausszhou/litegui";
-import { Panel } from "@gausszhou/litegui";
+import { Dialog } from "@gausszhou/litegui-components";
+import { Panel } from "@gausszhou/litegui-components";
 
 describe("lifecycle", () => {
   it("does not leak closed dialogs", () => {

@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { LiteGUI } from "@gausszhou/litegui";
+import { LiteGUI } from "@gausszhou/litegui-components";
 
 function container() {
   const element = document.createElement("div");

@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from "vitest";
-import { Button } from "@gausszhou/litegui";
-import { SearchBox } from "@gausszhou/litegui";
+import { Button } from "@gausszhou/litegui-components";
+import { SearchBox } from "@gausszhou/litegui-components";
 
 describe("test environment", () => {
   it("renders and interacts with a Button", () => {

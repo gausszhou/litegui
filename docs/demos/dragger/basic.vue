@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { onMounted, ref } from "vue";
-import { Dragger } from "@gausszhou/litegui";
+import { Dragger } from "@gausszhou/litegui-components";
 
 const host = ref<HTMLElement>();
 const value = ref(1.5);

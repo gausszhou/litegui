@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from "vitest";
-import { ContextMenu } from "@gausszhou/litegui";
+import { ContextMenu } from "@gausszhou/litegui-components";
 
 describe("ContextMenu", () => {
   it("renders items and invokes the item callback", () => {

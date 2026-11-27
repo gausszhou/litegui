@@ -14,7 +14,7 @@
     "typecheck": "tsc -p tsconfig.json --noEmit"
   },
   "dependencies": {
-    "@gausszhou/litegui": "workspace:*",
+    "@gausszhou/litegui-components": "workspace:*",
     "@gausszhou/litegui-core": "workspace:*",
     "@gausszhou/litegui-elements": "workspace:*"
   },

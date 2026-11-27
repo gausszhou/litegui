@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from "vitest";
-import { Slider } from "@gausszhou/litegui";
+import { Slider } from "@gausszhou/litegui-components";
 
 describe("Slider", () => {
   it("clamps values and reports changes", () => {

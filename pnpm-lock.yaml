@@ -112,7 +112,7 @@ importers:
       '@eslint/js':
         specifier: ^10.0.1
         version: 10.0.1(eslint@10.15.0(supports-color@7.2.0))
-      '@gausszhou/litegui':
+      '@gausszhou/litegui-components':
         specifier: workspace:*
         version: link:packages/litegui
       '@gausszhou/litegui-core':
@@ -157,7 +157,7 @@ importers:
 
   apps/demo:
     dependencies:
-      '@gausszhou/litegui':
+      '@gausszhou/litegui-components':
         specifier: workspace:*
         version: link:../../packages/litegui
     devDependencies:
@@ -170,7 +170,7 @@ importers:
 
   apps/editor:
     dependencies:
-      '@gausszhou/litegui':
+      '@gausszhou/litegui-components':
         specifier: workspace:*
         version: link:../../packages/litegui
       '@gausszhou/litegui-core':
@@ -199,7 +199,7 @@ importers:
 
   packages/elements:
     dependencies:
-      '@gausszhou/litegui':
+      '@gausszhou/litegui-components':
         specifier: workspace:*
         version: link:../litegui
     devDependencies:
@@ -237,7 +237,7 @@ importers:
 
   packages/tests:
     dependencies:
-      '@gausszhou/litegui':
+      '@gausszhou/litegui-components':
         specifier: workspace:*
         version: link:../litegui
       '@gausszhou/litegui-core':

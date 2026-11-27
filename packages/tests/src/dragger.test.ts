@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { Dragger } from "@gausszhou/litegui";
+import { Dragger } from "@gausszhou/litegui-components";
 
 function key(code: number, name: string) {
   const event = new KeyboardEvent("keydown", { key: name, bubbles: true });

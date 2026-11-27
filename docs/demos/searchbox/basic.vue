@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { onMounted, ref } from "vue";
-import { SearchBox } from "@gausszhou/litegui";
+import { SearchBox } from "@gausszhou/litegui-components";
 
 const host = ref<HTMLElement>();
 const query = ref("");

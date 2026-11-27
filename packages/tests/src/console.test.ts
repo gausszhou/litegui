@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { Console } from "@gausszhou/litegui";
+import { Console } from "@gausszhou/litegui-components";
 
 describe("Console", () => {
   it("adds messages with severity classes and clears them", () => {

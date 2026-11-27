@@ -1,4 +1,4 @@
-import { Button } from "@gausszhou/litegui/button";
+import { Button } from "@gausszhou/litegui-components/button";
 import { LiteGuiElement } from "../base";
 
 export type LiteGuiButtonSize = "default" | "small" | "mini";

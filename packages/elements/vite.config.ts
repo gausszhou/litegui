@@ -24,7 +24,7 @@ export default defineConfig({
         entryName === "index" || entryName === "define" ? `${entryName}.js` : `elements/${entryName}.js`
     },
     rollupOptions: {
-      external: [/^@gausszhou\/litegui(\/.*)?$/],
+      external: [/^@gausszhou\/litegui-components(\/.*)?$/],
       output: { chunkFileNames: "chunks/[name]-[hash].js" }
     }
   }

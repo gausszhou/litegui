@@ -1,5 +1,5 @@
 {
-  "name": "@gausszhou/litegui",
+  "name": "@gausszhou/litegui-components",
   "version": "1.0.1",
   "description": "Framework-free desktop-style Web UI components built on native DOM + TypeScript",
   "type": "module",

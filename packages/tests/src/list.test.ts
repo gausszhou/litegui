@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from "vitest";
-import { List } from "@gausszhou/litegui";
+import { List } from "@gausszhou/litegui-components";
 
 describe("List", () => {
   it("renders string items and selects on click", () => {

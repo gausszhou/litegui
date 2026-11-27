@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { onMounted, ref } from "vue";
-import { Slider } from "@gausszhou/litegui";
+import { Slider } from "@gausszhou/litegui-components";
 
 const host = ref<HTMLElement>();
 const value = ref(0.4);

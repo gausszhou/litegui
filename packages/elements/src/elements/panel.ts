@@ -1,4 +1,4 @@
-import { Panel } from "@gausszhou/litegui/panel";
+import { Panel } from "@gausszhou/litegui-components/panel";
 import { LiteGuiElement } from "../base";
 
 /**

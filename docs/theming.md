@@ -10,7 +10,7 @@ LiteGUI 使用 CSS 变量作为主题 token，默认暗色；在 `<html>` 上设
 ## 切换主题
 
 ```ts
-import LiteGUI from "@gausszhou/litegui";
+import LiteGUI from "@gausszhou/litegui-components";
 
 LiteGUI.setTheme("light");
 LiteGUI.getTheme(); // "light"
@@ -27,18 +27,18 @@ LiteGUI.init({
 
 ## 变量
 
-主题变量定义在 `packages/litegui/src/styles/theme.scss`，构建后位于 `@gausszhou/litegui/style.css`：
+主题变量定义在 `packages/litegui/src/styles/theme.scss`，构建后位于 `@gausszhou/litegui-components/style.css`：
 
-| 变量 | 用途 |
-| --- | --- |
-| `--lg-color-bg` | 页面背景 |
-| `--lg-color-panel` | 面板/对话框背景 |
-| `--lg-color-header` | 标题栏背景 |
-| `--lg-color-text` | 正文文字 |
-| `--lg-color-text-strong` | 高对比文字 |
-| `--lg-color-accent` | 强调色 |
-| `--lg-color-button` | 按钮背景 |
-| `--lg-color-overlay` | 模态遮罩 |
+| 变量                     | 用途            |
+| ------------------------ | --------------- |
+| `--lg-color-bg`          | 页面背景        |
+| `--lg-color-panel`       | 面板/对话框背景 |
+| `--lg-color-header`      | 标题栏背景      |
+| `--lg-color-text`        | 正文文字        |
+| `--lg-color-text-strong` | 高对比文字      |
+| `--lg-color-accent`      | 强调色          |
+| `--lg-color-button`      | 按钮背景        |
+| `--lg-color-overlay`     | 模态遮罩        |
 
 覆盖示例：
 

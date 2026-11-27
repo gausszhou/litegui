@@ -12,7 +12,7 @@ export default defineConfig({
       fileName: () => "index.cjs"
     },
     rollupOptions: {
-      external: [/^@gausszhou\/litegui(\/.*)?$/]
+      external: [/^@gausszhou\/litegui-components(\/.*)?$/]
     }
   }
 });

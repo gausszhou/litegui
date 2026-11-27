@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { onMounted, ref } from "vue";
-import { Split } from "@gausszhou/litegui";
+import { Split } from "@gausszhou/litegui-components";
 
 const host = ref<HTMLElement>();
 

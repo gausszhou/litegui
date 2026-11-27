@@ -1,5 +1,5 @@
 import { beforeAll, describe, expect, it } from "vitest";
-import { LineEditor } from "@gausszhou/litegui";
+import { LineEditor } from "@gausszhou/litegui-components";
 
 beforeAll(() => {
   HTMLCanvasElement.prototype.getContext = (() => ({

@@ -33,8 +33,8 @@ features:
 ## 快速预览
 
 ```ts
-import LiteGUI from "@gausszhou/litegui";
-import "@gausszhou/litegui/style.css";
+import LiteGUI from "@gausszhou/litegui-components";
+import "@gausszhou/litegui-components/style.css";
 
 LiteGUI.init({ container: "#app", menubar: true });
 

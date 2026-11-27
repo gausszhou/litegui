@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { onMounted, ref } from "vue";
-import { LiteBox } from "@gausszhou/litegui";
+import { LiteBox } from "@gausszhou/litegui-components";
 
 const host = ref<HTMLElement>();
 
