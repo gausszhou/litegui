@@ -7,7 +7,7 @@ description: 菜单栏、子菜单与分隔符
 
 菜单用 `"A/B/C"` 路径描述层级，支持分隔符、复选框状态与多级子菜单。子菜单与父项顶部对齐、从父面板右缘展开，空间不足时自动翻转。
 
-<ComponentDemo name="menu/basic" title="菜单栏与二级菜单" height="240px" />
+<ComponentDemo name="menu/basic" title="菜单栏与二级菜单" height="340px" />
 
 <<< @/demos/menu/basic.vue
 

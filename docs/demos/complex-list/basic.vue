@@ -25,6 +25,6 @@ onMounted(() => {
 <template>
   <div class="doc-demo">
     <div ref="host" class="doc-demo-list-host" />
-    <p class="doc-demo-hint">当前选中：{{ selected }}（末尾条目可删除）</p>
+    <p class="doc-demo-hint">当前选中：{{ selected }}</p>
   </div>
 </template>
