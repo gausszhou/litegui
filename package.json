@@ -31,7 +31,9 @@
     "pages:build": "node scripts/build-pages.mjs",
     "remove": "rm -rf packages/*/dist packages/*/node_modules apps/*/node_modules apps/*/dist",
     "docs:styles": "node scripts/build-demo-css.mjs",
-    "elements:styles": "node scripts/build-elements-css.mjs"
+    "elements:styles": "node scripts/build-elements-css.mjs",
+    "dev:blender": "pnpm --filter @gausszhou/litegui-blender dev",
+    "dev:photocraft": "pnpm --filter @gausszhou/litegui-photocraft dev"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",

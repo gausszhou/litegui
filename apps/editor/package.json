@@ -3,7 +3,7 @@
   "version": "0.0.0",
   "private": true,
   "type": "module",
-  "description": "Comprehensive LiteGUI editor-style demo page",
+  "description": "Classic LiteGUI editor layout demo with Blender theme",
   "scripts": {
     "dev": "vite",
     "build": "tsc --noEmit && vite build",

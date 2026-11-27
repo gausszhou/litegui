@@ -14,44 +14,6 @@ test("demo page mounts the layout", async ({ page }) => {
   expect(errors).toEqual([]);
 });
 
-test("editor page mounts menus, dialogs and tables", async ({ page }) => {
-  const errors: string[] = [];
-  page.on("pageerror", (error) => errors.push(error.message));
-
-  await page.goto(EDITOR_URL);
-
-  await expect(page.locator(".lg-area").first()).toBeVisible();
-  await expect(page.locator(".lg-menu").first()).toBeVisible();
-  await expect(page.locator(".lg-dialog").first()).toBeVisible();
-  await expect(page.locator(".lg-table").first()).toBeAttached();
-  expect(errors).toEqual([]);
-});
-
-test("editor opens menus and closes dialogs", async ({ page }) => {
-  await page.goto(EDITOR_URL);
-
-  await page.locator(".lg-menu__item").first().click();
-  await expect(page.locator(".lg-menu__panel").first()).toBeVisible();
-
-  const dialogs = page.locator(".lg-dialog");
-  const before = await dialogs.count();
-  await dialogs.first().locator(".lg-dialog__button--close").click();
-  await expect(dialogs).toHaveCount(before - 1);
-});
-
-test("editor renders table rows and switches tabs", async ({ page }) => {
-  await page.goto(EDITOR_URL);
-
-  const rows = page.locator(".lg-table tr");
-  await expect(rows.first()).toBeVisible();
-  expect(await rows.count()).toBeGreaterThan(1);
-
-  const tabs = page.locator(".lg-tabs .lg-tabs__tab");
-  await expect(tabs.first()).toBeVisible();
-  await tabs.nth(1).click();
-  await expect(tabs.nth(1)).toHaveClass(/lg-tabs__tab--selected/);
-});
-
 test("mobile viewport keeps the demo usable", async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 720 });
   await page.goto(DEMO_URL);

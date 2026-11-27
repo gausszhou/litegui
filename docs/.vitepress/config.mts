@@ -42,6 +42,7 @@ export default defineConfig({
           { text: "快速开始", link: "/getting-started" },
           { text: "包与导入", link: "/packages" },
           { text: "主题", link: "/theming" },
+          { text: "Blender UI 规范", link: "/design/blender-ui" },
           { text: "测试", link: "/testing" }
         ]
       },

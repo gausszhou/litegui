@@ -9,7 +9,7 @@ let rightPanel = null;
 
 window.onload = function () {
   LiteGUI.init();
-  LiteGUI.createMenu();
+  createMenu();
 
   mainarea = new LiteGUI.Area({
     id: "mainarea",

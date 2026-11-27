@@ -1,0 +1,409 @@
+/* Blender-inspired default theme
+ * 默认主题：Blender 4.x 的深色、扁平、低饱和蓝强调色。
+ * 结构参考 docs/design/blender-ui.md；浅色主题通过 data-lg-theme="light" 覆盖。
+ * 尺寸按 Web 可读性放大，不追求 Blender 的 11px 像素级密度。
+ */
+
+:root:not([data-lg-theme="light"]) {
+  --lg-font: "Inter", "Segoe UI", "DejaVu Sans", Roboto, Arial, sans-serif;
+  --lg-font-size: 13px;
+  --lg-font-size-sm: 12px;
+  --lg-color-bg: #1d1d1d;
+  --lg-color-bg-alt: #282828;
+  --lg-color-panel: #2e2e2e;
+  --lg-color-panel-2: #252525;
+  --lg-color-header: #2b2b2b;
+  --lg-color-header-2: #353535;
+  --lg-color-text: #d8d8d8;
+  --lg-color-text-strong: #f0f0f0;
+  --lg-color-text-muted: #9a9a9a;
+  --lg-color-accent: #4772b3;
+  --lg-color-accent-hover: #5885c8;
+  --lg-color-border: #3d3d3d;
+  --lg-color-button: #3d3d3d;
+  --lg-color-button-hover: #4a4a4a;
+  --lg-color-button-text: #e6e6e6;
+  --lg-color-overlay: rgba(0, 0, 0, 0.72);
+  --lg-radius: 3px;
+  --lg-header-height: 30px;
+  --lg-row-height: 26px;
+  --lg-control-height: 26px;
+}
+
+:root:not([data-lg-theme="light"]) body {
+  background: var(--lg-color-bg);
+  color: var(--lg-color-text);
+  font-family: var(--lg-font);
+  font-size: var(--lg-font-size);
+}
+
+:root:not([data-lg-theme="light"]) .lg-app,
+:root:not([data-lg-theme="light"]) .lg-app__wrap,
+:root:not([data-lg-theme="light"]) .lg-app__main {
+  background: var(--lg-color-bg);
+}
+
+/* ---------- panels / dialogs ---------- */
+
+:root:not([data-lg-theme="light"]) .lg-panel,
+:root:not([data-lg-theme="light"]) .lg-dialog {
+  background: var(--lg-color-panel);
+  background-image: none;
+  border: 1px solid var(--lg-color-border);
+  border-radius: var(--lg-radius);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.28);
+}
+
+:root:not([data-lg-theme="light"]) .lg-panel__header,
+:root:not([data-lg-theme="light"]) .lg-dialog__header {
+  height: var(--lg-header-height);
+  min-height: var(--lg-header-height);
+  background: var(--lg-color-header);
+  background-image: none;
+  border-bottom: 1px solid var(--lg-color-border);
+  color: var(--lg-color-text-strong);
+  font-size: var(--lg-font-size);
+}
+
+:root:not([data-lg-theme="light"]) .lg-panel__title,
+:root:not([data-lg-theme="light"]) .lg-dialog__title {
+  font-size: var(--lg-font-size);
+  font-weight: 500;
+  letter-spacing: 0;
+}
+
+:root:not([data-lg-theme="light"]) .lg-panel__content,
+:root:not([data-lg-theme="light"]) .lg-dialog__content {
+  background: var(--lg-color-panel);
+  color: var(--lg-color-text);
+  padding: 8px;
+}
+
+:root:not([data-lg-theme="light"]) .lg-panel__footer,
+:root:not([data-lg-theme="light"]) .lg-dialog__footer {
+  background: var(--lg-color-header);
+  border-top: 1px solid var(--lg-color-border);
+  color: var(--lg-color-text-muted);
+  min-height: var(--lg-row-height);
+}
+
+:root:not([data-lg-theme="light"]) .lg-panel__close,
+:root:not([data-lg-theme="light"]) .lg-dialog__button,
+:root:not([data-lg-theme="light"]) .lg-dialog__button--close {
+  width: 24px;
+  height: 22px;
+  display: inline-grid;
+  place-items: center;
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 2px;
+  color: var(--lg-color-text-muted);
+}
+
+:root:not([data-lg-theme="light"]) .lg-panel__close:hover,
+:root:not([data-lg-theme="light"]) .lg-dialog__button:hover {
+  background: var(--lg-color-header-2);
+  border-color: var(--lg-color-border);
+  color: var(--lg-color-text-strong);
+}
+
+/* ---------- buttons ---------- */
+
+:root:not([data-lg-theme="light"]) .lg-button {
+  min-height: var(--lg-control-height);
+}
+
+:root:not([data-lg-theme="light"]) button.lg-button__control {
+  min-height: var(--lg-control-height);
+  padding: 0 12px;
+  background: var(--lg-color-button);
+  background-image: none;
+  border: 1px solid #4a4a4a;
+  border-radius: var(--lg-radius);
+  color: var(--lg-color-button-text);
+  font-size: var(--lg-font-size);
+  box-shadow: none;
+  text-shadow: none;
+}
+
+:root:not([data-lg-theme="light"]) button.lg-button__control:hover:not(:disabled) {
+  background: var(--lg-color-button-hover);
+  border-color: #5a5a5a;
+}
+
+:root:not([data-lg-theme="light"]) button.lg-button__control:active:not(:disabled),
+:root:not([data-lg-theme="light"]) button.lg-button__control.active {
+  background: var(--lg-color-accent);
+  border-color: var(--lg-color-accent);
+  color: #fff;
+}
+
+:root:not([data-lg-theme="light"]) button.lg-button__control:disabled {
+  opacity: 0.45;
+}
+
+:root:not([data-lg-theme="light"]) button.lg-button__control.lg-button--close {
+  background: transparent;
+  border-color: transparent;
+  min-width: 24px;
+  padding: 0 6px;
+}
+
+/* ---------- inputs ---------- */
+
+:root:not([data-lg-theme="light"]) .lg-input,
+:root:not([data-lg-theme="light"]) .lg-searchbox {
+  min-height: var(--lg-control-height);
+  background: #1d1d1d;
+  border: 1px solid var(--lg-color-border);
+  border-radius: var(--lg-radius);
+}
+
+:root:not([data-lg-theme="light"]) .lg-input__field,
+:root:not([data-lg-theme="light"]) .lg-searchbox__input,
+:root:not([data-lg-theme="light"]) input.lg-input__field {
+  height: var(--lg-control-height);
+  padding: 0 8px;
+  background: #1d1d1d;
+  border: 0;
+  color: #e6e6e6;
+  font-size: var(--lg-font-size);
+  outline: 0;
+}
+
+:root:not([data-lg-theme="light"]) .lg-input:focus-within,
+:root:not([data-lg-theme="light"]) .lg-searchbox:focus-within {
+  border-color: var(--lg-color-accent);
+  box-shadow: 0 0 0 1px rgba(71, 114, 179, 0.35);
+}
+
+:root:not([data-lg-theme="light"]) .lg-checkbox {
+  width: 18px;
+  height: 18px;
+}
+
+:root:not([data-lg-theme="light"]) .lg-checkbox__flag {
+  width: 18px;
+  height: 18px;
+  background: #1d1d1d;
+  border: 1px solid #555;
+  border-radius: 3px;
+  color: #fff;
+}
+
+:root:not([data-lg-theme="light"]) .lg-checkbox--on .lg-checkbox__flag {
+  background: var(--lg-color-accent);
+  border-color: var(--lg-color-accent);
+}
+
+/* ---------- menus ---------- */
+
+:root:not([data-lg-theme="light"]) .lg-menu {
+  background: transparent;
+}
+
+:root:not([data-lg-theme="light"]) .lg-menu > .lg-menu__list,
+:root:not([data-lg-theme="light"]) .lg-menu__list {
+  background: var(--lg-color-header);
+  border: 1px solid var(--lg-color-border);
+  border-radius: var(--lg-radius);
+  box-shadow: none;
+}
+
+:root:not([data-lg-theme="light"]) .lg-menu__item {
+  height: 28px;
+  padding: 0 9px;
+  color: var(--lg-color-text);
+  font-size: var(--lg-font-size);
+}
+
+:root:not([data-lg-theme="light"]) .lg-menu__item:hover,
+:root:not([data-lg-theme="light"]) .lg-menu__item.lg-menu__item--active {
+  background: var(--lg-color-header-2);
+}
+
+:root:not([data-lg-theme="light"]) .lg-menu__panel {
+  background: #282828;
+  border: 1px solid #4a4a4a;
+  border-radius: var(--lg-radius);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6);
+  padding: 4px 0;
+}
+
+:root:not([data-lg-theme="light"]) .lg-menu__panel-item {
+  height: 26px;
+  padding: 0 12px;
+  color: var(--lg-color-text);
+  font-size: var(--lg-font-size);
+}
+
+:root:not([data-lg-theme="light"]) .lg-menu__panel-item:hover {
+  background: var(--lg-color-accent);
+  color: #fff;
+}
+
+:root:not([data-lg-theme="light"]) .lg-menu__panel-item.lg-menu__panel-item--separator {
+  height: 1px;
+  background: var(--lg-color-border);
+  margin: 4px 0;
+}
+
+/* ---------- tabs ---------- */
+
+:root:not([data-lg-theme="light"]) .lg-tabs {
+  background: var(--lg-color-panel);
+}
+
+:root:not([data-lg-theme="light"]) .lg-tabs__list {
+  background: var(--lg-color-header);
+  border-bottom: 1px solid var(--lg-color-border);
+  min-height: 30px;
+}
+
+:root:not([data-lg-theme="light"]) .lg-tabs__tab {
+  height: 30px;
+  padding: 0 12px;
+  color: var(--lg-color-text-muted);
+  border-right: 1px solid transparent;
+  font-size: var(--lg-font-size);
+}
+
+:root:not([data-lg-theme="light"]) .lg-tabs__tab:hover {
+  color: var(--lg-color-text);
+  background: #333;
+}
+
+:root:not([data-lg-theme="light"]) .lg-tabs__tab.lg-tabs__tab--selected {
+  color: var(--lg-color-text-strong);
+  background: var(--lg-color-panel);
+  border-bottom: 2px solid var(--lg-color-accent);
+}
+
+/* ---------- trees / lists ---------- */
+
+:root:not([data-lg-theme="light"]) .lg-list {
+  background: #282828;
+  border: 1px solid var(--lg-color-border);
+  border-radius: var(--lg-radius);
+}
+
+:root:not([data-lg-theme="light"]) .lg-list__item {
+  min-height: 26px;
+  padding: 2px 8px;
+  color: var(--lg-color-text);
+  font-size: var(--lg-font-size);
+}
+
+:root:not([data-lg-theme="light"]) .lg-list__item:hover {
+  background: #333;
+}
+
+:root:not([data-lg-theme="light"]) .lg-list__item.lg-is-selected {
+  background: var(--lg-color-accent);
+  color: #fff;
+}
+
+:root:not([data-lg-theme="light"]) .lg-list__item.lg-is-selected::after,
+:root:not([data-lg-theme="light"]) .lg-list__item.lg-is-selected::before {
+  display: none;
+}
+
+:root:not([data-lg-theme="light"]) .lg-complex-list {
+  background: #282828;
+  border: 1px solid var(--lg-color-border);
+  border-radius: var(--lg-radius);
+}
+
+:root:not([data-lg-theme="light"]) .lg-complex-list__item {
+  background: #2e2e2e;
+  border: 1px solid var(--lg-color-border);
+  color: var(--lg-color-text);
+}
+
+/* ---------- tables ---------- */
+
+:root:not([data-lg-theme="light"]) .lg-table {
+  background: #282828;
+  color: var(--lg-color-text);
+  font-size: var(--lg-font-size-sm);
+}
+
+:root:not([data-lg-theme="light"]) .lg-table th {
+  background: #353535;
+  color: #c8c8c8;
+  border-right: 1px solid var(--lg-color-border);
+  border-bottom: 1px solid var(--lg-color-border);
+  padding: 6px 8px;
+  font-weight: 500;
+}
+
+:root:not([data-lg-theme="light"]) .lg-table td {
+  border-right: 1px solid #333;
+  border-bottom: 1px solid #333;
+  padding: 5px 8px;
+}
+
+:root:not([data-lg-theme="light"]) .lg-table tr:nth-child(even) {
+  background: rgba(255, 255, 255, 0.025);
+}
+
+:root:not([data-lg-theme="light"]) .lg-table tr:hover {
+  background: rgba(71, 114, 179, 0.14);
+}
+
+/* ---------- console ---------- */
+
+:root:not([data-lg-theme="light"]) .lg-console {
+  background: #151515;
+  border: 1px solid var(--lg-color-border);
+  border-radius: var(--lg-radius);
+  color: #c8c8c8;
+  font: 12px/1.55 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+}
+
+:root:not([data-lg-theme="light"]) .lg-console__footer {
+  background: #252525;
+  border-top: 1px solid var(--lg-color-border);
+}
+
+:root:not([data-lg-theme="light"]) .lg-console__message--warn { color: #d8b04a; }
+:root:not([data-lg-theme="light"]) .lg-console__message--error { color: #d86a6a; }
+:root:not([data-lg-theme="light"]) .lg-console__message--me { color: #7fa7d8; }
+
+/* ---------- dialog ---------- */
+
+:root:not([data-lg-theme="light"]) .lg-dialog {
+  min-width: 280px;
+}
+
+:root:not([data-lg-theme="light"]) .lg-dialog__buttons {
+  background: var(--lg-color-header);
+  border-bottom: 1px solid var(--lg-color-border);
+}
+
+:root:not([data-lg-theme="light"]) .lg-dialog__footer .lg-button__control {
+  min-width: 72px;
+}
+
+/* ---------- areas / split ---------- */
+
+:root:not([data-lg-theme="light"]) .lg-area {
+  background: var(--lg-color-bg);
+}
+
+:root:not([data-lg-theme="light"]) .lg-area__splitbar,
+:root:not([data-lg-theme="light"]) .lg-split__splitbar {
+  background: var(--lg-color-border);
+}
+
+:root:not([data-lg-theme="light"]) .lg-area__splitbar:hover,
+:root:not([data-lg-theme="light"]) .lg-split__splitbar:hover {
+  background: var(--lg-color-accent);
+}
+
+/* ---------- light theme keeps readable neutral surfaces ---------- */
+
+:root[data-lg-theme="light"] body {
+  font-family: var(--lg-font);
+  font-size: 13px;
+}
