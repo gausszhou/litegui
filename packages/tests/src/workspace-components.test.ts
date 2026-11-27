@@ -41,7 +41,7 @@ describe("HeaderBar", () => {
     expect(bar.left.textContent).toContain("Left");
     expect(bar.center.innerHTML).toContain("<b>Mid</b>");
     bar.setTitle("Title", "<svg></svg>", "tip");
-    expect(bar.titleElement.textContent).toContain("Title");
+    expect(bar.root.querySelector(".lg-header-bar__title")?.textContent).toContain("Title");
     expect(bar.root.querySelector(".lg-header-bar__title svg")).not.toBeNull();
     bar.addLeft(document.createElement("i"));
     expect(bar.left.querySelector("i")).not.toBeNull();
@@ -91,7 +91,7 @@ describe("Toolbar", () => {
     bar.setActive("missing");
     expect(bar.getActive()).toBe("rotate");
     bar.setTitle("More");
-    expect(bar.titleElement.textContent).toBe("More");
+    expect(bar.root.querySelector(".lg-toolbar__title")?.textContent).toBe("More");
   });
 });
 
