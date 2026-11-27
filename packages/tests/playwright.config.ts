@@ -1,9 +1,10 @@
 import { defineConfig, devices } from "@playwright/test";
 
-// demo 与 editor 现在各自是独立 app，分别起一个 dev server。
-const DEMO_URL = process.env.LITEGUI_DEMO_URL ?? "http://127.0.0.1:5173/";
+// coder / editor / blender / photocraft 各自是独立 app，分别起 dev server。
+const CODER_URL = process.env.LITEGUI_CODER_URL ?? "http://127.0.0.1:5173/";
 const EDITOR_URL = process.env.LITEGUI_EDITOR_URL ?? "http://127.0.0.1:5174/";
 const BLENDER_URL = process.env.LITEGUI_BLENDER_URL ?? "http://127.0.0.1:5175/";
+const PHOTOCRAFT_URL = process.env.LITEGUI_PHOTOCRAFT_URL ?? "http://127.0.0.1:5176/";
 const DOCS_URL = process.env.LITEGUI_DOCS_URL ?? "http://127.0.0.1:5178/litegui/docs/";
 
 export default defineConfig({
@@ -17,8 +18,8 @@ export default defineConfig({
   },
   webServer: [
     {
-      command: "pnpm --filter @gausszhou/litegui-demo dev",
-      url: DEMO_URL,
+      command: "pnpm --filter @gausszhou/litegui-coder dev",
+      url: CODER_URL,
       reuseExistingServer: true,
       timeout: 120_000,
     },
@@ -31,6 +32,12 @@ export default defineConfig({
     {
       command: "pnpm --filter @gausszhou/litegui-blender dev",
       url: BLENDER_URL,
+      reuseExistingServer: true,
+      timeout: 120_000,
+    },
+    {
+      command: "pnpm --filter @gausszhou/litegui-photocraft dev",
+      url: PHOTOCRAFT_URL,
       reuseExistingServer: true,
       timeout: 120_000,
     },

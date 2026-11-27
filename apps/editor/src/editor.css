@@ -1,0 +1,132 @@
+/* apps/editor 布局样式
+ *
+ * 这里只负责“壳”的布局：视口铺满、顶栏高度、Area 分区比例、dock 面板内部滚动。
+ * 组件的外观（颜色、字体、边框、圆角、强调色，以及 Inspector / Tree / Table 的
+ * 内部排版）全部来自 packages/components 默认的 Blender 深色主题，此处不重复定义。
+ */
+
+/* ---------- 1. 页面铺满视口 ---------- */
+
+html,
+body,
+#app {
+	height: 100%;
+	margin: 0;
+	padding: 0;
+}
+
+html,
+body {
+	overflow: hidden;
+}
+
+#app {
+	position: relative;
+}
+
+/* LiteGUI.init({ wrapped: true }) 生成的根节点 */
+.lg-app {
+	width: 100%;
+	height: 100%;
+	overflow: hidden;
+}
+
+.lg-app__main {
+	width: 100%;
+	height: 100%;
+	overflow: hidden;
+}
+
+/* ---------- 2. 顶部主菜单固定 30px ---------- */
+
+.lg-app__main > .lg-menu {
+	height: 30px;
+}
+
+.lg-app__main > .lg-menu > .lg-menu__list {
+	height: 30px;
+	margin: 0;
+	padding: 0;
+}
+
+.lg-app__main > .lg-menu > .lg-menu__list > .lg-menu__item {
+	height: 30px;
+	line-height: 30px;
+}
+
+/* ---------- 3. Area 分区 ---------- */
+
+/* 横向分割的两个 section 是 inline-block，用 top 对齐避免基线错位 */
+.lg-area > .lg-area,
+.lg-area > .lg-area__splitbar {
+	vertical-align: top;
+}
+
+/* ---------- 4. dock 面板：没有 footer 内容时不要白占 26px ---------- */
+
+.editor-sidepanel > .lg-panel__footer:empty,
+.editor-bottompanel > .lg-panel__footer:empty {
+	display: none;
+}
+
+/* ---------- 5. 主画布 ---------- */
+
+#canvasarea {
+	overflow: hidden;
+}
+
+#canvasarea > canvas {
+	display: block;
+	width: 100%;
+	height: 100%;
+}
+
+/* ---------- 6. 右侧面板：Tabs 在上、Inspector 在下，各自内部滚动 ---------- */
+
+.editor-sidepanel > .lg-panel__content {
+	display: flex;
+	flex-direction: column;
+	gap: 6px;
+	overflow: hidden;
+}
+
+.editor-sidepanel .editor-tabs {
+	flex: 0 0 45%;
+	min-height: 0;
+	display: flex;
+	flex-direction: column;
+	overflow: hidden;
+}
+
+.editor-sidepanel .editor-tabs > .lg-tabs__list {
+	flex: 0 0 auto;
+}
+
+/* 标签内容区（Info / Tree / Extra）：占满剩余高度并独立滚动 */
+.editor-sidepanel .editor-tabs > .lg-tabs__panel {
+	display: block;
+	flex: 1 1 auto;
+	min-height: 0;
+	overflow: auto;
+}
+
+.editor-sidepanel .editor-inspector {
+	flex: 1 1 0;
+	min-height: 0;
+	overflow-x: hidden;
+	overflow-y: auto;
+}
+
+/* ---------- 7. Dialog：内容区按 30px 标题栏计算高度，底部由主题的 padding 留出 footer ---------- */
+
+#app .lg-dialog > .lg-dialog__content {
+	height: calc(100% - var(--lg-header-height, 30px)) !important;
+	overflow: auto;
+}
+
+/* ---------- 8. 下拉菜单：与 apps/blender 的 .be-popup 对齐（其余样式来自组件主题） ---------- */
+
+/* 子菜单用右侧 + 标记即可，去掉整列竖线 */
+#app .lg-menu__panel-item--has-submenu {
+	border-right: 0;
+}

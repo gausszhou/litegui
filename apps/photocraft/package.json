@@ -1,9 +1,9 @@
 {
-  "name": "@gausszhou/litegui-demo",
+  "name": "@gausszhou/litegui-photocraft",
   "version": "0.0.0",
   "private": true,
   "type": "module",
-  "description": "Minimal LiteGUI demo page",
+  "description": "Affinity Photo-style image editor mock built with LiteGUI",
   "scripts": {
     "dev": "vite",
     "build": "tsc --noEmit && vite build",

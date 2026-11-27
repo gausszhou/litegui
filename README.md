@@ -4,7 +4,7 @@
 
 LiteGUI 面向编辑器、调试器、工具台这类需要菜单、面板、分栏、对话框、属性检查器、树和表格的 Web 应用。项目从 [jagenjo/litegui.js](https://github.com/jagenjo/litegui.js)（MIT）重构而来，并拆分为「core + 组件库 + 示例应用 + 文档站」的 pnpm monorepo。
 
-- 在线 Demo：https://gausszhou.github.io/litegui/demo/
+- 在线 Demo：https://gausszhou.github.io/litegui/coder/
 - 在线 Editor：https://gausszhou.github.io/litegui/editor/
 - 文档：https://gausszhou.github.io/litegui/docs/
 - 路线图：[ROADMAP.md](./ROADMAP.md)
@@ -29,7 +29,7 @@ LiteGUI 面向编辑器、调试器、工具台这类需要菜单、面板、分
 | `packages/components` | `@gausszhou/litegui-components`：全部 20 个组件（含 `Inspector`、`Tree`）、`LiteGUI` 命名空间、15 个按组件入口、全局样式          |
 | `packages/elements`   | `@gausszhou/litegui-elements`：Web Components 适配层（Custom Elements + Shadow DOM），当前覆盖 Button / Checkbox / Panel / Dialog |
 | `packages/tests`      | 私有：Vitest + jsdom、Playwright、Table 基准                                                                                      |
-| `apps/demo`           | 最小示例页                                                                                                                        |
+| `apps/coder`          | VS Code 风格代码编辑器                                                                                                                        |
 | `apps/editor`         | 综合示例：工具台、菜单、对话框、表格、树                                                                                          |
 | `docs`                | VitePress 文档站；`docs:api` 由 Typedoc 生成 API 参考                                                                             |
 | `scripts`             | 体积报告、UMD / tarball 校验、Pages 构建                                                                                          |

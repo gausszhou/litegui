@@ -5,10 +5,10 @@ export default defineConfig({
   server: {
     host: "127.0.0.1",
     port: 5173,
-    strictPort: true,
+    strictPort: true
   },
   build: {
-    outDir: "../../dist/demo",
-    emptyOutDir: true,
-  },
+    outDir: "../../dist/coder",
+    emptyOutDir: true
+  }
 });

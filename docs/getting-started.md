@@ -137,4 +137,4 @@ pnpm verify-pack     # 校验发布会话中的 tarball 内容
 pnpm docs:dev        # 文档站
 ```
 
-库产物在各包的 `dist/`，示例页面在根目录 `dist/demo` 与 `dist/editor`。
+库产物在各包的 `dist/`，示例页面在根目录 `dist/coder`、`dist/editor`、`dist/blender` 与 `dist/photocraft`。

@@ -1,6 +1,15 @@
 // @ts-nocheck
 import "@gausszhou/litegui-components/style.css";
 import "./editor.css";
+import {
+  HeaderBar,
+  StatusBar,
+  Timeline,
+  Toolbar,
+  NodeEditor,
+  TextEditor,
+  ImageEditor
+} from "@gausszhou/litegui-components";
 import { Viewport, type SceneObject, type Vec3 } from "./viewport";
 
 const icons: Record<string, string> = {
@@ -32,19 +41,15 @@ const icons: Record<string, string> = {
   data: '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor"><path d="M3 3h10v3H3zM3 8h10v3H3zM3 13h10"/></svg>',
   material: '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor"><circle cx="8" cy="8" r="6"/><path d="M5 6c2 1 4 1 6 0M5 10c2-1 4-1 6 0"/></svg>',
   texture: '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor"><path d="M2 2h12v12H2z"/><path d="M2 6c2 0 2-2 4-2s2 2 4 2 2-2 4-2M2 10c2 0 2 2 4 2s2-2 4-2 2 2 4 2"/></svg>',
-  play: '<svg viewBox="0 0 16 16" fill="currentColor"><path d="M4 2l9 6-9 6z"/></svg>',
-  pause: '<svg viewBox="0 0 16 16" fill="currentColor"><path d="M4 2h3v12H4zM9 2h3v12H9z"/></svg>',
-  start: '<svg viewBox="0 0 16 16" fill="currentColor"><path d="M4 2h2v12H4zM14 2L6 8l8 6z"/></svg>',
-  end: '<svg viewBox="0 0 16 16" fill="currentColor"><path d="M10 2h2v12h-2zM2 2l8 6-8 6z"/></svg>',
-  prev: '<svg viewBox="0 0 16 16" fill="currentColor"><path d="M11 2L3 8l8 6z"/></svg>',
-  next: '<svg viewBox="0 0 16 16" fill="currentColor"><path d="M5 2l8 6-8 6z"/></svg>',
   magnet: '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor"><path d="M4 2v6a4 4 0 0 0 8 0V2M4 6h4M12 6H8"/></svg>',
   overlay: '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor"><circle cx="8" cy="8" r="5"/><path d="M8 1v14M1 8h14"/></svg>',
   wire: '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor"><path d="M8 1l6 3.5v7L8 15 2 11.5v-7z"/><path d="M2 4.5L8 8l6-3.5M8 8v7"/></svg>',
   solid: '<svg viewBox="0 0 16 16" fill="currentColor"><path d="M8 1l6 3.5v7L8 15 2 11.5v-7z"/></svg>',
   materialShade: '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor"><circle cx="8" cy="8" r="6"/><path d="M8 2v12M2 8h12"/></svg>',
   rendered: '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor"><rect x="1" y="2" width="14" height="10"/><path d="M1 9l4-3 3 3 2-2 5 4"/></svg>',
-  script: '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor"><path d="M5 3L1 8l4 5M11 3l4 5-4 5M9 2L7 14"/></svg>'
+  script: '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor"><path d="M5 3L1 8l4 5M11 3l4 5-4 5M9 2L7 14"/></svg>',
+  nodes: '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor"><rect x="1" y="3" width="5" height="4"/><rect x="10" y="9" width="5" height="4"/><path d="M6 5h2a2 2 0 0 1 2 2v4"/></svg>',
+  brush: '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor"><path d="M9 2l5 5-7 7H2v-5z"/><path d="M7 4l5 5"/></svg>'
 };
 
 function icon(name: string, size = 14): string {
@@ -55,34 +60,48 @@ const app = document.querySelector<HTMLDivElement>("#app");
 if (!app) throw new Error("#app missing");
 
 app.innerHTML = `
-  <div class="be-app lg-theme-blender">
-    <header class="be-topbar">
-      <div class="be-brand" title="Blender">${icon("blender", 18)}</div>
-      <div class="be-menubar" id="menubar"></div>
-      <div class="be-workspace-tabs" id="workspaces"></div>
-      <div class="be-top-right">
-        <button class="be-scene-btn" id="scene-btn"><span class="be-dot"></span>Scene <span>▾</span></button>
-        <button class="be-scene-btn" id="viewlayer-btn">ViewLayer <span>▾</span></button>
-      </div>
-    </header>
+  <div class="be-app lg-theme-blender" data-workspace="layout">
+    <div id="topbar-slot"></div>
 
     <div class="be-main">
-      <div class="be-workspace">
-        <div class="be-area">
-          <div class="be-area-header" id="viewport-header"></div>
+      <div class="be-workspace" id="workspace">
+        <section class="be-region be-region--viewport" id="viewport-region">
+          <div id="viewport-header-slot"></div>
           <div class="be-viewport-slot" id="viewport-slot"></div>
-          <div class="be-editor-overlay" id="editor-overlay" hidden></div>
-        </div>
+          <div class="be-toolbar-slot" id="toolbar-slot"></div>
+          <aside class="be-sidebar hidden" id="viewport-sidebar"></aside>
+        </section>
+
+        <section class="be-region be-region--uv" id="uv-region">
+          <div class="be-region-fill" id="uv-editor-slot"></div>
+        </section>
+
+        <section class="be-region be-region--nodes" id="nodes-region">
+          <div id="nodes-header-slot"></div>
+          <div class="be-region-fill" id="node-editor-slot"></div>
+        </section>
+
+        <section class="be-region be-region--render" id="render-region">
+          <div class="be-region-fill" id="render-editor-slot"></div>
+        </section>
+
+        <section class="be-region be-region--preview" id="preview-region">
+          <div class="be-region-fill" id="preview-editor-slot"></div>
+        </section>
+
+        <section class="be-region be-region--script" id="script-region">
+          <div class="be-region-fill" id="script-editor-slot"></div>
+        </section>
       </div>
 
       <div class="be-resizer" id="right-resizer" title="Resize Areas"></div>
 
-      <div class="be-right">
+      <div class="be-right" id="right-column">
         <section class="be-outliner">
           <div class="be-panel-header">
             ${icon("layers", 14)}
-            <span style="color:#d8d8d8">Outliner</span>
-            <select class="be-select" id="outliner-mode" style="width:96px;height:24px;flex:0 0 96px"><option>View Layer</option><option>Scenes</option><option>Data API</option></select>
+            <span class="be-panel-title">Outliner</span>
+            <select class="be-select" id="outliner-mode" style="width:92px;height:24px;flex:0 0 92px"><option>View Layer</option><option>Scenes</option><option>Data API</option></select>
             <input class="be-search" id="outliner-search" placeholder="Search" />
             ${icon("eye", 13)}
           </div>
@@ -96,52 +115,19 @@ app.innerHTML = `
       </div>
     </div>
 
-    <div class="be-timeline">
-      <div class="be-timeline-header" id="timeline-header"></div>
-      <div class="be-timeline-body"><canvas class="be-timeline-canvas" id="timeline-canvas"></canvas></div>
-    </div>
-
-    <div class="be-statusbar">
-      <div class="be-status-left" id="status-left">Select with Left Mouse</div>
-      <div class="be-status-right">
-        <span id="status-stats">Objects: 3 | Verts: 8 | Faces: 6</span>
-        <span class="accent">LiteGUI 4.5.17</span>
-      </div>
-    </div>
+    <div class="be-timeline-slot" id="timeline-slot"></div>
+    <div id="statusbar-slot"></div>
   </div>
 `;
 
+/* ------------------------------------------------------------------ */
+/* data + state                                                        */
+/* ------------------------------------------------------------------ */
+
 const objects: SceneObject[] = [
-  {
-    id: "Camera",
-    name: "Camera",
-    type: "camera",
-    loc: [-6.8, -4.6, 4.2],
-    rot: [0, 0, 0],
-    scale: [1, 1, 1],
-    visible: true,
-    selectable: true
-  },
-  {
-    id: "Cube",
-    name: "Cube",
-    type: "mesh",
-    loc: [0, 0, 1],
-    rot: [0, 0, 0],
-    scale: [1, 1, 1],
-    visible: true,
-    selectable: true
-  },
-  {
-    id: "Light",
-    name: "Light",
-    type: "light",
-    loc: [3.8, -1.5, 5.0],
-    rot: [0, 0, 0],
-    scale: [1, 1, 1],
-    visible: true,
-    selectable: true
-  }
+  { id: "Camera", name: "Camera", type: "camera", loc: [-6.8, -4.6, 4.2], rot: [0, 0, 0], scale: [1, 1, 1], visible: true, selectable: true },
+  { id: "Cube", name: "Cube", type: "mesh", loc: [0, 0, 1], rot: [0, 0, 0], scale: [1, 1, 1], visible: true, selectable: true },
+  { id: "Light", name: "Light", type: "light", loc: [3.8, -1.5, 5.0], rot: [0, 0, 0], scale: [1, 1, 1], visible: true, selectable: true }
 ];
 
 const workspaces = [
@@ -185,92 +171,143 @@ let toolbarOpen = true;
 let snap = false;
 let shading: "wireframe" | "solid" | "material" | "rendered" = "solid";
 let frame = 1;
-let frameStart = 1;
-let frameEnd = 250;
 let playing = false;
-let playTimer = 0;
 let statusTimer = 0;
 let statusText = "Select with Left Mouse";
-let transformMode: "translate" | "rotate" | "scale" | null = null;
-let history: Array<{ id: string; loc: Vec3; rot: Vec3; scale: Vec3 }> = [];
-let future: typeof history = [];
-let keyframes: number[] = [1, 60, 120];
-let viewport: Viewport;
 let popup: HTMLElement | null = null;
+let popupAnchor: HTMLElement | null = null;
+let viewport: Viewport;
+let timeline: Timeline;
+let statusBar: StatusBar;
+let viewportHeader: HeaderBar;
+let nodesHeader: HeaderBar;
+let toolbar: Toolbar;
+let textEditor: TextEditor;
+let uvEditor: ImageEditor;
+let renderEditor: ImageEditor;
+let previewEditor: ImageEditor;
+let shadingEditor: NodeEditor;
+let compositingEditor: NodeEditor;
+let geometryEditor: NodeEditor;
+
+const appEl = document.querySelector<HTMLElement>(".be-app")!;
+const workspaceEl = document.querySelector<HTMLElement>("#workspace")!;
+const rightColumn = document.querySelector<HTMLElement>("#right-column")!;
+const mainEl = document.querySelector<HTMLElement>(".be-main")!;
+const sidebar = document.querySelector<HTMLElement>("#viewport-sidebar")!;
+
+const isNodeWorkspace = () => ["Shading", "Compositing", "Geometry Nodes"].includes(currentWorkspace);
+const hasViewport = () => ["Layout", "Modeling", "Sculpting", "UV Editing", "Texture Paint", "Shading", "Animation", "Geometry Nodes"].includes(currentWorkspace);
 
 function selectedObject(): SceneObject | undefined {
   return objects.find((object) => object.id === selectedId);
 }
 
+function slug(name: string) {
+  return name.toLowerCase().replace(/\s+/g, "-");
+}
+
+/* ------------------------------------------------------------------ */
+/* status + stats                                                      */
+/* ------------------------------------------------------------------ */
+
+const statusBarEl = new StatusBar({
+  id: "statusbar",
+  className: "be-statusbar",
+  left: "Select with Left Mouse",
+  accent: "LiteGUI 4.5.17"
+});
+statusBar = statusBarEl;
+statusBar.leftElement.id = "status-left";
+document.querySelector("#statusbar-slot")!.appendChild(statusBar.root);
+
+const statsEl = document.createElement("span");
+statsEl.className = "lg-status-bar__item";
+statsEl.id = "status-stats";
+statusBar.rightElement.insertBefore(statsEl, statusBar.rightElement.lastElementChild);
+
 function setStatus(text: string, timeout = 0) {
   statusText = text;
-  const el = document.querySelector<HTMLElement>("#status-left");
-  if (el) el.textContent = text;
+  statusBar.setLeft(text);
   if (statusTimer) window.clearTimeout(statusTimer);
   if (timeout) {
+    const expected = text;
     statusTimer = window.setTimeout(() => {
+      if (statusText !== expected) return;
       statusText = defaultHint();
-      const current = document.querySelector<HTMLElement>("#status-left");
-      if (current) current.textContent = statusText;
+      statusBar.setLeft(statusText);
     }, timeout);
   }
 }
 
 function defaultHint(): string {
-  if (currentMode === "Edit Mode") return "Tab: Object Mode | 1/2/3: Vertex/Edge/Face";
-  return "Select with Left Mouse | G/R/S: Transform | Tab: Edit Mode | N: Sidebar";
+  if (currentWorkspace === "Scripting") return "Ctrl+Enter: Run Script · Tab: Indent · Tabs: Text/Console";
+  if (isNodeWorkspace()) return "Drag nodes · Drag a port to connect · Delete: remove node · Wheel: N/A";
+  if (currentMode === "Edit Mode") return "Tab: Object Mode · 1/2/3: Vertex/Edge/Face · G/R/S: Transform";
+  return "Select LMB · G/R/S · F: Frame Selected · Shift+A: Add · Ctrl+Z: Undo · Tab · N · Space";
 }
 
 function updateStats() {
-  const stats = document.querySelector<HTMLElement>("#status-stats");
-  if (stats) stats.textContent = `Objects: ${objects.length} | Verts: 8 | Faces: 6 | Frame: ${frame}`;
+  const faceCount = objects.filter((object) => object.type === "mesh").length * 6;
+  const vertCount = objects.filter((object) => object.type === "mesh").length * 8;
+  if (statsEl) {
+    statsEl.textContent = `Objects: ${objects.length} | Verts: ${vertCount} | Faces: ${faceCount} | Frame: ${timeline ? timeline.frame : frame}`;
+  }
 }
 
-function renderAll() {
-  viewport?.setObjects(objects);
-  renderSidebar();
-  renderOutliner();
-  renderProperties();
-  renderHeader();
-  updateStats();
-}
+/* ------------------------------------------------------------------ */
+/* history                                                             */
+/* ------------------------------------------------------------------ */
 
+interface HistoryEntry {
+  objects: SceneObject[];
+  selectedId: string | null;
+}
+let history: HistoryEntry[] = [];
+let future: HistoryEntry[] = [];
+
+function cloneObjects() {
+  return objects.map((object) => ({ ...object, loc: [...object.loc], rot: [...object.rot], scale: [...object.scale] }));
+}
+function snapshot(): HistoryEntry {
+  return { objects: cloneObjects(), selectedId };
+}
 function pushHistory() {
-  const object = selectedObject();
-  if (!object) return;
-  history.push({ id: object.id, loc: [...object.loc], rot: [...object.rot], scale: [...object.scale] });
-  if (history.length > 40) history.shift();
+  history.push(snapshot());
+  if (history.length > 60) history.shift();
   future = [];
 }
-
+function applyHistoryEntry(entry: HistoryEntry) {
+  objects.splice(0, objects.length, ...entry.objects.map((object) => ({ ...object, loc: [...object.loc], rot: [...object.rot], scale: [...object.scale] })));
+  selectedId = entry.selectedId;
+  viewport.setObjects(objects);
+  renderAll();
+  viewport.invalidate();
+}
 function undo() {
-  const entry = history.pop();
-  if (!entry) return;
-  const object = objects.find((item) => item.id === entry.id);
-  if (!object) return;
-  future.push({ id: object.id, loc: [...object.loc], rot: [...object.rot], scale: [...object.scale] });
-  object.loc = [...entry.loc];
-  object.rot = [...entry.rot];
-  object.scale = [...entry.scale];
-  selectedId = object.id;
-  renderAll();
-  setStatus("Undo", 1200);
+  if (!history.length) {
+    setStatus("Nothing to undo", 1200);
+    return;
+  }
+  future.push(snapshot());
+  const entry = history.pop()!;
+  applyHistoryEntry(entry);
+  setStatus("Undo", 1400);
 }
-
 function redo() {
-  const entry = future.pop();
-  if (!entry) return;
-  const object = objects.find((item) => item.id === entry.id);
-  if (!object) return;
-  history.push({ id: object.id, loc: [...object.loc], rot: [...object.rot], scale: [...object.scale] });
-  object.loc = [...entry.loc];
-  object.rot = [...entry.rot];
-  object.scale = [...entry.scale];
-  renderAll();
-  setStatus("Redo", 1200);
+  if (!future.length) {
+    setStatus("Nothing to redo", 1200);
+    return;
+  }
+  history.push(snapshot());
+  const entry = future.pop()!;
+  applyHistoryEntry(entry);
+  setStatus("Redo", 1400);
 }
 
-/* ---------- popup menus ---------- */
+/* ------------------------------------------------------------------ */
+/* popup menus                                                         */
+/* ------------------------------------------------------------------ */
 
 interface MenuItem {
   label?: string;
@@ -283,7 +320,8 @@ interface MenuItem {
 function closePopup() {
   popup?.remove();
   popup = null;
-  document.querySelectorAll(".be-menu-btn.active").forEach((el) => el.classList.remove("active"));
+  if (popupAnchor) popupAnchor.classList.remove("active");
+  popupAnchor = null;
 }
 
 function openMenuAt(x: number, y: number, items: MenuItem[]) {
@@ -308,24 +346,58 @@ function openMenuAt(x: number, y: number, items: MenuItem[]) {
   }
   document.body.appendChild(menu);
   const rect = menu.getBoundingClientRect();
-  menu.style.left = `${Math.min(x, window.innerWidth - rect.width - 6)}px`;
-  menu.style.top = `${Math.min(y, window.innerHeight - rect.height - 6)}px`;
+  menu.style.left = `${Math.max(4, Math.min(x, window.innerWidth - rect.width - 6))}px`;
+  menu.style.top = `${Math.max(4, Math.min(y, window.innerHeight - rect.height - 6))}px`;
   popup = menu;
 }
 
 function openMenuFrom(anchor: HTMLElement, items: MenuItem[]) {
+  if (popup && popupAnchor === anchor) {
+    closePopup();
+    return;
+  }
+  closePopup();
   const rect = anchor.getBoundingClientRect();
   openMenuAt(rect.left, rect.bottom + 1, items);
+  popupAnchor = anchor;
   anchor.classList.add("active");
 }
 
 document.addEventListener("mousedown", (event) => {
-  if (popup && !popup.contains(event.target as Node)) closePopup();
+  if (!popup) return;
+  const target = event.target as Node;
+  if (popup.contains(target)) return;
+  if (popupAnchor && popupAnchor.contains(target)) return;
+  closePopup();
 });
 
-/* ---------- topbar ---------- */
+/* ------------------------------------------------------------------ */
+/* top bar                                                             */
+/* ------------------------------------------------------------------ */
 
-const menubar = document.querySelector<HTMLElement>("#menubar")!;
+function createTopButton(label: string, className = "lg-header-bar__button", id = ""): HTMLButtonElement {
+  const button = document.createElement("button");
+  button.type = "button";
+  button.className = className;
+  button.innerHTML = label;
+  if (id) button.id = id;
+  return button;
+}
+
+const topbar = new HeaderBar({ id: "topbar", className: "be-topbar", variant: "topbar" });
+document.querySelector("#topbar-slot")!.appendChild(topbar.root);
+
+const brand = document.createElement("div");
+brand.className = "lg-header-bar__brand be-brand";
+brand.title = "Blender";
+brand.innerHTML = icon("blender", 18);
+topbar.left.appendChild(brand);
+
+const menubar = document.createElement("div");
+menubar.className = "be-menubar";
+menubar.id = "menubar";
+topbar.left.appendChild(menubar);
+
 const topMenus: Array<{ label: string; items: MenuItem[] }> = [
   {
     label: "File",
@@ -358,7 +430,7 @@ const topMenus: Array<{ label: string; items: MenuItem[] }> = [
       { label: "Render Image", shortcut: "F12", action: () => renderImage() },
       { label: "Render Animation", shortcut: "Ctrl F12", action: () => renderImage() },
       { separator: true },
-      { label: "View Render", shortcut: "F11", action: () => setStatus("Render View（示例）", 1400) }
+      { label: "View Render", shortcut: "F11", action: () => switchWorkspace("Rendering") }
     ]
   },
   {
@@ -382,35 +454,35 @@ const topMenus: Array<{ label: string; items: MenuItem[] }> = [
 ];
 
 for (const menu of topMenus) {
-  const button = document.createElement("button");
-  button.className = "be-menu-btn";
-  button.textContent = menu.label;
+  const button = createTopButton(menu.label, "lg-header-bar__button be-menu-btn");
   button.addEventListener("click", () => openMenuFrom(button, menu.items));
   menubar.appendChild(button);
 }
 
-const workspacesEl = document.querySelector<HTMLElement>("#workspaces")!;
+const workspaceTabs = document.createElement("div");
+workspaceTabs.className = "lg-header-bar__tabs be-workspace-tabs";
+workspaceTabs.id = "workspaces";
+topbar.center.appendChild(workspaceTabs);
 for (const name of workspaces) {
-  const button = document.createElement("button");
-  button.className = "be-workspace-tab" + (name === currentWorkspace ? " active" : "");
-  button.textContent = name;
+  const button = createTopButton(name, "lg-header-bar__tab be-workspace-tab" + (name === currentWorkspace ? " lg-header-bar__tab--active active" : ""));
+  button.dataset.workspace = name;
   button.addEventListener("click", () => switchWorkspace(name));
-  workspacesEl.appendChild(button);
+  workspaceTabs.appendChild(button);
 }
 
-document.querySelector<HTMLElement>("#scene-btn")?.addEventListener("click", (event) => {
-  const button = event.currentTarget as HTMLElement;
-  openMenuFrom(button, [
+const sceneBtn = createTopButton('<span class="lg-header-bar__dot"></span>Scene <span>▾</span>', "lg-header-bar__button be-scene-btn", "scene-btn");
+const viewlayerBtn = createTopButton("ViewLayer <span>▾</span>", "lg-header-bar__button be-scene-btn", "viewlayer-btn");
+topbar.right.append(sceneBtn, viewlayerBtn);
+sceneBtn.addEventListener("click", () => {
+  openMenuFrom(sceneBtn, [
     { label: "Scene", action: () => setStatus("Scene active", 1000) },
     { label: "Scene.001", action: () => setStatus("Scene.001 active", 1000) },
     { separator: true },
     { label: "New Scene", action: () => setStatus("New Scene（示例）", 1200) }
   ]);
 });
-
-document.querySelector<HTMLElement>("#viewlayer-btn")?.addEventListener("click", (event) => {
-  const button = event.currentTarget as HTMLElement;
-  openMenuFrom(button, [
+viewlayerBtn.addEventListener("click", () => {
+  openMenuFrom(viewlayerBtn, [
     { label: "ViewLayer", action: () => setStatus("ViewLayer active", 1000) },
     { label: "ViewLayer.001", action: () => setStatus("ViewLayer.001 active", 1000) },
     { separator: true },
@@ -418,368 +490,119 @@ document.querySelector<HTMLElement>("#viewlayer-btn")?.addEventListener("click",
   ]);
 });
 
-const editorOverlay = document.querySelector<HTMLElement>("#editor-overlay")!;
+/* ------------------------------------------------------------------ */
+/* area header (viewport)                                              */
+/* ------------------------------------------------------------------ */
 
-function hideOverlay() {
-  editorOverlay.hidden = true;
-  editorOverlay.innerHTML = "";
+viewportHeader = new HeaderBar({ id: "viewport-header", className: "be-area-header", variant: "area" });
+document.querySelector("#viewport-header-slot")!.appendChild(viewportHeader.root);
+
+nodesHeader = new HeaderBar({ id: "nodes-header", className: "be-nodes-header", variant: "area" });
+document.querySelector("#nodes-header-slot")!.appendChild(nodesHeader.root);
+
+function areaButton(label: string, menu: string, active = false) {
+  const button = createTopButton(label, "lg-header-bar__button be-menu-btn be-area-menu" + (active ? " active" : ""));
+  button.dataset.menu = menu;
+  return button;
 }
 
-function showScriptingEditor() {
-  editorOverlay.hidden = false;
-  editorOverlay.innerHTML = `
-    <div class="be-script-editor">
-      <div class="be-script-header">
-        <span class="be-script-tab active">Text</span>
-        <span class="be-script-tab">Console</span>
-        <span style="margin-left:auto;color:#888">Python · 示例</span>
-      </div>
-      <div class="be-script-body">
-        <div class="be-line-numbers">${Array.from({ length: 18 }, (_, index) => index + 1).join("<br>")}</div>
-        <textarea spellcheck="false">import bpy
-
-# LiteGUI Blender-style editor demo
-cube = bpy.data.objects.get("Cube")
-if cube:
-    cube.location = (0, 0, 1)
-    cube.rotation_euler = (0, 0, 0.0)
-
-print("Hello from Blender-compatible editor")
-</textarea>
-      </div>
-      <div class="be-script-footer">Ln 1, Col 1 &nbsp;|&nbsp; Python &nbsp;|&nbsp; UTF-8</div>
-    </div>
-  `;
-}
-
-function showRenderResult() {
-  editorOverlay.hidden = false;
-  const image = viewport.snapshot();
-  editorOverlay.innerHTML = `
-    <div class="be-image-editor">
-      <div class="be-image-header"><span>Render Result</span><span style="margin-left:auto;color:#888">1920 × 1080 · 100%</span></div>
-      <div class="be-image-body"><img src="${image}" alt="Render Result" /></div>
-    </div>
-  `;
-}
-
-function switchWorkspace(name: string) {
-  currentWorkspace = name;
-  document.querySelectorAll(".be-workspace-tab").forEach((tab) => {
-    tab.classList.toggle("active", tab.textContent === name);
-  });
-  const appEl = document.querySelector<HTMLElement>(".be-app");
-  if (appEl) appEl.dataset.workspace = name.toLowerCase().replace(/\s+/g, "-");
-
-  if (name === "Scripting") {
-    activeProp = "scene";
-    renderProperties();
-    showScriptingEditor();
-    setStatus("Scripting workspace: Text Editor", 1800);
-  } else if (name === "Rendering") {
-    activeProp = "render";
-    renderProperties();
-    showRenderResult();
-    setStatus("Rendering workspace: Render Result", 1800);
-  } else if (name === "Shading") {
-    activeProp = "material";
-    renderProperties();
-    hideOverlay();
-    setStatus("Shading workspace: Viewport + Material", 1600);
-  } else if (name === "Animation") {
-    activeProp = "object";
-    renderProperties();
-    hideOverlay();
-    setStatus("Animation workspace", 1400);
-  } else {
-    activeProp = "object";
-    renderProperties();
-    hideOverlay();
-    setStatus(`${name} workspace`, 1200);
-  }
-  renderHeader();
-}
-
-/* ---------- viewport ---------- */
-
-const slot = document.querySelector<HTMLElement>("#viewport-slot")!;
-viewport = new Viewport(slot, {
-  objects,
-  getSelected: () => selectedId,
-  onSelect: (id) => {
-    selectedId = id;
-    renderOutliner();
-    renderProperties();
-    renderHeader();
-    setStatus(id ? `${id} selected` : "Nothing selected");
-  },
-  onStatus: (text) => setStatus(text),
-  onContextMenu: (x, y) => openContextMenu(x, y),
-  onChange: () => {
-    renderOutliner();
-    renderProperties();
-    viewport.invalidate();
-  }
-});
-
-const toolbar = document.createElement("div");
-toolbar.className = "be-toolbar";
-const tools: Array<[string, string, string]> = [
-  ["select", "select", "Select Box (W)"],
-  ["cursor", "cursor", "Cursor (Shift Space)"],
-  ["move", "move", "Move (G)"],
-  ["rotate", "rotate", "Rotate (R)"],
-  ["scale", "scale", "Scale (S)"],
-  ["transform", "transform", "Transform (Shift Space)"],
-  ["annotate", "annotate", "Annotate (D)"],
-  ["measure", "measure", "Measure (M)"],
-  ["add", "add", "Add (Shift A)"]
-];
-for (const [id, iconName, tip] of tools) {
+function areaIcon(name: string, menu: string, tip: string, active = false) {
   const button = document.createElement("button");
-  button.className = "be-tool" + (id === currentTool ? " active" : "");
-  button.dataset.tool = id;
-  button.dataset.tip = tip;
-  button.innerHTML = icon(iconName, 15);
+  button.type = "button";
+  button.className = "lg-header-bar__icon-button be-icon-btn" + (active ? " active" : "");
+  button.dataset.menu = menu;
   button.title = tip;
-  button.addEventListener("click", () => {
-    currentTool = id;
-    viewport.setTool(id);
-    document.querySelectorAll(".be-tool").forEach((tool) => tool.classList.toggle("active", (tool as HTMLElement).dataset.tool === id));
-    setStatus(tip, 1400);
-    if (id === "move") beginTransform("translate");
-    else if (id === "rotate") beginTransform("rotate");
-    else if (id === "scale") beginTransform("scale");
-    else if (id === "add") openAddMenu(button);
-  });
-  toolbar.appendChild(button);
+  button.innerHTML = icon(name, 13);
+  return button;
 }
-viewport.root.appendChild(toolbar);
-
-const sidebar = document.createElement("aside");
-sidebar.className = "be-sidebar";
-sidebar.id = "viewport-sidebar";
-viewport.root.appendChild(sidebar);
-
-const sidebarToggle = document.createElement("button");
-sidebarToggle.className = "be-icon-btn";
-sidebarToggle.innerHTML = icon("layers", 13);
-sidebarToggle.title = "Sidebar (N)";
-sidebarToggle.style.position = "absolute";
-sidebarToggle.style.right = "8px";
-sidebarToggle.style.top = "38px";
-sidebarToggle.style.zIndex = "4";
-sidebarToggle.addEventListener("click", () => toggleSidebar());
-viewport.root.appendChild(sidebarToggle);
-
-const shortcuts = document.createElement("div");
-shortcuts.className = "be-viewport-shortcuts";
-shortcuts.innerHTML = "<kbd>N</kbd> Sidebar &nbsp; <kbd>T</kbd> Toolbar &nbsp; <kbd>Tab</kbd> Edit Mode &nbsp; <kbd>MMB</kbd> Orbit &nbsp; <kbd>Shift+MMB</kbd> Pan &nbsp; <kbd>Wheel</kbd> Zoom";
-viewport.root.appendChild(shortcuts);
-
-function renderSidebar() {
-  const object = selectedObject();
-  sidebar.innerHTML = `
-    <div class="be-sidebar-header"><span>Item</span><span>${icon("object", 12)}</span></div>
-    <div class="be-sidebar-section">
-      <div class="be-sidebar-title">${icon("transform", 12)} Transform</div>
-      <div class="be-sidebar-row"><span>Location</span><div class="be-vec">${axisFields("loc")}</div></div>
-      <div class="be-sidebar-row"><span>Rotation</span><div class="be-vec">${axisFields("rot")}</div></div>
-      <div class="be-sidebar-row"><span>Scale</span><div class="be-vec">${axisFields("scale")}</div></div>
-    </div>
-    <div class="be-sidebar-section">
-      <div class="be-sidebar-title">${icon("camera", 12)} View</div>
-      <div class="be-sidebar-row"><span>Local View</span><button class="be-scene-btn">Off</button></div>
-      <div class="be-sidebar-row"><span>Camera</span><button class="be-scene-btn">View</button></div>
-      <div class="be-sidebar-row"><span>Clip Start</span><span>0.01m</span></div>
-      <div class="be-sidebar-row"><span>Clip End</span><span>1000m</span></div>
-    </div>
-    <div class="be-sidebar-section">
-      <div class="be-sidebar-title">${icon("overlay", 12)} Overlays</div>
-      <div class="be-sidebar-row"><span>Grid</span><span>On</span></div>
-      <div class="be-sidebar-row"><span>Gizmo</span><span>On</span></div>
-    </div>
-  `;
-  bindNumericFields(sidebar);
-  sidebar.classList.toggle("hidden", !sidebarOpen || !object);
-}
-
-function axisFields(key: "loc" | "rot" | "scale"): string {
-  const object = selectedObject();
-  const values = object ? object[key] : [0, 0, 0];
-  return ["x", "y", "z"].map((axis, index) => `
-    <div class="be-field"><span class="be-axis ${axis}">${axis.toUpperCase()}</span><input data-field="${key}" data-axis="${index}" type="number" step="0.1" value="${values[index].toFixed(2)}" /></div>
-  `).join("");
-}
-
-function bindNumericFields(root: HTMLElement) {
-  root.querySelectorAll<HTMLInputElement>("input[data-field]").forEach((input) => {
-    input.addEventListener("change", () => {
-      const object = selectedObject();
-      if (!object) return;
-      pushHistory();
-      const key = input.dataset.field as "loc" | "rot" | "scale";
-      const axis = Number(input.dataset.axis);
-      const value = Number(input.value);
-      if (Number.isFinite(value)) {
-        object[key][axis] = value;
-        viewport.invalidate();
-        updateStats();
-        renderProperties();
-      }
-    });
-    const axis = input.parentElement?.querySelector<HTMLElement>(".be-axis");
-    if (!axis) return;
-    axis.addEventListener("pointerdown", (event) => {
-      const object = selectedObject();
-      if (!object) return;
-      const key = input.dataset.field as "loc" | "rot" | "scale";
-      const axisIndex = Number(input.dataset.axis);
-      const startX = event.clientX;
-      const start = object[key][axisIndex];
-      const move = (moveEvent: PointerEvent) => {
-        const next = start + (moveEvent.clientX - startX) * 0.01;
-        object[key][axisIndex] = Number(next.toFixed(2));
-        input.value = object[key][axisIndex].toFixed(2);
-        viewport.invalidate();
-        renderProperties();
-      };
-      const up = () => {
-        window.removeEventListener("pointermove", move);
-        window.removeEventListener("pointerup", up);
-      };
-      window.addEventListener("pointermove", move);
-      window.addEventListener("pointerup", up, { once: true });
-      event.preventDefault();
-    });
-  });
-}
-
-function toggleSidebar() {
-  sidebarOpen = !sidebarOpen;
-  sidebar.classList.toggle("hidden", !sidebarOpen);
-  viewport.setSidebarOpen(sidebarOpen);
-  setStatus(`Sidebar ${sidebarOpen ? "shown" : "hidden"}`, 1000);
-}
-
-function toggleToolbar() {
-  toolbarOpen = !toolbarOpen;
-  toolbar.style.display = toolbarOpen ? "flex" : "none";
-  setStatus(`Toolbar ${toolbarOpen ? "shown" : "hidden"}`, 1000);
-}
-
-function toggleFullscreen() {
-  if (!document.fullscreenElement) document.documentElement.requestFullscreen?.();
-  else document.exitFullscreen?.();
-}
-
-function resetScene() {
-  objects.splice(0, objects.length,
-    { id: "Camera", name: "Camera", type: "camera", loc: [-6.8, -4.6, 4.2], rot: [0, 0, 0], scale: [1, 1, 1], visible: true, selectable: true },
-    { id: "Cube", name: "Cube", type: "mesh", loc: [0, 0, 1], rot: [0, 0, 0], scale: [1, 1, 1], visible: true, selectable: true },
-    { id: "Light", name: "Light", type: "light", loc: [3.8, -1.5, 5.0], rot: [0, 0, 0], scale: [1, 1, 1], visible: true, selectable: true }
-  );
-  selectedId = "Cube";
-  frame = 1;
-  history = [];
-  future = [];
-  renderAll();
-  viewport.frameAll();
-  setStatus("New scene", 1400);
-}
-
-function renderImage() {
-  setStatus("Rendering... 0%", 0);
-  let progress = 0;
-  const timer = window.setInterval(() => {
-    progress += 20;
-    if (progress >= 100) {
-      window.clearInterval(timer);
-      setStatus("Render complete: 1920×1080 · EEVEE", 2200);
-    } else {
-      setStatus(`Rendering... ${progress}%`, 0);
-    }
-  }, 120);
-}
-
-/* ---------- viewport header ---------- */
-
-const viewportHeader = document.querySelector<HTMLElement>("#viewport-header")!;
 
 function renderHeader() {
-  viewportHeader.innerHTML = `
-    <div class="be-area-title" title="3D Viewport">${icon("object", 14)}</div>
-    <button class="be-menu-btn be-area-menu" data-menu="mode">${currentMode} ▾</button>
-    <button class="be-menu-btn be-area-menu" data-menu="view">View</button>
-    <button class="be-menu-btn be-area-menu" data-menu="select">Select</button>
-    <button class="be-menu-btn be-area-menu" data-menu="add">Add</button>
-    <button class="be-menu-btn be-area-menu" data-menu="object">Object</button>
-    <span class="be-spacer"></span>
-    <button class="be-scene-btn" data-menu="orient">Global ▾</button>
-    <button class="be-icon-btn ${snap ? "active" : ""}" data-menu="snap" title="Snap">${icon("magnet", 13)}</button>
-    <button class="be-icon-btn ${shading === "wireframe" ? "active" : ""}" data-menu="wire" title="Wireframe">${icon("wire", 13)}</button>
-    <button class="be-icon-btn ${shading === "solid" ? "active" : ""}" data-menu="solid" title="Solid">${icon("solid", 13)}</button>
-    <button class="be-icon-btn ${shading === "material" ? "active" : ""}" data-menu="material" title="Material Preview">${icon("materialShade", 13)}</button>
-    <button class="be-icon-btn ${shading === "rendered" ? "active" : ""}" data-menu="rendered" title="Rendered">${icon("rendered", 13)}</button>
-    <button class="be-icon-btn ${overlays ? "active" : ""}" data-menu="overlay" title="Overlays">${icon("overlay", 13)}</button>
-    <button class="be-icon-btn" data-menu="options" title="Options">${icon("wrench", 13)}</button>
-  `;
-  viewportHeader.querySelectorAll<HTMLElement>("[data-menu]").forEach((button) => {
-    button.addEventListener("click", () => {
-      const menu = button.dataset.menu;
-      if (menu === "mode") openMenuFrom(button, modeMenu());
-      else if (menu === "view") openMenuFrom(button, viewMenu());
-      else if (menu === "select") openMenuFrom(button, selectMenu());
-      else if (menu === "add") openMenuFrom(button, addMenu());
-      else if (menu === "object") openMenuFrom(button, objectMenu());
-      else if (menu === "orient") openMenuFrom(button, orientationMenu());
-      else if (menu === "snap") {
-        snap = !snap;
-        renderHeader();
-        setStatus(`Snap ${snap ? "on" : "off"}`, 1000);
-      } else if (menu === "wire" || menu === "solid" || menu === "material" || menu === "rendered") {
-        shading = menu;
-        viewport.setShading(shading);
-        renderHeader();
-      } else if (menu === "overlay") {
-        overlays = !overlays;
-        viewport.setOverlays(overlays);
-        renderHeader();
-        setStatus(`Overlays ${overlays ? "on" : "off"}`, 1000);
-      } else if (menu === "options") {
-        openMenuFrom(button, [
-          { label: "Show Gizmo", action: () => setStatus("Gizmo: On", 1000) },
-          { label: "Show Grid", action: () => setStatus("Grid: On", 1000) },
-          { label: "Show Axes", action: () => setStatus("Axes: On", 1000) },
-          { separator: true },
-          { label: "Toggle Sidebar", shortcut: "N", action: toggleSidebar }
-        ]);
-      }
-    });
+  const title = document.createElement("div");
+  title.className = "lg-header-bar__title";
+  title.innerHTML = `${icon("object", 14)}<span class="lg-header-bar__title-text" title="3D Viewport">3D Viewport</span>`;
+  const compact = currentWorkspace === "UV Editing";
+  const left = [title, areaButton(`${currentMode} ▾`, "mode"), areaButton("View", "view")];
+  if (compact) left.push(areaButton("Add", "add"));
+  else left.push(areaButton("Select", "select"), areaButton("Add", "add"), areaButton("Object", "object"));
+  viewportHeader.setLeft(left);
+  const orientation = createTopButton("Global ▾", "lg-header-bar__button be-scene-btn be-area-menu");
+  orientation.dataset.menu = "orient";
+  const right = [orientation, areaIcon("magnet", "snap", "Snap", snap)];
+  if (!compact) {
+    right.push(
+      areaIcon("wire", "wire", "Wireframe", shading === "wireframe"),
+      areaIcon("solid", "solid", "Solid", shading === "solid"),
+      areaIcon("materialShade", "material", "Material Preview", shading === "material"),
+      areaIcon("rendered", "rendered", "Rendered", shading === "rendered")
+    );
+  } else {
+    right.push(areaIcon("solid", "solid", "Solid", shading === "solid"));
+  }
+  right.push(areaIcon("overlay", "overlay", "Overlays", overlays), areaIcon("wrench", "options", "Options"));
+  viewportHeader.setRight(right);
+  viewportHeader.root.querySelectorAll<HTMLElement>("[data-menu]").forEach((button) => {
+    button.addEventListener("click", () => handleAreaMenu(button));
   });
+}
+
+function handleAreaMenu(button: HTMLElement) {
+  const menu = button.dataset.menu;
+  if (menu === "mode") openMenuFrom(button, modeMenu());
+  else if (menu === "view") openMenuFrom(button, viewMenu());
+  else if (menu === "select") openMenuFrom(button, selectMenu());
+  else if (menu === "add") openMenuFrom(button, addMenu());
+  else if (menu === "object") openMenuFrom(button, objectMenu());
+  else if (menu === "orient") openMenuFrom(button, orientationMenu());
+  else if (menu === "snap") {
+    snap = !snap;
+    renderHeader();
+    setStatus(`Snap ${snap ? "on" : "off"}`, 1000);
+  } else if (menu === "wire" || menu === "solid" || menu === "material" || menu === "rendered") {
+    shading = menu === "wire" ? "wireframe" : menu;
+    viewport.setShading(shading);
+    renderHeader();
+    setStatus(`Viewport shading: ${shading}`, 1000);
+  } else if (menu === "overlay") {
+    overlays = !overlays;
+    viewport.setOverlays(overlays);
+    renderHeader();
+    setStatus(`Overlays ${overlays ? "on" : "off"}`, 1000);
+  } else if (menu === "options") {
+    openMenuFrom(button, [
+      { label: "Show Gizmo", action: () => setStatus("Gizmo: On", 1000) },
+      { label: "Show Grid", action: () => setStatus("Grid: On", 1000) },
+      { label: "Show Axes", action: () => setStatus("Axes: On", 1000) },
+      { separator: true },
+      { label: "Toggle Sidebar", shortcut: "N", action: toggleSidebar }
+    ]);
+  }
 }
 
 function modeMenu(): MenuItem[] {
   return ["Object Mode", "Edit Mode", "Sculpt Mode", "Vertex Paint", "Weight Paint", "Texture Paint"].map((mode) => ({
     label: mode,
-    action: () => {
-      currentMode = mode;
-      setStatus(`${mode}`, 1200);
-      viewport.setShading(mode === "Edit Mode" ? "wireframe" : shading);
-      viewport.setEditMode(mode === "Edit Mode");
-      renderHeader();
-    }
+    action: () => setMode(mode)
   }));
+}
+
+function setMode(mode: string) {
+  currentMode = mode;
+  const edit = mode === "Edit Mode";
+  viewport.setEditMode(edit);
+  viewport.setShading(edit ? "wireframe" : shading);
+  renderHeader();
+  if (edit) setStatus("Edit Mode · 1/2/3: Vertex/Edge/Face · Tab: Object Mode", 1800);
+  else setStatus(mode, 1400);
 }
 
 function viewMenu(): MenuItem[] {
   return [
     { label: "Frame All", shortcut: "Home", action: () => viewport.frameAll() },
-    { label: "Frame Selected", shortcut: "Numpad .", action: () => viewport.focusSelection() },
+    { label: "Frame Selected", shortcut: "F", action: () => focusSelected() },
     { separator: true },
-    { label: "Front", shortcut: "Numpad 1", action: () => viewport.setView(0, 0, 16.5) },
-    { label: "Right", shortcut: "Numpad 3", action: () => viewport.setView(Math.PI / 2, 0, 16.5) },
-    { label: "Top", shortcut: "Numpad 7", action: () => viewport.setView(0, Math.PI / 2 - 0.01, 16.5) },
+    { label: "Front", shortcut: "Numpad 1", action: () => { viewport.setView(0, 0, 16.5); setStatus("Front Orthographic", 1000); } },
+    { label: "Right", shortcut: "Numpad 3", action: () => { viewport.setView(Math.PI / 2, 0, 16.5); setStatus("Right Orthographic", 1000); } },
+    { label: "Top", shortcut: "Numpad 7", action: () => { viewport.setView(0, Math.PI / 2 - 0.01, 16.5); setStatus("Top Orthographic", 1000); } },
     { separator: true },
     { label: "Toggle Sidebar", shortcut: "N", action: toggleSidebar },
     { label: "Toggle Toolbar", shortcut: "T", action: toggleToolbar }
@@ -788,15 +611,15 @@ function viewMenu(): MenuItem[] {
 
 function selectMenu(): MenuItem[] {
   return [
-    { label: "All", shortcut: "A", action: () => setStatus("Select All（示例）", 1000) },
-    { label: "None", shortcut: "Alt A", action: () => { selectedId = null; renderAll(); viewport.invalidate(); } },
-    { label: "Invert", shortcut: "Ctrl I", action: () => setStatus("Invert Selection（示例）", 1000) }
+    { label: "All", shortcut: "A", action: () => selectAllObjects() },
+    { label: "None", shortcut: "Alt A", action: () => { selectedId = null; renderAll(); viewport.invalidate(); setStatus("Deselect All", 1000); } },
+    { label: "Invert", shortcut: "Ctrl I", action: () => invertSelection() }
   ];
 }
 
 function addMenu(): MenuItem[] {
   return [
-    { label: "Mesh / Cube", action: () => addObject("mesh") },
+    { label: "Mesh / Cube", shortcut: "Shift A", action: () => addObject("mesh") },
     { label: "Camera", action: () => addObject("camera") },
     { label: "Light", action: () => addObject("light") }
   ];
@@ -806,8 +629,9 @@ function objectMenu(): MenuItem[] {
   return [
     { label: "Duplicate", shortcut: "Shift D", action: duplicateSelected },
     { label: "Delete", shortcut: "X", action: deleteSelected },
+    { label: "Rename", shortcut: "F2", action: renameSelected },
     { separator: true },
-    { label: "Frame Selected", action: () => viewport.focusSelection() }
+    { label: "Frame Selected", action: () => focusSelected() }
   ];
 }
 
@@ -818,7 +642,315 @@ function orientationMenu(): MenuItem[] {
   }));
 }
 
+function selectAllObjects() {
+  selectedId = objects.find((object) => object.selectable)?.id ?? null;
+  renderAll();
+  viewport.invalidate();
+  setStatus("Select All (single-selection demo)", 1200);
+}
+
+function invertSelection() {
+  const candidates = objects.filter((object) => object.selectable && object.id !== selectedId);
+  selectedId = candidates[0]?.id ?? null;
+  renderAll();
+  viewport.invalidate();
+  setStatus("Invert Selection (single-selection demo)", 1200);
+}
+
+/* ------------------------------------------------------------------ */
+/* viewport                                                           */
+/* ------------------------------------------------------------------ */
+
+const slot = document.querySelector<HTMLElement>("#viewport-slot")!;
+viewport = new Viewport(slot, {
+  objects,
+  getSelected: () => selectedId,
+  onSelect: (id) => {
+    selectedId = id;
+    renderOutliner();
+    renderProperties();
+    renderSidebar();
+    renderHeader();
+    syncTransformFields();
+    setStatus(id ? `${id} selected` : "Nothing selected", 1200);
+  },
+  onStatus: (text) => setStatus(text, 6000),
+  onContextMenu: (x, y) => openContextMenu(x, y),
+  onChange: () => {
+    syncTransformFields();
+    updateStats();
+    viewport.invalidate();
+  }
+});
+
+const sidebarToggle = document.createElement("button");
+sidebarToggle.className = "be-sidebar-toggle";
+sidebarToggle.id = "sidebar-toggle";
+sidebarToggle.innerHTML = "‹";
+sidebarToggle.title = "Sidebar (N)";
+sidebarToggle.addEventListener("click", () => toggleSidebar());
+workspaceEl.appendChild(sidebarToggle);
+
+const shortcuts = document.createElement("div");
+shortcuts.className = "be-viewport-shortcuts";
+shortcuts.innerHTML = "<kbd>N</kbd> Sidebar &nbsp; <kbd>T</kbd> Toolbar &nbsp; <kbd>Tab</kbd> Edit Mode &nbsp; <kbd>F</kbd> Frame &nbsp; <kbd>Shift+A</kbd> Add &nbsp; <kbd>MMB</kbd> Orbit &nbsp; <kbd>Shift+MMB</kbd> Pan &nbsp; <kbd>Wheel</kbd> Zoom";
+viewport.root.appendChild(shortcuts);
+
+/* ------------------------------------------------------------------ */
+/* toolbar                                                            */
+/* ------------------------------------------------------------------ */
+
+const defaultTools = [
+  { id: "select", label: "Select Box", icon: icons.select, shortcut: "W" },
+  { id: "cursor", label: "Cursor", icon: icons.cursor, shortcut: "Shift Space" },
+  { id: "move", label: "Move", icon: icons.move, shortcut: "G" },
+  { id: "rotate", label: "Rotate", icon: icons.rotate, shortcut: "R" },
+  { id: "scale", label: "Scale", icon: icons.scale, shortcut: "S" },
+  { id: "transform", label: "Transform", icon: icons.transform, shortcut: "Shift Space" },
+  { id: "annotate", label: "Annotate", icon: icons.annotate, shortcut: "D" },
+  { id: "measure", label: "Measure", icon: icons.measure, shortcut: "M" },
+  { id: "add", label: "Add", icon: icons.add, shortcut: "Shift A" }
+];
+
+const sculptTools = [
+  { id: "sculpt-draw", label: "Draw", icon: icons.brush },
+  { id: "sculpt-clay", label: "Clay Strips", icon: icons.transform },
+  { id: "sculpt-smooth", label: "Smooth", icon: icons.cursor },
+  { id: "sculpt-grab", label: "Grab", icon: icons.move },
+  { id: "sculpt-mask", label: "Mask", icon: icons.eyeOff },
+  { id: "sculpt-add", label: "Add", icon: icons.add }
+];
+
+const paintTools = [
+  { id: "paint-draw", label: "Draw", icon: icons.brush },
+  { id: "paint-clone", label: "Clone", icon: icons.cursor },
+  { id: "paint-smudge", label: "Smudge", icon: icons.transform },
+  { id: "paint-fill", label: "Fill", icon: icons.solid },
+  { id: "paint-add", label: "Add", icon: icons.add }
+];
+
+const uvTools = [
+  { id: "uv-select", label: "Select", icon: icons.select },
+  { id: "uv-move", label: "Move", icon: icons.move },
+  { id: "uv-rotate", label: "Rotate", icon: icons.rotate },
+  { id: "uv-scale", label: "Scale", icon: icons.scale },
+  { id: "uv-add", label: "Add", icon: icons.add }
+];
+
+function toolsForWorkspace(name: string) {
+  if (name === "Sculpting") return sculptTools;
+  if (name === "Texture Paint") return paintTools;
+  if (name === "UV Editing") return uvTools;
+  return defaultTools;
+}
+
+function defaultToolFor(name: string) {
+  if (name === "Sculpting") return "sculpt-draw";
+  if (name === "Texture Paint") return "paint-draw";
+  if (name === "UV Editing") return "uv-select";
+  return "select";
+}
+
+toolbar = new Toolbar({ id: "viewport-toolbar", className: "be-toolbar", tools: defaultTools, active: "select" });
+document.querySelector("#toolbar-slot")!.appendChild(toolbar.root);
+toolbar.on("change", (id) => selectTool(String(id)));
+
+function isBrushTool(id: string) {
+  return id.startsWith("sculpt-") || id.startsWith("paint-");
+}
+
+function selectTool(id: string) {
+  currentTool = id;
+  toolbar.setActive(id);
+  viewport.setTool(id);
+  viewport.setBrush(isBrushTool(id) ? id : null);
+  const tool = toolsForWorkspace(currentWorkspace).find((item) => item.id === id);
+  const label = tool?.label ?? id;
+  setStatus(`${label}${isBrushTool(id) ? " brush" : " tool"} active`, 1400);
+  if (id === "move" || id === "rotate" || id === "scale") {
+    beginTransform(id === "move" ? "translate" : id === "rotate" ? "rotate" : "scale");
+  } else if (id === "add" || id === "sculpt-add" || id === "paint-add" || id === "uv-add") {
+    openAddMenu(viewportHeader.root.querySelector<HTMLElement>('[data-menu="add"]') ?? viewportHeader.root);
+  }
+}
+
+function activateToolVisual(id: string) {
+  currentTool = id;
+  toolbar.setActive(id);
+  viewport.setTool(id);
+  viewport.setBrush(isBrushTool(id) ? id : null);
+}
+
+function applyWorkspaceToolbar(name: string) {
+  const tools = toolsForWorkspace(name);
+  const active = defaultToolFor(name);
+  toolbar.setTools(tools);
+  toolbar.setActive(active);
+  currentTool = active;
+  viewport.setTool(active);
+  viewport.setBrush(isBrushTool(active) ? active : null);
+}
+
+function toggleToolbar() {
+  toolbarOpen = !toolbarOpen;
+  toolbar.root.style.display = toolbarOpen ? "" : "none";
+  setStatus(`Toolbar ${toolbarOpen ? "shown" : "hidden"}`, 1000);
+}
+
+/* ------------------------------------------------------------------ */
+/* sidebar                                                             */
+/* ------------------------------------------------------------------ */
+
+function axisFields(key: "loc" | "rot" | "scale"): string {
+  const object = selectedObject();
+  const values = object ? object[key] : [0, 0, 0];
+  return ["x", "y", "z"].map((axis, index) => `
+    <div class="be-field"><span class="be-axis ${axis}">${axis.toUpperCase()}</span><input data-field="${key}" data-axis="${index}" type="number" step="0.1" value="${values[index].toFixed(2)}" /></div>
+  `).join("");
+}
+
+function renderSidebar() {
+  const object = selectedObject();
+  if (!object) {
+    sidebar.innerHTML = `<div class="be-sidebar-header"><span>Item</span><span>No active object</span></div><div class="be-panel-note">Select an object to edit its transform.</div>`;
+    return;
+  }
+  sidebar.innerHTML = `
+    <div class="be-sidebar-header"><span>Item</span><span>${icon("object", 12)} ${object.name}</span></div>
+    <div class="be-sidebar-section">
+      <div class="be-sidebar-title">${icon("transform", 12)} Transform</div>
+      <div class="be-sidebar-row"><span>Location</span><div class="be-vec">${axisFields("loc")}</div></div>
+      <div class="be-sidebar-row"><span>Rotation</span><div class="be-vec">${axisFields("rot")}</div></div>
+      <div class="be-sidebar-row"><span>Scale</span><div class="be-vec">${axisFields("scale")}</div></div>
+    </div>
+    <div class="be-sidebar-section">
+      <div class="be-sidebar-title">${icon("camera", 12)} View</div>
+      <div class="be-sidebar-row"><span>Local View</span><button class="lg-header-bar__button" data-sidebar-action="local-view">Off</button></div>
+      <div class="be-sidebar-row"><span>Camera</span><button class="lg-header-bar__button" data-sidebar-action="camera">View</button></div>
+      <div class="be-sidebar-row"><span>Clip Start</span><span>0.01m</span></div>
+      <div class="be-sidebar-row"><span>Clip End</span><span>1000m</span></div>
+    </div>
+    <div class="be-sidebar-section">
+      <div class="be-sidebar-title">${icon("overlay", 12)} Overlays</div>
+      <div class="be-sidebar-row"><span>Grid</span><span>On</span></div>
+      <div class="be-sidebar-row"><span>Gizmo</span><span>On</span></div>
+    </div>
+  `;
+  bindNumericFields(sidebar);
+  sidebar.querySelectorAll<HTMLElement>("[data-sidebar-action]").forEach((button) => {
+    button.addEventListener("click", () => {
+      setStatus(`Sidebar: ${button.dataset.sidebarAction} (demo)`, 1200);
+    });
+  });
+}
+
+function updateSidebarVisibility() {
+  sidebar.classList.toggle("hidden", !sidebarOpen);
+  sidebarToggle.style.display = hasViewport() ? "" : "none";
+  sidebarToggle.classList.toggle("be-sidebar-toggle--open", sidebarOpen);
+  sidebarToggle.textContent = sidebarOpen ? "›" : "‹";
+}
+
+function toggleSidebar() {
+  if (!hasViewport()) {
+    setStatus("Sidebar unavailable in this workspace", 1200);
+    return;
+  }
+  sidebarOpen = !sidebarOpen;
+  updateSidebarVisibility();
+  viewport.setSidebarOpen(sidebarOpen);
+  renderSidebar();
+  setStatus(`Sidebar ${sidebarOpen ? "shown" : "hidden"}`, 1000);
+}
+
+/* ------------------------------------------------------------------ */
+/* numeric property editing                                            */
+/* ------------------------------------------------------------------ */
+
+function syncTransformFields() {
+  const object = selectedObject();
+  if (!object) return;
+  document.querySelectorAll<HTMLInputElement>("input[data-field]").forEach((input) => {
+    const key = input.dataset.field as "loc" | "rot" | "scale";
+    const axis = Number(input.dataset.axis);
+    if (document.activeElement === input) return;
+    input.value = object[key][axis].toFixed(2);
+  });
+}
+
+function bindNumericFields(root: HTMLElement) {
+  root.querySelectorAll<HTMLInputElement>("input[data-field]").forEach((input) => {
+    const key = input.dataset.field as "loc" | "rot" | "scale";
+    const axis = Number(input.dataset.axis);
+
+    const commit = () => {
+      const object = selectedObject();
+      if (!object) return;
+      const value = Number(input.value);
+      if (!Number.isFinite(value)) {
+        input.value = object[key][axis].toFixed(2);
+        return;
+      }
+      if (object[key][axis] !== value) {
+        pushHistory();
+        object[key][axis] = value;
+        viewport.invalidate();
+        updateStats();
+      }
+      input.value = value.toFixed(2);
+      syncTransformFields();
+      renderSidebar();
+      renderProperties();
+      viewport.invalidate();
+      const label = key === "loc" ? "Location" : key === "rot" ? "Rotation" : "Scale";
+      setStatus(`${object.name} ${label} ${"XYZ"[axis]} = ${value.toFixed(2)}`, 1800);
+    };
+
+    input.addEventListener("change", commit);
+    input.addEventListener("keydown", (event) => {
+      if (event.key === "Enter") {
+        commit();
+        input.blur();
+        event.preventDefault();
+      }
+    });
+
+    const axisEl = input.parentElement?.querySelector<HTMLElement>(".be-axis");
+    if (!axisEl) return;
+    axisEl.addEventListener("pointerdown", (event) => {
+      const object = selectedObject();
+      if (!object) return;
+      event.preventDefault();
+      pushHistory();
+      const startX = event.clientX;
+      const start = object[key][axis];
+      const move = (moveEvent: PointerEvent) => {
+        const next = start + (moveEvent.clientX - startX) * 0.01;
+        object[key][axis] = Number(next.toFixed(2));
+        input.value = object[key][axis].toFixed(2);
+        syncTransformFields();
+        viewport.invalidate();
+        updateStats();
+      };
+      const up = () => {
+        window.removeEventListener("pointermove", move);
+        window.removeEventListener("pointerup", up);
+        renderSidebar();
+        renderProperties();
+        viewport.invalidate();
+      };
+      window.addEventListener("pointermove", move);
+      window.addEventListener("pointerup", up, { once: true });
+    });
+  });
+}
+
+/* ------------------------------------------------------------------ */
+/* object operations                                                   */
+/* ------------------------------------------------------------------ */
+
 function addObject(type: SceneObject["type"]) {
+  pushHistory();
   const index = objects.filter((object) => object.type === type).length + 1;
   const id = `${type === "mesh" ? "Cube" : type === "camera" ? "Camera" : "Light"}.${index}`;
   objects.push({
@@ -834,56 +966,53 @@ function addObject(type: SceneObject["type"]) {
   selectedId = id;
   viewport.setObjects(objects);
   renderAll();
+  viewport.invalidate();
   setStatus(`Added ${id}`, 1400);
 }
 
 function duplicateSelected() {
   const object = selectedObject();
-  if (!object) return;
+  if (!object) {
+    setStatus("Nothing to duplicate", 1000);
+    return;
+  }
+  pushHistory();
   const copy: SceneObject = { ...object, id: `${object.id}.copy`, name: `${object.name}.copy`, loc: [object.loc[0] + 1, object.loc[1] + 1, object.loc[2]], rot: [...object.rot], scale: [...object.scale] };
   objects.push(copy);
   selectedId = copy.id;
   viewport.setObjects(objects);
   renderAll();
+  viewport.invalidate();
   setStatus("Duplicated", 1200);
 }
 
 function deleteSelected() {
   const index = objects.findIndex((object) => object.id === selectedId);
-  if (index < 0) return;
+  if (index < 0) {
+    setStatus("Nothing to delete", 1000);
+    return;
+  }
+  pushHistory();
   const [removed] = objects.splice(index, 1);
   selectedId = objects[0]?.id ?? null;
   viewport.setObjects(objects);
   renderAll();
+  viewport.invalidate();
   setStatus(`Deleted ${removed.name}`, 1200);
-}
-
-function openAddMenu(anchor: HTMLElement) {
-  openMenuFrom(anchor, addMenu());
-}
-
-function openContextMenu(x: number, y: number) {
-  openMenuAt(x, y, [
-    { label: "Select", action: () => setStatus("Select tool", 1000) },
-    { label: "Add Cube", action: () => addObject("mesh") },
-    { separator: true },
-    { label: "Duplicate", shortcut: "Shift D", action: duplicateSelected },
-    { label: "Delete", shortcut: "X", action: deleteSelected },
-    { separator: true },
-    { label: "Frame Selected", action: () => viewport.focusSelection() }
-  ]);
 }
 
 function renameSelected() {
   const object = selectedObject();
   if (!object) return;
   const name = window.prompt("Object name", object.name);
-  if (!name) return;
+  if (!name || name === object.name) return;
+  pushHistory();
   object.name = name;
   object.id = name;
   selectedId = name;
   viewport.setObjects(objects);
   renderAll();
+  viewport.invalidate();
   setStatus(`Renamed to ${name}`, 1200);
 }
 
@@ -893,10 +1022,39 @@ function toggleSelectedVisibility() {
   object.visible = !object.visible;
   viewport.setObjects(objects);
   renderAll();
+  viewport.invalidate();
   setStatus(`${object.name} ${object.visible ? "visible" : "hidden"}`, 1000);
 }
 
-/* ---------- outliner ---------- */
+function focusSelected() {
+  if (!selectedObject()) {
+    setStatus("Nothing selected", 1000);
+    return;
+  }
+  viewport.focusSelection();
+  setStatus(`Focused ${selectedId}`, 1200);
+}
+
+function openContextMenu(x: number, y: number) {
+  openMenuAt(x, y, [
+    { label: "Select", action: () => setStatus("Select tool", 1000) },
+    { label: "Add Cube", action: () => addObject("mesh") },
+    { separator: true },
+    { label: "Duplicate", shortcut: "Shift D", action: duplicateSelected },
+    { label: "Rename", action: renameSelected },
+    { label: "Delete", shortcut: "X", action: deleteSelected },
+    { separator: true },
+    { label: "Frame Selected", action: focusSelected }
+  ]);
+}
+
+function openAddMenu(anchor: HTMLElement) {
+  openMenuFrom(anchor, addMenu());
+}
+
+/* ------------------------------------------------------------------ */
+/* outliner                                                           */
+/* ------------------------------------------------------------------ */
 
 const outlinerEl = document.querySelector<HTMLElement>("#outliner")!;
 const searchEl = document.querySelector<HTMLInputElement>("#outliner-search")!;
@@ -905,7 +1063,7 @@ function renderOutliner() {
   const query = searchEl.value.trim().toLowerCase();
   const rows = objects.filter((object) => !query || object.name.toLowerCase().includes(query));
   outlinerEl.innerHTML = `
-    <div class="be-tree-row" style="padding-left:4px;color:#ccc">
+    <div class="be-tree-row be-tree-row--root" style="padding-left:4px">
       <span class="be-tree-toggle">▾</span>${icon("layers", 13)}<span class="be-tree-name">Scene Collection</span>
     </div>
     ${rows.map((object) => `
@@ -923,21 +1081,28 @@ function renderOutliner() {
       event.preventDefault();
       selectedId = row.dataset.object!;
       renderAll();
+      viewport.invalidate();
       openMenuAt(event.clientX, event.clientY, [
         { label: "Select", action: () => setStatus(`${selectedId} selected`, 1000) },
         { label: "Duplicate", action: duplicateSelected },
-        { label: "Rename", action: () => renameSelected() },
+        { label: "Rename", action: renameSelected },
         { label: "Delete", action: deleteSelected },
         { separator: true },
-        { label: "Hide", action: () => toggleSelectedVisibility() }
+        { label: "Hide", action: toggleSelectedVisibility },
+        { label: "Frame Selected", action: focusSelected }
       ]);
     });
     row.addEventListener("click", () => {
       selectedId = row.dataset.object!;
-      renderAll();
+      renderOutliner();
+      renderProperties();
+      renderSidebar();
+      renderHeader();
       viewport.invalidate();
+      syncTransformFields();
       setStatus(`${selectedId} selected`, 1000);
     });
+    row.addEventListener("dblclick", () => renameSelected());
   });
   outlinerEl.querySelectorAll<HTMLElement>("[data-eye]").forEach((button) => {
     button.addEventListener("click", (event) => {
@@ -947,6 +1112,9 @@ function renderOutliner() {
       object.visible = !object.visible;
       viewport.setObjects(objects);
       renderOutliner();
+      renderProperties();
+      renderSidebar();
+      viewport.invalidate();
       setStatus(`${object.name} ${object.visible ? "visible" : "hidden"}`, 1000);
     });
   });
@@ -964,11 +1132,17 @@ function renderOutliner() {
 }
 
 searchEl.addEventListener("input", renderOutliner);
+document.querySelector<HTMLSelectElement>("#outliner-mode")!.addEventListener("change", (event) => {
+  setStatus(`Outliner mode: ${(event.target as HTMLSelectElement).value}`, 1200);
+});
 
-/* ---------- properties ---------- */
+/* ------------------------------------------------------------------ */
+/* properties                                                          */
+/* ------------------------------------------------------------------ */
 
 const propTabs = document.querySelector<HTMLElement>("#prop-tabs")!;
 const propContent = document.querySelector<HTMLElement>("#prop-content")!;
+const collapsedPanels = new Set<string>(["Delta Transform"]);
 
 function renderPropTabs() {
   propTabs.innerHTML = propertyTabs.map((tab) => `
@@ -987,21 +1161,25 @@ function bindPanelToggles(root: HTMLElement) {
     title.addEventListener("click", () => {
       const body = title.nextElementSibling as HTMLElement | null;
       if (!body) return;
-      body.classList.toggle("collapsed");
+      const key = title.dataset.panel ?? "";
+      const collapsed = body.classList.toggle("collapsed");
+      if (collapsed) collapsedPanels.add(key);
+      else collapsedPanels.delete(key);
       const chev = title.querySelector<HTMLElement>(".be-chev");
-      if (chev) chev.textContent = body.classList.contains("collapsed") ? "▸" : "▾";
+      if (chev) chev.textContent = collapsed ? "▸" : "▾";
     });
   });
 }
 
-function panel(title: string, body: string, open = true): string {
+function panel(title: string, body: string): string {
+  const open = !collapsedPanels.has(title);
   return `<div class="be-prop-panel">
-    <div class="be-prop-title"><span class="be-chev">${open ? "▾" : "▸"}</span>${title}</div>
+    <div class="be-prop-title" data-panel="${title}"><span class="be-chev">${open ? "▾" : "▸"}</span>${title}</div>
     <div class="be-prop-body ${open ? "" : "collapsed"}">${body}</div>
   </div>`;
 }
 
-function vecRow(label: string, key: "loc" | "rot" | "scale", step = 0.1): string {
+function vecRow(label: string, key: "loc" | "rot" | "scale"): string {
   return `<div class="be-prop-row"><label>${label}</label><div class="be-vec">${axisFields(key)}</div></div>`;
 }
 
@@ -1015,31 +1193,55 @@ function renderProperties() {
     }
     propContent.innerHTML = [
       panel("Transform", `${vecRow("Location", "loc")}${vecRow("Rotation", "rot")}${vecRow("Scale", "scale")}`),
-      panel("Delta Transform", `${vecRow("Delta Location", "loc")}${vecRow("Delta Rotation", "rot")}${vecRow("Delta Scale", "scale")}`, false),
+      panel("Delta Transform", `${vecRow("Delta Location", "loc")}${vecRow("Delta Rotation", "rot")}${vecRow("Delta Scale", "scale")}`),
       panel("Relations", `<div class="be-prop-row"><label>Parent</label><select class="be-select"><option>Scene Collection</option><option>Camera</option></select></div>`),
       panel("Collections", `<div class="be-prop-row"><label>Collection</label><span>Scene Collection</span></div>`),
-      panel("Viewport Display", `<div class="be-prop-row"><label>Display As</label><select class="be-select"><option>Textured</option><option>Solid</option><option>Wire</option></select></div><div class="be-prop-row"><label>Color</label><input type="color" class="be-color-input" value="#b8b8b8" /></div>`),
-      panel("Visibility", `<div class="be-prop-row"><label>Show in Viewport</label><input type="checkbox" ${object.visible ? "checked" : ""} data-visibility /></div>`)
+      panel("Viewport Display", `<div class="be-prop-row"><label>Display As</label><select class="be-select"><option>Textured</option><option>Solid</option><option>Wire</option></select></div><div class="be-prop-row"><label>Color</label><input type="color" class="be-color-input" value="#b8b8b8" data-object-color /></div>`),
+      panel("Visibility", `<div class="be-prop-row"><label>Show in Viewport</label><input type="checkbox" ${object.visible ? "checked" : ""} data-visibility /></div><div class="be-prop-row"><label>Selectable</label><input type="checkbox" ${object.selectable ? "checked" : ""} data-selectable-prop /></div>`)
     ].join("");
     bindNumericFields(propContent);
     propContent.querySelector<HTMLInputElement>("[data-visibility]")?.addEventListener("change", (event) => {
       object.visible = (event.target as HTMLInputElement).checked;
       viewport.setObjects(objects);
       renderOutliner();
+      renderSidebar();
       setStatus(`${object.name} ${object.visible ? "visible" : "hidden"}`, 1000);
+    });
+    propContent.querySelector<HTMLInputElement>("[data-selectable-prop]")?.addEventListener("change", (event) => {
+      object.selectable = (event.target as HTMLInputElement).checked;
+      viewport.setObjects(objects);
+      renderOutliner();
+      setStatus(`${object.name} ${object.selectable ? "selectable" : "locked"}`, 1000);
+    });
+    propContent.querySelector<HTMLInputElement>("[data-object-color]")?.addEventListener("input", (event) => {
+      setStatus(`Viewport color ${(event.target as HTMLInputElement).value}`, 1000);
     });
   } else if (activeProp === "render") {
     propContent.innerHTML = [
-      panel("Render Engine", `<div class="be-prop-row"><label>Engine</label><select class="be-select"><option>EEVEE</option><option>Cycles</option><option>Workbench</option></select></div>`),
+      panel("Render Engine", `<div class="be-prop-row"><label>Engine</label><select class="be-select"><option>EEVEE</option><option>Cycles</option><option>Workbench</option></select></div><div class="be-prop-row"><label></label><button class="be-action-btn" data-render-image>Render Image (F12)</button></div>`),
       panel("Sampling", `<div class="be-prop-row"><label>Render</label><div class="be-field"><input type="number" value="64" /></div></div><div class="be-prop-row"><label>Viewport</label><div class="be-field"><input type="number" value="16" /></div></div>`),
-      panel("Resolution", `<div class="be-prop-row"><label>Resolution X</label><div class="be-field"><input type="number" value="1920" /></div></div><div class="be-prop-row"><label>Resolution Y</label><div class="be-field"><input type="number" value="1080" /></div></div><div class="be-prop-row"><label>Frame Rate</label><div class="be-field"><input type="number" value="24" /></div></div>`),
+      panel("Resolution", `<div class="be-prop-row"><label>Resolution X</label><div class="be-field"><input type="number" value="1920" /></div></div><div class="be-prop-row"><label>Resolution Y</label><div class="be-field"><input type="number" value="1080" /></div></div><div class="be-prop-row"><label>Frame Rate</label><div class="be-field"><input type="number" value="24" data-fps /></div></div>`),
       panel("Film", `<div class="be-prop-row"><label>Transparent</label><input type="checkbox" /></div>`)
     ].join("");
+    propContent.querySelector<HTMLElement>("[data-render-image]")?.addEventListener("click", () => renderImage());
+    propContent.querySelector<HTMLInputElement>("[data-fps]")?.addEventListener("change", (event) => {
+      const fps = Math.max(1, Number((event.target as HTMLInputElement).value) || 24);
+      timeline.setFps(fps);
+      setStatus(`Frame rate: ${fps} fps`, 1200);
+    });
   } else if (activeProp === "output") {
     propContent.innerHTML = [
       panel("Output", `<div class="be-prop-row"><label>Format</label><select class="be-select"><option>PNG</option><option>JPEG</option><option>OpenEXR</option></select></div><div class="be-prop-row"><label>Color</label><select class="be-select"><option>sRGB</option><option>Filmic</option><option>AgX</option></select></div>`),
-      panel("Frame Range", `<div class="be-prop-row"><label>Start</label><div class="be-field"><input type="number" value="${frameStart}" /></div></div><div class="be-prop-row"><label>End</label><div class="be-field"><input type="number" value="${frameEnd}" /></div></div><div class="be-prop-row"><label>Step</label><div class="be-field"><input type="number" value="1" /></div></div>`)
+      panel("Frame Range", `<div class="be-prop-row"><label>Start</label><div class="be-field"><input type="number" value="${timeline.start}" data-frame-start /></div></div><div class="be-prop-row"><label>End</label><div class="be-field"><input type="number" value="${timeline.end}" data-frame-end /></div></div><div class="be-prop-row"><label>Step</label><div class="be-field"><input type="number" value="1" /></div></div>`)
     ].join("");
+    propContent.querySelector<HTMLInputElement>("[data-frame-start]")?.addEventListener("change", (event) => {
+      timeline.setRange(Number((event.target as HTMLInputElement).value), timeline.end);
+      setStatus(`Frame range ${timeline.start}–${timeline.end}`, 1200);
+    });
+    propContent.querySelector<HTMLInputElement>("[data-frame-end]")?.addEventListener("change", (event) => {
+      timeline.setRange(timeline.start, Number((event.target as HTMLInputElement).value));
+      setStatus(`Frame range ${timeline.start}–${timeline.end}`, 1200);
+    });
   } else if (activeProp === "world") {
     propContent.innerHTML = [
       panel("Surface", `<div class="be-prop-row"><label>Color</label><input type="color" class="be-color-input" value="#252525" /></div><div class="be-prop-row"><label>Strength</label><div class="be-field"><input type="number" value="1.0" step="0.1" /></div></div>`),
@@ -1048,10 +1250,18 @@ function renderProperties() {
   } else if (activeProp === "material") {
     propContent.innerHTML = [
       panel("Surface", `<div class="be-prop-row"><label>Base Color</label><input type="color" class="be-color-input" value="#b8b8b8" /></div><div class="be-prop-row"><label>Metallic</label><div class="be-field"><input type="number" value="0.0" step="0.1" /></div></div><div class="be-prop-row"><label>Roughness</label><div class="be-field"><input type="number" value="0.5" step="0.1" /></div></div>`),
-      panel("Settings", `<div class="be-prop-row"><label>Blend Mode</label><select class="be-select"><option>Opaque</option><option>Alpha Blend</option></select></div>`)
+      panel("Settings", `<div class="be-prop-row"><label>Blend Mode</label><select class="be-select"><option>Opaque</option><option>Alpha Blend</option></select></div>`),
+      panel("Shader Editor", `<div class="be-panel-note">Switch to the Shading workspace to edit the node tree.</div>`)
     ].join("");
   } else if (activeProp === "modifiers") {
-    propContent.innerHTML = `<div class="be-panel-note">No modifiers on this object.<br><br><button class="be-scene-btn">Add Modifier</button></div>`;
+    const geometry = currentWorkspace === "Geometry Nodes";
+    propContent.innerHTML = `<div class="be-panel-note">${geometry ? "Geometry Nodes modifier:<br><b>LiteGUI Node Group</b><br><br>Switch to Geometry Nodes workspace to edit the node tree." : "No modifiers on this object."}<br><br><button class="be-action-btn" data-add-modifier>Add Modifier</button></div>`;
+    propContent.querySelector<HTMLElement>("[data-add-modifier]")?.addEventListener("click", () => setStatus("Add Modifier (demo)", 1200));
+  } else if (activeProp === "data") {
+    propContent.innerHTML = [
+      panel("UV Maps", `<div class="be-prop-row"><label>Active</label><select class="be-select"><option>UVMap</option></select></div><div class="be-prop-row"><label>UV Sync</label><input type="checkbox" checked /></div>`),
+      panel("Geometry Data", `<div class="be-prop-row"><label>Vertices</label><span>8</span></div><div class="be-prop-row"><label>Edges</label><span>12</span></div><div class="be-prop-row"><label>Faces</label><span>6</span></div>`)
+    ].join("");
   } else if (activeProp === "scene") {
     propContent.innerHTML = [
       panel("Scene", `<div class="be-prop-row"><label>Camera</label><select class="be-select"><option>Camera</option></select></div><div class="be-prop-row"><label>Units</label><select class="be-select"><option>Metric</option><option>Imperial</option></select></div>`),
@@ -1059,284 +1269,764 @@ function renderProperties() {
     ].join("");
   } else {
     const tab = propertyTabs.find((item) => item.id === activeProp);
-    propContent.innerHTML = `<div class="be-panel-note">${tab?.title ?? "Properties"} 面板：示例中仅实现核心 Object/Render/Output/World/Material。</div>`;
+    propContent.innerHTML = `<div class="be-panel-note">${tab?.title ?? "Properties"} 面板：示例中仅实现核心 Object/Render/Output/World/Material/Data。</div>`;
   }
   bindPanelToggles(propContent);
 }
 
-/* ---------- timeline ---------- */
+/* ------------------------------------------------------------------ */
+/* timeline                                                            */
+/* ------------------------------------------------------------------ */
 
-const timelineHeader = document.querySelector<HTMLElement>("#timeline-header")!;
-const timelineCanvas = document.querySelector<HTMLCanvasElement>("#timeline-canvas")!;
-let timelineDragging = false;
+timeline = new Timeline({
+  id: "timeline",
+  className: "be-timeline",
+  start: 1,
+  end: 250,
+  frame: 1,
+  fps: 24,
+  keyframes: [1, 60, 120],
+  height: "100%",
+  canvasId: "timeline-canvas",
+  frameInputId: "frame-input",
+  startInputId: "start-input",
+  endInputId: "end-input",
+  onFrameChange: (next) => handleFrame(next)
+});
+document.querySelector("#timeline-slot")!.appendChild(timeline.root);
 
-function renderTimeline() {
-  timelineHeader.innerHTML = `
-    <button class="be-menu-btn be-area-menu" data-tl="playback">Playback</button>
-    <button class="be-menu-btn be-area-menu" data-tl="keying">Keying</button>
-    <button class="be-menu-btn be-area-menu" data-tl="view">View</button>
-    <button class="be-menu-btn be-area-menu" data-tl="marker">Marker</button>
-    <span class="be-spacer"></span>
-    <button class="be-icon-btn" data-tl="start" title="Jump to Start">${icon("start", 12)}</button>
-    <button class="be-icon-btn" data-tl="prev" title="Previous Keyframe">${icon("prev", 12)}</button>
-    <button class="be-icon-btn" data-tl="play" title="Play (Space)">${icon(playing ? "pause" : "play", 12)}</button>
-    <button class="be-icon-btn" data-tl="next" title="Next Keyframe">${icon("next", 12)}</button>
-    <button class="be-icon-btn" data-tl="end" title="Jump to End">${icon("end", 12)}</button>
-    <div class="be-frame-box"><input id="frame-input" type="number" value="${frame}" /><span>FPS 24</span></div>
-    <div class="be-frame-box"><input id="start-input" type="number" value="${frameStart}" /><span>Start</span></div>
-    <div class="be-frame-box"><input id="end-input" type="number" value="${frameEnd}" /><span>End</span></div>
-  `;
-  timelineHeader.querySelectorAll<HTMLElement>("[data-tl]").forEach((button) => {
-    button.addEventListener("click", () => {
-      const action = button.dataset.tl;
-      if (action === "play") togglePlay();
-      else if (action === "start") setFrame(frameStart);
-      else if (action === "end") setFrame(frameEnd);
-      else if (action === "prev") setFrame(Math.max(frameStart, frame - 10));
-      else if (action === "next") setFrame(Math.min(frameEnd, frame + 10));
-      else if (action === "playback") openMenuFrom(button, [
-        { label: "Play", shortcut: "Space", action: togglePlay },
-        { label: "Set Start Frame", action: () => setFrame(frameStart) },
-        { label: "Set End Frame", action: () => setFrame(frameEnd) }
-      ]);
-      else if (action === "keying") openMenuFrom(button, [{ label: "Insert Keyframe", action: insertKeyframe }]);
-      else if (action === "view") openMenuFrom(button, [{ label: "Frame All", action: () => setFrame(frameStart) }]);
-      else if (action === "marker") openMenuFrom(button, [{ label: "Add Marker", action: () => setStatus("Marker added", 1000) }]);
-    });
-  });
-  timelineHeader.querySelector<HTMLInputElement>("#frame-input")?.addEventListener("change", (event) => {
-    setFrame(Number((event.target as HTMLInputElement).value));
-  });
-  timelineHeader.querySelector<HTMLInputElement>("#start-input")?.addEventListener("change", (event) => {
-    frameStart = Math.max(1, Number((event.target as HTMLInputElement).value) || 1);
-    frame = Math.max(frameStart, frame);
-    renderTimeline();
-    drawTimeline();
-  });
-  timelineHeader.querySelector<HTMLInputElement>("#end-input")?.addEventListener("change", (event) => {
-    frameEnd = Math.max(frameStart + 1, Number((event.target as HTMLInputElement).value) || 250);
-    frame = Math.min(frameEnd, frame);
-    renderTimeline();
-    drawTimeline();
-  });
+timeline.addMenuButton("Playback", (button) => {
+  openMenuFrom(button, [
+    { label: "Play / Pause", shortcut: "Space", action: () => timeline.togglePlay() },
+    { label: "Jump to Start", action: () => timeline.setFrame(timeline.start) },
+    { label: "Jump to End", action: () => timeline.setFrame(timeline.end) },
+    { separator: true },
+    { label: "Insert Keyframe", action: insertKeyframe }
+  ]);
+});
+timeline.addMenuButton("Keying", (button) => {
+  openMenuFrom(button, [
+    { label: "Insert Keyframe", shortcut: "K", action: insertKeyframe },
+    { label: "Delete Keyframe", action: () => { timeline.removeKeyframe(timeline.frame); setStatus(`Deleted keyframe at ${timeline.frame}`, 1200); } }
+  ]);
+});
+timeline.addMenuButton("View", (button) => {
+  openMenuFrom(button, [
+    { label: "Frame All", shortcut: "Home", action: () => timeline.setRange(1, 250) },
+    { label: "Frame Current", action: () => setStatus(`Frame ${timeline.frame}`, 1000) }
+  ]);
+});
+timeline.addMenuButton("Marker", (button) => {
+  openMenuFrom(button, [
+    { label: "Add Marker", action: () => setStatus(`Marker added at frame ${timeline.frame}`, 1200) },
+    { label: "Clear Markers", action: () => setStatus("Markers cleared (demo)", 1200) }
+  ]);
+});
+timeline.on("play", (value) => {
+  playing = Boolean(value);
+  if (playing) setStatus("Playing", 0);
+  else {
+    setStatus("Paused", 1200);
+    renderProperties();
+    updateStats();
+  }
+});
+timeline.on("keyframe", (value) => setStatus(`Keyframe inserted at frame ${value}`, 1200));
+timeline.on("range", () => {
+  if (activeProp === "output") renderProperties();
+  updateStats();
+});
+
+function handleFrame(next: number) {
+  frame = next;
+  const cube = objects.find((object) => object.id === "Cube");
+  if (cube) {
+    cube.rot[2] = ((frame - timeline.start) / Math.max(1, timeline.end - timeline.start)) * Math.PI * 2;
+    viewport.invalidate();
+  }
+  if (!timeline.playing) setStatus(`Frame ${frame}`, 700);
+  updateStats();
 }
 
 function setFrame(next: number) {
-  frame = Math.max(frameStart, Math.min(frameEnd, Math.round(next)));
-  const frameInput = document.querySelector<HTMLInputElement>("#frame-input");
-  if (frameInput) frameInput.value = String(frame);
-  const object = selectedObject();
-  if (object && object.id === "Cube") {
-    object.rot[2] = ((frame - frameStart) / Math.max(1, frameEnd - frameStart)) * Math.PI * 2;
-    viewport.invalidate();
-  }
-  updateStats();
-  renderProperties();
-  drawTimeline();
+  timeline.setFrame(next);
 }
 
 function togglePlay() {
-  playing = !playing;
-  renderTimeline();
-  if (playing) {
-    playTimer = window.setInterval(() => {
-      let next = frame + 1;
-      if (next > frameEnd) next = frameStart;
-      setFrame(next);
-    }, 40);
-    setStatus("Playing", 0);
-  } else {
-    window.clearInterval(playTimer);
-    setStatus("Paused", 1200);
-  }
+  timeline.togglePlay();
 }
 
 function insertKeyframe() {
-  if (!keyframes.includes(frame)) keyframes.push(frame);
-  keyframes.sort((a, b) => a - b);
-  setStatus(`Keyframe inserted at frame ${frame}`, 1400);
-  drawTimeline();
+  timeline.insertKeyframe(timeline.frame);
 }
 
-function drawTimeline() {
-  const rect = timelineCanvas.parentElement?.getBoundingClientRect();
-  if (!rect) return;
-  const dpr = window.devicePixelRatio || 1;
-  const w = rect.width;
-  const h = rect.height;
-  timelineCanvas.width = Math.floor(w * dpr);
-  timelineCanvas.height = Math.floor(h * dpr);
-  timelineCanvas.style.width = `${w}px`;
-  timelineCanvas.style.height = `${h}px`;
-  const ctx = timelineCanvas.getContext("2d");
-  if (!ctx) return;
-  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-  ctx.clearRect(0, 0, w, h);
-  ctx.fillStyle = "#282828";
-  ctx.fillRect(0, 0, w, h);
+/* ------------------------------------------------------------------ */
+/* node editors                                                        */
+/* ------------------------------------------------------------------ */
 
-  const left = 0;
-  const right = w;
-  const top = 0;
-  const rulerHeight = 20;
-  const usable = right - left;
-  const frameToX = (value: number) => left + ((value - frameStart) / Math.max(1, frameEnd - frameStart)) * usable;
+const nodeGraphs: Record<string, () => { nodes: any[]; links: any[] }> = {
+  shading: () => ({
+    nodes: [
+      { id: "output", title: "Material Output", x: 620, y: 40, color: "#7a4a4a", inputs: [{ id: "surface", name: "Surface" }, { id: "volume", name: "Volume" }] },
+      { id: "principled", title: "Principled BSDF", x: 380, y: 30, color: "#5b7d5b", inputs: [{ id: "base", name: "Base Color" }, { id: "rough", name: "Roughness" }], outputs: [{ id: "bsdf", name: "BSDF" }] },
+      { id: "ramp", title: "Color Ramp", x: 190, y: 40, color: "#7a6a3a", inputs: [{ id: "fac", name: "Fac" }], outputs: [{ id: "color", name: "Color" }] },
+      { id: "noise", title: "Noise Texture", x: 20, y: 40, color: "#5b6a7d", outputs: [{ id: "fac", name: "Fac" }, { id: "color", name: "Color" }] }
+    ],
+    links: [
+      { from: "noise", fromPort: "fac", to: "ramp", toPort: "fac" },
+      { from: "ramp", fromPort: "color", to: "principled", toPort: "base" },
+      { from: "principled", fromPort: "bsdf", to: "output", toPort: "surface" }
+    ]
+  }),
+  compositing: () => ({
+    nodes: [
+      { id: "layers", title: "Render Layers", x: 20, y: 40, color: "#4a6a7a", outputs: [{ id: "image", name: "Image" }, { id: "alpha", name: "Alpha" }] },
+      { id: "glare", title: "Glare", x: 250, y: 40, color: "#7a6a3a", inputs: [{ id: "image", name: "Image" }], outputs: [{ id: "image", name: "Image" }] },
+      { id: "composite", title: "Composite", x: 480, y: 40, color: "#7a4a4a", inputs: [{ id: "image", name: "Image" }] }
+    ],
+    links: [
+      { from: "layers", fromPort: "image", to: "glare", toPort: "image" },
+      { from: "glare", fromPort: "image", to: "composite", toPort: "image" }
+    ]
+  }),
+  geometry: () => ({
+    nodes: [
+      { id: "input", title: "Group Input", x: 20, y: 40, color: "#4a6a7a", outputs: [{ id: "geometry", name: "Geometry" }] },
+      { id: "distribute", title: "Distribute Points", x: 230, y: 30, color: "#6a5b7a", inputs: [{ id: "geometry", name: "Geometry" }], outputs: [{ id: "points", name: "Points" }] },
+      { id: "instance", title: "Instance on Points", x: 460, y: 30, color: "#6a5b7a", inputs: [{ id: "points", name: "Points" }, { id: "instance", name: "Instance" }], outputs: [{ id: "geometry", name: "Geometry" }] },
+      { id: "output", title: "Group Output", x: 690, y: 40, color: "#4a6a5a", inputs: [{ id: "geometry", name: "Geometry" }] }
+    ],
+    links: [
+      { from: "input", fromPort: "geometry", to: "distribute", toPort: "geometry" },
+      { from: "distribute", fromPort: "points", to: "instance", toPort: "points" },
+      { from: "instance", fromPort: "geometry", to: "output", toPort: "geometry" }
+    ]
+  })
+};
 
+shadingEditor = new NodeEditor({ id: "shading-node-editor", className: "be-node-editor" });
+compositingEditor = new NodeEditor({ id: "compositing-node-editor", className: "be-node-editor" });
+geometryEditor = new NodeEditor({ id: "geometry-node-editor", className: "be-node-editor" });
+for (const editor of [shadingEditor, compositingEditor, geometryEditor]) {
+  editor.on("change", () => {
+    updateNodeHeader();
+    const graph = editor.getGraph();
+    setStatus(`Node graph updated · ${graph.nodes.length} nodes · ${graph.links.length} links`, 1200);
+  });
+  editor.on("select", (id) => {
+    if (id) setStatus(`Node selected: ${id}`, 900);
+  });
+}
+
+function mountNodeEditor() {
+  const slot = document.querySelector<HTMLElement>("#node-editor-slot");
+  if (!slot) return;
+  slot.innerHTML = "";
+  const editor = currentNodesEditor();
+  if (!editor) return;
+  slot.appendChild(editor.root);
+  requestAnimationFrame(() => editor.refresh());
+}
+
+function currentNodesEditor(): NodeEditor | null {
+  if (currentWorkspace === "Shading") return shadingEditor;
+  if (currentWorkspace === "Compositing") return compositingEditor;
+  if (currentWorkspace === "Geometry Nodes") return geometryEditor;
+  return null;
+}
+
+function nodeGraphForWorkspace() {
+  if (currentWorkspace === "Shading") return nodeGraphs.shading();
+  if (currentWorkspace === "Compositing") return nodeGraphs.compositing();
+  return nodeGraphs.geometry();
+}
+
+function initNodeEditors() {
+  shadingEditor.setGraph(nodeGraphs.shading().nodes, nodeGraphs.shading().links);
+  compositingEditor.setGraph(nodeGraphs.compositing().nodes, nodeGraphs.compositing().links);
+  geometryEditor.setGraph(nodeGraphs.geometry().nodes, nodeGraphs.geometry().links);
+  updateNodeHeader();
+}
+
+function updateNodeHeader() {
+  const editor = currentNodesEditor();
+  if (!editor) return;
+  const graph = editor.getGraph();
+  const title = currentWorkspace === "Shading" ? "Shader Editor" : currentWorkspace === "Compositing" ? "Compositor" : "Geometry Node Editor";
+  nodesHeader.setLeft([
+    areaButton("View", "node-view"),
+    areaButton("Select", "node-select"),
+    areaButton("Add", "node-add"),
+    areaButton("Node", "node-node")
+  ]);
+  nodesHeader.setTitle(title, icon("nodes", 14), title);
+  const count = document.createElement("span");
+  count.className = "lg-header-bar__text";
+  count.style.color = "#9a9a9a";
+  count.style.padding = "0 6px";
+  count.textContent = `${graph.nodes.length} nodes · ${graph.links.length} links`;
+  const addButton = createTopButton("Add Node", "lg-header-bar__button");
+  addButton.addEventListener("click", () => openNodeAddMenu(editor, addButton));
+  nodesHeader.setRight([count, addButton]);
+  nodesHeader.root.querySelectorAll<HTMLElement>("[data-menu]").forEach((button) => {
+    button.addEventListener("click", () => handleNodeMenu(button, editor));
+  });
+}
+
+function handleNodeMenu(button: HTMLElement, editor: NodeEditor) {
+  const menu = button.dataset.menu;
+  if (menu === "node-add") openNodeAddMenu(editor, button);
+  else if (menu === "node-select") openMenuFrom(button, [
+    { label: "Select All", action: () => setStatus("Select All nodes (demo)", 1000) },
+    { label: "Deselect", action: () => { editor.select(null); setStatus("Deselected", 800); } }
+  ]);
+  else if (menu === "node-node") openMenuFrom(button, [
+    { label: "Delete Selected", shortcut: "Delete", action: () => { if (editor.getSelected()) editor.removeNode(editor.getSelected()!); else setStatus("No node selected", 900); } },
+    { label: "Duplicate (demo)", action: () => setStatus("Duplicate node (demo)", 900) }
+  ]);
+  else if (menu === "node-view") openMenuFrom(button, [
+    { label: "Frame All", action: () => { editor.refresh(); setStatus("Node graph refreshed", 900); } },
+    { label: "Recalculate Links", action: () => { editor.refresh(); setStatus("Links recalculated", 900); } }
+  ]);
+}
+
+function openNodeAddMenu(editor: NodeEditor, anchor: HTMLElement) {
+  const labels = currentWorkspace === "Shading"
+    ? ["Noise Texture", "Color Ramp", "Principled BSDF", "Material Output"]
+    : currentWorkspace === "Compositing"
+      ? ["Render Layers", "Glare", "Color Balance", "Composite"]
+      : ["Group Input", "Distribute Points", "Instance on Points", "Join Geometry", "Group Output"];
+  openMenuFrom(anchor, labels.map((label) => ({
+    label,
+    action: () => {
+      const count = editor.getNodes().length;
+      const id = `${label.toLowerCase().replace(/\s+/g, "-")}-${Date.now().toString(36)}`;
+      editor.addNode({
+        id,
+        title: label,
+        x: 24 + (count % 4) * 190,
+        y: 24 + Math.floor(count / 4) * 120,
+        color: "#5b6a7d",
+        inputs: label.includes("Output") ? [{ id: "in", name: "Input" }] : [{ id: "in", name: "Input" }],
+        outputs: label.includes("Output") ? [] : [{ id: "out", name: "Output" }]
+      });
+      setStatus(`Added node: ${label}`, 1000);
+    }
+  })));
+}
+
+/* ------------------------------------------------------------------ */
+/* text editor (Scripting)                                             */
+/* ------------------------------------------------------------------ */
+
+const scriptSample = `import bpy
+
+# LiteGUI Blender-style editor demo
+cube = bpy.data.objects.get("Cube")
+if cube:
+    cube.location = (0, 0, 1)
+    cube.rotation_euler = (0, 0, 0.0)
+
+print("Hello from Blender-compatible editor")
+`;
+const consoleSample = `Python 3.11.9 (main, Blender 4.5.17)
+>>> import bpy
+>>> bpy.context.scene.frame_current
+1
+>>> # Ctrl+Enter runs the Text tab
+`;
+
+textEditor = new TextEditor({
+  id: "script-editor",
+  className: "be-script-editor",
+  language: "Python",
+  tabs: [
+    { id: "text", label: "Text", value: scriptSample },
+    { id: "console", label: "Console", value: consoleSample, readOnly: true }
+  ],
+  activeTab: "text"
+});
+document.querySelector("#script-editor-slot")!.appendChild(textEditor.root);
+textEditor.on("tab", (id) => {
+  setStatus(id === "console" ? "Console tab" : "Text tab", 900);
+});
+textEditor.on("run", (value: unknown) => {
+  const lines = String(value).split("\n").length;
+  textEditor.appendTabLine("console", `>>> Run Text (${lines} lines)`);
+  textEditor.appendTabLine("console", "Hello from Blender-compatible editor");
+  setStatus("Script executed · 0 errors", 2000);
+});
+
+/* ------------------------------------------------------------------ */
+/* image editors (UV / Rendering / Compositing preview)                */
+/* ------------------------------------------------------------------ */
+
+function makeUvImage() {
+  const canvas = document.createElement("canvas");
+  canvas.width = 512;
+  canvas.height = 512;
+  const ctx = canvas.getContext("2d")!;
   ctx.fillStyle = "#1d1d1d";
-  ctx.fillRect(0, 0, w, rulerHeight);
-  ctx.strokeStyle = "#3d3d3d";
-  ctx.beginPath();
-  ctx.moveTo(0, rulerHeight);
-  ctx.lineTo(w, rulerHeight);
-  ctx.stroke();
-
-  ctx.font = "10px Inter, sans-serif";
-  ctx.fillStyle = "#9a9a9a";
-  const step = 10;
-  for (let value = frameStart; value <= frameEnd; value += step) {
-    const x = frameToX(value);
-    ctx.strokeStyle = "#3d3d3d";
-    ctx.beginPath();
-    ctx.moveTo(x, 12);
-    ctx.lineTo(x, h);
-    ctx.stroke();
-    ctx.fillText(String(value), x + 3, 13);
+  ctx.fillRect(0, 0, 512, 512);
+  for (let y = 0; y < 512; y += 32) {
+    for (let x = 0; x < 512; x += 32) {
+      ctx.fillStyle = (x / 32 + y / 32) % 2 === 0 ? "#3a3a3a" : "#303030";
+      ctx.fillRect(x, y, 32, 32);
+    }
   }
-
-  const keyframes = [frameStart, 60, 120, frameEnd].filter((value, index, list) => list.indexOf(value) === index && value >= frameStart && value <= frameEnd);
-  for (const value of keyframes) {
-    const x = frameToX(value);
-    ctx.fillStyle = "#d8b04a";
+  ctx.strokeStyle = "#4a4a4a";
+  ctx.lineWidth = 1;
+  for (let i = 0; i <= 512; i += 64) {
     ctx.beginPath();
-    ctx.moveTo(x, 54);
-    ctx.lineTo(x + 5, 59);
-    ctx.lineTo(x, 64);
-    ctx.lineTo(x - 5, 59);
+    ctx.moveTo(i, 0);
+    ctx.lineTo(i, 512);
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.moveTo(0, i);
+    ctx.lineTo(512, i);
+    ctx.stroke();
+  }
+  const islands = [
+    [[34, 470], [160, 470], [160, 360], [34, 360]],
+    [[190, 470], [330, 470], [330, 350], [190, 350]],
+    [[360, 470], [478, 470], [478, 390], [360, 390]],
+    [[34, 330], [150, 330], [150, 240], [34, 240]]
+  ];
+  for (const island of islands) {
+    ctx.beginPath();
+    island.forEach(([x, y], index) => (index === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y)));
     ctx.closePath();
+    ctx.fillStyle = "rgba(71, 114, 179, 0.22)";
+    ctx.fill();
+    ctx.strokeStyle = "#7fa7d8";
+    ctx.lineWidth = 2;
+    ctx.stroke();
+  }
+  ctx.fillStyle = "#c8c8c8";
+  ctx.font = "14px Inter, sans-serif";
+  ctx.fillText("UVMap", 18, 24);
+  return canvas.toDataURL("image/png");
+}
+
+function makeCompositePreview() {
+  const canvas = document.createElement("canvas");
+  canvas.width = 640;
+  canvas.height = 360;
+  const ctx = canvas.getContext("2d")!;
+  const gradient = ctx.createLinearGradient(0, 0, 640, 360);
+  gradient.addColorStop(0, "#26354a");
+  gradient.addColorStop(0.55, "#6a4a6a");
+  gradient.addColorStop(1, "#c07a4a");
+  ctx.fillStyle = gradient;
+  ctx.fillRect(0, 0, 640, 360);
+  ctx.fillStyle = "rgba(255,255,255,0.85)";
+  for (let i = 0; i < 7; i += 1) {
+    ctx.beginPath();
+    ctx.arc(100 + i * 72, 150 + Math.sin(i) * 40, 18 + i * 3, 0, Math.PI * 2);
     ctx.fill();
   }
-
-  const x = frameToX(frame);
-  ctx.strokeStyle = "#4772b3";
-  ctx.lineWidth = 1.5;
-  ctx.beginPath();
-  ctx.moveTo(x, 0);
-  ctx.lineTo(x, h);
-  ctx.stroke();
-  ctx.fillStyle = "#4772b3";
-  ctx.beginPath();
-  ctx.moveTo(x - 5, 0);
-  ctx.lineTo(x + 5, 0);
-  ctx.lineTo(x, 7);
-  ctx.closePath();
-  ctx.fill();
+  ctx.fillStyle = "rgba(20,20,20,0.75)";
+  ctx.fillRect(0, 320, 640, 40);
+  ctx.fillStyle = "#e8e8e8";
+  ctx.font = "14px Inter, sans-serif";
+  ctx.fillText("Viewer Node · Composite", 14, 345);
+  return canvas.toDataURL("image/png");
 }
 
-timelineCanvas.addEventListener("mousedown", (event) => {
-  timelineDragging = true;
-  updateFrameFromTimeline(event);
+uvEditor = new ImageEditor({
+  id: "uv-editor",
+  className: "be-image-editor",
+  title: "UV Editor",
+  subtitle: "UVMap · 512 × 512",
+  src: makeUvImage(),
+  checkerboard: true
 });
-window.addEventListener("mousemove", (event) => {
-  if (timelineDragging) updateFrameFromTimeline(event);
-});
-window.addEventListener("mouseup", () => { timelineDragging = false; });
+document.querySelector("#uv-editor-slot")!.appendChild(uvEditor.root);
 
-function updateFrameFromTimeline(event: MouseEvent) {
-  const rect = timelineCanvas.getBoundingClientRect();
-  const ratio = Math.max(0, Math.min(1, (event.clientX - rect.left) / rect.width));
-  setFrame(frameStart + ratio * (frameEnd - frameStart));
+renderEditor = new ImageEditor({
+  id: "render-editor",
+  className: "be-image-editor",
+  title: "Render Result",
+  subtitle: "1920 × 1080 · 100%",
+  checkerboard: false,
+  emptyText: "Press F12 to render"
+});
+document.querySelector("#render-editor-slot")!.appendChild(renderEditor.root);
+
+previewEditor = new ImageEditor({
+  id: "preview-editor",
+  className: "be-image-editor",
+  title: "Composite Preview",
+  subtitle: "Viewer Node",
+  src: makeCompositePreview(),
+  checkerboard: true
+});
+document.querySelector("#preview-editor-slot")!.appendChild(previewEditor.root);
+
+for (const editor of [uvEditor, renderEditor, previewEditor]) {
+  editor.on("zoom", () => setStatus(`Zoom: ${Math.round(editor.getZoom() * 100)}%`, 1000));
 }
 
-/* ---------- keyboard ---------- */
+/* ------------------------------------------------------------------ */
+/* workspaces                                                          */
+/* ------------------------------------------------------------------ */
 
-window.addEventListener("keydown", (event) => {
-  const target = event.target as HTMLElement;
-  if (target.tagName === "INPUT" || target.tagName === "SELECT" || target.tagName === "TEXTAREA") return;
-  const key = event.key.toLowerCase();
-  if (key === "g") { beginTransform("translate"); event.preventDefault(); }
-  else if (key === "r") { beginTransform("rotate"); event.preventDefault(); }
-  else if (key === "s") { beginTransform("scale"); event.preventDefault(); }
-  else if (key === "tab") {
-    currentMode = currentMode === "Edit Mode" ? "Object Mode" : "Edit Mode";
-    viewport.setShading(currentMode === "Edit Mode" ? "wireframe" : shading);
-    viewport.setEditMode(currentMode === "Edit Mode");
-    renderHeader();
-    setStatus(`${currentMode}`, 1200);
-    event.preventDefault();
-  } else if (key === "n") { toggleSidebar(); event.preventDefault(); }
-  else if (key === "t") { toggleToolbar(); event.preventDefault(); }
-  else if (key === " ") { togglePlay(); event.preventDefault(); }
-  else if (key === "escape") { viewport.cancelTransform(); closePopup(); event.preventDefault(); }
-  else if (key === "enter") { viewport.confirmTransform(); event.preventDefault(); }
-  else if (key === "delete" || key === "x") { deleteSelected(); event.preventDefault(); }
-  else if (key === "d" && event.shiftKey) { duplicateSelected(); event.preventDefault(); }
-  else if (key === "a" && event.shiftKey) { openAddMenuFromShortcut(); event.preventDefault(); }
-  else if (key === "home") { viewport.frameAll(); event.preventDefault(); }
-  else if (key === "f3") { openSearchMenu(); event.preventDefault(); }
-  else if (event.code === "Numpad1") { viewport.setView(0, 0, 16.5); event.preventDefault(); }
-  else if (event.code === "Numpad3") { viewport.setView(Math.PI / 2, 0, 16.5); event.preventDefault(); }
-  else if (event.code === "Numpad7") { viewport.setView(0, Math.PI / 2 - 0.01, 16.5); event.preventDefault(); }
-});
+const workspaceProps: Record<string, string> = {
+  Layout: "object",
+  Modeling: "object",
+  Sculpting: "modifiers",
+  "UV Editing": "data",
+  "Texture Paint": "material",
+  Shading: "material",
+  Animation: "object",
+  Rendering: "render",
+  Compositing: "render",
+  "Geometry Nodes": "modifiers",
+  Scripting: "scene"
+};
+
+function switchWorkspace(name: string) {
+  if (!workspaces.includes(name)) return;
+  currentWorkspace = name;
+  closePopup();
+  appEl.dataset.workspace = slug(name);
+  document.querySelectorAll<HTMLElement>(".be-workspace-tab").forEach((tab) => {
+    const active = tab.dataset.workspace === name;
+    tab.classList.toggle("active", active);
+    tab.classList.toggle("lg-header-bar__tab--active", active);
+  });
+
+  activeProp = workspaceProps[name] ?? "object";
+  applyWorkspaceToolbar(name);
+  renderHeader();
+  updateNodeHeader();
+  mountNodeEditor();
+  renderProperties();
+  renderSidebar();
+  updateSidebarVisibility();
+  updateStats();
+
+  if (name !== "Animation" && timeline.playing) timeline.pause();
+  if (name === "Rendering") ensureRenderResult();
+  if (name === "Compositing" && !previewEditor.getSource()) previewEditor.setSource(makeCompositePreview());
+
+  requestAnimationFrame(() => {
+    timeline.scheduleDraw();
+    viewport.invalidate();
+    if (name === "UV Editing") uvEditor.fit();
+    if (name === "Rendering") renderEditor.fit();
+    if (name === "Compositing") previewEditor.fit();
+    const editor = currentNodesEditor();
+    if (editor) editor.refresh();
+  });
+
+  const hints: Record<string, string> = {
+    Layout: "Layout workspace",
+    Modeling: "Modeling workspace",
+    Sculpting: "Sculpting workspace · brush tools in the toolbar",
+    "UV Editing": "UV Editing workspace · UV grid + 3D viewport",
+    "Texture Paint": "Texture Paint workspace · paint tools",
+    Shading: "Shading workspace · Shader Editor",
+    Animation: "Animation workspace · timeline expanded",
+    Rendering: "Rendering workspace · Render Result",
+    Compositing: "Compositing workspace · Compositor + Viewer",
+    "Geometry Nodes": "Geometry Nodes workspace · node graph + 3D preview",
+    Scripting: "Scripting workspace · Text Editor"
+  };
+  setStatus(hints[name] ?? name, 1600);
+}
+
+/* ------------------------------------------------------------------ */
+/* rendering                                                           */
+/* ------------------------------------------------------------------ */
+
+let renderingTimer = 0;
+
+function captureViewport(): string {
+  const canvas = document.querySelector<HTMLCanvasElement>("canvas.be-canvas");
+  if (!canvas || canvas.width <= 32 || canvas.height <= 32) return "";
+  return viewport.snapshot();
+}
+
+function renderImage() {
+  if (renderingTimer) window.clearInterval(renderingTimer);
+  let progress = 0;
+  setStatus("Rendering... 0%", 0);
+  renderingTimer = window.setInterval(() => {
+    progress += 20;
+    if (progress >= 100) {
+      window.clearInterval(renderingTimer);
+      renderingTimer = 0;
+      viewport.invalidate();
+      window.setTimeout(() => {
+        const image = captureViewport();
+        if (image) renderEditor.setSource(image);
+        renderEditor.setTitle("Render Result", "1920 × 1080 · EEVEE");
+        setStatus("Render complete: 1920×1080 · EEVEE", 5000);
+        if (currentWorkspace === "Rendering") {
+          requestAnimationFrame(() => renderEditor.fit());
+        }
+      }, 60);
+    } else {
+      setStatus(`Rendering... ${progress}%`, 0);
+    }
+  }, 120);
+}
+
+function ensureRenderResult() {
+  if (renderEditor.getSource()) return;
+  viewport.invalidate();
+  window.setTimeout(() => {
+    if (!renderEditor.getSource()) {
+      const image = captureViewport();
+      if (image) renderEditor.setSource(image);
+      renderEditor.setTitle("Render Result", "1920 × 1080 · 100%");
+    }
+  }, 120);
+}
+
+/* ------------------------------------------------------------------ */
+/* misc actions                                                        */
+/* ------------------------------------------------------------------ */
+
+function toggleFullscreen() {
+  if (!document.fullscreenElement) document.documentElement.requestFullscreen?.();
+  else document.exitFullscreen?.();
+}
+
+function resetScene() {
+  objects.splice(0, objects.length,
+    { id: "Camera", name: "Camera", type: "camera", loc: [-6.8, -4.6, 4.2], rot: [0, 0, 0], scale: [1, 1, 1], visible: true, selectable: true },
+    { id: "Cube", name: "Cube", type: "mesh", loc: [0, 0, 1], rot: [0, 0, 0], scale: [1, 1, 1], visible: true, selectable: true },
+    { id: "Light", name: "Light", type: "light", loc: [3.8, -1.5, 5.0], rot: [0, 0, 0], scale: [1, 1, 1], visible: true, selectable: true }
+  );
+  selectedId = "Cube";
+  history = [];
+  future = [];
+  timeline.setRange(1, 250);
+  timeline.setFrame(1);
+  viewport.setObjects(objects);
+  renderAll();
+  viewport.frameAll();
+  viewport.invalidate();
+  setStatus("New scene", 1400);
+}
 
 function beginTransform(kind: "translate" | "rotate" | "scale") {
-  transformMode = kind;
+  if (!selectedObject()) {
+    setStatus("No active object to transform", 1200);
+    return;
+  }
   pushHistory();
-  viewport.beginTransform(kind);
+  const started = viewport.beginTransform(kind);
+  if (!started) history.pop();
+}
+
+/* ------------------------------------------------------------------ */
+/* keyboard                                                            */
+/* ------------------------------------------------------------------ */
+
+function openSearchMenu() {
+  const anchor = viewportHeader.root.querySelector<HTMLElement>('[data-menu="add"]') ?? viewportHeader.root;
+  openMenuFrom(anchor, [
+    { label: "Add Cube", action: () => addObject("mesh") },
+    { label: "Add Camera", action: () => addObject("camera") },
+    { label: "Add Light", action: () => addObject("light") },
+    { separator: true },
+    { label: "Frame Selected", action: focusSelected },
+    { label: "Frame All", action: () => viewport.frameAll() },
+    { label: "Toggle Sidebar", action: toggleSidebar },
+    { label: "Render Image", shortcut: "F12", action: () => renderImage() }
+  ]);
 }
 
 function openAddMenuFromShortcut() {
-  const anchor = document.querySelector<HTMLElement>("#viewport-header");
-  if (anchor) openMenuFrom(anchor, addMenu());
+  const anchor = viewportHeader.root.querySelector<HTMLElement>('[data-menu="add"]') ?? viewportHeader.root;
+  openMenuFrom(anchor, addMenu());
 }
 
-function openSearchMenu() {
-  const anchor = document.querySelector<HTMLElement>("#viewport-header");
-  if (anchor) {
-    openMenuFrom(anchor, [
-      { label: "Add Cube", action: () => addObject("mesh") },
-      { label: "Add Camera", action: () => addObject("camera") },
-      { label: "Add Light", action: () => addObject("light") },
-      { separator: true },
-      { label: "Toggle Sidebar", action: toggleSidebar },
-      { label: "Frame All", action: () => viewport.frameAll() }
-    ]);
+window.addEventListener("keydown", (event) => {
+  const target = event.target as HTMLElement;
+  const inField = target.tagName === "INPUT" || target.tagName === "SELECT" || target.tagName === "TEXTAREA";
+  const inNodeEditor = Boolean(target.closest(".lg-node-editor"));
+  const key = event.key.toLowerCase();
+  const mod = event.ctrlKey || event.metaKey;
+
+  if (inField) return;
+  if (key === "escape") {
+    if (popup) closePopup();
+    else viewport.cancelTransform();
+    event.preventDefault();
+    return;
   }
-}
+  if (mod && key === "z") {
+    if (event.shiftKey) redo();
+    else undo();
+    event.preventDefault();
+    return;
+  }
+  if (mod && key === "y") {
+    redo();
+    event.preventDefault();
+    return;
+  }
+  if (event.key === "F12") {
+    renderImage();
+    event.preventDefault();
+    return;
+  }
+  if (mod) return;
 
-/* ---------- area resizer ---------- */
+  if (key === "g") {
+    if (inNodeEditor) return;
+    activateToolVisual("move");
+    beginTransform("translate");
+    event.preventDefault();
+  } else if (key === "r") {
+    if (inNodeEditor) return;
+    activateToolVisual("rotate");
+    beginTransform("rotate");
+    event.preventDefault();
+  } else if (key === "s") {
+    if (inNodeEditor) return;
+    activateToolVisual("scale");
+    beginTransform("scale");
+    event.preventDefault();
+  } else if (key === "tab") {
+    if (hasViewport()) {
+      setMode(currentMode === "Edit Mode" ? "Object Mode" : "Edit Mode");
+    }
+    event.preventDefault();
+  } else if (key === "n") {
+    toggleSidebar();
+    event.preventDefault();
+  } else if (key === "t") {
+    toggleToolbar();
+    event.preventDefault();
+  } else if (key === "f") {
+    if (hasViewport() && !inNodeEditor) focusSelected();
+    event.preventDefault();
+  } else if (key === " ") {
+    if (popup) closePopup();
+    if (!timeline.root.offsetParent) {
+      setStatus("Timeline hidden in this workspace", 1200);
+      event.preventDefault();
+      return;
+    }
+    togglePlay();
+    event.preventDefault();
+  } else if (key === "enter") {
+    viewport.confirmTransform();
+    event.preventDefault();
+  } else if (key === "delete" || key === "backspace") {
+    if (inNodeEditor) return;
+    deleteSelected();
+    event.preventDefault();
+  } else if (key === "x") {
+    if (inNodeEditor) return;
+    deleteSelected();
+    event.preventDefault();
+  } else if (event.shiftKey && key === "d") {
+    duplicateSelected();
+    event.preventDefault();
+  } else if (event.shiftKey && key === "a") {
+    openAddMenuFromShortcut();
+    event.preventDefault();
+  } else if (key === "home") {
+    viewport.frameAll();
+    setStatus("Frame All", 900);
+    event.preventDefault();
+  } else if (key === "f3") {
+    openSearchMenu();
+    event.preventDefault();
+  } else if (event.code === "Numpad1") {
+    viewport.setView(0, 0, 16.5);
+    setStatus("Front Orthographic", 1000);
+    event.preventDefault();
+  } else if (event.code === "Numpad3") {
+    viewport.setView(Math.PI / 2, 0, 16.5);
+    setStatus("Right Orthographic", 1000);
+    event.preventDefault();
+  } else if (event.code === "Numpad7") {
+    viewport.setView(0, Math.PI / 2 - 0.01, 16.5);
+    setStatus("Top Orthographic", 1000);
+    event.preventDefault();
+  } else if (currentMode === "Edit Mode" && (key === "1" || key === "2" || key === "3")) {
+    const element = key === "1" ? "vertex" : key === "2" ? "edge" : "face";
+    viewport.setEditElementMode(element);
+    setStatus(`Edit select mode: ${element}`, 1000);
+    event.preventDefault();
+  }
+});
+
+/* ------------------------------------------------------------------ */
+/* area resizer                                                        */
+/* ------------------------------------------------------------------ */
 
 const rightResizer = document.querySelector<HTMLElement>("#right-resizer");
-const mainEl = document.querySelector<HTMLElement>(".be-main");
-if (rightResizer && mainEl) {
+if (rightResizer) {
   rightResizer.addEventListener("pointerdown", (event) => {
     event.preventDefault();
     const startX = event.clientX;
-    const startWidth = mainEl.getBoundingClientRect().width - document.querySelector(".be-workspace")!.getBoundingClientRect().width;
+    const startWidth = rightColumn.getBoundingClientRect().width;
     const move = (moveEvent: PointerEvent) => {
       const width = Math.max(250, Math.min(520, startWidth - (moveEvent.clientX - startX)));
       mainEl.style.setProperty("--right-width", `${width}px`);
-      drawTimeline();
+      timeline.scheduleDraw();
+      viewport.invalidate();
     };
     const up = () => {
       window.removeEventListener("pointermove", move);
       window.removeEventListener("pointerup", up);
+      timeline.scheduleDraw();
+      viewport.invalidate();
+      if (currentWorkspace === "UV Editing") uvEditor.fit();
+      if (currentWorkspace === "Rendering") renderEditor.fit();
+      if (currentWorkspace === "Compositing") previewEditor.fit();
     };
     window.addEventListener("pointermove", move);
     window.addEventListener("pointerup", up, { once: true });
   });
 }
 
-/* ---------- init ---------- */
+/* ------------------------------------------------------------------ */
+/* render glue                                                         */
+/* ------------------------------------------------------------------ */
 
+function renderAll() {
+  viewport?.setObjects(objects);
+  renderSidebar();
+  renderOutliner();
+  renderProperties();
+  renderHeader();
+  updateNodeHeader();
+  updateStats();
+  syncTransformFields();
+}
+
+/* ------------------------------------------------------------------ */
+/* init                                                                */
+/* ------------------------------------------------------------------ */
+
+appEl.dataset.workspace = "layout";
+initNodeEditors();
+applyWorkspaceToolbar(currentWorkspace);
 renderHeader();
-renderTimeline();
 renderProperties();
 renderOutliner();
 renderSidebar();
+updateSidebarVisibility();
 viewport.setObjects(objects);
 viewport.setSidebarOpen(sidebarOpen);
-sidebar.classList.add("hidden");
 setStatus(defaultHint());
 updateStats();
-drawTimeline();
-window.addEventListener("resize", () => drawTimeline());
+timeline.scheduleDraw();
+window.addEventListener("resize", () => {
+  timeline.scheduleDraw();
+  viewport.invalidate();
+});
+window.setTimeout(() => {
+  ensureRenderResult();
+  uvEditor.fit();
+  previewEditor.fit();
+}, 150);

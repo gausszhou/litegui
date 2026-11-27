@@ -1,8 +1,10 @@
 #!/usr/bin/env node
 /**
  * 构建 GitHub Pages 部署产物到 dist/：
- *   dist/demo/    apps/demo 最小示例
- *   dist/editor/  apps/editor 综合示例
+ *   dist/coder/   apps/coder VS Code 风格代码编辑器
+ *   dist/editor/  apps/editor 经典布局示例
+ *   dist/blender/ apps/blender Blender 风格工作台
+ *   dist/photocraft/ apps/photocraft 图像编辑器
  *   dist/docs/    VitePress 文档站 + Typedoc API（base 由 DOCS_BASE 决定，默认 /litegui/docs/）
  *   dist/index.html  站点入口页
  *   dist/.nojekyll   跳过 GitHub Pages 的 Jekyll 处理
@@ -28,8 +30,10 @@ function run(command) {
 rmSync(distDir, { recursive: true, force: true });
 mkdirSync(distDir, { recursive: true });
 
-run("pnpm --filter @gausszhou/litegui-demo build");
+run("pnpm --filter @gausszhou/litegui-coder build");
 run("pnpm --filter @gausszhou/litegui-editor build");
+run("pnpm --filter @gausszhou/litegui-blender build");
+run("pnpm --filter @gausszhou/litegui-photocraft build");
 run("pnpm docs:build");
 
 writeFileSync(join(distDir, ".nojekyll"), "");
@@ -37,8 +41,10 @@ writeFileSync(join(distDir, "index.html"), landingPage());
 
 const expected = [
   join(distDir, "index.html"),
-  join(distDir, "demo", "index.html"),
+  join(distDir, "coder", "index.html"),
   join(distDir, "editor", "index.html"),
+  join(distDir, "blender", "index.html"),
+  join(distDir, "photocraft", "index.html"),
   join(distDir, "docs", "index.html"),
 ];
 const missing = expected.filter((file) => !existsSync(file));
@@ -49,7 +55,7 @@ if (missing.length) {
 }
 
 console.log("\nPages 产物已生成：");
-console.log(`  demo:   ${join(distDir, "demo")}`);
+console.log(`  coder:  ${join(distDir, "coder")}`);
 console.log(`  editor: ${join(distDir, "editor")}`);
 console.log(`  docs:   ${join(distDir, "docs")}（base: ${docsBase}）`);
 console.log(`  root:   ${join(distDir, "index.html")}`);
@@ -124,13 +130,21 @@ function landingPage() {
           <strong>文档</strong>
           <span>快速开始、组件指南与 API 参考</span>
         </a>
-        <a class="card" href="./demo/">
-          <strong>Demo</strong>
-          <span>最小示例：菜单、布局与按钮</span>
+        <a class="card" href="./coder/">
+          <strong>Coder</strong>
+          <span>VS Code 风格代码编辑器：文件树、标签页、编辑器</span>
         </a>
         <a class="card" href="./editor/">
           <strong>Editor</strong>
-          <span>综合示例：工具台、对话框、表格与树</span>
+          <span>经典 LiteGUI 布局：菜单、面板、表格与树</span>
+        </a>
+        <a class="card" href="./blender/">
+          <strong>Blender Workbench</strong>
+          <span>Blender 风格工作台：视口、Outliner、属性、时间线</span>
+        </a>
+        <a class="card" href="./photocraft/">
+          <strong>Photocraft</strong>
+          <span>图像编辑器：工具栏、画布、曲线与图层</span>
         </a>
       </nav>
       <p class="meta">MIT License · <a href="https://github.com/gausszhou/litegui">GitHub</a></p>

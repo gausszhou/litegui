@@ -72,6 +72,11 @@ export class Viewport {
   private sidebarOpen = true;
   private shading: "wireframe" | "solid" | "material" | "rendered" = "solid";
   private editMode = false;
+  private editElement: "vertex" | "edge" | "face" = "vertex";
+  private brush: string | null = null;
+  private pointerX = 0;
+  private pointerY = 0;
+  private hasPointer = false;
 
   constructor(parent: HTMLElement, options: ViewportOptions) {
     this.options = options;
@@ -115,7 +120,11 @@ export class Viewport {
       if (this.transform) this.confirmTransform();
       else this.canvas.focus();
     });
-    this.canvas.addEventListener("mousemove", (event) => {
+    window.addEventListener("mousemove", (event) => {
+      this.pointerX = event.clientX;
+      this.pointerY = event.clientY;
+      this.hasPointer = true;
+      if (this.brush) this.invalidate();
       if (!this.orbiting && !this.panning && !this.transform) {
         this.lastX = event.clientX;
         this.lastY = event.clientY;
@@ -153,6 +162,24 @@ export class Viewport {
     this.invalidate();
   }
 
+  setEditElementMode(value: "vertex" | "edge" | "face") {
+    this.editElement = value;
+    this.invalidate();
+  }
+
+  getEditElementMode() {
+    return this.editElement;
+  }
+
+  setBrush(value: string | null) {
+    this.brush = value;
+    this.invalidate();
+  }
+
+  getBrush() {
+    return this.brush;
+  }
+
   setView(yaw: number, pitch: number, distance = this.distance) {
     this.yaw = yaw;
     this.pitch = pitch;
@@ -174,14 +201,20 @@ export class Viewport {
   }
 
   beginTransform(kind: "translate" | "rotate" | "scale") {
-    if (!this.lastX) {
-      const rect = this.canvas.getBoundingClientRect();
+    const rect = this.canvas.getBoundingClientRect();
+    if (this.hasPointer) {
+      this.lastX = this.pointerX;
+      this.lastY = this.pointerY;
+    } else if (!this.lastX) {
       this.lastX = rect.left + rect.width / 2;
       this.lastY = rect.top + rect.height / 2;
     }
     const id = this.options.getSelected();
     const object = this.options.objects.find((item) => item.id === id);
-    if (!object) return;
+    if (!object) {
+      this.options.onStatus("No active object to transform");
+      return false;
+    }
     this.transform = kind;
     this.transformStart = {
       loc: [...object.loc] as Vec3,
@@ -195,6 +228,7 @@ export class Viewport {
       kind === "rotate" ? "Rotate: 移动鼠标，左键/Enter 确认，右键/Esc 取消" :
       "Scale: 移动鼠标，左键/Enter 确认，右键/Esc 取消"
     );
+    return true;
   }
 
   confirmTransform() {
@@ -323,8 +357,26 @@ export class Viewport {
     for (const object of this.options.objects) {
       if (!object.visible || !object.selectable) continue;
       const p = this.project(object.loc);
-      const distance = Math.hypot(p[0] - x, p[1] - y);
-      if (distance < 34 && p[2] < bestDepth) {
+      let hit = Math.hypot(p[0] - x, p[1] - y) < 22;
+      if (object.type === "mesh") {
+        const corners: Vec3[] = [
+          [-1, -1, -1], [1, -1, -1], [1, 1, -1], [-1, 1, -1],
+          [-1, -1, 1], [1, -1, 1], [1, 1, 1], [-1, 1, 1]
+        ];
+        let minX = Infinity;
+        let maxX = -Infinity;
+        let minY = Infinity;
+        let maxY = -Infinity;
+        for (const corner of corners) {
+          const projected = this.project(this.worldPoint(object, corner));
+          minX = Math.min(minX, projected[0]);
+          maxX = Math.max(maxX, projected[0]);
+          minY = Math.min(minY, projected[1]);
+          maxY = Math.max(maxY, projected[1]);
+        }
+        hit = x >= minX - 4 && x <= maxX + 4 && y >= minY - 4 && y <= maxY + 4;
+      }
+      if (hit && p[2] < bestDepth) {
         best = object.id;
         bestDepth = p[2];
       }
@@ -392,6 +444,36 @@ export class Viewport {
       this.drawGizmo();
       this.drawAxisWidget();
     }
+    this.drawBrushCursor();
+  }
+
+  private drawBrushCursor() {
+    if (!this.brush || !this.hasPointer) return;
+    const rect = this.canvas.getBoundingClientRect();
+    const x = this.pointerX - rect.left;
+    const y = this.pointerY - rect.top;
+    if (x < 0 || y < 0 || x > rect.width || y > rect.height) return;
+    const ctx = this.ctx;
+    ctx.save();
+    ctx.strokeStyle = "rgba(240, 160, 48, 0.9)";
+    ctx.fillStyle = "rgba(240, 160, 48, 0.10)";
+    ctx.lineWidth = 1.4;
+    ctx.beginPath();
+    ctx.arc(x, y, 20, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.arc(x, y, 2, 0, Math.PI * 2);
+    ctx.fillStyle = "rgba(240, 160, 48, 0.9)";
+    ctx.fill();
+    ctx.restore();
+  }
+
+  /**
+   * Brush cursor follows the mouse; repaint on move while a brush is set.
+   */
+  invalidatePointer() {
+    if (this.brush) this.invalidate();
   }
 
   private drawGrid() {
@@ -474,8 +556,8 @@ export class Viewport {
     }
 
     if (this.editMode && selected) {
-      ctx.strokeStyle = "#ffb84d";
-      ctx.lineWidth = 1.5;
+      ctx.strokeStyle = this.editElement === "edge" ? "#ffb84d" : "rgba(255, 184, 77, 0.55)";
+      ctx.lineWidth = this.editElement === "edge" ? 2 : 1.2;
       for (const face of CUBE_FACES) {
         ctx.beginPath();
         face.forEach((index, pointIndex) => {
@@ -484,13 +566,20 @@ export class Viewport {
           else ctx.lineTo(p[0], p[1]);
         });
         ctx.closePath();
+        if (this.editElement === "face") {
+          ctx.fillStyle = "rgba(255, 184, 77, 0.18)";
+          ctx.fill();
+        }
         ctx.stroke();
       }
-      ctx.fillStyle = "#ffb84d";
-      for (const p of projected) {
-        ctx.beginPath();
-        ctx.arc(p[0], p[1], 3, 0, Math.PI * 2);
-        ctx.fill();
+      const showVertices = this.editElement === "vertex" || this.editElement === "edge";
+      if (showVertices) {
+        ctx.fillStyle = "#ffb84d";
+        for (const p of projected) {
+          ctx.beginPath();
+          ctx.arc(p[0], p[1], this.editElement === "vertex" ? 3.5 : 2, 0, Math.PI * 2);
+          ctx.fill();
+        }
       }
     }
   }
