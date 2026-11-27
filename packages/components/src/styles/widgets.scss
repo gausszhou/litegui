@@ -1,5 +1,5 @@
 /********************/
-.liteslider {
+.lg-slider {
 	display: inline-block;
 	position: relative;
 	width: calc(100% - 50px);
@@ -7,7 +7,7 @@
 	cursor: pointer;
 }
 
-.liteslider-value {
+.lg-slider__value {
 	width: 42px;
 	padding-left: 5px;
 }
@@ -23,7 +23,7 @@
 	flex: 1;
 }
 
-.liteslider {
+.lg-slider {
 	display: block;
 	width: 100%;
 	border-radius: 2px;
@@ -43,28 +43,28 @@
 	border: 0;
 }
 
-.searchbox {
+.lg-searchbox {
 	padding: 2px;
 	opacity: 0.5;
 	transition: all 0.5s;
 	width: 100%;
 }
 
-.searchbox input {
+.lg-searchbox__input {
 	padding: 2px 4px;
 	outline: 0;
 	width: 100%;
 }
 
-.searchbox input:focus {
+.lg-searchbox__input:focus {
 	outline: 0;
 }
 
-.searchbox:hover {
+.lg-searchbox:hover {
 	opacity: 1;
 }
 
-.litecheckbox {
+.lg-checkbox {
 	width: 1em;
 	height: 1em;
 	display: inline-block;
@@ -83,12 +83,12 @@
 	cursor: pointer;
 }
 
-.litecheckbox .on {
+.lg-checkbox--on {
 	background-color: #5af;
 	color: black;
 }
 
-.litecheckbox .flag {
+.lg-checkbox__flag {
 	display: block;
 	width: 100%;
 	height: 100%;
@@ -99,14 +99,14 @@
 	cursor: pointer;
 }
 
-.liteconsole {
+.lg-console {
 	width: 100%;
 	height: 100%;
 	background-color: black;
 	border: 1px solid #222;
 }
 
-.liteconsole .log {
+.lg-console__log {
 	width: 100%;
 	height: calc(100% - 26px);
 	overflow: auto;
@@ -114,40 +114,40 @@
 	padding: 4px;
 }
 
-.liteconsole .log .msg {
+.lg-console__message {
 	white-space: pre-wrap;
 	margin: 0;
 	padding: 0;
 	box-sizing: border-box;
 }
 
-.liteconsole .log .msg.me {
+.lg-console__message--me {
 	color: white;
 }
 
-.liteconsole .log .msg.msglog {
+.lg-console__message--log {
 	color: #aaa;
 }
 
-.liteconsole .log .msg.msgwarn {
+.lg-console__message--warn {
 	color: #ffa;
 }
 
-.liteconsole .log .msg.msgerror {
+.lg-console__message--error {
 	color: #faa;
 }
 
-.liteconsole .log .msg.good {
+.lg-console__message--good {
 	color: #afa;
 }
 
-.liteconsole .foot {
+.lg-console__footer {
 	width: 100%;
 	height: 24px;
 	color: #111;
 }
 
-.liteconsole .foot input {
+.lg-console__footer input {
 	width: 100%;
 	height: 24px;
 	color: white;
@@ -159,17 +159,17 @@
 	resize: none;
 }
 
-.liteconsole .foot input:focus {
+.lg-console__footer input:focus {
 	outline: none;
 }
 
-.litecomplexlist {
+.lg-complex-list {
 	background-color: black;
 	padding: 4px;
 	overflow: auto;
 }
 
-.litecomplexlist .listitem {
+.lg-complex-list__item {
 	border-radius: 2px;
 	margin: 2px;
 	padding: 2px;
@@ -178,22 +178,22 @@
 	line-height: 2em;
 }
 
-.litecomplexlist .listitem:hover {
+.lg-complex-list__item:hover {
 	background-color: #363636;
 }
 
-.litecomplexlist .listitem.selected {
+.lg-complex-list__item.lg-is-selected {
 	background-color: #354a5f;
 }
 
-.litecomplexlist .listtitle {
+.lg-complex-list__title {
 	margin: 4px;
 	margin-top: 10px;
 	font-size: 1.2em;
 	color: #aaa;
 }
 
-.litecomplexlist .listitem .title {
+.lg-complex-list__item .lg-complex-list__item-title {
 	color: #8e96a7;
 	width: calc(100% - 60px);
 	display: inline-block;
@@ -202,7 +202,7 @@
 	vertical-align: middle;
 }
 
-.litecomplexlist .listitem .tick {
+.lg-complex-list__item .lg-complex-list__tick {
 	cursor: pointer;
 	text-align: center;
 	width: 24px;
@@ -215,16 +215,16 @@
 	border-radius: 2px;
 }
 
-.litecomplexlist .listitem .tick span {
+.lg-complex-list__item .lg-complex-list__tick span {
 	transform: translate(0, 0px);
 	display: inline-block;
 }
 
-.litecomplexlist .listitem:not(.enabled) .tick {
+.lg-complex-list__item:not(.lg-is-enabled) .lg-complex-list__tick {
 	color: black;
 }
 
-.litecomplexlist .listitem button {
+.lg-complex-list__item button {
 	border: 0;
 	background-color: #363636;
 	border-radius: 4px;
@@ -233,7 +233,7 @@
 	margin-bottom: 0;
 }
 
-.litecomplexlist .listtext {
+.lg-complex-list__text {
 	cursor: pointer;
 	text-align: center;
 }

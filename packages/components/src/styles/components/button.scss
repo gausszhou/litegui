@@ -1,4 +1,4 @@
-button.litebutton {
+button.lg-button__control {
 	background: -webkit-linear-gradient(#32302d, #4b4947) repeat scroll 0 0 transparent;
 	background: -moz-linear-gradient(#32302d, #4b4947) repeat scroll 0 0 transparent;
 	background: linear-gradient(#32302d, #4b4947) repeat scroll 0 0 transparent;
@@ -13,28 +13,28 @@ button.litebutton {
 	vertical-align: top;
 }
 
-button.litebutton.flat {
+button.lg-button__control--flat {
 	background: #32302d;
 	box-shadow: 0 0 0 transparent;
 	border: 0;
 }
 
-button.litebutton:hover:not(:disabled) {
+button.lg-button__control:hover:not(:disabled) {
 	background: #aab !important;
 }
 
-button.litebutton:active:not(:disabled) {
+button.lg-button__control:active:not(:disabled) {
 	background: #fff !important;
 }
 
-button.litebutton:focus:not(:disabled) {
+button.lg-button__control:focus:not(:disabled) {
 	outline: 1px solid #777;
 }
 
-button.litebutton:disabled {
+button.lg-button__control:disabled {
 	opacity: 0.5;
 }
 
-button.litebutton.close-button {
+button.lg-button__control--close {
 	background-size: 100% auto;
 }

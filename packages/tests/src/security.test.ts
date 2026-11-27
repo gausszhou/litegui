@@ -33,9 +33,9 @@ describe("HTML escaping", () => {
     menu.add("File/<img src=x onerror=alert(1)>");
     document.body.appendChild(menu.root);
 
-    menu.root.querySelector<HTMLElement>(".lite-menu-item")?.click();
+    menu.root.querySelector<HTMLElement>(".lg-menu__item")?.click();
 
-    const label = document.querySelector(".lite-menu-panel-item .name");
+    const label = document.querySelector(".lg-menu__panel-item .lg-menu__name");
     expect(label?.textContent).toBe("<img src=x onerror=alert(1)>");
     expect(document.querySelector("img")).toBeNull();
   });

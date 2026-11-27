@@ -48,4 +48,4 @@ element.addEventListener("contextmenu", (event) => {
 | `addItem(name, value, options)` | 追加条目 |
 | `close(event?)` | 关闭菜单（含子菜单） |
 
-> 属于 experimental API；样式类名为 `.litecontextmenu`。
+> 属于 experimental API；样式类名为 `.lg-context-menu`。

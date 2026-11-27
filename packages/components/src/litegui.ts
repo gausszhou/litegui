@@ -120,7 +120,7 @@ export class LiteGUI {
     if (options.wrapped) {
       //create litegui root element
       const root = document.createElement("div");
-      root.className = "litegui-root";
+      root.className = "lg-app";
       root.style.position = "relative";
       root.style.overflow = "hidden";
       this.root = root;
@@ -144,8 +144,8 @@ export class LiteGUI {
       coreState.content = this.content;
     }
 
-    this.root.classList.add("litegui-wrap", "fullscreen");
-    this.content.classList.add("litegui-maincontent");
+    this.root.classList.add("lg-app__wrap", "lg-app--fullscreen");
+    this.content.classList.add("lg-app__main");
 
     if (options.width && options.height) {
       this.setWindowSize(options.width, options.height);
@@ -153,7 +153,7 @@ export class LiteGUI {
 
     //create modal dialogs container
     this.modalbg_div = document.createElement("div");
-    this.modalbg_div.className = "litemodalbg";
+    this.modalbg_div.className = "lg-modal-backdrop";
     this.modalbg_div.style.display = "none";
     coreState.modalbg = this.modalbg_div;
     this.root.appendChild(this.modalbg_div);
@@ -187,10 +187,10 @@ export class LiteGUI {
       style.width = w + "px";
       style.height = h + "px";
       style.boxShadow = "0 0 4px black";
-      this.root.classList.remove("fullscreen");
+      this.root.classList.remove("lg-app--fullscreen");
     } else {
-      if (this.root.classList.contains("fullscreen")) return;
-      this.root.classList.add("fullscreen");
+      if (this.root.classList.contains("lg-app--fullscreen")) return;
+      this.root.classList.add("lg-app--fullscreen");
       style.width = "100%";
       style.height = "100%";
       style.boxShadow = "0 0 0";
@@ -709,7 +709,7 @@ export class LiteGUI {
    **/
   static createButton(id_class: string, content: string, callback: EventListener, style: string | Record<string, string>) {
     var elem = document.createElement("button");
-    elem.className = "litegui litebutton button";
+    elem.className = "lg-button__control";
     if (id_class) {
       var t = id_class.split(" ");
       for (var i = 0; i < t.length; i++) {
@@ -843,12 +843,12 @@ export class LiteGUI {
    * @param {Object} options ( title, width, height, content, noclose )
    **/
   static alert(content: string, options: any = {}) {
-    options.className = "alert";
+    options.className = "lg-dialog--alert";
     options.title = options.title || "Alert";
     options.width = options.width || 280;
     options.height = options.height || 140;
     if (typeof content == "string") content = "<p>" + content + "</p>";
-    LiteGUI.remove(".litedialog.alert"); //kill other panels
+    LiteGUI.remove(".lg-dialog--alert"); //kill other panels
     return LiteGUI.showMessage(content, options);
   }
 
@@ -861,7 +861,7 @@ export class LiteGUI {
    **/
   static confirm(content: string, callback: Function, options: any = {}) {
 
-    options.className = "alert";
+    options.className = "lg-dialog--alert";
     options.title = options.title || "Confirm";
     options.width = options.width || 280;
     // options.height = 100;
@@ -869,8 +869,8 @@ export class LiteGUI {
       content = "<p>" + content + "</p>";
     }
     content +=
-      `<button class='litebutton' data-value='yes' style='width:45%; margin-left: 10px'>Yes</button>
-       <button class='litebutton' data-value='no' style='width:45%' margin-left: 10px'>No</button>`;
+      `<button class='lg-button__control' data-value='yes' style='width:45%; margin-left: 10px'>Yes</button>
+       <button class='lg-button__control' data-value='no' style='width:45%' margin-left: 10px'>No</button>`;
     options.noclose = true;
 
     const dialog = this.showMessage(content, options);
@@ -898,7 +898,7 @@ export class LiteGUI {
    **/
   static prompt(content: string, callback: Function, options: any = {}) {
     options = options || {};
-    options.className = "alert";
+    options.className = "lg-dialog--alert";
     options.title = options.title || "Prompt";
     options.width = options.width || 280;
 
@@ -912,7 +912,7 @@ export class LiteGUI {
     content +=
       "<p>" +
       textinput +
-      "</p><button class='litebutton' data-value='accept' style='width:45%; margin-left: 10px; margin-bottom: 10px'>Accept</button><button class='litebutton' data-value='cancel' style='width:45%'>Cancel</button>";
+      "</p><button class='lg-button__control' data-value='accept' style='width:45%; margin-left: 10px; margin-bottom: 10px'>Accept</button><button class='lg-button__control' data-value='cancel' style='width:45%'>Cancel</button>";
     options.noclose = true;
 
     var dialog = this.showMessage(content, options);
@@ -947,7 +947,7 @@ export class LiteGUI {
    * @param {Object} options ( title, width, height, content, noclose )
    **/
   static choice(content: string, choices: string[] | any[], callback: Function, options: any = {}) {
-    options.className = "alert";
+    options.className = "lg-dialog--alert";
     options.title = options.title || "Select one option";
     options.width = options.width || 280;
     // options.height = 100;
@@ -955,7 +955,7 @@ export class LiteGUI {
 
     for (var i in choices) {
       content +=
-        "<button class='litebutton' data-value='" +
+        "<button class='lg-button__control' data-value='" +
         i +
         "' style='width:45%; margin-left: 10px'>" +
         (choices[i].content || choices[i]) +

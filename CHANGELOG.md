@@ -1,5 +1,13 @@
 # Changelog
 
+## Unreleased（CSS class BEM 化）
+
+### Changed
+
+- 组件根 class 统一为 `lg-<block>`，子元素使用 `__`，修饰符使用 `--`；状态统一为 `lg-is-*`。
+- 已迁移：Button、Checkbox、Slider、SearchBox、Dragger、Panel、Dialog、Menu、ContextMenu、Tabs、Split、Area、List、ComplexList、Table、Console，以及根布局 `lg-app` / `lg-modal-backdrop`。
+- 同步更新 SCSS、组件 DOM、文档示例、单测与 e2e 选择器；旧 class 不再保留。
+
 ## Unreleased（Web Components 标签前缀）
 
 ### Changed

@@ -22,7 +22,7 @@ describe("Checkbox", () => {
     const onChange = vi.fn();
     const checkbox = new Checkbox(false, { onChange });
 
-    expect(checkbox.root.querySelector(".checkbox")).not.toBeNull();
+    expect(checkbox.root.querySelector(".lg-checkbox__flag")).not.toBeNull();
     expect(checkbox.root.dataset["value"]).toBe("false");
 
     checkbox.root.click();
@@ -40,10 +40,10 @@ describe("Checkbox", () => {
     expect(onChange).not.toHaveBeenCalled();
   });
 
-  it("uses the litecheckbox class that the stylesheet targets", () => {
+  it("uses the lg-checkbox class that the stylesheet targets", () => {
     const checkbox = new Checkbox(false, {});
-    expect(checkbox.root.classList.contains("litecheckbox")).toBe(true);
-    expect(checkbox.root.classList.contains("lite-checkbox")).toBe(true);
+    expect(checkbox.root.classList.contains("lg-checkbox")).toBe(true);
+    expect(checkbox.root.classList.contains("lg-input")).toBe(true);
   });
 });
 
@@ -51,7 +51,7 @@ describe("Dragger", () => {
   it("mounts its input and updates the value", () => {
     const dragger = new Dragger(1.5, { precision: 2, min: 0, max: 10 });
 
-    expect(dragger.root.querySelector(".drag_widget")).not.toBeNull();
+    expect(dragger.root.querySelector(".lg-dragger__widget")).not.toBeNull();
     expect(dragger.input.value).toBe("1.50");
 
     dragger.setValue(2.25);

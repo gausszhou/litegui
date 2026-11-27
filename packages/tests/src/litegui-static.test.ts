@@ -105,6 +105,6 @@ describe("LiteGUI static dialogs", () => {
     LiteGUI.alert("First");
     LiteGUI.alert("Second");
 
-    expect(document.querySelectorAll(".litedialog.alert").length).toBe(1);
+    expect(document.querySelectorAll(".lg-dialog--alert").length).toBe(1);
   });
 });

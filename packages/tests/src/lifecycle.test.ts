@@ -11,7 +11,7 @@ describe("lifecycle", () => {
     }
 
     expect(Dialog.INSTANCE_LIST).toHaveLength(0);
-    expect(document.querySelectorAll(".litedialog")).toHaveLength(0);
+    expect(document.querySelectorAll(".lg-dialog")).toHaveLength(0);
   });
 
   it("removes closed panels from the document", () => {

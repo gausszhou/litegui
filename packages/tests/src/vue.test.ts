@@ -32,14 +32,14 @@ describe("Vue bindings", () => {
     });
     await nextTick();
 
-    const button = wrapper.find("button.litebutton");
+    const button = wrapper.find("button.lg-button__control");
     expect(button.text()).toBe("保存");
 
     await button.trigger("click");
     expect(wrapper.emitted("click")).toHaveLength(1);
 
     await wrapper.setProps({ label: "运行" });
-    expect(wrapper.find("button.litebutton").text()).toBe("运行");
+    expect(wrapper.find("button.lg-button__control").text()).toBe("运行");
 
     wrapper.unmount();
   });
@@ -51,7 +51,7 @@ describe("Vue bindings", () => {
     });
     await nextTick();
 
-    await wrapper.find(".litecheckbox").trigger("click");
+    await wrapper.find(".lg-checkbox").trigger("click");
 
     expect(wrapper.emitted("update:modelValue")?.[0]).toEqual([true]);
     expect(wrapper.emitted("change")?.[0]).toEqual([true]);
@@ -66,7 +66,7 @@ describe("Vue bindings", () => {
     });
     await nextTick();
 
-    await wrapper.find(".liteslider").trigger("keydown", { key: "ArrowRight" });
+    await wrapper.find(".lg-slider").trigger("keydown", { key: "ArrowRight" });
 
     expect(wrapper.emitted("update:modelValue")?.[0]).toEqual([1]);
 
@@ -81,7 +81,7 @@ describe("Vue bindings", () => {
     });
     await nextTick();
 
-    expect(wrapper.find(".panel-title").text()).toBe("属性");
+    expect(wrapper.find(".lg-panel__title").text()).toBe("属性");
     expect(wrapper.find(".slot-content").text()).toBe("内容");
 
     wrapper.unmount();
@@ -95,10 +95,10 @@ describe("Vue bindings", () => {
     });
     await nextTick();
 
-    expect(wrapper.find(".litedialog").exists()).toBe(true);
+    expect(wrapper.find(".lg-dialog").exists()).toBe(true);
     expect(wrapper.find(".slot-content").text()).toBe("内容");
 
-    await wrapper.find(".close-button").trigger("click");
+    await wrapper.find(".lg-dialog__button--close").trigger("click");
 
     expect(wrapper.emitted("update:modelValue")?.[0]).toEqual([false]);
     expect(wrapper.emitted("close")).toHaveLength(1);
@@ -124,7 +124,7 @@ describe("Vue bindings", () => {
     await nextTick();
 
     expect(wrapper.find(".tab-a").text()).toBe("A content");
-    await wrapper.findAll(".wtab")[1].trigger("click");
+    await wrapper.findAll(".lg-tabs__tab")[1].trigger("click");
     expect(wrapper.emitted("update:modelValue")?.at(-1)).toEqual(["b"]);
 
     wrapper.unmount();
@@ -172,12 +172,12 @@ describe("Vue bindings", () => {
     });
     await nextTick();
 
-    expect(wrapper.find("table.litetable").text()).toContain("名称");
-    expect(wrapper.find("table.litetable").text()).toContain("A");
+    expect(wrapper.find("table.lg-table").text()).toContain("名称");
+    expect(wrapper.find("table.lg-table").text()).toContain("A");
 
     await wrapper.setProps({ rows: [{ name: "B" }] });
     await nextTick();
-    expect(wrapper.find("table.litetable").text()).toContain("B");
+    expect(wrapper.find("table.lg-table").text()).toContain("B");
 
     wrapper.unmount();
   });
@@ -189,9 +189,9 @@ describe("Vue bindings", () => {
     });
     await nextTick();
 
-    expect(wrapper.find(".list-item.selected").text()).toContain("A");
+    expect(wrapper.find(".lg-list__item.lg-is-selected").text()).toContain("A");
 
-    await wrapper.findAll(".list-item")[1].trigger("click");
+    await wrapper.findAll(".lg-list__item")[1].trigger("click");
 
     expect(wrapper.emitted("update:modelValue")?.at(-1)).toEqual(["B"]);
 
@@ -209,7 +209,7 @@ describe("Vue bindings", () => {
     });
     await nextTick();
 
-    expect(wrapper.findAll(".split-section")).toHaveLength(2);
+    expect(wrapper.findAll(".lg-split__section")).toHaveLength(2);
     expect(wrapper.find(".left").text()).toBe("Left");
     expect(wrapper.find(".right").text()).toBe("Right");
 
@@ -241,9 +241,9 @@ describe("Vue bindings", () => {
     });
     await nextTick();
 
-    await wrapper.find(".lite-menu-item").trigger("click");
+    await wrapper.find(".lg-menu__item").trigger("click");
 
-    const leaf = wrapper.findAll(".lite-menu-panel-item").find(item => item.text().includes("新建"));
+    const leaf = wrapper.findAll(".lg-menu__panel-item").find(item => item.text().includes("新建"));
     expect(leaf).toBeDefined();
     await leaf!.trigger("click");
 

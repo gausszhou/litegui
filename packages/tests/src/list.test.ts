@@ -7,12 +7,12 @@ describe("List", () => {
     const list = new List("files", ["A", "B"], { callback });
     document.body.appendChild(list.root);
 
-    expect(list.root.querySelectorAll(".list-item")).toHaveLength(2);
+    expect(list.root.querySelectorAll(".lg-list__item")).toHaveLength(2);
 
-    list.root.querySelectorAll<HTMLLIElement>(".list-item")[1].click();
+    list.root.querySelectorAll<HTMLLIElement>(".lg-list__item")[1].click();
 
     expect(list.getSelectedValue()).toBe("B");
-    expect(list.getSelectedItem()?.classList.contains("selected")).toBe(true);
+    expect(list.getSelectedItem()?.classList.contains("lg-is-selected")).toBe(true);
     expect(callback).toHaveBeenCalledTimes(1);
   });
 

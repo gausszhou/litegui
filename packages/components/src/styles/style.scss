@@ -47,7 +47,7 @@ a:hover {
 
 
 
-.litecontextmenu {
+.lg-context-menu {
 	position: fixed;
 	top: 100px;
 	left: 100px;
@@ -58,27 +58,27 @@ a:hover {
 	background-color: #2e2e2e !important;
 }
 
-.litecontextmenu .litemenu-title img {
+.lg-context-menu .lg-context-menu__title img {
 	margin-top: 2px;
 	margin-left: 2px;
 	margin-right: 4px;
 }
 
-.litecontextmenu .lite-menu-panel-item {
+.lg-context-menu .lg-context-menu__item {
 	margin: 2px;
 	padding: 2px;
 }
 
-.litecontextmenu .lite-menu-panel-item.submenu {
+.lg-context-menu .lg-context-menu__item.lg-context-menu__item--has-submenu {
 	background-color: #2e2e2e !important;
 }
 
 
-.litedialog .content button.litebutton {
+.lg-dialog .lg-dialog__content button.lg-button__control {
 	vertical-align: initial;
 }
 
-.litedialog button.litebutton.mini-button {
+.lg-dialog button.lg-button__control--mini {
 	margin: 2px 2px 0 0;
 	line-height: 0;
 	padding: 0;
@@ -89,7 +89,7 @@ a:hover {
 }
 
 
-.litesplit {
+.lg-split {
 	display: block;
 	width: 100%;
 	height: 100%;
@@ -97,7 +97,7 @@ a:hover {
 	padding: 0;
 }
 
-.litesplit .split-section {
+.lg-split .lg-split__section {
 	display: inline-block;
 	vertical-align: top;
 	margin: 0;
@@ -215,24 +215,24 @@ li.ltreeitem.filtered {
 	background-color: rgba(100, 100, 100, 0.5);
 }
 
-.litesplitbar {
+.lg-area__splitbar {
 	background-color: #222;
 	display: inline-block;
 }
 
-.litesplitbar:hover {
+.lg-area__splitbar:hover {
 	background-color: #888;
 	transition: all 0.5s;
 	transition-delay: 0.3s;
 }
 
-.litesplitbar.horizontal {
+.lg-area__splitbar--horizontal {
 	cursor: e-resize;
 	width: 2px;
 	height: 100%;
 }
 
-.litesplitbar.vertical {
+.lg-area__splitbar--vertical {
 	cursor: n-resize;
 	width: 100%;
 	height: 2px;

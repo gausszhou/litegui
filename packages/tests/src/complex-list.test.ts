@@ -12,15 +12,15 @@ describe("ComplexList", () => {
     list.addTitle("Group");
     const item = list.addItem({ value: "a" }, "Alpha", true, true);
 
-    expect(list.root.querySelector(".listtitle")?.textContent).toBe("Group");
-    expect(item.querySelector(".title")?.textContent).toBe("Alpha");
+    expect(list.root.querySelector(".lg-complex-list__title")?.textContent).toBe("Group");
+    expect(item.querySelector(".lg-complex-list__item-title")?.textContent).toBe("Alpha");
 
     item.dispatchEvent(new MouseEvent("mousedown", { bubbles: true }));
     expect(onSelected).toHaveBeenCalledTimes(1);
     expect(list.getSelected()).toBe(item.item);
-    expect(item.classList.contains("selected")).toBe(true);
+    expect(item.classList.contains("lg-is-selected")).toBe(true);
 
-    item.querySelector<HTMLElement>(".tick")?.dispatchEvent(new MouseEvent("mousedown", { bubbles: true }));
+    item.querySelector<HTMLElement>(".lg-complex-list__tick")?.dispatchEvent(new MouseEvent("mousedown", { bubbles: true }));
     expect(onToggled).toHaveBeenCalled();
   });
 
@@ -30,7 +30,7 @@ describe("ComplexList", () => {
     list.onItemRemoved = onRemoved;
 
     const item = list.addItem({ value: "a" }, "Alpha", true, true);
-    item.querySelector<HTMLElement>(".trash")?.dispatchEvent(new MouseEvent("mousedown", { bubbles: true }));
+    item.querySelector<HTMLElement>(".lg-complex-list__trash")?.dispatchEvent(new MouseEvent("mousedown", { bubbles: true }));
     expect(onRemoved).toHaveBeenCalledTimes(1);
 
     list.clear();
@@ -46,10 +46,10 @@ describeComplexExtra("ComplexList extras", () => {
     const item = list.addItem({}, "Old", true, true);
 
     item.setContent?.("New");
-    expectComplexExtra(item.querySelector(".title")?.textContent).toBe("New");
+    expectComplexExtra(item.querySelector(".lg-complex-list__item-title")?.textContent).toBe("New");
 
     item.toggleEnabled?.();
-    expectComplexExtra(item.classList.contains("enabled")).toBe(false);
+    expectComplexExtra(item.classList.contains("lg-is-enabled")).toBe(false);
 
     item.hide?.();
     expectComplexExtra(item.style.display).toBe("none");

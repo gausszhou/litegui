@@ -23,14 +23,14 @@ export class Button  extends Widget {
     }
     createElementRoot() {
         const root = document.createElement("div");
-        root.classList.add("lite-button");
+        root.classList.add("lg-button");
         const size = this.options?.size;
-        if (size) root.classList.add(size);
+        if (size) root.classList.add(`lg-button--${size}`);
         return root;
     }
     createElementButton() {
         const button = document.createElement("button");
-        button.className = "litebutton";
+        button.className = "lg-button__control";
         return button;
     }
     initDom(value: string) {

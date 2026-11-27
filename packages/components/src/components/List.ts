@@ -18,7 +18,7 @@ export class List {
   constructor(id: string, items: Array<string | ListItem>, options: ListOptions = {}) {
     this.root = document.createElement("ul");
     this.root.id = id;
-    this.root.className = "litelist";
+    this.root.className = "lg-list";
     this.root.setAttribute("role", "listbox");
     this.callback = options.callback;
     this.items = items;
@@ -42,11 +42,11 @@ export class List {
   }
 
   private selectElement(element: HTMLLIElement, emit: boolean) {
-    this.root.querySelectorAll<HTMLElement>(".list-item").forEach((item) => {
-      item.classList.remove("selected");
+    this.root.querySelectorAll<HTMLElement>(".lg-list__item").forEach((item) => {
+      item.classList.remove("lg-is-selected");
       item.setAttribute("aria-selected", "false");
     });
-    element.classList.add("selected");
+    element.classList.add("lg-is-selected");
     element.setAttribute("aria-selected", "true");
 
     const value = element.dataset.value || "";
@@ -61,7 +61,7 @@ export class List {
 
   createItem(item: string | ListItem): HTMLLIElement {
     const li = document.createElement("li");
-    li.className = "list-item";
+    li.className = "lg-list__item";
     li.setAttribute("role", "option");
     li.setAttribute("aria-selected", "false");
     li.dataset.value = this.itemValue(item);
@@ -72,14 +72,14 @@ export class List {
 
     li.textContent = li.dataset.value || "";
     const arrow = document.createElement("span");
-    arrow.className = "arrow";
+    arrow.className = "lg-list__arrow";
     li.appendChild(arrow);
 
     return li;
   }
 
   getSelectedItem(): HTMLLIElement | null {
-    return this.root.querySelector(".list-item.selected");
+    return this.root.querySelector(".lg-list__item.lg-is-selected");
   }
 
   getSelectedValue(): string | null {
@@ -87,7 +87,7 @@ export class List {
   }
 
   setSelectedItem(value: string): boolean {
-    const target = Array.from(this.root.querySelectorAll<HTMLLIElement>(".list-item")).find(
+    const target = Array.from(this.root.querySelectorAll<HTMLLIElement>(".lg-list__item")).find(
       (item) => item.dataset.value === value
     );
     if (!target) return false;

@@ -21,7 +21,7 @@ export class Panel extends EventMitter {
     this.id = opts.id || "";
     this.root = this.createElementRoot();
     this.header = this.createElementHeader();
-    this.titleElement = this.header.querySelector(".panel-title") as HTMLElement;
+    this.titleElement = this.header.querySelector(".lg-panel__title") as HTMLElement;
     this.content = this.createElementContent();
     this.footer = this.createElementFooter();
 
@@ -32,23 +32,23 @@ export class Panel extends EventMitter {
   createElementRoot() {
     const root = document.createElement("div");
     if (this.id) root.id = this.id;
-    root.className = "litepanel " + (this.options.className || "");
+    root.className = "lg-panel " + (this.options.className || "");
     return root;
   }
 
   createElementHeader() {
     const header = document.createElement("div");
-    header.className = "panel-header";
+    header.className = "lg-panel__header";
 
     const title = document.createElement("span");
-    title.className = "panel-title";
+    title.className = "lg-panel__title";
     title.textContent = this.options.title || "";
     header.appendChild(title);
 
     if (this.options.close) {
       const button = document.createElement("button");
       button.type = "button";
-      button.className = "litebutton mini-button panel-close";
+      button.className = "lg-button__control lg-button__control--mini lg-panel__close";
       button.textContent = "×";
       button.title = "Close";
       button.addEventListener("click", (e) => {
@@ -68,14 +68,14 @@ export class Panel extends EventMitter {
 
   createElementContent() {
     const content = document.createElement("div");
-    content.className = "content";
+    content.className = "lg-panel__content";
     if (this.options.content) content.innerHTML = this.options.content;
     return content;
   }
 
   createElementFooter() {
     const footer = document.createElement("div");
-    footer.className = "panel-footer";
+    footer.className = "lg-panel__footer";
     return footer;
   }
 

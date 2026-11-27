@@ -23,7 +23,7 @@ export class Slider {
   constructor(value: number, private options: SliderOptions = {}) {
     this.root = document.createElement("div");
     this.value = value;
-    this.root.className = "liteslider";
+    this.root.className = "lg-slider";
     this.root.setAttribute("role", "slider");
     this.root.tabIndex = 0;
 

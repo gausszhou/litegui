@@ -2,11 +2,11 @@ import { remove as removeElement } from "@gausszhou/litegui-core";
 import { getRoot } from "@gausszhou/litegui-core";
 import { Panel } from "./Panel";
 
-const MENU_CLASS_NAME = "lite-menu";
-const MENU_LIST_CLASS_NAME = "lite-menu-list";
-const MENU_ITEM_CLASS_NAME = "lite-menu-item";
-const MENU_PANEL_CLASS_NAME = "lite-menu-panel";
-const MENU_PANEL_ITEM_CLASS_NAME = "lite-menu-panel-item";
+const MENU_CLASS_NAME = "lg-menu";
+const MENU_LIST_CLASS_NAME = "lg-menu__list";
+const MENU_ITEM_CLASS_NAME = "lg-menu__item";
+const MENU_PANEL_CLASS_NAME = "lg-menu__panel";
+const MENU_PANEL_ITEM_CLASS_NAME = "lg-menu__panel-item";
 
 interface MenuOptions {
   auto_open?: boolean;
@@ -211,9 +211,9 @@ export class Menu {
     $item.setAttribute("aria-haspopup", "true");
 
     const icon = document.createElement("span");
-    icon.className = "icon";
+    icon.className = "lg-menu__icon";
     const name = document.createElement("span");
-    name.className = "name";
+    name.className = "lg-menu__name";
     name.textContent = item.name;
     $item.append(icon, name);
     /* ON CLICK TOP MAIN MENU ITEM */
@@ -306,25 +306,25 @@ export class Menu {
       $menu_item.setAttribute("role", "menuitem");
       const has_submenu = menu_item.children?.length;
       if (has_submenu) {
-        $menu_item.classList.add("has_submenu");
+        $menu_item.classList.add("lg-menu__panel-item--has-submenu");
       }
       if (menu_item.name) {
         // is a menu item
         const icon = document.createElement("span");
-        icon.className = "icon";
+        icon.className = "lg-menu__icon";
         const name = document.createElement("span");
-        name.className = "name";
+        name.className = "lg-menu__name";
         name.textContent = menu_item.name;
         $menu_item.append(icon, name);
         if (has_submenu) {
           const more = document.createElement("span");
-          more.className = "more";
+          more.className = "lg-menu__more";
           more.textContent = "+";
           $menu_item.appendChild(more);
         }
       } else {
         // is a menu separator
-        $menu_item.classList.add("separator");
+        $menu_item.classList.add("lg-menu__panel-item--separator");
         $menu_item.setAttribute("role", "separator");
       }
       //check if it has to show the item being 'checked'
@@ -339,8 +339,8 @@ export class Menu {
             data.instance[data.property] == data.value) ||
           (typeof data.isChecked == "function" && data.isChecked.call(data.instance, data));
 
-        if (checked) $menu_item.className += " checked";
-        if (data.disabled) $menu_item.className += " disabled";
+        if (checked) $menu_item.className += " lg-menu__panel-item--checked";
+        if (data.disabled) $menu_item.className += " lg-menu__panel-item--disabled";
       }
 
       /* ON CLICK SUBMENU ITEM */
@@ -353,8 +353,8 @@ export class Menu {
           if (data.instance && data.property) {
             if (data.type == "checkbox") {
               data.instance[data.property] = !data.instance[data.property];
-              if (data.instance[data.property]) $menu_item.classList.add("checked");
-              else $menu_item.classList.remove("checked");
+              if (data.instance[data.property]) $menu_item.classList.add("lg-menu__panel-item--checked");
+              else $menu_item.classList.remove("lg-menu__panel-item--checked");
             } else if (Object.prototype.hasOwnProperty.call(data, "value")) {
               data.instance[data.property] = data.value;
             }
@@ -363,8 +363,8 @@ export class Menu {
           //to have a checkbox behaviour
           if (data.checkbox != null) {
             data.checkbox = !data.checkbox;
-            if (data.checkbox) $menu_item.classList.add("checked");
-            else $menu_item.classList.remove("checked");
+            if (data.checkbox) $menu_item.classList.add("lg-menu__panel-item--checked");
+            else $menu_item.classList.remove("lg-menu__panel-item--checked");
           }
 
           //execute a function

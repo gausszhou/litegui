@@ -23,7 +23,7 @@ export class Checkbox {
   }
   createElementRoot() {
     const root = (this.root = document.createElement("span"));
-    root.className = "litecheckbox lite-checkbox inputfield";
+    root.className = "lg-checkbox lg-input";
     root.setAttribute("role", "checkbox");
     root.setAttribute("aria-checked", this.value.toString());
     root.tabIndex = 0;
@@ -32,7 +32,7 @@ export class Checkbox {
   createElementContent() {
     const value = this.value;
     const element = (this.element = document.createElement("span"));
-    element.className = "fixed flag checkbox " + (value ? "on" : "off");
+    element.className = "lg-checkbox__flag " + (value ? "lg-checkbox--on" : "lg-checkbox--off");
     return element;
   }
   initDom() {
@@ -69,11 +69,11 @@ export class Checkbox {
   }
   onValueChange(v: boolean) {
     if (v) {
-      this.element.classList.remove("off");
-      this.element.classList.add("on");
+      this.element.classList.remove("lg-checkbox--off");
+      this.element.classList.add("lg-checkbox--on");
     } else {
-      this.element.classList.remove("on");
-      this.element.classList.add("off");
+      this.element.classList.remove("lg-checkbox--on");
+      this.element.classList.add("lg-checkbox--off");
     }
   }
   getValue() {

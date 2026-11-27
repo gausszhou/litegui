@@ -27,7 +27,7 @@ describe("LiteGUI", () => {
     expect(LiteGUI.container).toBe(container);
     expect(LiteGUI.root).toBe(container);
     expect(LiteGUI.content).toBe(container);
-    expect(container.querySelector(".litemodalbg")).not.toBeNull();
+    expect(container.querySelector(".lg-modal-backdrop")).not.toBeNull();
 
     const menubar = LiteGUI.createMenu();
     expect(LiteGUI.menubar).toBe(menubar);

@@ -30,9 +30,9 @@ describe("Menu", () => {
     menu.add("File/New", { callback: onNew });
     document.body.appendChild(menu.root);
 
-    menu.root.querySelector<HTMLElement>(".lite-menu-item")?.click();
+    menu.root.querySelector<HTMLElement>(".lg-menu__item")?.click();
 
-    const entries = document.querySelectorAll<HTMLElement>(".lite-menu-panel-item");
+    const entries = document.querySelectorAll<HTMLElement>(".lg-menu__panel-item");
     expect(entries.length).toBe(1);
     entries[0].click();
 
@@ -76,13 +76,13 @@ describeMenuExtra("Menu extras", () => {
     document.body.appendChild(menu.root);
     LiteGUI.root = document.body;
 
-    menu.root.querySelector<HTMLElement>(".lite-menu-item")?.click();
-    const exportItem = Array.from(document.querySelectorAll<HTMLElement>(".lite-menu-panel-item")).find((item) =>
+    menu.root.querySelector<HTMLElement>(".lg-menu__item")?.click();
+    const exportItem = Array.from(document.querySelectorAll<HTMLElement>(".lg-menu__panel-item")).find((item) =>
       item.textContent?.includes("Export")
     );
     exportItem?.click();
 
-    const jsonItem = Array.from(document.querySelectorAll<HTMLElement>(".lite-menu-panel-item")).find((item) =>
+    const jsonItem = Array.from(document.querySelectorAll<HTMLElement>(".lg-menu__panel-item")).find((item) =>
       item.textContent?.includes("JSON")
     );
     jsonItem?.click();
@@ -164,9 +164,9 @@ describe("Menu container", () => {
     menu.add("File/New");
     document.body.appendChild(menu.root);
 
-    menu.root.querySelector<HTMLElement>(".lite-menu-item")?.click();
+    menu.root.querySelector<HTMLElement>(".lg-menu__item")?.click();
 
-    const panel = host.querySelector(".lite-menu-panel");
+    const panel = host.querySelector(".lg-menu__panel");
     expect(panel).not.toBeNull();
     expect(panel!.parentElement).toBe(host);
   });

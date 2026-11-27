@@ -6,7 +6,7 @@ describe("Split", () => {
     const split = new Split([50, 50], { vertical: true, id: "split" });
 
     expect(split.root.id).toBe("split");
-    expect(split.root.className).toContain("vsplit");
+    expect(split.root.className).toContain("lg-split--vertical");
     expect(split.sections).toHaveLength(2);
     expect(split.sections[0].element.style.height).toBe("50%");
   });
@@ -16,7 +16,7 @@ describe("Split", () => {
     const child = document.createElement("div");
     split.getSection(0).add(child);
 
-    expect(split.root.className).toContain("hsplit");
+    expect(split.root.className).toContain("lg-split--horizontal");
     expect(split.sections[0].element.style.width).toBe("200px");
     expect(split.sections[0].element.contains(child)).toBe(true);
   });

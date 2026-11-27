@@ -59,4 +59,4 @@ pnpm test:e2e
 # 首次：pnpm --filter @gausszhou/litegui-tests e2e:install
 ```
 
-新增页面测试时，优先使用稳定的 class（`.litearea`、`.litedialog`、`.lite-menu-panel`）而不是文本选择器。
+新增页面测试时，优先使用稳定的 class（`.lg-area`、`.lg-dialog`、`.lg-menu__panel`）而不是文本选择器。

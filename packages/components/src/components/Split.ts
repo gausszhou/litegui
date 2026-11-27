@@ -32,7 +32,7 @@ export class Split {
     this.sections = [];
     sections.forEach((sectionInfo, index) => {
       const section = this.createSection(options, sectionInfo)
-      section.element.classList.add("split-" + index);
+      section.element.classList.add("lg-split__section--" + index);
       this.root.appendChild(section.element);
       this.sections.push(section);
     })
@@ -56,8 +56,8 @@ export class Split {
   // 
   createRoot(options: SplitOptions) {
     const root = document.createElement("div");
-    root.className = "litesplit"
-    root.classList.add(options.vertical ? "vsplit" : "hsplit");
+    root.className = "lg-split"
+    root.classList.add(options.vertical ? "lg-split--vertical" : "lg-split--horizontal");
     if (options.id) {
       root.id = options.id;
     }
@@ -65,7 +65,7 @@ export class Split {
   }
   createSection(options: SplitOptions | any = {}, sectionInfo: SectionInfo | number | string): Section {
     const element = document.createElement("div");
-    element.className = "split-section"
+    element.className = "lg-split__section"
     if (typeof sectionInfo == "number") {
       if (options.vertical) {
         element.style.height = sectionInfo.toFixed(1) + "%";

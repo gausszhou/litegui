@@ -12,7 +12,7 @@ describe("Tabs", () => {
     expect(first.content.textContent).toBe("First content");
     expect(first.content.style.display).toBe("");
     expect(second.content.style.display).toBe("none");
-    expect(first.tab?.classList.contains("selected")).toBe(true);
+    expect(first.tab?.classList.contains("lg-tabs__tab--selected")).toBe(true);
   });
 
   it("switches tabs by id and by element click", () => {
@@ -63,7 +63,7 @@ describeTabs("Tabs lifecycle", () => {
     tabs.addPlusTab(onPlus);
     tabs.addButtonTab("action", "Action", onButton);
 
-    const buttons = tabs.list.querySelectorAll<HTMLElement>("li.wtab.button");
+    const buttons = tabs.list.querySelectorAll<HTMLElement>("li.lg-tabs__tab.lg-tabs__tab--button");
     expectTabs(buttons.length).toBe(2);
     buttons[0].click();
     buttons[1].click();

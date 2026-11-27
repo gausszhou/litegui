@@ -1,4 +1,4 @@
-.lite-menu ul {
+.lg-menu__list {
   font-family: Tahoma, sans-serif;
   margin: 0;
   padding: 2px 0;
@@ -8,7 +8,7 @@
   background-color: #232323;
 }
 
-.lite-menu li {
+.lg-menu__item {
   font-size: 14px;
   height: 24px;
   line-height: 24px;
@@ -23,12 +23,12 @@
   cursor: pointer;
 }
 
-.lite-menu li:hover {
+.lg-menu__item:hover {
   color: #eee;
   background-color: #343740;
 }
 
-.lite-menu-panel {
+.lg-menu__panel {
   /* 用视口坐标定位，菜单面板由 getRoot() 挂载，避免受 offsetParent 影响 */
   position: fixed;
   z-index: 10;
@@ -40,7 +40,7 @@
 }
 
 
-.lite-menu-panel-item {
+.lg-menu__panel-item {
 	font-size: 14px;
 	color: #aaa;
 	padding: 2px;
@@ -55,32 +55,32 @@
   white-space: nowrap;
 }
 
-.lite-menu-panel-item .icon {
+.lg-menu__panel-item .lg-menu__icon {
 	display: inline-block;
 	width: 12px;
 	height: 12px;
 	margin: 2px;
 	vertical-align: top;
 }
-.lite-menu-panel-item .name {
+.lg-menu__panel-item .lg-menu__name {
   flex: 1;
 }
 
-.lite-menu-panel-item.checked .icon {
+.lg-menu__panel-item--checked .lg-menu__icon {
 	background-color: #aaf;
 }
 
-.lite-menu-panel-item .more {
+.lg-menu__panel-item .lg-menu__more {
 	float: right;
 	padding-right: 5px;
 }
 
-.lite-menu-panel-item.disabled {
+.lg-menu__panel-item--disabled {
 	opacity: 0.5;
 	cursor: default;
 }
 
-.lite-menu-panel-item.separator {
+.lg-menu__panel-item--separator {
 	display: block;
 	border-top: 1px solid #333;
 	border-bottom: 1px solid #666;
@@ -92,11 +92,11 @@
 	cursor: default !important;
 }
 
-.lite-menu-panel-item.has_submenu {
+.lg-menu__panel-item--has-submenu {
 	border-right: 2px solid cyan;
 }
 
-.litemenu-title {
+.lg-context-menu__title {
 	color: #dde;
 	background-color: #111;
 	margin: 0;
@@ -104,7 +104,7 @@
 	cursor: default;
 }
 
-.lite-menu-panel-item:hover:not(.disabled):not(.separator) {
+.lg-menu__panel-item:hover:not(.lg-menu__panel-item--disabled):not(.lg-menu__panel-item--separator) {
 	background-color: #555;
 	color: #eee;
 }

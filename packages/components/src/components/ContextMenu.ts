@@ -59,7 +59,7 @@ export class ContextMenu {
 
         // 创建根元素
         const root = this.root = document.createElement("div");
-        root.className = "litecontextmenu litemenubar-panel";
+        root.className = "lg-context-menu";
         root.style.minWidth = "100px";
         root.style.minHeight = "100px";
         root.style.pointerEvents = "none";
@@ -89,7 +89,7 @@ export class ContextMenu {
         // 添加标题
         if (options.title) {
             const element = document.createElement("div");
-            element.className = "litemenu-title";
+            element.className = "lg-context-menu__title";
             element.innerHTML = options.title;
             root.appendChild(element);
         }
@@ -182,12 +182,12 @@ export class ContextMenu {
         const that = this;
 
         const element = document.createElement("div");
-        element.className = "litemenu-entry submenu";
+        element.className = "lg-context-menu__item";
 
         let disabled = false;
 
         if (value === null) {
-            element.classList.add("separator");
+            element.classList.add("lg-context-menu__item--separator");
         } else {
             element.innerHTML = value && value.title ? value.title : String(name ?? "");
             (element as any).value = value;
@@ -195,10 +195,10 @@ export class ContextMenu {
             if (value) {
                 if (value.disabled) {
                     disabled = true;
-                    element.classList.add("disabled");
+                    element.classList.add("lg-context-menu__item--disabled");
                 }
                 if (value.submenu || value.has_submenu) {
-                    element.classList.add("has_submenu");
+                    element.classList.add("lg-context-menu__item--has-submenu");
                 }
             }
 

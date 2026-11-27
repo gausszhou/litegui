@@ -88,7 +88,7 @@ export class Tabs {
     if (options.id) {
       root.id = options.id;
     }
-    root.className = "litetabs " + this.mode;
+    root.className = "lg-tabs lg-tabs--" + this.mode;
     this.root = root;
     
 
@@ -117,7 +117,7 @@ export class Tabs {
 
     // 创建标签页容器
     const list = document.createElement("ul");
-    list.className = "wtabcontainer";
+    list.className = "lg-tabs__list";
     if (this.mode === "vertical") {
       list.style.width = `${Tabs.tabs_width}px`;
     } else {
@@ -270,19 +270,18 @@ export class Tabs {
 
     //the tab element
     var element = document.createElement("LI");
-    var safe_id = id.replace(/ /gi, "_");
-    element.className = "wtab wtab-" + safe_id + " ";
+    element.className = "lg-tabs__tab ";
     //if(options.selected) element.className += " selected";
     element.dataset["id"] = id;
-    element.innerHTML = "<span class='tabtitle'>" + (options.title || id) + "</span>";
+    element.innerHTML = "<span class='lg-tabs__tab-title'>" + (options.title || id) + "</span>";
 
-    if (options.button) element.className += "button ";
+    if (options.button) element.className += "lg-tabs__tab--button ";
     if (options.tab_className) element.className += options.tab_className;
     if (options.bigicon)
-      element.innerHTML = "<img class='tabbigicon' src='" + options.bigicon + "'/>" + element.innerHTML;
+      element.innerHTML = "<img class='lg-tabs__tab-icon' src='" + options.bigicon + "'/>" + element.innerHTML;
     if (options.closable) {
-      element.innerHTML += "<span class='tabclose'>Close</span>";
-      element.querySelector("span.tabclose")!.addEventListener(
+      element.innerHTML += "<span class='lg-tabs__tab-close'>Close</span>";
+      element.querySelector("span.lg-tabs__tab-close")!.addEventListener(
         "click",
         function (e) {
           that.removeTab(id);
@@ -308,7 +307,7 @@ export class Tabs {
     }
 
     if (this.options.autoswitch) {
-      element.classList.add("autoswitch");
+      element.classList.add("lg-tabs__tab--autoswitch");
       element.addEventListener("dragenter", function (_e) {
         //console.log("Enter",this.dataset["id"]);
         if (that._timeout_mouseover) clearTimeout(that._timeout_mouseover);
@@ -334,7 +333,7 @@ export class Tabs {
     var content = document.createElement("div");
     if (options.id) content.id = options.id;
 
-    content.className = "wtabcontent " + "wtabcontent-" + safe_id + " " + (options.className || "");
+    content.className = "lg-tabs__panel " + (options.className || "");
     content.dataset["id"] = id;
     content.style.display = "none";
     content.setAttribute("role", "tabpanel");
@@ -396,7 +395,7 @@ export class Tabs {
 
 
 
-    const titleElement = element.querySelector<HTMLElement>("span.tabtitle");
+    const titleElement = element.querySelector<HTMLElement>("span.lg-tabs__tab-title");
 
     //tab object
     const tab_info = new Tab();
@@ -507,9 +506,9 @@ export class Tabs {
       }
     }
 
-    this.list.querySelectorAll<HTMLElement>("li.wtab").forEach((tabElement) => {
+    this.list.querySelectorAll<HTMLElement>("li.lg-tabs__tab").forEach((tabElement) => {
       const selected = tabElement === element;
-      tabElement.classList.toggle("selected", selected);
+      tabElement.classList.toggle("lg-tabs__tab--selected", selected);
       tabElement.setAttribute("aria-selected", selected ? "true" : "false");
       tabElement.tabIndex = selected ? 0 : -1;
     });
@@ -653,7 +652,7 @@ export class Tabs {
     }
 
     // 更新样式和选中状态
-    tab.tab.classList.remove("selected");
+    tab.tab.classList.remove("lg-tabs__tab--selected");
     target_tabs.selectTab(id);
   };
 }

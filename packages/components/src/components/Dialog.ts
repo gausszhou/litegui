@@ -132,7 +132,7 @@ export class Dialog extends EventMitter implements LiteComponent {
   createElementRoot() {
     const options = this.options;
     const element = document.createElement("div");
-    element.className = "litedialog";
+    element.className = "lg-dialog";
     if (this.id) element.id = this.id;
     if (options.className) element.className += " " + options.className;
     return element;
@@ -141,7 +141,7 @@ export class Dialog extends EventMitter implements LiteComponent {
   createElementHeader() {
     const options = this.options;
     const header = document.createElement("div");
-    header.className = "panel-header";
+    header.className = "lg-dialog__header";
     header.textContent = options.title || "";
     if (!options.title) header.style.display = "none";
     return header;
@@ -150,12 +150,12 @@ export class Dialog extends EventMitter implements LiteComponent {
   createElementButtons() {
     const options = this.options;
     const container = document.createElement("div");
-    container.className = "buttons";
+    container.className = "lg-dialog__buttons";
 
     const createMiniButton = (className: string, label: string, title: string) => {
       const button = document.createElement("button");
       button.type = "button";
-      button.className = `litebutton mini-button ${className}`;
+      button.className = `lg-button__control lg-button__control--mini lg-dialog__button--${className.replace("-button", "")}`;
       button.textContent = label;
       button.title = title;
       return button;
@@ -183,14 +183,14 @@ export class Dialog extends EventMitter implements LiteComponent {
   createElementContent() {
     const options = this.options;
     const content = document.createElement("div");
-    content.className = "content";
+    content.className = "lg-dialog__content";
     if (options.content) content.innerHTML = options.content;
     return content;
   }
 
   createElementFooter() {
     const footer = document.createElement("div");
-    footer.className = "panel-footer";
+    footer.className = "lg-dialog__footer";
     return footer;
   }
 
@@ -216,28 +216,28 @@ export class Dialog extends EventMitter implements LiteComponent {
   }
 
   bindWindowButtons() {
-    const close = this.root.querySelector<HTMLButtonElement>(".close-button");
+    const close = this.root.querySelector<HTMLButtonElement>(".lg-dialog__button--close");
     close?.addEventListener("click", (e) => {
       e.preventDefault();
       e.stopPropagation();
       this.close();
     });
 
-    const minimize = this.root.querySelector<HTMLButtonElement>(".minimize-button");
+    const minimize = this.root.querySelector<HTMLButtonElement>(".lg-dialog__button--minimize");
     minimize?.addEventListener("click", (e) => {
       e.preventDefault();
       e.stopPropagation();
       this.minimize();
     });
 
-    const maximize = this.root.querySelector<HTMLButtonElement>(".maximize-button");
+    const maximize = this.root.querySelector<HTMLButtonElement>(".lg-dialog__button--maximize");
     maximize?.addEventListener("click", (e) => {
       e.preventDefault();
       e.stopPropagation();
       this.maximize();
     });
 
-    const hide = this.root.querySelector<HTMLButtonElement>(".hide-button");
+    const hide = this.root.querySelector<HTMLButtonElement>(".lg-dialog__button--hide");
     hide?.addEventListener("click", (e) => {
       e.preventDefault();
       e.stopPropagation();
@@ -431,11 +431,11 @@ export class Dialog extends EventMitter implements LiteComponent {
 
     // 设置页脚最小高度和添加可调整类
     footer.style.minHeight = "4px";
-    footer.classList.add("resizable");
+    footer.classList.add("lg-dialog__footer--resizable");
 
     // 创建右下角调整大小的元素
     const corner = document.createElement("div");
-    corner.className = "resizable-corner";
+    corner.className = "lg-dialog__resize-handle";
     root.appendChild(corner);
 
     // 记录鼠标位置
@@ -595,8 +595,8 @@ export class Dialog extends EventMitter implements LiteComponent {
     this.content.style.display = "none";
 
     // 更新最小化/最大化按钮显示状态
-    const minimizeButton = this.root.querySelector(".minimize-button") as HTMLElement;
-    const maximizeButton = this.root.querySelector(".maximize-button") as HTMLElement;
+    const minimizeButton = this.root.querySelector(".lg-dialog__button--minimize") as HTMLElement;
+    const maximizeButton = this.root.querySelector(".lg-dialog__button--maximize") as HTMLElement;
     if (minimizeButton) minimizeButton.style.display = "none";
     if (maximizeButton) maximizeButton.style.display = "";
 
@@ -649,8 +649,8 @@ export class Dialog extends EventMitter implements LiteComponent {
     }
 
     // 更新按钮显示状态
-    const minimizeButton = this.root.querySelector(".minimize-button") as HTMLElement;
-    const maximizeButton = this.root.querySelector(".maximize-button") as HTMLElement;
+    const minimizeButton = this.root.querySelector(".lg-dialog__button--minimize") as HTMLElement;
+    const maximizeButton = this.root.querySelector(".lg-dialog__button--maximize") as HTMLElement;
     if (minimizeButton) minimizeButton.style.display = "";
     if (maximizeButton) maximizeButton.style.display = "none";
 
@@ -762,7 +762,7 @@ export class Dialog extends EventMitter implements LiteComponent {
 
     // 计算额外高度(页脚)
     let extraHeight = 0;
-    const footer = this.root.querySelector(".panel-footer") as HTMLDivElement;
+    const footer = this.root.querySelector(".lg-dialog__footer") as HTMLDivElement;
     if (footer) {
       extraHeight += footer.offsetHeight;
     }

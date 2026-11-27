@@ -5,27 +5,27 @@ div {
 	padding: 0;
 }
 
-.litegui-wrap {
+.lg-app__wrap {
 	width: 1000px;
 	height: 600px;
 	margin: auto;
 	background-color: #333;
 }
 
-.litegui-wrap.fullscreen {
+.lg-app__wrap.lg-app--fullscreen {
 	width: 100%;
 	height: 100%;
 	overflow: hidden;
 }
 
-.litegui-maincontent {
+.lg-app__main {
 	width: 100%;
 	height: 100%;
 	overflow: hidden;
 	background-color: #181818;
 }
 
-.litearea {
+.lg-area {
 	vertical-align: top;
 	position: relative;
 	-moz-box-sizing: border-box;
@@ -36,19 +36,19 @@ div {
 	position: relative;
 }
 
-.litepanel {
+.lg-panel {
 	width: 100%;
 	height: 100%;
 	box-sizing: border-box;
 }
 
-.litedialog {
+.lg-dialog {
 	position: absolute;
 	z-index: 10;
 }
 
-.litepanel,
-.litedialog {
+.lg-panel,
+.lg-dialog {
 	background-color: #444;
 	box-sizing: border-box;
 	overflow: hidden;
@@ -56,8 +56,8 @@ div {
 	color: #888;
 }
 
-.litepanel .panel-header,
-.litedialog .panel-header {
+.lg-panel .lg-panel__header,
+.lg-dialog .lg-dialog__header {
 	font-size: 1em;
 	line-height: 1.5;
 	padding: 0 0.3em;
@@ -79,8 +79,8 @@ div {
 	overflow: hidden;
 }
 
-.litepanel .panel-header button,
-.litedialog .panel-header button {
+.lg-panel .lg-panel__header button,
+.lg-dialog .lg-dialog__header button {
 	margin-top: 0;
 	background-image: none;
 	border: 0;
@@ -88,21 +88,21 @@ div {
 	background-color: #333;
 }
 
-.litedialog.alert {
+.lg-dialog--alert {
 	font-size: 1.6em;
 }
 
-.litedialog.ui-draggable .panel-header {
+.lg-dialog.ui-draggable .lg-dialog__header {
 	cursor: move;
 }
 
-.litepanel .content {
+.lg-panel .lg-panel__content {
 	height: calc(100% - 20px);
 	overflow-y: auto;
 }
 
-.litepanel .panel-footer,
-.litedialog .panel-footer {
+.lg-panel .lg-panel__footer,
+.lg-dialog .lg-dialog__footer {
 	position: absolute;
 	bottom: 0;
 	font-size: 0.8em;
@@ -117,11 +117,11 @@ div {
 	text-align: right;
 }
 
-.litedialog .panel-footer.resizable {
+.lg-dialog .lg-dialog__footer--resizable {
 	cursor: s-resize;
 }
 
-.litedialog .resizable-corner {
+.lg-dialog .lg-dialog__resize-handle {
 	display: inline-block;
 	position: absolute;
 	bottom: 0;
@@ -133,23 +133,23 @@ div {
 	background-color: red;
 }
 
-.litedialog .panel-footer button {
+.lg-dialog .lg-dialog__footer button {
 	font-size: inherit;
 	padding: 0.1em 0.6em;
 }
 
-.litedialog .buttons {
+.lg-dialog .lg-dialog__buttons {
 	position: absolute;
 	top: 2px;
 	right: 2px;
 }
 
-.litedialog .content p {
+.lg-dialog .lg-dialog__content p {
 	padding: 0.2em;
 	margin: 0.2em;
 }
 
-.litemodalbg {
+.lg-modal-backdrop {
 	position: absolute;
 	top: 0;
 	left: 0;

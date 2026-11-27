@@ -23,7 +23,7 @@ description: 浮动 / 模态对话框
 | `draggable` | `boolean` | `false` | 可拖动标题栏 |
 | `resizable` | `boolean` | `false` | 可拖动右下角调整大小 |
 | `minimize` / `hide` / `detachable` | `boolean` | `false` | 标题栏按钮 |
-| `fullscreen` / `fullcontent` | `boolean` | `false` | 全屏 / 内容区占满 |
+| `lg-app--fullscreen` / `fullcontent` | `boolean` | `false` | 全屏 / 内容区占满 |
 | `scroll` | `boolean` | `false` | 内容区滚动 |
 | `buttons` | `ButtonsItemOptions[]` | — | 页脚按钮 |
 

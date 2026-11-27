@@ -65,7 +65,7 @@ export const LiteGuiSplit = defineComponent({
               ref: element => {
                 if (element) contents[index] = element as HTMLDivElement;
               },
-              class: "lg-vue-split-section"
+              class: "lg-vue-split__section"
             },
             slots[`section-${index}`]?.()
           )

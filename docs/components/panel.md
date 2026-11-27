@@ -36,7 +36,7 @@ description: 带标题与关闭按钮的面板
 
 ## 结构
 
-- `root`：`.litepanel`
+- `root`：`.lg-panel`
 - `header` / `titleElement`：标题栏与标题节点
 - `content`：内容区（`add()` 的挂载点）
 - `footer`：页脚

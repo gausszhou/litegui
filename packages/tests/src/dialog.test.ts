@@ -14,11 +14,11 @@ describe("Dialog", () => {
       close: true
     });
 
-    expect(dialog.root.className).toContain("litedialog");
-    expect(dialog.header.className).toBe("panel-header");
-    expect(dialog.content.className).toBe("content");
-    expect(dialog.footer.className).toBe("panel-footer");
-    expect(dialog.root.querySelector(".close-button")).not.toBeNull();
+    expect(dialog.root.className).toContain("lg-dialog");
+    expect(dialog.header.className).toBe("lg-dialog__header");
+    expect(dialog.content.className).toBe("lg-dialog__content");
+    expect(dialog.footer.className).toBe("lg-dialog__footer");
+    expect(dialog.root.querySelector(".lg-dialog__button--close")).not.toBeNull();
     expect(dialog.content.innerHTML).toContain("Body");
 
     dialog.show();
@@ -47,7 +47,7 @@ describe("Dialog", () => {
     const dialog = new Dialog({ title: "Close button", close: true });
     dialog.show();
 
-    dialog.root.querySelector<HTMLButtonElement>(".close-button")?.click();
+    dialog.root.querySelector<HTMLButtonElement>(".lg-dialog__button--close")?.click();
 
     expect(document.body.contains(dialog.root)).toBe(false);
   });

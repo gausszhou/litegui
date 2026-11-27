@@ -32,8 +32,8 @@ describe("editor page", () => {
     await import("../../../apps/editor/src/main.ts");
     window.onload?.call(window, new Event("load"));
 
-    expect(document.querySelector(".litearea")).not.toBeNull();
-    expect(document.querySelector(".lite-menu")).not.toBeNull();
-    expect(document.querySelectorAll(".litedialog").length).toBeGreaterThan(0);
+    expect(document.querySelector(".lg-area")).not.toBeNull();
+    expect(document.querySelector(".lg-menu")).not.toBeNull();
+    expect(document.querySelectorAll(".lg-dialog").length).toBeGreaterThan(0);
   });
 });

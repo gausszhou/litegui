@@ -7,8 +7,8 @@ describe("Area", () => {
     const area = new Area({ id: "main", width: 400, height: 300 });
 
     expect(area.root.id).toBe("main");
-    expect(area.root.className).toBe("litearea");
-    expect(area.content.className).toBe("liteareacontent");
+    expect(area.root.className).toBe("lg-area");
+    expect(area.content.className).toBe("lg-area__content");
     expect(area.root.style.width).toBe("400px");
     expect(area.root.style.height).toBe("300px");
   });
@@ -31,7 +31,7 @@ describe("Area", () => {
     expect(area.sections).toHaveLength(2);
     expect(area.sections[0].root.style.width).toBe("200px");
     expect(area.sections[1].root.style.width).toContain("calc");
-    expect(area.splitbar?.className).toContain("litesplitbar");
+    expect(area.splitbar?.className).toContain("lg-area__splitbar");
     expect(area.content.parentElement).toBe(area.sections[0].root);
     expect(area.getSection(0)).toBe(area.sections[0]);
   });
@@ -94,7 +94,7 @@ describe("Area merge and helpers", () => {
     area.setAreaSize(0, "50%");
 
     expect(area.sections[0].root.style.width).toContain("calc");
-    expect(area.query(".liteareacontent")).toBe(area.content);
+    expect(area.query(".lg-area__content")).toBe(area.content);
   });
 
   it("hides and shows the whole area", () => {

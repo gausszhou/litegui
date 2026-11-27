@@ -46,12 +46,12 @@ test("component gallery lists all entry pages", async ({ page }) => {
 
 test("menu demo opens a submenu aligned with its parent item", async ({ page }) => {
   await page.goto(`${DOCS_URL}components/menu`);
-  await page.locator(".lg-demo .lite-menu-item", { hasText: "文件" }).click();
+  await page.locator(".lg-demo .lg-menu__item", { hasText: "文件" }).click();
 
-  const parent = page.locator(".lg-demo .lite-menu-panel-item", { hasText: "使用配置文件新建窗口" });
+  const parent = page.locator(".lg-demo .lg-menu__panel-item", { hasText: "使用配置文件新建窗口" });
   await parent.click();
 
-  const submenu = page.locator(".lg-demo .lite-menu-panel").nth(1);
+  const submenu = page.locator(".lg-demo .lg-menu__panel").nth(1);
   await expect(submenu).toBeVisible();
 
   const parentBox = await parent.boundingBox();
@@ -65,7 +65,7 @@ test("dialog demo stays inside its demo container", async ({ page }) => {
   await page.goto(`${DOCS_URL}components/dialog`);
 
   const container = page.locator(".lg-demo");
-  const dialog = container.locator(".litedialog");
+  const dialog = container.locator(".lg-dialog");
   await expect(dialog).toBeVisible();
 
   const containerBox = await container.boundingBox();
@@ -85,11 +85,11 @@ test("web components page upgrades elements and keeps light DOM slots", async ({
   await expect(buttons).toHaveCount(3);
   await expect.poll(async () => buttons.first().evaluate(element => Boolean(element.shadowRoot))).toBe(true);
 
-  await expect(page.locator(".wc-demo lg-panel .panel-title")).toHaveText("属性");
-  await expect(page.locator(".wc-demo lg-dialog .litedialog")).toBeVisible();
-  await expect(page.locator(".wc-demo lg-menu .lite-menu-item")).toHaveCount(1);
-  await page.locator(".wc-demo lg-menu .lite-menu-item").click();
-  await expect(page.locator(".wc-demo lg-menu .lite-menu-panel")).toBeVisible();
+  await expect(page.locator(".wc-demo lg-panel .lg-panel__title")).toHaveText("属性");
+  await expect(page.locator(".wc-demo lg-dialog .lg-dialog")).toBeVisible();
+  await expect(page.locator(".wc-demo lg-menu .lg-menu__item")).toHaveCount(1);
+  await page.locator(".wc-demo lg-menu .lg-menu__item").click();
+  await expect(page.locator(".wc-demo lg-menu .lg-menu__panel")).toBeVisible();
 
   const theme = await page.locator("html").getAttribute("data-lg-theme");
   const isDark = await page.locator("html").evaluate(element => element.classList.contains("dark"));
@@ -103,24 +103,24 @@ test("vue bindings page mounts wrappers and v-model works", async ({ page }) => 
 
   await page.goto(`${DOCS_URL}vue`);
 
-  const checkbox = page.locator(".lg-demo .litecheckbox").first();
+  const checkbox = page.locator(".lg-demo .lg-checkbox").first();
   await expect(checkbox).toHaveAttribute("aria-checked", "true");
   await checkbox.click();
   await expect(checkbox).toHaveAttribute("aria-checked", "false");
 
   await page.locator(".lg-demo button", { hasText: "打开对话框" }).click();
-  await expect(page.locator(".lg-demo .litedialog")).toBeVisible();
+  await expect(page.locator(".lg-demo .lg-dialog")).toBeVisible();
 
-  await page.locator(".lg-menu-demo .lite-menu-item").click();
-  await expect(page.locator(".lg-menu-demo .lite-menu-panel")).toBeVisible();
+  await page.locator(".lg-menu-demo .lg-menu__item").click();
+  await expect(page.locator(".lg-menu-demo .lg-menu__panel")).toBeVisible();
 
-  await expect(page.locator(".lg-vue-table table.litetable")).toBeVisible();
-  await expect(page.locator(".lg-vue-list .list-item.selected")).toContainText("Alpha");
-  await expect(page.locator(".lg-vue-split .split-section")).toHaveCount(2);
+  await expect(page.locator(".lg-vue-table table.lg-table")).toBeVisible();
+  await expect(page.locator(".lg-vue-list .lg-list__item.lg-is-selected")).toContainText("Alpha");
+  await expect(page.locator(".lg-vue-split .lg-split__section")).toHaveCount(2);
   await expect(page.locator(".lg-vue-searchbox input")).toBeVisible();
-  await expect(page.locator(".lg-vue-tabs .wtab")).toHaveCount(2);
+  await expect(page.locator(".lg-vue-tabs .lg-tabs__tab")).toHaveCount(2);
   await expect(page.locator(".lg-vue-dragger input")).toBeVisible();
-  await expect(page.locator(".lg-vue-console .liteconsole")).toBeVisible();
+  await expect(page.locator(".lg-vue-console .lg-console")).toBeVisible();
 
   expect(errors).toEqual([]);
 });

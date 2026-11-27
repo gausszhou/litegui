@@ -55,6 +55,6 @@ LiteGUI.init({
 
 ## 自定义样式
 
-组件暴露稳定的 class 前缀（`litearea`、`litepanel`、`litedialog`、`litetable` 等）。建议优先覆盖变量；需要更细的样式时再覆盖 class。
+组件暴露稳定的 class 前缀（`lg-area`、`lg-panel`、`lg-dialog`、`lg-table` 等）。建议优先覆盖变量；需要更细的样式时再覆盖 class。
 
 > 1.x 仍使用全局 class；作用域前缀与 Shadow DOM 不在当前路线图内。

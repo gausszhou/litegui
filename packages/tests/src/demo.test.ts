@@ -11,7 +11,7 @@ describe("demo page", () => {
     window.onload?.call(window, new Event("load"));
 
     const app = document.querySelector("#app");
-    expect(app?.querySelector(".litearea")).not.toBeNull();
-    expect(document.querySelector(".litemodalbg")).not.toBeNull();
+    expect(app?.querySelector(".lg-area")).not.toBeNull();
+    expect(document.querySelector(".lg-modal-backdrop")).not.toBeNull();
   });
 });

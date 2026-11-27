@@ -7,10 +7,10 @@ describe("Panel", () => {
     const panel = new Panel({ id: "side", title: "Side", content: "<b>Hello</b>" });
 
     expect(panel.root.id).toBe("side");
-    expect(panel.root.className).toContain("litepanel");
-    expect(panel.header.className).toBe("panel-header");
-    expect(panel.content.className).toBe("content");
-    expect(panel.footer.className).toBe("panel-footer");
+    expect(panel.root.className).toContain("lg-panel");
+    expect(panel.header.className).toBe("lg-panel__header");
+    expect(panel.content.className).toBe("lg-panel__content");
+    expect(panel.footer.className).toBe("lg-panel__footer");
     expect(panel.content.innerHTML).toBe("<b>Hello</b>");
   });
 
@@ -38,7 +38,7 @@ describe("Panel", () => {
     panel.on("closed", closed);
 
     document.body.appendChild(panel.root);
-    panel.root.querySelector<HTMLButtonElement>(".panel-close")?.click();
+    panel.root.querySelector<HTMLButtonElement>(".lg-panel__close")?.click();
 
     expect(closed).toHaveBeenCalledTimes(1);
     expect(document.body.contains(panel.root)).toBe(false);

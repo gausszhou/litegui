@@ -35,7 +35,7 @@ describe("accessibility attributes", () => {
     tabs.addTab("two", { content: "Two" });
 
     expect(tabs.list.getAttribute("role")).toBe("tablist");
-    const tabElements = tabs.list.querySelectorAll<HTMLElement>("li.wtab");
+    const tabElements = tabs.list.querySelectorAll<HTMLElement>("li.lg-tabs__tab");
     expect(tabElements[0].getAttribute("role")).toBe("tab");
     expect(tabElements[0].getAttribute("aria-selected")).toBe("true");
     expect(tabElements[1].getAttribute("aria-selected")).toBe("false");
@@ -51,7 +51,7 @@ describe("accessibility attributes", () => {
     const list = new List("list", ["A", "B"]);
 
     expect(list.root.getAttribute("role")).toBe("listbox");
-    const options = list.root.querySelectorAll<HTMLElement>(".list-item");
+    const options = list.root.querySelectorAll<HTMLElement>(".lg-list__item");
     expect(options[0].getAttribute("role")).toBe("option");
 
     options[1].click();
@@ -75,7 +75,7 @@ describe("accessibility attributes", () => {
     const menu = new Menu("main");
     menu.add("File/New");
     expect(menu.content.getAttribute("role")).toBe("menubar");
-    expect(menu.root.querySelector(".lite-menu-item")?.getAttribute("role")).toBe("menuitem");
+    expect(menu.root.querySelector(".lg-menu__item")?.getAttribute("role")).toBe("menuitem");
 
     const search = new SearchBox("", { placeholder: "Find" });
     expect(search.root.getAttribute("role")).toBe("search");

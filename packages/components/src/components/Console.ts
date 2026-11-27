@@ -36,17 +36,17 @@ export class Console extends EventMitter {
   }
   createRoot() {
     const root = document.createElement("div");
-    root.className = "liteconsole";
+    root.className = "lg-console";
     return root;
   }
   createLog() {
     const log = document.createElement("div");
-    log.className = "log";
+    log.className = "lg-console__log";
     return log;
   }
   createFooter() {
     const footer = document.createElement("div");
-    footer.className = "foot";
+    footer.className = "lg-console__footer";
     return footer;
   }
   createInput() {
@@ -104,9 +104,11 @@ export class Console extends EventMitter {
       } else {
         element.innerHTML = txt;
       }
-      element.className = "msg";
+      element.className = "lg-console__message";
       if (className) {
-        element.classList.add(className);
+        const suffix = className.startsWith("msg") ? className.slice(3) : className;
+        const modifier = className.startsWith("lg-") ? className : `lg-console__message--${suffix}`;
+        element.classList.add(modifier);
       }
       content.appendChild(element);
       // length limit

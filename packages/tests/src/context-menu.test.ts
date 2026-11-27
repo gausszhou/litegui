@@ -7,7 +7,7 @@ describe("ContextMenu", () => {
     const menu = new ContextMenu([{ title: "Rename", callback }], { left: 10, top: 20 });
 
     expect(menu.root.parentElement).toBe(document.body);
-    const entry = menu.root.querySelector<HTMLElement>(".litemenu-entry");
+    const entry = menu.root.querySelector<HTMLElement>(".lg-context-menu__item");
     expect(entry?.textContent).toContain("Rename");
 
     entry?.click();
@@ -17,7 +17,7 @@ describe("ContextMenu", () => {
 
   it("supports object values and closes manually", () => {
     const menu = new ContextMenu({ Delete: { title: "Delete" } });
-    expect(menu.root.querySelector(".litemenu-entry")?.textContent).toContain("Delete");
+    expect(menu.root.querySelector(".lg-context-menu__item")?.textContent).toContain("Delete");
 
     menu.close();
     expect(menu.root.parentElement).toBeNull();
@@ -44,10 +44,10 @@ describeSubmenu("ContextMenu submenu", () => {
       }
     ]);
 
-    menu.root.querySelector<HTMLElement>(".litemenu-entry")?.click();
+    menu.root.querySelector<HTMLElement>(".lg-context-menu__item")?.click();
 
     expectSubmenu(menu.current_submenu).toBeDefined();
-    const child = menu.current_submenu?.root.querySelector<HTMLElement>(".litemenu-entry");
+    const child = menu.current_submenu?.root.querySelector<HTMLElement>(".lg-context-menu__item");
     expectSubmenu(child?.textContent).toContain("Child");
 
     child?.click();
@@ -61,7 +61,7 @@ describe("ContextMenu container", () => {
     document.body.appendChild(host);
     const menu = new ContextMenu([{ title: "Rename" }], { left: 10, top: 10, container: host });
 
-    const menuRoot = host.querySelector(".litecontextmenu");
+    const menuRoot = host.querySelector(".lg-context-menu");
     expect(menuRoot).not.toBeNull();
     expect(menuRoot!.parentElement).toBe(host);
     menu.close();

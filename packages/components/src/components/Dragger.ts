@@ -32,14 +32,14 @@ export class Dragger extends EventMitter {
   createRoot() {
     const options = this.options;
     const root = document.createElement("div");
-    root.className = "dragger " + (options.extraclass ? options.extraclass : "");
+    root.className = "lg-dragger " + (options.extraclass ? options.extraclass : "");
     return root;
   }
   createWrap() {
     const options = this.options;
     const wrap = document.createElement("span");
-    wrap.className = "inputfield " + (options.extraclass ? options.extraclass : "") + (options.full ? " full" : "");
-    if (options.disabled) wrap.className += " disabled";
+    wrap.className = "lg-input " + (options.extraclass ? options.extraclass : "") + (options.full ? " lg-input--full" : "");
+    if (options.disabled) wrap.className += " lg-is-disabled";
     return wrap;
   }
   createInput() {
@@ -48,7 +48,7 @@ export class Dragger extends EventMitter {
     const precision = this.precision;
     const dragger_class = options.dragger_class || "full";
     const input = document.createElement("input");
-    input.className = "text number " + (dragger_class ? dragger_class : "");
+    input.className = "lg-input__field lg-input__field--number" + (dragger_class ? " lg-input__field--" + dragger_class : "");
     input.value = value.toFixed(precision) + (options.units ? options.units : "");
     input.tabIndex = options.tab_index;
     if (options.disabled) input.disabled = true;
@@ -59,8 +59,8 @@ export class Dragger extends EventMitter {
   createDragger() {
     const options = this.options;
     const dragger = document.createElement("div");
-    dragger.className = "drag_widget";
-    if (options.disabled) dragger.className += " disabled";
+    dragger.className = "lg-dragger__widget";
+    if (options.disabled) dragger.className += " lg-is-disabled";
     return dragger;
   }
   initDom() {

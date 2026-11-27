@@ -25,7 +25,7 @@ describe("LiteGUI custom elements", () => {
 
   it("lg-button renders, reflects label and emits litegui-click", () => {
     const button = mount<LiteGuiButtonElement>("lg-button", { label: "Save" });
-    const inner = button.shadowRoot?.querySelector<HTMLButtonElement>("button.litebutton");
+    const inner = button.shadowRoot?.querySelector<HTMLButtonElement>("button.lg-button__control");
     expect(inner?.textContent).toBe("Save");
 
     const onClick = vi.fn();
@@ -47,7 +47,7 @@ describe("LiteGUI custom elements", () => {
     const onClick = vi.fn();
     button.addEventListener("litegui-click", onClick);
 
-    button.shadowRoot?.querySelector<HTMLButtonElement>("button.litebutton")?.click();
+    button.shadowRoot?.querySelector<HTMLButtonElement>("button.lg-button__control")?.click();
 
     expect(button.disabled).toBe(true);
     expect(onClick).not.toHaveBeenCalled();
@@ -60,7 +60,7 @@ describe("LiteGUI custom elements", () => {
     const onChange = vi.fn();
     checkbox.addEventListener("litegui-change", onChange);
 
-    checkbox.shadowRoot?.querySelector<HTMLElement>(".litecheckbox")?.click();
+    checkbox.shadowRoot?.querySelector<HTMLElement>(".lg-checkbox")?.click();
 
     expect(checkbox.checked).toBe(false);
     expect(checkbox.hasAttribute("checked")).toBe(false);
@@ -77,13 +77,13 @@ describe("LiteGUI custom elements", () => {
 
     document.body.appendChild(panel);
 
-    expect(panel.shadowRoot?.querySelector(".panel-title")?.textContent).toBe("属性");
+    expect(panel.shadowRoot?.querySelector(".lg-panel__title")?.textContent).toBe("属性");
     expect(panel.shadowRoot?.querySelector("slot")).not.toBeNull();
     expect(panel.querySelector("span")?.textContent).toBe("内容");
 
     const onClose = vi.fn();
     panel.addEventListener("litegui-close", onClose);
-    panel.shadowRoot?.querySelector<HTMLElement>(".panel-close")?.click();
+    panel.shadowRoot?.querySelector<HTMLElement>(".lg-panel__close")?.click();
 
     expect(onClose).toHaveBeenCalledTimes(1);
     expect(panel.hidden).toBe(true);
@@ -92,14 +92,14 @@ describe("LiteGUI custom elements", () => {
   it("lg-dialog follows the open attribute and reopens after close", () => {
     const dialog = mount("lg-dialog", { heading: "设置", open: "", closable: "" });
 
-    const findDialog = () => dialog.shadowRoot?.querySelector<HTMLElement>(".litedialog");
+    const findDialog = () => dialog.shadowRoot?.querySelector<HTMLElement>(".lg-dialog");
     expect(findDialog()).not.toBeNull();
     expect(findDialog()?.style.display).not.toBe("none");
 
     const onClose = vi.fn();
     dialog.addEventListener("litegui-close", onClose);
 
-    findDialog()?.querySelector<HTMLElement>(".close-button")?.click();
+    findDialog()?.querySelector<HTMLElement>(".lg-dialog__button--close")?.click();
 
     expect(dialog.hasAttribute("open")).toBe(false);
     expect(onClose).toHaveBeenCalledTimes(1);
@@ -120,11 +120,11 @@ describe("LiteGUI custom elements", () => {
     `;
     document.body.appendChild(menu);
 
-    const top = menu.shadowRoot?.querySelector<HTMLElement>(".lite-menu-item");
+    const top = menu.shadowRoot?.querySelector<HTMLElement>(".lg-menu__item");
     expect(top?.textContent).toContain("文件");
 
     top?.click();
-    const leaves = [...(menu.shadowRoot?.querySelectorAll<HTMLElement>(".lite-menu-panel-item") ?? [])];
+    const leaves = [...(menu.shadowRoot?.querySelectorAll<HTMLElement>(".lg-menu__panel-item") ?? [])];
     const leaf = leaves.find(element => element.textContent?.includes("新建"));
     expect(leaf).toBeDefined();
 
@@ -146,6 +146,6 @@ describe("LiteGUI custom elements", () => {
 
     other.appendChild(button);
 
-    expect(button.shadowRoot?.querySelectorAll("button.litebutton")).toHaveLength(1);
+    expect(button.shadowRoot?.querySelectorAll("button.lg-button__control")).toHaveLength(1);
   });
 });

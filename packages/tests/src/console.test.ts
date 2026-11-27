@@ -9,11 +9,11 @@ describe("Console", () => {
     consoleWidget.warn("careful");
     consoleWidget.error("boom");
 
-    const messages = consoleWidget.$log.querySelectorAll("pre.msg");
+    const messages = consoleWidget.$log.querySelectorAll("pre.lg-console__message");
     expect(messages).toHaveLength(3);
-    expect(messages[0].className).toContain("msglog");
-    expect(messages[1].className).toContain("msgwarn");
-    expect(messages[2].className).toContain("msgerror");
+    expect(messages[0].className).toContain("lg-console__message--log");
+    expect(messages[1].className).toContain("lg-console__message--warn");
+    expect(messages[2].className).toContain("lg-console__message--error");
 
     consoleWidget.clear();
     expect(consoleWidget.$log.children).toHaveLength(0);
@@ -61,6 +61,6 @@ describeConsole("Console input", () => {
     widget.addMessage({ a: 1 }, "msglog");
     widget.addMessage(["a", "b"], "msglog");
 
-    expectConsole(widget.$log.querySelectorAll("pre.msg")).toHaveLength(3);
+    expectConsole(widget.$log.querySelectorAll("pre.lg-console__message")).toHaveLength(3);
   });
 });

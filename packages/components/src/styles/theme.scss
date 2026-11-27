@@ -46,63 +46,63 @@ body {
 	font-family: var(--lg-font);
 }
 
-.litegui-wrap,
-.litegui-maincontent {
+.lg-app__wrap,
+.lg-app__main {
 	background-color: var(--lg-color-bg);
 }
 
-.litepanel,
-.litedialog {
+.lg-panel,
+.lg-dialog {
 	background-color: var(--lg-color-panel);
 	background-image: none;
 	color: var(--lg-color-text);
 }
 
-.litepanel .panel-header,
-.litedialog .panel-header {
+.lg-panel .lg-panel__header,
+.lg-dialog .lg-dialog__header {
 	background-color: var(--lg-color-header);
 	background-image: none;
 	color: var(--lg-color-text-strong);
 }
 
-.litepanel .panel-header button,
-.litedialog .panel-header button {
+.lg-panel .lg-panel__header button,
+.lg-dialog .lg-dialog__header button {
 	background-color: var(--lg-color-header-2);
 	color: var(--lg-color-text-strong);
 }
 
-.litepanel .panel-footer,
-.litedialog .panel-footer {
+.lg-panel .lg-panel__footer,
+.lg-dialog .lg-dialog__footer {
 	color: var(--lg-color-text-muted);
 }
 
-button.litebutton {
+button.lg-button__control {
 	background: var(--lg-color-button);
 	border-radius: var(--lg-radius);
 	color: var(--lg-color-button-text);
 	text-shadow: none;
 }
 
-button.litebutton:hover:not(:disabled),
-button.litebutton:active:not(:disabled) {
+button.lg-button__control:hover:not(:disabled),
+button.lg-button__control:active:not(:disabled) {
 	background: var(--lg-color-button-hover) !important;
 	color: var(--lg-color-text-strong);
 }
 
-button.litebutton:focus-visible {
+button.lg-button__control:focus-visible {
 	outline: 2px solid var(--lg-color-accent);
 	outline-offset: 1px;
 }
 
-.litemodalbg {
+.lg-modal-backdrop {
 	background-color: var(--lg-color-overlay);
 }
 
-.liteslider {
+.lg-slider {
 	background-color: var(--lg-color-panel-2);
 }
 
-.litetable th {
+.lg-table th {
 	color: var(--lg-color-accent);
 	background: var(--lg-color-panel-2);
 }

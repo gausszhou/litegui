@@ -31,9 +31,9 @@ export class ComplexList {
 
     constructor(options: ComplexListOptions = {}) {
         this.root = document.createElement("div");
-        this.root.className = "litecomplexlist";
+        this.root.className = "lg-complex-list";
 
-        this.item_code = options.item_code || `<div class='listitem'><span class='tick'><span>Tick</span></span><span class='title'></span><button class='trash'>Close</button></div>`;
+        this.item_code = options.item_code || `<div class='lg-complex-list__item'><span class='lg-complex-list__tick'><span>Tick</span></span><span class='lg-complex-list__item-title'></span><button class='lg-complex-list__trash'>Close</button></div>`;
 
         if (options.height) {
             this.root.style.height = sizeToCSS(options.height);
@@ -46,13 +46,13 @@ export class ComplexList {
     }
 
     public addTitle(text: string): HTMLElement {
-        const elem = createElement("div", ".listtitle", text);
+        const elem = createElement("div", ".lg-complex-list__title", text);
         this.root.appendChild(elem);
         return elem;
     }
 
     public addHTML(html: string, on_click?: (e: MouseEvent) => void): HTMLElement {
-        const elem = createElement("div", ".listtext", html);
+        const elem = createElement("div", ".lg-complex-list__text", html);
         if (on_click) {
             elem.addEventListener("mousedown", on_click);
         }
@@ -66,15 +66,15 @@ export class ComplexList {
 
     public addItem(item: ListItem, text?: string, is_enabled?: boolean, can_be_removed?: boolean): ExtendedHTMLElement {
         const title = text || item.content || item.name || '';
-        const elem = createListItem(this.item_code, { ".title": title }) as ExtendedHTMLElement;
+        const elem = createListItem(this.item_code, { ".lg-complex-list__item-title": title }) as ExtendedHTMLElement;
         elem.item = item;
 
         if (is_enabled) {
-            elem.classList.add("enabled");
+            elem.classList.add("lg-is-enabled");
         }
 
         if (!can_be_removed) {
-            const trashElem = elem.querySelector(".trash") as HTMLDivElement;
+            const trashElem = elem.querySelector(".lg-complex-list__trash") as HTMLDivElement;
             if (trashElem) {
                 trashElem.style.display = "none";
             }
@@ -88,18 +88,18 @@ export class ComplexList {
             }
         });
 
-        const tickElem = elem.querySelector(".tick") as HTMLDivElement;
+        const tickElem = elem.querySelector(".lg-complex-list__tick") as HTMLDivElement;
         if (tickElem) {
             tickElem.addEventListener("mousedown", (e: MouseEvent) => {
                 e.preventDefault();
-                elem.classList.toggle("enabled");
+                elem.classList.toggle("lg-is-enabled");
                 if (this.onItemToggled) {
                     this.onItemToggled(item, elem, elem.classList.contains("enabled"));
                 }
             });
         }
 
-        const trashElem = elem.querySelector(".trash") as HTMLDivElement;
+        const trashElem = elem.querySelector(".lg-complex-list__trash") as HTMLDivElement;
         if (trashElem) {
             trashElem.addEventListener("mousedown", (e: MouseEvent) => {
                 e.preventDefault();
@@ -112,7 +112,7 @@ export class ComplexList {
         }
 
         elem.setContent = (v: string, is_html?: boolean) => {
-            const titleElem = elem.querySelector(".title");
+            const titleElem = elem.querySelector(".lg-complex-list__item-title");
             if (titleElem) {
                 if (is_html) {
                     titleElem.innerHTML = v;
@@ -123,15 +123,15 @@ export class ComplexList {
         };
 
         elem.toggleEnabled = () => {
-            elem.classList.toggle("enabled");
+            elem.classList.toggle("lg-is-enabled");
         };
 
         elem.setSelected = (v: boolean) => {
-            this.root.querySelectorAll(".listitem.selected").forEach((item) => item.classList.remove("selected"));
+            this.root.querySelectorAll(".lg-complex-list__item.lg-is-selected").forEach((item) => item.classList.remove("lg-is-selected"));
             if (v) {
-                elem.classList.add("selected");
+                elem.classList.add("lg-is-selected");
             } else {
-                elem.classList.remove("selected");
+                elem.classList.remove("lg-is-selected");
             }
             this.selected = elem.item;
         };

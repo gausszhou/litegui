@@ -1,21 +1,21 @@
-table.litetable {
+table.lg-table {
 	width: 100%;
 	height: 100%;
 	display: block;
 }
 
-table.litetable tr {
+table.lg-table tr {
 	display: block;
 	width: 100%;
 }
 
-table.litetable th,
-table.litetable td {
+table.lg-table th,
+table.lg-table td {
 	display: inline-block;
 	border-right: 1px solid rgba(0, 0, 0, 0.2);
 }
 
-table.litetable th {
+table.lg-table th {
 	color: #6c7ba7;
 	background: #272a30;
 	font-weight: bold;
@@ -26,10 +26,10 @@ table.litetable th {
 	*/
 }
 
-table.litetable td {
+table.lg-table td {
 	padding: 2px 4px;
 }
 
-table.litetable tr:nth-child(even) {
+table.lg-table tr:nth-child(even) {
 	background: rgba(0, 0, 0, 0.1);
 }

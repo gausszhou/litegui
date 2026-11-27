@@ -44,7 +44,7 @@ export class Table extends EventMitter {
 
   createRoot() {
     const root = document.createElement("table");
-    root.classList.add("litetable");
+    root.classList.add("lg-table");
     return root;
   }
 

@@ -57,7 +57,7 @@ export class Area extends EventMitter {
   createRoot() {
     const options = this.options;
     const root = document.createElement("div");
-    root.className = "litearea";
+    root.className = "lg-area";
     if (options.id) root.id = options.id;
     if (options.className) root.className += " " + options.className;
     return root;
@@ -67,7 +67,7 @@ export class Area extends EventMitter {
     const options = this.options;
     var content = document.createElement("div");
     if (options.content_id) content.id = options.content_id;
-    content.className = "liteareacontent";
+    content.className = "lg-area__content";
     content.style.width = "100%";
     content.style.height = "100%";
     return content;
@@ -111,7 +111,7 @@ export class Area extends EventMitter {
     };
 
     const splitbar = document.createElement("div");
-    splitbar.className = "litesplitbar " + direction;
+    splitbar.className = "lg-area__splitbar lg-area__splitbar--" + direction;
     if (direction == "vertical") splitbar.style.height = Area.SPLITBAR_SIZE + "px";
     else splitbar.style.width = Area.SPLITBAR_SIZE + "px";
     splitbar.addEventListener("mousedown", inner_mousedown);
@@ -398,7 +398,7 @@ export class Area extends EventMitter {
     trigger(this.root, EVENT_KEY_ON_SPLIT_MOVED);
 
     //trigger split_moved event in all areas inside this area
-    var areas = this.root.querySelectorAll(".litearea");
+    var areas = this.root.querySelectorAll(".lg-area");
     for (var i = 0; i < areas.length; ++i) trigger(areas[i], EVENT_KEY_ON_SPLIT_MOVED);
     
     return true;
