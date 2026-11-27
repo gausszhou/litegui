@@ -110,6 +110,35 @@ describe("LiteGUI custom elements", () => {
     expect(reopened?.style.display).not.toBe("none");
   });
 
+  it("litegui-menu builds nested items from light DOM", () => {
+    const menu = document.createElement("litegui-menu");
+    menu.innerHTML = `
+      <litegui-menu-item label="文件">
+        <litegui-menu-item label="新建"></litegui-menu-item>
+        <litegui-menu-item label="打开"></litegui-menu-item>
+      </litegui-menu-item>
+    `;
+    document.body.appendChild(menu);
+
+    const top = menu.shadowRoot?.querySelector<HTMLElement>(".lite-menu-item");
+    expect(top?.textContent).toContain("文件");
+
+    top?.click();
+    const leaves = [...(menu.shadowRoot?.querySelectorAll<HTMLElement>(".lite-menu-panel-item") ?? [])];
+    const leaf = leaves.find(element => element.textContent?.includes("新建"));
+    expect(leaf).toBeDefined();
+
+    const onSelect = vi.fn();
+    menu.addEventListener("litegui-select", onSelect);
+    leaf?.click();
+
+    expect(onSelect).toHaveBeenCalledTimes(1);
+    expect((onSelect.mock.calls[0][0] as CustomEvent).detail).toEqual({
+      label: "新建",
+      path: "文件/新建"
+    });
+  });
+
   it("does not duplicate content when the element is moved", () => {
     const button = mount("litegui-button", { label: "Move" });
     const other = document.createElement("div");

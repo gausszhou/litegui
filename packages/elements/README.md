@@ -48,6 +48,7 @@ customElements.define("my-button", LiteGuiButtonElement);
 | `<litegui-checkbox>` | `checked`、`disabled` | `litegui-change` |
 | `<litegui-panel>` | `heading`、`height`、`closable` | `litegui-close` |
 | `<litegui-dialog>` | `heading`、`width`、`height`、`open`、`closable` | `litegui-close` |
+| `<litegui-menu>` | 子元素 `<litegui-menu-item label>` | `litegui-select` |
 
 事件都是 `bubbles: true` + `composed: true` 的 `CustomEvent`，数据在 `event.detail`。
 标题属性使用 `heading`，避免与全局 `title`（tooltip）冲突。
@@ -70,6 +71,6 @@ CSS 变量会穿透 Shadow DOM。
 - 仅客户端：不支持 SSR / Declarative Shadow DOM；
 - 模态框尚未适配 Shadow DOM；
 - 浮层元素不能放在带 `transform` / `filter` / `contain` 的祖先里；
-- 当前覆盖 Button / Checkbox / Panel / Dialog，其余元素逐步补齐。
+- 当前覆盖 Button / Checkbox / Panel / Dialog / Menu，其余元素逐步补齐。
 
 文档：https://gausszhou.github.io/litegui/docs/web-components

@@ -208,3 +208,7 @@
 .wc-demo litegui-dialog {
   width: min(100%, 360px);
 }
+
+.wc-menu-demo {
+  min-height: 240px;
+}

@@ -18,7 +18,8 @@
     "./panel": "./src/elements/panel.ts",
     "./dialog": "./src/elements/dialog.ts",
     "./tokens.css": "./src/styles/generated/tokens.css",
-    "./package.json": "./package.json"
+    "./package.json": "./package.json",
+    "./menu": "./src/elements/menu.ts"
   },
   "sideEffects": [
     "*.css",
@@ -71,7 +72,11 @@
         "import": "./dist/elements/dialog.js"
       },
       "./tokens.css": "./dist/tokens.css",
-      "./package.json": "./package.json"
+      "./package.json": "./package.json",
+      "./menu": {
+        "types": "./dist/types/elements/menu.d.ts",
+        "import": "./dist/elements/menu.js"
+      }
     }
   },
   "license": "MIT",

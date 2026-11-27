@@ -1,13 +1,16 @@
 import { LiteGuiButtonElement } from "./elements/button";
 import { LiteGuiCheckboxElement } from "./elements/checkbox";
 import { LiteGuiDialogElement } from "./elements/dialog";
+import { LiteGuiMenuElement, LiteGuiMenuItemElement } from "./elements/menu";
 import { LiteGuiPanelElement } from "./elements/panel";
 
 export const ELEMENT_TAGS = {
   "litegui-button": LiteGuiButtonElement,
   "litegui-checkbox": LiteGuiCheckboxElement,
   "litegui-panel": LiteGuiPanelElement,
-  "litegui-dialog": LiteGuiDialogElement
+  "litegui-dialog": LiteGuiDialogElement,
+  "litegui-menu": LiteGuiMenuElement,
+  "litegui-menu-item": LiteGuiMenuItemElement
 } as const;
 
 export type LiteGuiElementTag = keyof typeof ELEMENT_TAGS;

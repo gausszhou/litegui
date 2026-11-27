@@ -4,7 +4,7 @@ import elementsCss from "./styles/generated/elements.css?raw";
  * Node/SSR 下没有 HTMLElement，用一个空基类兜底，
  * 保证 `import "@gausszhou/litegui-elements"` 不会在服务端直接抛错。
  */
-const HTMLElementBase = (typeof HTMLElement === "undefined" ? class {} : HTMLElement) as typeof HTMLElement;
+export const HTMLElementBase = (typeof HTMLElement === "undefined" ? class {} : HTMLElement) as typeof HTMLElement;
 
 let sharedSheet: CSSStyleSheet | null | undefined;
 const hostSheetCache = new Map<string, CSSStyleSheet>();

@@ -73,6 +73,26 @@ Dialog 用 `open` 控制显示，关闭按钮会移除 `open` 并派发 `litegui
 </litegui-dialog>
 ```
 
+Menu 用嵌套的 `<litegui-menu-item>` 声明菜单树，点击叶子项派发 `litegui-select`：
+
+<div class="wc-demo wc-menu-demo">
+  <litegui-menu>
+    <litegui-menu-item label="文件">
+      <litegui-menu-item label="新建文本文件"></litegui-menu-item>
+      <litegui-menu-item label="打开"></litegui-menu-item>
+    </litegui-menu-item>
+  </litegui-menu>
+</div>
+
+```html
+<litegui-menu>
+  <litegui-menu-item label="文件">
+    <litegui-menu-item label="新建文本文件"></litegui-menu-item>
+    <litegui-menu-item label="打开"></litegui-menu-item>
+  </litegui-menu-item>
+</litegui-menu>
+```
+
 ## 已实现的元素
 
 | 标签                 | 属性                                                        | 事件                             |
@@ -151,7 +171,7 @@ UMD 会自动把 tokens 注入文档，无需再单独引入 `tokens.css`。
 - **仅客户端**：元素在 JS 加载并升级前没有内容，暂不支持 SSR / Declarative Shadow DOM；服务端渲染请继续使用类 API。
 - **模态框**：`Dialog` 的 `makeModal()` 依赖全局遮罩，Shadow DOM 下尚未适配；当前只支持普通对话框。
 - **浮层定位**：`Menu` 等后续元素的 `position: fixed` 面板不能放在有 `transform` / `filter` / `contain` 的祖先里，否则定位会偏移。
-- 目前只覆盖 Button、Checkbox、Panel、Dialog；Menu、Tabs、Table、Slider 等会逐步补齐。
+- 目前覆盖 Button、Checkbox、Panel、Dialog、Menu；Tabs、Table、Slider 等会逐步补齐。
 
 ## 包结构
 

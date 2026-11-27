@@ -87,6 +87,9 @@ test("web components page upgrades elements and keeps light DOM slots", async ({
 
   await expect(page.locator(".wc-demo litegui-panel .panel-title")).toHaveText("属性");
   await expect(page.locator(".wc-demo litegui-dialog .litedialog")).toBeVisible();
+  await expect(page.locator(".wc-demo litegui-menu .lite-menu-item")).toHaveCount(1);
+  await page.locator(".wc-demo litegui-menu .lite-menu-item").click();
+  await expect(page.locator(".wc-demo litegui-menu .lite-menu-panel")).toBeVisible();
 
   const theme = await page.locator("html").getAttribute("data-lg-theme");
   const isDark = await page.locator("html").evaluate(element => element.classList.contains("dark"));

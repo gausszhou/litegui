@@ -41,7 +41,7 @@ if (!elements) {
 } else {
   if (typeof elements.defineElements !== "function") failures.push("elements UMD 缺少 defineElements");
   const tags = Object.keys(elements.ELEMENT_TAGS ?? {});
-  for (const tag of ["litegui-button", "litegui-checkbox", "litegui-panel", "litegui-dialog"]) {
+  for (const tag of ["litegui-button", "litegui-checkbox", "litegui-panel", "litegui-dialog", "litegui-menu", "litegui-menu-item"]) {
     if (!tags.includes(tag)) failures.push(`elements UMD 缺少 ${tag}`);
   }
   console.log(`elements UMD: ${tags.length} 个自定义元素`);

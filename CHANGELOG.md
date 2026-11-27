@@ -4,7 +4,7 @@
 
 ### Added
 
-- 新增 `@gausszhou/litegui-elements` Web Components 适配层（Shadow DOM 薄封装），首批支持 `litegui-button`、`litegui-checkbox`、`litegui-panel`、`litegui-dialog`，含 `tokens.css`、ESM/CJS/UMD 产物与 jsdom/Playwright 测试。
+- 新增 `@gausszhou/litegui-elements` Web Components 适配层（Shadow DOM 薄封装），首批支持 `litegui-button`、`litegui-checkbox`、`litegui-panel`、`litegui-dialog`、`litegui-menu`（含声明式 `litegui-menu-item`），含 `tokens.css`、ESM/CJS/UMD 产物与 jsdom/Playwright 测试。
 - 新增文档页 `docs/web-components.md`，包含实时示例、属性/事件约定与 React 19 / Vue 接入说明。
 
 ## Unreleased（monorepo 改造）
