@@ -402,7 +402,7 @@ describe("Vue bindings", () => {
     await nextTick();
 
     expect(wrapper.find(".lg-header-bar").classes()).toContain("lg-header-bar--area");
-    expect(wrapper.find(".lg-header-bar").element.style.height).toBe("30px");
+    expect((wrapper.find(".lg-header-bar").element as HTMLElement).style.height).toBe("30px");
     expect(wrapper.find(".hb-left").text()).toBe("Left");
     expect(wrapper.find(".hb-right").text()).toBe("Right");
 
