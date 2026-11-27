@@ -114,7 +114,7 @@ importers:
         version: 10.0.1(eslint@10.15.0(supports-color@7.2.0))
       '@gausszhou/litegui-components':
         specifier: workspace:*
-        version: link:packages/litegui
+        version: link:packages/components
       '@gausszhou/litegui-core':
         specifier: workspace:*
         version: link:packages/core
@@ -159,7 +159,7 @@ importers:
     dependencies:
       '@gausszhou/litegui-components':
         specifier: workspace:*
-        version: link:../../packages/litegui
+        version: link:../../packages/components
     devDependencies:
       typescript:
         specifier: ^5.8.3
@@ -172,7 +172,7 @@ importers:
     dependencies:
       '@gausszhou/litegui-components':
         specifier: workspace:*
-        version: link:../../packages/litegui
+        version: link:../../packages/components
       '@gausszhou/litegui-core':
         specifier: workspace:*
         version: link:../../packages/core
@@ -184,33 +184,7 @@ importers:
         specifier: ^5.4.11
         version: 5.4.21(@types/node@22.20.7)(sass@1.108.2)
 
-  packages/core:
-    dependencies:
-      mitt:
-        specifier: ^3.0.0
-        version: 3.0.1
-    devDependencies:
-      typescript:
-        specifier: ^5.8.3
-        version: 5.9.3
-      vite:
-        specifier: ^5.4.11
-        version: 5.4.21(@types/node@22.20.7)(sass@1.108.2)
-
-  packages/elements:
-    dependencies:
-      '@gausszhou/litegui-components':
-        specifier: workspace:*
-        version: link:../litegui
-    devDependencies:
-      typescript:
-        specifier: ^5.8.3
-        version: 5.9.3
-      vite:
-        specifier: ^5.4.11
-        version: 5.4.21(@types/node@22.20.7)(sass@1.108.2)
-
-  packages/litegui:
+  packages/components:
     dependencies:
       '@gausszhou/litegui-core':
         specifier: workspace:*
@@ -235,11 +209,37 @@ importers:
         specifier: ^5.4.11
         version: 5.4.21(@types/node@22.20.7)(sass@1.108.2)
 
+  packages/core:
+    dependencies:
+      mitt:
+        specifier: ^3.0.0
+        version: 3.0.1
+    devDependencies:
+      typescript:
+        specifier: ^5.8.3
+        version: 5.9.3
+      vite:
+        specifier: ^5.4.11
+        version: 5.4.21(@types/node@22.20.7)(sass@1.108.2)
+
+  packages/elements:
+    dependencies:
+      '@gausszhou/litegui-components':
+        specifier: workspace:*
+        version: link:../components
+    devDependencies:
+      typescript:
+        specifier: ^5.8.3
+        version: 5.9.3
+      vite:
+        specifier: ^5.4.11
+        version: 5.4.21(@types/node@22.20.7)(sass@1.108.2)
+
   packages/tests:
     dependencies:
       '@gausszhou/litegui-components':
         specifier: workspace:*
-        version: link:../litegui
+        version: link:../components
       '@gausszhou/litegui-core':
         specifier: workspace:*
         version: link:../core

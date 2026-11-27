@@ -1,10 +1,16 @@
 # Changelog
 
+## Unreleased（目录调整）
+
+### Changed
+
+- 包目录 `packages/litegui` → `packages/components`；npm 包名、子路径导出与公开 API 不变。
+
 ## Unreleased（包名调整）
 
 ### Changed
 
-- npm 包名 `@gausszhou/litegui` → `@gausszhou/litegui-components`；`packages/litegui` 目录、子路径导出、`window.LiteGUI` 与公开 API 均不变。
+- npm 包名 `@gausszhou/litegui` → `@gausszhou/litegui-components`；子路径导出、`window.LiteGUI` 与公开 API 均不变。
 
 ## Unreleased（Web Components 适配）
 

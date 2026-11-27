@@ -46,16 +46,16 @@ export default defineConfig({
       reporter: ["text", "html"],
       include: [
         "packages/core/src/**/*.ts",
-        "packages/litegui/src/**/*.ts",
+        "packages/components/src/**/*.ts",
         "packages/elements/src/**/*.ts",
       ],
       exclude: [
-        "packages/litegui/src/entries/**",
-        "packages/litegui/src/umd.ts",
+        "packages/components/src/entries/**",
+        "packages/components/src/umd.ts",
         // Inspector/Tree 仍为 experimental（@ts-nocheck + 上游 prototype 风格 API），
         // 和拆分到独立包时期一样不纳入覆盖率统计。
-        "packages/litegui/src/components/Inspector.ts",
-        "packages/litegui/src/components/Tree.ts",
+        "packages/components/src/components/Inspector.ts",
+        "packages/components/src/components/Tree.ts",
         "**/*.d.ts",
       ],
       reportsDirectory: join(repoRoot, "coverage"),

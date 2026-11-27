@@ -7,14 +7,14 @@ description: monorepo 中各个包的职责、产物与引入方式
 
 仓库按 pnpm workspace 组织，`packages/*` 是可发布的库，`apps/*` 是示例页面：
 
-| 路径                | 包名                            | 说明                                                                                                     |
-| ------------------- | ------------------------------- | -------------------------------------------------------------------------------------------------------- |
-| `packages/core`     | `@gausszhou/litegui-core`       | DOM 工具、事件总线、全局状态、`Widget` 基类、通用工具；无 CSS                                            |
-| `packages/litegui`  | `@gausszhou/litegui-components` | 全部组件（含标记为 experimental 的 `Inspector`、`Tree`）、`LiteGUI` 命名空间、按组件子路径入口、全局样式 |
-| `packages/elements` | `@gausszhou/litegui-elements`   | 可选 Web Components 适配层；Shadow DOM、`tokens.css`、按元素子路径入口                                   |
-| `packages/tests`    | `@gausszhou/litegui-tests`      | 私有：Vitest + Playwright 测试与基准                                                                     |
-| `apps/demo`         | `@gausszhou/litegui-demo`       | 私有：最小示例                                                                                           |
-| `apps/editor`       | `@gausszhou/litegui-editor`     | 私有：综合示例                                                                                           |
+| 路径                  | 包名                            | 说明                                                                                                     |
+| --------------------- | ------------------------------- | -------------------------------------------------------------------------------------------------------- |
+| `packages/core`       | `@gausszhou/litegui-core`       | DOM 工具、事件总线、全局状态、`Widget` 基类、通用工具；无 CSS                                            |
+| `packages/components` | `@gausszhou/litegui-components` | 全部组件（含标记为 experimental 的 `Inspector`、`Tree`）、`LiteGUI` 命名空间、按组件子路径入口、全局样式 |
+| `packages/elements`   | `@gausszhou/litegui-elements`   | 可选 Web Components 适配层；Shadow DOM、`tokens.css`、按元素子路径入口                                   |
+| `packages/tests`      | `@gausszhou/litegui-tests`      | 私有：Vitest + Playwright 测试与基准                                                                     |
+| `apps/demo`           | `@gausszhou/litegui-demo`       | 私有：最小示例                                                                                           |
+| `apps/editor`         | `@gausszhou/litegui-editor`     | 私有：综合示例                                                                                           |
 
 ## 依赖关系
 

@@ -27,7 +27,7 @@ LiteGUI.init({
 
 ## 变量
 
-主题变量定义在 `packages/litegui/src/styles/theme.scss`，构建后位于 `@gausszhou/litegui-components/style.css`：
+主题变量定义在 `packages/components/src/styles/theme.scss`，构建后位于 `@gausszhou/litegui-components/style.css`：
 
 | 变量                     | 用途            |
 | ------------------------ | --------------- |

@@ -3,8 +3,8 @@
   "plugin": ["typedoc-plugin-markdown"],
   "entryPoints": [
     "packages/core/src/index.ts",
-    "packages/litegui/src/litegui.ts",
-    "packages/litegui/src/components/*.ts"
+    "packages/components/src/litegui.ts",
+    "packages/components/src/components/*.ts"
   ],
   "tsconfig": "tsconfig.typedoc.json",
   "out": "docs/api",

@@ -16,7 +16,7 @@ import postcss from "postcss";
 import * as sass from "sass";
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), "..");
-const source = join(root, "packages/litegui/src/styles/index.scss");
+const source = join(root, "packages/components/src/styles/index.scss");
 const outDir = join(root, "packages/elements/src/styles/generated");
 
 const compiled = sass.compile(source, { style: "expanded" });

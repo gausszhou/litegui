@@ -21,7 +21,7 @@ pnpm bench          # Table 基准
 ## 单元测试
 
 测试集中在 `packages/tests/src`，使用 Vitest + jsdom，并通过别名直接指向各包源码，
-因此覆盖率统计的是 `packages/core/src` 与 `packages/litegui/src`。
+因此覆盖率统计的是 `packages/core/src` 与 `packages/components/src`。
 
 公共约定：
 
@@ -44,7 +44,7 @@ it("clicks", () => {
 ```
 
 覆盖率门槛在 `packages/tests/vite.config.ts`：statements/functions/lines ≥ 70%，branches ≥ 65%。
-`Inspector`/`Tree`（`packages/litegui/src/components/{Inspector,Tree}.ts`）作为 experimental 暂不纳入覆盖率统计。
+`Inspector`/`Tree`（`packages/components/src/components/{Inspector,Tree}.ts`）作为 experimental 暂不纳入覆盖率统计。
 
 ## 端到端测试
 

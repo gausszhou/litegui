@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 /**
  * 生成文档站专用的 LiteGUI 演示样式：
- *   1. 编译 packages/litegui/src/styles/index.scss；
+ *   1. 编译 packages/components/src/styles/index.scss；
  *   2. 给所有选择器加 `.lg-demo` 前缀（`:root` 主题变量保持全局），
  *      并丢弃 body/html 级别的全局 reset，避免污染 VitePress；
  *   3. 输出到 docs/.vitepress/theme/generated/litegui-demo.css。
@@ -17,7 +17,7 @@ import selectorParser from "postcss-selector-parser";
 import * as sass from "sass";
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), "..");
-const source = join(root, "packages/litegui/src/styles/index.scss");
+const source = join(root, "packages/components/src/styles/index.scss");
 const outFile = join(root, "docs/.vitepress/theme/generated/litegui-demo.css");
 const PREFIX = ".lg-demo";
 
