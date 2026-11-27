@@ -90,3 +90,66 @@ describeMenuExtra("Menu extras", () => {
     expectMenuExtra(callback).toHaveBeenCalledTimes(1);
   });
 });
+
+function domRect(x: number, y: number, width: number, height: number): DOMRect {
+  return {
+    x,
+    y,
+    left: x,
+    top: y,
+    right: x + width,
+    bottom: y + height,
+    width,
+    height,
+    toJSON: () => ({}),
+  } as DOMRect;
+}
+
+describe("Menu positioning", () => {
+  it("aligns a submenu with the clicked parent item", () => {
+    const menu = new Menu("main");
+    const anchor = document.createElement("p");
+    anchor.getBoundingClientRect = () => domRect(100, 150, 200, 24);
+    const panel = document.createElement("div");
+    panel.getBoundingClientRect = () => domRect(0, 0, 180, 90);
+
+    menu.positionPanel(panel, anchor, true);
+
+    expect(panel.style.left).toBe("299px");
+    expect(panel.style.top).toBe("150px");
+  });
+
+  it("flips the submenu left and keeps it inside a narrow viewport", () => {
+    vi.spyOn(document.documentElement, "clientWidth", "get").mockReturnValue(320);
+    vi.spyOn(document.documentElement, "clientHeight", "get").mockReturnValue(400);
+
+    const menu = new Menu("main");
+    const anchor = document.createElement("p");
+    anchor.getBoundingClientRect = () => domRect(250, 380, 60, 24);
+    const panel = document.createElement("div");
+    panel.getBoundingClientRect = () => domRect(0, 0, 180, 90);
+
+    menu.positionPanel(panel, anchor, true);
+
+    expect(panel.style.left).toBe("71px");
+    expect(panel.style.top).toBe("306px");
+  });
+
+  it("closes panels at the target level and deeper", () => {
+    const menu = new Menu("main");
+    const panels = [1, 2, 3].map((level) => {
+      const panel = document.createElement("div");
+      panel.dataset.level = String(level);
+      document.body.appendChild(panel);
+      return panel;
+    });
+    menu.panels = panels;
+
+    menu.closePanelsFromLevel(2);
+
+    expect(panels[0].isConnected).toBe(true);
+    expect(panels[1].isConnected).toBe(false);
+    expect(panels[2].isConnected).toBe(false);
+    expect(menu.panels).toHaveLength(1);
+  });
+});

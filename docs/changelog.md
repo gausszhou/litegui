@@ -13,6 +13,7 @@ monorepo 改造：
 - 包名改为 `@gausszhou/litegui`、`@gausszhou/litegui-core`、`@gausszhou/litegui-experimental`
 - 产物从 `lib/` 改为各包 `dist/`；新增 ESLint、Typedoc API、size / verify-pack / pages 脚本
 - 主包新增组件命名导出，UMD 仍为自包含单文件
+- 修复二级菜单定位：与父项对齐、视口内自动翻转、清理旧子菜单
 
 ## 1.0.1
 

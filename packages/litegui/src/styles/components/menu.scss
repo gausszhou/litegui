@@ -29,10 +29,9 @@
 }
 
 .lite-menu-panel {
-  position: absolute;
+  /* 用视口坐标定位，菜单面板由 getRoot() 挂载，避免受 offsetParent 影响 */
+  position: fixed;
   z-index: 10;
-  top: 5px;
-  left: 5px;
   min-width: 200px;
   padding: 4px 0;
   border-radius: 0 0 2px 2px;

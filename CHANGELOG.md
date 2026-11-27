@@ -18,6 +18,11 @@
 - `pnpm size` / `pnpm verify-umd` / `pnpm verify-pack` / `pnpm pages:build` 脚本与 `shells/` 手动发布入口。
 - CI 增加 lint、coverage、体积、UMD 与 tarball 校验、Chrome/Firefox e2e，并在 master 通过后自动发布 gh-pages。
 
+### Fixed
+
+- 二级菜单改为与父菜单项顶部对齐、贴着父面板右缘展开；右侧/底部空间不足时自动翻转，
+  并清理同层及更深的旧子菜单（此前子菜单始终按主菜单项定位，会跑到菜单栏下方）。
+
 ### Removed
 
 - 根 `rollup.config.js`、`vite.config.js`、`package-lock.json`、旧 `lib/` 构建链。

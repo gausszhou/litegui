@@ -261,10 +261,13 @@ export class Menu {
    * @param is_submenu 
    * @returns 
    */
-  showMenuPanel(menu: MenuItem, _e: Event, root: HTMLElement, is_submenu: boolean = false) {
+  showMenuPanel(menu: MenuItem, _e: Event, root: HTMLElement, is_submenu: boolean = false, level: number = 1) {
     // if not a submenu close current menu panel 如果不是子菜单，则关闭当前的菜单面板
     if (!is_submenu) {
       this.hideMenuPanel();
+    } else {
+      // 打开下一级子菜单时，先关闭同层及更深的旧面板，避免多个子菜单叠在一起
+      this.closePanelsFromLevel(level);
     }
     if (!menu.children || !menu.children.length) {
       return false;
@@ -275,6 +278,7 @@ export class Menu {
     const $menu_panel = document.createElement("div");
     $menu_panel.className = MENU_PANEL_CLASS_NAME;
     $menu_panel.setAttribute("role", "menu");
+    $menu_panel.dataset.level = String(level);
 
     const sorted_entries = Array.from(menu.children);
 
@@ -365,7 +369,7 @@ export class Menu {
 
         // more menus
         if (menu_item.children && menu_item.children.length) {
-          this.showMenuPanel(menu_item as MenuItem, e, root, true);
+          this.showMenuPanel(menu_item as MenuItem, e, $menu_item, true, level + 1);
         } else {
           this.is_open = false;
           this.hideMenuPanel();
@@ -397,14 +401,62 @@ export class Menu {
       this.closing_by_leave = null;
     });
 
-    // compute X and Y for menu
-    const box = root.getBoundingClientRect();
-    $menu_panel.style.left = box.left + (is_submenu ? 200 : 0) + "px";
-    $menu_panel.style.top = box.top + box.height + (is_submenu ? -20 : 10) + "px";
-
+    // 先挂载再测量：子菜单要按父项的实际位置和面板的实际尺寸对齐
+    $menu_panel.style.visibility = "hidden";
     this.panels.push($menu_panel);
     getRoot().appendChild($menu_panel);
+
+    this.positionPanel($menu_panel, root, is_submenu);
+    $menu_panel.style.visibility = "";
     return true;
+  };
+
+  /**
+   * 计算菜单面板位置。
+   * 主菜单面板挂在菜单项下方；子菜单与父项顶部对齐、贴着父面板右缘展开，
+   * 右侧或底部空间不足时翻到反方向，保证不超出视口。
+   */
+  positionPanel($menu_panel: HTMLDivElement, root: HTMLElement, is_submenu: boolean) {
+    const anchor = root.getBoundingClientRect();
+    const box = $menu_panel.getBoundingClientRect();
+    const vw = document.documentElement.clientWidth || window.innerWidth;
+    const vh = document.documentElement.clientHeight || window.innerHeight;
+
+    let left: number;
+    let top: number;
+    if (is_submenu) {
+      left = anchor.right - 1;
+      top = anchor.top;
+      // 右侧空间不足：翻到父项左侧
+      if (left + box.width > vw) left = anchor.left - box.width + 1;
+      // 底部空间不足：向上收，保持子菜单完整可见
+      if (top + box.height > vh) top = vh - box.height - 4;
+    } else {
+      left = anchor.left;
+      top = anchor.bottom + 2;
+      if (left + box.width > vw) left = vw - box.width - 4;
+      // 底部空间不足：翻到菜单项上方
+      if (top + box.height > vh) top = anchor.top - box.height - 2;
+    }
+
+    left = Math.max(4, Math.min(left, vw - box.width - 4));
+    top = Math.max(4, Math.min(top, vh - box.height - 4));
+
+    $menu_panel.style.left = `${Math.round(left)}px`;
+    $menu_panel.style.top = `${Math.round(top)}px`;
+  };
+
+  /** 关闭指定层级及更深的所有菜单面板 */
+  closePanelsFromLevel(level: number) {
+    const kept: HTMLDivElement[] = [];
+    for (const panel of this.panels) {
+      if (Number(panel.dataset.level ?? 1) >= level) {
+        removeElement(panel);
+      } else {
+        kept.push(panel);
+      }
+    }
+    this.panels = kept;
   };
 
   hideMenuPanel() {
