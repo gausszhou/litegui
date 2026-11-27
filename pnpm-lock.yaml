@@ -118,6 +118,9 @@ importers:
       '@gausszhou/litegui-core':
         specifier: workspace:*
         version: link:packages/core
+      '@gausszhou/litegui-elements':
+        specifier: workspace:*
+        version: link:packages/elements
       eslint:
         specifier: ^10.15.0
         version: 10.15.0(supports-color@7.2.0)
@@ -194,6 +197,19 @@ importers:
         specifier: ^5.4.11
         version: 5.4.21(@types/node@22.20.7)(sass@1.108.2)
 
+  packages/elements:
+    dependencies:
+      '@gausszhou/litegui':
+        specifier: workspace:*
+        version: link:../litegui
+    devDependencies:
+      typescript:
+        specifier: ^5.8.3
+        version: 5.9.3
+      vite:
+        specifier: ^5.4.11
+        version: 5.4.21(@types/node@22.20.7)(sass@1.108.2)
+
   packages/litegui:
     dependencies:
       '@gausszhou/litegui-core':
@@ -227,6 +243,9 @@ importers:
       '@gausszhou/litegui-core':
         specifier: workspace:*
         version: link:../core
+      '@gausszhou/litegui-elements':
+        specifier: workspace:*
+        version: link:../elements
     devDependencies:
       '@playwright/test':
         specifier: ^1.65.1

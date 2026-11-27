@@ -34,6 +34,19 @@ if (typeof LiteGUI !== "function") {
   console.log(`litegui UMD: LiteGUI 暴露 ${Object.keys(LiteGUI).length} 个静态成员`);
 }
 
+run(join(packagesDir, "elements/dist/index.umd.cjs"));
+const elements = sandbox.LiteGUIElements ?? sandbox.window.LiteGUIElements;
+if (!elements) {
+  failures.push("elements UMD 未挂载 window.LiteGUIElements");
+} else {
+  if (typeof elements.defineElements !== "function") failures.push("elements UMD 缺少 defineElements");
+  const tags = Object.keys(elements.ELEMENT_TAGS ?? {});
+  for (const tag of ["litegui-button", "litegui-checkbox", "litegui-panel", "litegui-dialog"]) {
+    if (!tags.includes(tag)) failures.push(`elements UMD 缺少 ${tag}`);
+  }
+  console.log(`elements UMD: ${tags.length} 个自定义元素`);
+}
+
 if (failures.length) {
   console.error("\nUMD 校验失败：");
   for (const failure of failures) console.error(`  - ${failure}`);

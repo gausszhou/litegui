@@ -1,0 +1,95 @@
+{
+  "name": "@gausszhou/litegui-elements",
+  "version": "1.0.1",
+  "description": "Web Components adapter for LiteGUI: framework-free custom elements backed by Shadow DOM",
+  "type": "module",
+  "private": false,
+  "main": "./src/index.ts",
+  "module": "./src/index.ts",
+  "types": "./src/index.ts",
+  "files": [
+    "dist"
+  ],
+  "exports": {
+    ".": "./src/index.ts",
+    "./define": "./src/define.ts",
+    "./button": "./src/elements/button.ts",
+    "./checkbox": "./src/elements/checkbox.ts",
+    "./panel": "./src/elements/panel.ts",
+    "./dialog": "./src/elements/dialog.ts",
+    "./tokens.css": "./src/styles/generated/tokens.css",
+    "./package.json": "./package.json"
+  },
+  "sideEffects": [
+    "*.css",
+    "./src/index.ts",
+    "./src/umd.ts",
+    "./dist/index.js",
+    "./dist/index.umd.cjs"
+  ],
+  "scripts": {
+    "styles": "node ../../scripts/build-elements-css.mjs",
+    "dev": "pnpm styles && vite",
+    "build": "pnpm styles && vite build && vite build --config vite.cjs.config.ts && vite build --config vite.umd.config.ts && tsc -p tsconfig.json --emitDeclarationOnly --declaration && node ../../scripts/copy-file.mjs src/styles/generated/tokens.css dist/tokens.css",
+    "typecheck": "pnpm styles && tsc -p tsconfig.json --noEmit"
+  },
+  "dependencies": {
+    "@gausszhou/litegui": "workspace:*"
+  },
+  "devDependencies": {
+    "typescript": "^5.8.3",
+    "vite": "^5.4.11"
+  },
+  "publishConfig": {
+    "main": "./dist/index.cjs",
+    "module": "./dist/index.js",
+    "types": "./dist/types/index.d.ts",
+    "exports": {
+      ".": {
+        "types": "./dist/types/index.d.ts",
+        "import": "./dist/index.js",
+        "require": "./dist/index.cjs"
+      },
+      "./define": {
+        "types": "./dist/types/define.d.ts",
+        "import": "./dist/define.js"
+      },
+      "./button": {
+        "types": "./dist/types/elements/button.d.ts",
+        "import": "./dist/elements/button.js"
+      },
+      "./checkbox": {
+        "types": "./dist/types/elements/checkbox.d.ts",
+        "import": "./dist/elements/checkbox.js"
+      },
+      "./panel": {
+        "types": "./dist/types/elements/panel.d.ts",
+        "import": "./dist/elements/panel.js"
+      },
+      "./dialog": {
+        "types": "./dist/types/elements/dialog.d.ts",
+        "import": "./dist/elements/dialog.js"
+      },
+      "./tokens.css": "./dist/tokens.css",
+      "./package.json": "./package.json"
+    }
+  },
+  "license": "MIT",
+  "author": "Gauss Zhou <gausszhou@qq.com>",
+  "homepage": "https://gausszhou.github.io/litegui/",
+  "bugs": {
+    "url": "https://github.com/gausszhou/litegui/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/gausszhou/litegui.git",
+    "directory": "packages/elements"
+  },
+  "keywords": [
+    "litegui",
+    "web-components",
+    "custom-elements",
+    "shadow-dom",
+    "ui"
+  ]
+}

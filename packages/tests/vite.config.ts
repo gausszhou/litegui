@@ -26,6 +26,10 @@ export default defineConfig({
         replacement: join(packagesRoot, "litegui/src/styles/index.scss"),
       },
       {
+        find: /^@gausszhou\/litegui-elements$/,
+        replacement: join(packagesRoot, "elements/src/index.ts"),
+      },
+      {
         find: /^@gausszhou\/litegui$/,
         replacement: join(packagesRoot, "litegui/src/index.ts"),
       },
@@ -40,7 +44,11 @@ export default defineConfig({
       provider: "custom",
       customProviderModule: coverageProvider,
       reporter: ["text", "html"],
-      include: ["packages/core/src/**/*.ts", "packages/litegui/src/**/*.ts"],
+      include: [
+        "packages/core/src/**/*.ts",
+        "packages/litegui/src/**/*.ts",
+        "packages/elements/src/**/*.ts",
+      ],
       exclude: [
         "packages/litegui/src/entries/**",
         "packages/litegui/src/umd.ts",

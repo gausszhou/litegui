@@ -191,3 +191,20 @@
   color: var(--vp-c-text-2);
   font-size: 13px;
 }
+
+/* Web Components 文档页的实时示例舞台 */
+.wc-demo {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: flex-start;
+  padding: 16px;
+  margin: 12px 0;
+  border: 1px solid var(--vp-c-divider);
+  border-radius: 8px;
+}
+
+.wc-demo litegui-panel,
+.wc-demo litegui-dialog {
+  width: min(100%, 360px);
+}

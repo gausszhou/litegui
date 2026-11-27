@@ -11,6 +11,13 @@ export default defineConfig({
   base,
   outDir: "../dist/docs",
   cleanUrls: true,
+  vue: {
+    template: {
+      compilerOptions: {
+        isCustomElement: (tag: string) => tag.startsWith("litegui-")
+      }
+    }
+  },
   lastUpdated: true,
   ignoreDeadLinks: true,
   head: [
@@ -90,6 +97,7 @@ export default defineConfig({
       {
         text: "进阶",
         items: [
+          { text: "Web Components", link: "/web-components" },
           { text: "示例", link: "/examples" },
           { text: "实验性组件", link: "/experimental" },
           { text: "API 参考", link: "/api/" },

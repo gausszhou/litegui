@@ -20,12 +20,12 @@ const COMPONENT_PAGES = [
   "list",
   "complex-list",
   "table",
-  "console",
+  "console"
 ];
 
 test("every component page renders a live demo", async ({ page }) => {
   const errors: string[] = [];
-  page.on("pageerror", (error) => errors.push(error.message));
+  page.on("pageerror", error => errors.push(error.message));
 
   for (const slug of COMPONENT_PAGES) {
     await page.goto(`${DOCS_URL}components/${slug}`);
@@ -33,9 +33,7 @@ test("every component page renders a live demo", async ({ page }) => {
     // demo 是懒加载 + 客户端挂载：等“加载中”消失后再断言，避免 hydration 时序抖动
     await expect(page.locator(".lg-demo-loading"), slug).toHaveCount(0, { timeout: 15_000 });
     await expect(page.locator(".lg-demo-error"), slug).toHaveCount(0);
-    await expect
-      .poll(async () => page.locator(".lg-demo > *").count(), { message: slug })
-      .toBeGreaterThan(0);
+    await expect.poll(async () => page.locator(".lg-demo > *").count(), { message: slug }).toBeGreaterThan(0);
   }
 
   expect(errors).toEqual([]);
@@ -75,4 +73,23 @@ test("dialog demo stays inside its demo container", async ({ page }) => {
   expect(containerBox && dialogBox).toBeTruthy();
   expect(dialogBox!.x).toBeGreaterThanOrEqual(containerBox!.x);
   expect(dialogBox!.x + dialogBox!.width).toBeLessThanOrEqual(containerBox!.x + containerBox!.width + 1);
+});
+
+test("web components page upgrades elements and keeps light DOM slots", async ({ page }) => {
+  const errors: string[] = [];
+  page.on("pageerror", error => errors.push(error.message));
+
+  await page.goto(`${DOCS_URL}web-components`);
+
+  const buttons = page.locator(".wc-demo litegui-button");
+  await expect(buttons).toHaveCount(3);
+  await expect.poll(async () => buttons.first().evaluate(element => Boolean(element.shadowRoot))).toBe(true);
+
+  await expect(page.locator(".wc-demo litegui-panel .panel-title")).toHaveText("属性");
+  await expect(page.locator(".wc-demo litegui-dialog .litedialog")).toBeVisible();
+
+  const theme = await page.locator("html").getAttribute("data-lg-theme");
+  const isDark = await page.locator("html").evaluate(element => element.classList.contains("dark"));
+  expect(theme).toBe(isDark ? "dark" : "light");
+  expect(errors).toEqual([]);
 });

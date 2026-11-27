@@ -27,6 +27,7 @@ LiteGUI 面向编辑器、调试器、工具台这类需要菜单、面板、分
 | --- | --- |
 | `packages/core` | `@gausszhou/litegui-core`：DOM 工具、事件总线、全局状态、`Widget` 基类、通用工具 |
 | `packages/litegui` | `@gausszhou/litegui`：全部 20 个组件（含 `Inspector`、`Tree`）、`LiteGUI` 命名空间、15 个按组件入口、全局样式 |
+| `packages/elements` | `@gausszhou/litegui-elements`：Web Components 适配层（Custom Elements + Shadow DOM），当前覆盖 Button / Checkbox / Panel / Dialog |
 | `packages/tests` | 私有：Vitest + jsdom、Playwright、Table 基准 |
 | `apps/demo` | 最小示例页 |
 | `apps/editor` | 综合示例：工具台、菜单、对话框、表格、树 |

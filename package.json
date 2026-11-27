@@ -24,18 +24,20 @@
     "size": "node scripts/size-report.mjs",
     "verify-pack": "node scripts/verify-pack.mjs",
     "verify-umd": "node scripts/verify-umd.mjs",
-    "docs:dev": "pnpm docs:styles && pnpm docs:api && vitepress dev docs --host 127.0.0.1 --port 5178",
-    "docs:build": "pnpm docs:styles && pnpm docs:api && vitepress build docs",
+    "docs:dev": "pnpm elements:styles && pnpm docs:styles && pnpm docs:api && vitepress dev docs --host 127.0.0.1 --port 5178",
+    "docs:build": "pnpm elements:styles && pnpm docs:styles && pnpm docs:api && vitepress build docs",
     "docs:serve": "vitepress serve docs",
     "docs:api": "typedoc",
     "pages:build": "node scripts/build-pages.mjs",
     "remove": "rm -rf packages/*/dist packages/*/node_modules apps/*/node_modules apps/*/dist",
-    "docs:styles": "node scripts/build-demo-css.mjs"
+    "docs:styles": "node scripts/build-demo-css.mjs",
+    "elements:styles": "node scripts/build-elements-css.mjs"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
     "@gausszhou/litegui": "workspace:*",
     "@gausszhou/litegui-core": "workspace:*",
+    "@gausszhou/litegui-elements": "workspace:*",
     "eslint": "^10.15.0",
     "globals": "^17.14.0",
     "postcss": "^8.5.33",

@@ -15,7 +15,8 @@
   },
   "dependencies": {
     "@gausszhou/litegui": "workspace:*",
-    "@gausszhou/litegui-core": "workspace:*"
+    "@gausszhou/litegui-core": "workspace:*",
+    "@gausszhou/litegui-elements": "workspace:*"
   },
   "devDependencies": {
     "@playwright/test": "^1.65.1",
