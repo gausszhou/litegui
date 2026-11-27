@@ -1,0 +1,94 @@
+{
+  "name": "@gausszhou/litegui-vue",
+  "version": "1.0.1",
+  "description": "Vue 3 bindings for LiteGUI components",
+  "type": "module",
+  "private": false,
+  "main": "./src/index.ts",
+  "module": "./src/index.ts",
+  "types": "./src/index.ts",
+  "files": [
+    "dist"
+  ],
+  "exports": {
+    ".": "./src/index.ts",
+    "./button": "./src/components/button.ts",
+    "./checkbox": "./src/components/checkbox.ts",
+    "./slider": "./src/components/slider.ts",
+    "./panel": "./src/components/panel.ts",
+    "./dialog": "./src/components/dialog.ts",
+    "./menu": "./src/components/menu.ts",
+    "./package.json": "./package.json"
+  },
+  "sideEffects": false,
+  "scripts": {
+    "build": "vite build && vite build --config vite.cjs.config.ts && tsc -p tsconfig.json --emitDeclarationOnly --declaration",
+    "typecheck": "tsc -p tsconfig.json --noEmit"
+  },
+  "dependencies": {
+    "@gausszhou/litegui-components": "workspace:*",
+    "@gausszhou/litegui-core": "workspace:*"
+  },
+  "peerDependencies": {
+    "vue": "^3.5.0"
+  },
+  "devDependencies": {
+    "typescript": "^5.8.3",
+    "vite": "^5.4.11",
+    "vue": "^3.5.46"
+  },
+  "publishConfig": {
+    "main": "./dist/index.cjs",
+    "module": "./dist/index.js",
+    "types": "./dist/types/index.d.ts",
+    "exports": {
+      ".": {
+        "types": "./dist/types/index.d.ts",
+        "import": "./dist/index.js",
+        "require": "./dist/index.cjs"
+      },
+      "./button": {
+        "types": "./dist/types/components/button.d.ts",
+        "import": "./dist/components/button.js"
+      },
+      "./checkbox": {
+        "types": "./dist/types/components/checkbox.d.ts",
+        "import": "./dist/components/checkbox.js"
+      },
+      "./slider": {
+        "types": "./dist/types/components/slider.d.ts",
+        "import": "./dist/components/slider.js"
+      },
+      "./panel": {
+        "types": "./dist/types/components/panel.d.ts",
+        "import": "./dist/components/panel.js"
+      },
+      "./dialog": {
+        "types": "./dist/types/components/dialog.d.ts",
+        "import": "./dist/components/dialog.js"
+      },
+      "./menu": {
+        "types": "./dist/types/components/menu.d.ts",
+        "import": "./dist/components/menu.js"
+      },
+      "./package.json": "./package.json"
+    }
+  },
+  "license": "MIT",
+  "author": "Gauss Zhou <gausszhou@qq.com>",
+  "homepage": "https://gausszhou.github.io/litegui/",
+  "bugs": {
+    "url": "https://github.com/gausszhou/litegui/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/gausszhou/litegui.git",
+    "directory": "packages/vue"
+  },
+  "keywords": [
+    "litegui",
+    "vue",
+    "vue3",
+    "ui"
+  ]
+}

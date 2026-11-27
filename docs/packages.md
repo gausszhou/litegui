@@ -19,6 +19,7 @@ description: monorepo 中各个包的职责、产物与引入方式
 ## 依赖关系
 
 ```text
+@gausszhou/litegui-vue ─────────► @gausszhou/litegui-components
 @gausszhou/litegui-elements ──► @gausszhou/litegui-components
                                       │
                                       └── @gausszhou/litegui-core
@@ -63,7 +64,14 @@ defineElements();
 <litegui-checkbox checked></litegui-checkbox>
 ```
 
-详见 [Web Components](/web-components)。
+Vue 3 绑定：
+
+```ts
+import LiteGuiVue from "@gausszhou/litegui-vue";
+app.use(LiteGuiVue);
+```
+
+详见 [Web Components](/web-components) 与 [Vue 绑定](/vue)。
 
 ## 开发态与发布态
 

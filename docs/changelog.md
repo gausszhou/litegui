@@ -14,6 +14,7 @@ monorepo 改造与包名调整：
 - 产物从 `lib/` 改为各包 `dist/`；新增 ESLint、Typedoc API、size / verify-pack / pages 脚本
 - 主包新增组件命名导出；`Inspector`、`Tree` 并入主包并恢复 `LiteGUI.Inspector/Tree`，UMD 仍为自包含单文件
 - 修复二级菜单定位：与父项对齐、视口内自动翻转、清理旧子菜单
+- 新增 `@gausszhou/litegui-vue` Vue 3 绑定（Button / Checkbox / Slider / Panel / Dialog / Menu）
 - 文档站改为每组件独立页：真实渲染 demo + 同源示例代码，`.lg-demo` 前缀样式隔离
 - `Menu` / `ContextMenu` 新增 `container` 选项
 

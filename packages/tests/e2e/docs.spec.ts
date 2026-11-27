@@ -96,3 +96,23 @@ test("web components page upgrades elements and keeps light DOM slots", async ({
   expect(theme).toBe(isDark ? "dark" : "light");
   expect(errors).toEqual([]);
 });
+
+test("vue bindings page mounts wrappers and v-model works", async ({ page }) => {
+  const errors: string[] = [];
+  page.on("pageerror", error => errors.push(error.message));
+
+  await page.goto(`${DOCS_URL}vue`);
+
+  const checkbox = page.locator(".lg-demo .litecheckbox").first();
+  await expect(checkbox).toHaveAttribute("aria-checked", "true");
+  await checkbox.click();
+  await expect(checkbox).toHaveAttribute("aria-checked", "false");
+
+  await page.locator(".lg-demo button", { hasText: "打开对话框" }).click();
+  await expect(page.locator(".lg-demo .litedialog")).toBeVisible();
+
+  await page.locator(".lg-menu-demo .lite-menu-item").click();
+  await expect(page.locator(".lg-menu-demo .lite-menu-panel")).toBeVisible();
+
+  expect(errors).toEqual([]);
+});

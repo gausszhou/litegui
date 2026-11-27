@@ -38,6 +38,7 @@
     "@gausszhou/litegui-components": "workspace:*",
     "@gausszhou/litegui-core": "workspace:*",
     "@gausszhou/litegui-elements": "workspace:*",
+    "@gausszhou/litegui-vue": "workspace:*",
     "eslint": "^10.15.0",
     "globals": "^17.14.0",
     "postcss": "^8.5.33",

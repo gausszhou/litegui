@@ -98,6 +98,7 @@ export default defineConfig({
         text: "进阶",
         items: [
           { text: "Web Components", link: "/web-components" },
+          { text: "Vue 绑定", link: "/vue" },
           { text: "示例", link: "/examples" },
           { text: "实验性组件", link: "/experimental" },
           { text: "API 参考", link: "/api/" },

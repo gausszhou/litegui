@@ -16,12 +16,15 @@
   "dependencies": {
     "@gausszhou/litegui-components": "workspace:*",
     "@gausszhou/litegui-core": "workspace:*",
-    "@gausszhou/litegui-elements": "workspace:*"
+    "@gausszhou/litegui-elements": "workspace:*",
+    "@gausszhou/litegui-vue": "workspace:*",
+    "vue": "^3.5.46"
   },
   "devDependencies": {
     "@playwright/test": "^1.65.1",
     "@types/node": "^22.10.2",
     "@vitest/coverage-v8": "^2.1.8",
+    "@vue/test-utils": "^2.4.6",
     "jsdom": "^25.0.1",
     "typescript": "^5.8.3",
     "vite": "^5.4.11",

@@ -46,8 +46,9 @@ export class LiteGuiMenuElement extends LiteGuiElement {
       if (!label) continue;
 
       const path = prefix ? `${prefix}/${label}` : label;
+      const hasChildren = Array.from(child.children).some(element => element.localName === "litegui-menu-item");
       this.#menu?.add(path, {
-        callback: () => this.emit("litegui-select", { label, path })
+        callback: hasChildren ? undefined : () => this.emit("litegui-select", { label, path })
       });
 
       this.buildItems(child, path);
