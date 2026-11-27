@@ -30,8 +30,12 @@ test("every component page renders a live demo", async ({ page }) => {
   for (const slug of COMPONENT_PAGES) {
     await page.goto(`${DOCS_URL}components/${slug}`);
     await expect(page.locator(".lg-demo"), slug).toBeVisible();
+    // demo 是懒加载 + 客户端挂载：等“加载中”消失后再断言，避免 hydration 时序抖动
+    await expect(page.locator(".lg-demo-loading"), slug).toHaveCount(0, { timeout: 15_000 });
     await expect(page.locator(".lg-demo-error"), slug).toHaveCount(0);
-    expect(await page.locator(".lg-demo *").count(), slug).toBeGreaterThan(0);
+    await expect
+      .poll(async () => page.locator(".lg-demo > *").count(), { message: slug })
+      .toBeGreaterThan(0);
   }
 
   expect(errors).toEqual([]);
