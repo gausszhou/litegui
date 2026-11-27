@@ -1,5 +1,12 @@
 # Changelog
 
+## Unreleased（Web Components 标签前缀）
+
+### Changed
+
+- 自定义元素标签从 `litegui-*` 统一改为 `lg-*`：`lg-button`、`lg-checkbox`、`lg-panel`、`lg-dialog`、`lg-menu`、`lg-menu-item`。
+- 事件名保持 `litegui-*`（`litegui-click` / `litegui-change` / `litegui-close` / `litegui-select`），避免同时改事件 API。
+
 ## Unreleased（Vue 绑定）
 
 ### Added
@@ -23,7 +30,7 @@
 
 ### Added
 
-- 新增 `@gausszhou/litegui-elements` Web Components 适配层（Shadow DOM 薄封装），首批支持 `litegui-button`、`litegui-checkbox`、`litegui-panel`、`litegui-dialog`、`litegui-menu`（含声明式 `litegui-menu-item`），含 `tokens.css`、ESM/CJS/UMD 产物与 jsdom/Playwright 测试。
+- 新增 `@gausszhou/litegui-elements` Web Components 适配层（Shadow DOM 薄封装），首批支持 `lg-button`、`lg-checkbox`、`lg-panel`、`lg-dialog`、`lg-menu`（含声明式 `lg-menu-item`），含 `tokens.css`、ESM/CJS/UMD 产物与 jsdom/Playwright 测试。
 - 新增文档页 `docs/web-components.md`，包含实时示例、属性/事件约定与 React 19 / Vue 接入说明。
 
 ## Unreleased（monorepo 改造）

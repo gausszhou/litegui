@@ -14,7 +14,7 @@ export default defineConfig({
   vue: {
     template: {
       compilerOptions: {
-        isCustomElement: (tag: string) => tag.startsWith("litegui-")
+        isCustomElement: (tag: string) => tag.startsWith("lg-")
       }
     }
   },

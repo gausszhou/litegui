@@ -3,16 +3,16 @@
 LiteGUI 的可选 **Web Components 适配层**：用 Custom Elements + Shadow DOM 包装 `@gausszhou/litegui-components` 的类 API，让组件可以在纯 HTML 或任意框架里以标签使用。
 
 ```html
-<litegui-button label="保存"></litegui-button>
-<litegui-checkbox checked></litegui-checkbox>
+<lg-button label="保存"></lg-button>
+<lg-checkbox checked></lg-checkbox>
 
-<litegui-panel heading="属性" height="160">
+<lg-panel heading="属性" height="160">
   <div>light DOM 内容通过 slot 投影</div>
-</litegui-panel>
+</lg-panel>
 
-<litegui-dialog heading="设置" width="320" height="190" open closable>
+<lg-dialog heading="设置" width="320" height="190" open closable>
   <div>对话框内容</div>
-</litegui-dialog>
+</lg-dialog>
 ```
 
 ## 安装
@@ -42,13 +42,13 @@ customElements.define("my-button", LiteGuiButtonElement);
 
 ## 元素
 
-| 标签 | 属性 | 事件 |
-| --- | --- | --- |
-| `<litegui-button>` | `label`、`size`、`disabled` | `litegui-click` |
-| `<litegui-checkbox>` | `checked`、`disabled` | `litegui-change` |
-| `<litegui-panel>` | `heading`、`height`、`closable` | `litegui-close` |
-| `<litegui-dialog>` | `heading`、`width`、`height`、`open`、`closable` | `litegui-close` |
-| `<litegui-menu>` | 子元素 `<litegui-menu-item label>` | `litegui-select` |
+| 标签            | 属性                                             | 事件             |
+| --------------- | ------------------------------------------------ | ---------------- |
+| `<lg-button>`   | `label`、`size`、`disabled`                      | `litegui-click`  |
+| `<lg-checkbox>` | `checked`、`disabled`                            | `litegui-change` |
+| `<lg-panel>`    | `heading`、`height`、`closable`                  | `litegui-close`  |
+| `<lg-dialog>`   | `heading`、`width`、`height`、`open`、`closable` | `litegui-close`  |
+| `<lg-menu>`     | 子元素 `<lg-menu-item label>`                    | `litegui-select` |
 
 事件都是 `bubbles: true` + `composed: true` 的 `CustomEvent`，数据在 `event.detail`。
 标题属性使用 `heading`，避免与全局 `title`（tooltip）冲突。

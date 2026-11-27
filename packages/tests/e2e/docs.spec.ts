@@ -81,15 +81,15 @@ test("web components page upgrades elements and keeps light DOM slots", async ({
 
   await page.goto(`${DOCS_URL}web-components`);
 
-  const buttons = page.locator(".wc-demo litegui-button");
+  const buttons = page.locator(".wc-demo lg-button");
   await expect(buttons).toHaveCount(3);
   await expect.poll(async () => buttons.first().evaluate(element => Boolean(element.shadowRoot))).toBe(true);
 
-  await expect(page.locator(".wc-demo litegui-panel .panel-title")).toHaveText("属性");
-  await expect(page.locator(".wc-demo litegui-dialog .litedialog")).toBeVisible();
-  await expect(page.locator(".wc-demo litegui-menu .lite-menu-item")).toHaveCount(1);
-  await page.locator(".wc-demo litegui-menu .lite-menu-item").click();
-  await expect(page.locator(".wc-demo litegui-menu .lite-menu-panel")).toBeVisible();
+  await expect(page.locator(".wc-demo lg-panel .panel-title")).toHaveText("属性");
+  await expect(page.locator(".wc-demo lg-dialog .litedialog")).toBeVisible();
+  await expect(page.locator(".wc-demo lg-menu .lite-menu-item")).toHaveCount(1);
+  await page.locator(".wc-demo lg-menu .lite-menu-item").click();
+  await expect(page.locator(".wc-demo lg-menu .lite-menu-panel")).toBeVisible();
 
   const theme = await page.locator("html").getAttribute("data-lg-theme");
   const isDark = await page.locator("html").evaluate(element => element.classList.contains("dark"));

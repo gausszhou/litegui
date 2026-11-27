@@ -4,7 +4,7 @@ import { LiteGuiElement } from "../base";
 export type LiteGuiButtonSize = "default" | "small" | "mini";
 
 /**
- * `<litegui-button label="Save" size="small" disabled>`。
+ * `<lg-button label="Save" size="small" disabled>`。
  * 点击派发 `litegui-click`，detail 为 `{ label }`。
  */
 export class LiteGuiButtonElement extends LiteGuiElement {
@@ -60,6 +60,6 @@ export class LiteGuiButtonElement extends LiteGuiElement {
 
 declare global {
   interface HTMLElementTagNameMap {
-    "litegui-button": LiteGuiButtonElement;
+    "lg-button": LiteGuiButtonElement;
   }
 }

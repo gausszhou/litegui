@@ -32,75 +32,75 @@ import "@gausszhou/litegui-elements";
 下面的示例就是页面里的真实元素：
 
 <div class="wc-demo">
-  <litegui-button label="保存"></litegui-button>
-  <litegui-button label="Small" size="small"></litegui-button>
-  <litegui-button label="禁用" disabled></litegui-button>
-  <litegui-checkbox checked></litegui-checkbox>
+  <lg-button label="保存"></lg-button>
+  <lg-button label="Small" size="small"></lg-button>
+  <lg-button label="禁用" disabled></lg-button>
+  <lg-checkbox checked></lg-checkbox>
 </div>
 
 ```html
-<litegui-button label="保存"></litegui-button>
-<litegui-button label="Small" size="small"></litegui-button>
-<litegui-button label="禁用" disabled></litegui-button>
-<litegui-checkbox checked></litegui-checkbox>
+<lg-button label="保存"></lg-button>
+<lg-button label="Small" size="small"></lg-button>
+<lg-button label="禁用" disabled></lg-button>
+<lg-checkbox checked></lg-checkbox>
 ```
 
 Panel 的默认插槽会投影到内容区：
 
 <div class="wc-demo">
-  <litegui-panel heading="属性" height="160">
+  <lg-panel heading="属性" height="160">
     <div style="padding: 12px">这段内容来自 light DOM，被 slot 投影进面板。</div>
-  </litegui-panel>
+  </lg-panel>
 </div>
 
 ```html
-<litegui-panel heading="属性" height="160">
+<lg-panel heading="属性" height="160">
   <div>这段内容来自 light DOM，被 slot 投影进面板。</div>
-</litegui-panel>
+</lg-panel>
 ```
 
 Dialog 用 `open` 控制显示，关闭按钮会移除 `open` 并派发 `litegui-close`：
 
 <div class="wc-demo">
-  <litegui-dialog heading="设置" width="320" height="190" open closable>
+  <lg-dialog heading="设置" width="320" height="190" open closable>
     <div style="padding: 8px">对话框内容同样来自默认插槽。</div>
-  </litegui-dialog>
+  </lg-dialog>
 </div>
 
 ```html
-<litegui-dialog heading="设置" width="320" height="190" open closable>
+<lg-dialog heading="设置" width="320" height="190" open closable>
   <div>对话框内容同样来自默认插槽。</div>
-</litegui-dialog>
+</lg-dialog>
 ```
 
-Menu 用嵌套的 `<litegui-menu-item>` 声明菜单树，点击叶子项派发 `litegui-select`：
+Menu 用嵌套的 `<lg-menu-item>` 声明菜单树，点击叶子项派发 `litegui-select`：
 
 <div class="wc-demo wc-menu-demo">
-  <litegui-menu>
-    <litegui-menu-item label="文件">
-      <litegui-menu-item label="新建文本文件"></litegui-menu-item>
-      <litegui-menu-item label="打开"></litegui-menu-item>
-    </litegui-menu-item>
-  </litegui-menu>
+  <lg-menu>
+    <lg-menu-item label="文件">
+      <lg-menu-item label="新建文本文件"></lg-menu-item>
+      <lg-menu-item label="打开"></lg-menu-item>
+    </lg-menu-item>
+  </lg-menu>
 </div>
 
 ```html
-<litegui-menu>
-  <litegui-menu-item label="文件">
-    <litegui-menu-item label="新建文本文件"></litegui-menu-item>
-    <litegui-menu-item label="打开"></litegui-menu-item>
-  </litegui-menu-item>
-</litegui-menu>
+<lg-menu>
+  <lg-menu-item label="文件">
+    <lg-menu-item label="新建文本文件"></lg-menu-item>
+    <lg-menu-item label="打开"></lg-menu-item>
+  </lg-menu-item>
+</lg-menu>
 ```
 
 ## 已实现的元素
 
-| 标签                 | 属性                                                        | 事件                             |
-| -------------------- | ----------------------------------------------------------- | -------------------------------- |
-| `<litegui-button>`   | `label`、`size`（`default` / `small` / `mini`）、`disabled` | `litegui-click` → `{ label }`    |
-| `<litegui-checkbox>` | `checked`、`disabled`                                       | `litegui-change` → `{ checked }` |
-| `<litegui-panel>`    | `heading`、`height`、`closable`                             | `litegui-close`                  |
-| `<litegui-dialog>`   | `heading`、`width`、`height`、`open`、`closable`            | `litegui-close`                  |
+| 标签            | 属性                                                        | 事件                             |
+| --------------- | ----------------------------------------------------------- | -------------------------------- |
+| `<lg-button>`   | `label`、`size`（`default` / `small` / `mini`）、`disabled` | `litegui-click` → `{ label }`    |
+| `<lg-checkbox>` | `checked`、`disabled`                                       | `litegui-change` → `{ checked }` |
+| `<lg-panel>`    | `heading`、`height`、`closable`                             | `litegui-close`                  |
+| `<lg-dialog>`   | `heading`、`width`、`height`、`open`、`closable`            | `litegui-close`                  |
 
 约定：
 
@@ -135,7 +135,7 @@ document.documentElement.dataset.lgTheme = "light";
 React 19 原生支持 Custom Elements，事件用 `on` + 小写事件名：
 
 ```tsx
-<litegui-button label="保存" onlitegui-click={event => console.log(event.detail)} />
+<lg-button label="保存" onlitegui-click={event => console.log(event.detail)} />
 ```
 
 Vue 需要把 `litegui-` 前缀声明为自定义元素，避免被当成 Vue 组件解析：
@@ -152,7 +152,7 @@ vue({
 ```
 
 ```vue
-<litegui-button label="保存" @litegui-click="onSave" />
+<lg-button label="保存" @litegui-click="onSave" />
 ```
 
 ## 单文件 / script 标签
@@ -161,7 +161,7 @@ vue({
 
 ```html
 <script src="./node_modules/@gausszhou/litegui-elements/dist/index.umd.cjs"></script>
-<litegui-button label="保存"></litegui-button>
+<lg-button label="保存"></lg-button>
 ```
 
 UMD 会自动把 tokens 注入文档，无需再单独引入 `tokens.css`。

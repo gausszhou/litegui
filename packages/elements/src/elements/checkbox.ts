@@ -2,7 +2,7 @@ import { Checkbox } from "@gausszhou/litegui-components/checkbox";
 import { LiteGuiElement } from "../base";
 
 /**
- * `<litegui-checkbox checked disabled>`。
+ * `<lg-checkbox checked disabled>`。
  * 切换派发 `litegui-change`，detail 为 `{ checked }`；同时反射 `checked` attribute。
  */
 export class LiteGuiCheckboxElement extends LiteGuiElement {
@@ -52,6 +52,6 @@ export class LiteGuiCheckboxElement extends LiteGuiElement {
 
 declare global {
   interface HTMLElementTagNameMap {
-    "litegui-checkbox": LiteGuiCheckboxElement;
+    "lg-checkbox": LiteGuiCheckboxElement;
   }
 }

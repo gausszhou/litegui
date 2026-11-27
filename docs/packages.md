@@ -60,8 +60,8 @@ defineElements();
 ```
 
 ```html
-<litegui-button label="保存"></litegui-button>
-<litegui-checkbox checked></litegui-checkbox>
+<lg-button label="保存"></lg-button>
+<lg-checkbox checked></lg-checkbox>
 ```
 
 Vue 3 绑定：

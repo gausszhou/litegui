@@ -7,12 +7,12 @@ let menuId = 0;
  * 菜单项只是声明式数据的载体，不渲染自身：
  *
  * ```html
- * <litegui-menu>
- *   <litegui-menu-item label="文件">
- *     <litegui-menu-item label="新建"></litegui-menu-item>
- *     <litegui-menu-item label="打开"></litegui-menu-item>
- *   </litegui-menu-item>
- * </litegui-menu>
+ * <lg-menu>
+ *   <lg-menu-item label="文件">
+ *     <lg-menu-item label="新建"></lg-menu-item>
+ *     <lg-menu-item label="打开"></lg-menu-item>
+ *   </lg-menu-item>
+ * </lg-menu>
  * ```
  */
 export class LiteGuiMenuItemElement extends HTMLElementBase {
@@ -25,7 +25,7 @@ export class LiteGuiMenuItemElement extends HTMLElementBase {
 }
 
 /**
- * `<litegui-menu>`：点击叶子项派发 `litegui-select`，detail 为 `{ label, path }`。
+ * `<lg-menu>`：点击叶子项派发 `litegui-select`，detail 为 `{ label, path }`。
  */
 export class LiteGuiMenuElement extends LiteGuiElement {
   static hostStyles = ":host { display: inline-block; }";
@@ -33,20 +33,20 @@ export class LiteGuiMenuElement extends LiteGuiElement {
   #menu: Menu | null = null;
 
   protected render() {
-    this.#menu = new Menu(`litegui-menu-${++menuId}`, { container: this.mountPoint });
+    this.#menu = new Menu(`lg-menu-${++menuId}`, { container: this.mountPoint });
     this.buildItems(this, "");
     this.setComponent(this.#menu);
   }
 
   private buildItems(parent: Element, prefix: string) {
     for (const child of Array.from(parent.children)) {
-      // 用 localName，避免 <litegui-menu> 先于子项升级时 instanceof 失败
-      if (child.localName !== "litegui-menu-item") continue;
+      // 用 localName，避免 <lg-menu> 先于子项升级时 instanceof 失败
+      if (child.localName !== "lg-menu-item") continue;
       const label = child.getAttribute("label") ?? "";
       if (!label) continue;
 
       const path = prefix ? `${prefix}/${label}` : label;
-      const hasChildren = Array.from(child.children).some(element => element.localName === "litegui-menu-item");
+      const hasChildren = Array.from(child.children).some(element => element.localName === "lg-menu-item");
       this.#menu?.add(path, {
         callback: hasChildren ? undefined : () => this.emit("litegui-select", { label, path })
       });
@@ -67,7 +67,7 @@ export class LiteGuiMenuElement extends LiteGuiElement {
 
 declare global {
   interface HTMLElementTagNameMap {
-    "litegui-menu": LiteGuiMenuElement;
-    "litegui-menu-item": LiteGuiMenuItemElement;
+    "lg-menu": LiteGuiMenuElement;
+    "lg-menu-item": LiteGuiMenuItemElement;
   }
 }

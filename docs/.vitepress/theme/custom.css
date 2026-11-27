@@ -204,8 +204,8 @@
   border-radius: 8px;
 }
 
-.wc-demo litegui-panel,
-.wc-demo litegui-dialog {
+.wc-demo lg-panel,
+.wc-demo lg-dialog {
   width: min(100%, 360px);
 }
 

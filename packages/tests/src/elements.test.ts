@@ -12,19 +12,19 @@ function mount<T extends HTMLElement>(tag: string, attrs: Record<string, string>
 
 describe("LiteGUI custom elements", () => {
   it("registers the tags and falls back to a <style> when adoptedStyleSheets is unavailable", () => {
-    expect(customElements.get("litegui-button")).toBeDefined();
-    expect(customElements.get("litegui-checkbox")).toBeDefined();
-    expect(customElements.get("litegui-panel")).toBeDefined();
-    expect(customElements.get("litegui-dialog")).toBeDefined();
+    expect(customElements.get("lg-button")).toBeDefined();
+    expect(customElements.get("lg-checkbox")).toBeDefined();
+    expect(customElements.get("lg-panel")).toBeDefined();
+    expect(customElements.get("lg-dialog")).toBeDefined();
 
-    const button = mount("litegui-button", { label: "Save" });
+    const button = mount("lg-button", { label: "Save" });
     const style = button.shadowRoot?.querySelector("style");
     expect(style).not.toBeNull();
     expect(style?.textContent).toContain(":host { display: inline-block; }");
   });
 
-  it("litegui-button renders, reflects label and emits litegui-click", () => {
-    const button = mount<LiteGuiButtonElement>("litegui-button", { label: "Save" });
+  it("lg-button renders, reflects label and emits litegui-click", () => {
+    const button = mount<LiteGuiButtonElement>("lg-button", { label: "Save" });
     const inner = button.shadowRoot?.querySelector<HTMLButtonElement>("button.litebutton");
     expect(inner?.textContent).toBe("Save");
 
@@ -39,8 +39,8 @@ describe("LiteGUI custom elements", () => {
     expect(inner?.textContent).toBe("Run");
   });
 
-  it("litegui-button does not emit when disabled", () => {
-    const button = mount<LiteGuiButtonElement>("litegui-button", {
+  it("lg-button does not emit when disabled", () => {
+    const button = mount<LiteGuiButtonElement>("lg-button", {
       label: "Save",
       disabled: ""
     });
@@ -53,8 +53,8 @@ describe("LiteGUI custom elements", () => {
     expect(onClick).not.toHaveBeenCalled();
   });
 
-  it("litegui-checkbox reflects checked and emits litegui-change", () => {
-    const checkbox = mount<LiteGuiCheckboxElement>("litegui-checkbox", { checked: "" });
+  it("lg-checkbox reflects checked and emits litegui-change", () => {
+    const checkbox = mount<LiteGuiCheckboxElement>("lg-checkbox", { checked: "" });
     expect(checkbox.checked).toBe(true);
 
     const onChange = vi.fn();
@@ -68,8 +68,8 @@ describe("LiteGUI custom elements", () => {
     expect((onChange.mock.calls[0][0] as CustomEvent).detail).toEqual({ checked: false });
   });
 
-  it("litegui-panel projects slot content and emits close", () => {
-    const panel = document.createElement("litegui-panel");
+  it("lg-panel projects slot content and emits close", () => {
+    const panel = document.createElement("lg-panel");
     panel.setAttribute("heading", "属性");
     panel.setAttribute("height", "160");
     panel.setAttribute("closable", "");
@@ -89,8 +89,8 @@ describe("LiteGUI custom elements", () => {
     expect(panel.hidden).toBe(true);
   });
 
-  it("litegui-dialog follows the open attribute and reopens after close", () => {
-    const dialog = mount("litegui-dialog", { heading: "设置", open: "", closable: "" });
+  it("lg-dialog follows the open attribute and reopens after close", () => {
+    const dialog = mount("lg-dialog", { heading: "设置", open: "", closable: "" });
 
     const findDialog = () => dialog.shadowRoot?.querySelector<HTMLElement>(".litedialog");
     expect(findDialog()).not.toBeNull();
@@ -110,13 +110,13 @@ describe("LiteGUI custom elements", () => {
     expect(reopened?.style.display).not.toBe("none");
   });
 
-  it("litegui-menu builds nested items from light DOM", () => {
-    const menu = document.createElement("litegui-menu");
+  it("lg-menu builds nested items from light DOM", () => {
+    const menu = document.createElement("lg-menu");
     menu.innerHTML = `
-      <litegui-menu-item label="文件">
-        <litegui-menu-item label="新建"></litegui-menu-item>
-        <litegui-menu-item label="打开"></litegui-menu-item>
-      </litegui-menu-item>
+      <lg-menu-item label="文件">
+        <lg-menu-item label="新建"></lg-menu-item>
+        <lg-menu-item label="打开"></lg-menu-item>
+      </lg-menu-item>
     `;
     document.body.appendChild(menu);
 
@@ -140,7 +140,7 @@ describe("LiteGUI custom elements", () => {
   });
 
   it("does not duplicate content when the element is moved", () => {
-    const button = mount("litegui-button", { label: "Move" });
+    const button = mount("lg-button", { label: "Move" });
     const other = document.createElement("div");
     document.body.appendChild(other);
 

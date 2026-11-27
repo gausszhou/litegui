@@ -5,12 +5,12 @@ import { LiteGuiMenuElement, LiteGuiMenuItemElement } from "./elements/menu";
 import { LiteGuiPanelElement } from "./elements/panel";
 
 export const ELEMENT_TAGS = {
-  "litegui-button": LiteGuiButtonElement,
-  "litegui-checkbox": LiteGuiCheckboxElement,
-  "litegui-panel": LiteGuiPanelElement,
-  "litegui-dialog": LiteGuiDialogElement,
-  "litegui-menu": LiteGuiMenuElement,
-  "litegui-menu-item": LiteGuiMenuItemElement
+  "lg-button": LiteGuiButtonElement,
+  "lg-checkbox": LiteGuiCheckboxElement,
+  "lg-panel": LiteGuiPanelElement,
+  "lg-dialog": LiteGuiDialogElement,
+  "lg-menu": LiteGuiMenuElement,
+  "lg-menu-item": LiteGuiMenuItemElement
 } as const;
 
 export type LiteGuiElementTag = keyof typeof ELEMENT_TAGS;

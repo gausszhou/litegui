@@ -2,7 +2,7 @@ import { Panel } from "@gausszhou/litegui-components/panel";
 import { LiteGuiElement } from "../base";
 
 /**
- * `<litegui-panel heading="属性" height="200" closable>`
+ * `<lg-panel heading="属性" height="200" closable>`
  * 默认插槽内容会被放进面板内容区；关闭时派发 `litegui-close` 并隐藏宿主。
  */
 export class LiteGuiPanelElement extends LiteGuiElement {
@@ -54,6 +54,6 @@ export class LiteGuiPanelElement extends LiteGuiElement {
 
 declare global {
   interface HTMLElementTagNameMap {
-    "litegui-panel": LiteGuiPanelElement;
+    "lg-panel": LiteGuiPanelElement;
   }
 }

@@ -2,7 +2,7 @@ import { Dialog } from "@gausszhou/litegui-components/dialog";
 import { LiteGuiElement } from "../base";
 
 /**
- * `<litegui-dialog heading="设置" width="320" height="200" open closable>`
+ * `<lg-dialog heading="设置" width="320" height="200" open closable>`
  *
  * `open` 控制显示/隐藏；点关闭按钮时移除 `open` 并派发 `litegui-close`。
  * 默认插槽内容放进对话框内容区。
@@ -87,6 +87,6 @@ export class LiteGuiDialogElement extends LiteGuiElement {
 
 declare global {
   interface HTMLElementTagNameMap {
-    "litegui-dialog": LiteGuiDialogElement;
+    "lg-dialog": LiteGuiDialogElement;
   }
 }
