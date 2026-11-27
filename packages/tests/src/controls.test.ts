@@ -39,6 +39,12 @@ describe("Checkbox", () => {
     expect(checkbox.setValue(true)).toBe(false);
     expect(onChange).not.toHaveBeenCalled();
   });
+
+  it("uses the litecheckbox class that the stylesheet targets", () => {
+    const checkbox = new Checkbox(false, {});
+    expect(checkbox.root.classList.contains("litecheckbox")).toBe(true);
+    expect(checkbox.root.classList.contains("lite-checkbox")).toBe(true);
+  });
 });
 
 describe("Dragger", () => {

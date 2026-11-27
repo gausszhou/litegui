@@ -23,7 +23,7 @@ export class Checkbox {
   }
   createElementRoot() {
     const root = (this.root = document.createElement("span"));
-    root.className = "lite-checkbox inputfield";
+    root.className = "litecheckbox lite-checkbox inputfield";
     root.setAttribute("role", "checkbox");
     root.setAttribute("aria-checked", this.value.toString());
     root.tabIndex = 0;
