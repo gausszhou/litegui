@@ -1,21 +1,63 @@
-import { describe, expect, it } from "vitest";
+import { beforeAll, describe, expect, it, vi } from "vitest";
 import { mount } from "@vue/test-utils";
 import { createApp, nextTick } from "vue";
 import LiteGuiVue, {
+  components,
+  LiteGuiArea,
+  LiteGuiBox,
   LiteGuiButton,
   LiteGuiCheckbox,
+  LiteGuiComplexList,
   LiteGuiConsole,
+  LiteGuiContextMenu,
   LiteGuiDragger,
   LiteGuiDialog,
+  LiteGuiHeaderBar,
+  LiteGuiImageEditor,
+  LiteGuiInspector,
+  LiteGuiLineEditor,
   LiteGuiList,
   LiteGuiMenu,
+  LiteGuiNodeEditor,
   LiteGuiPanel,
   LiteGuiSearchBox,
   LiteGuiSplit,
+  LiteGuiStatusBar,
   LiteGuiTable,
   LiteGuiTabs,
+  LiteGuiTextEditor,
+  LiteGuiTimeline,
+  LiteGuiToolbar,
+  LiteGuiTree,
   LiteGuiSlider
 } from "@gausszhou/litegui-vue";
+
+beforeAll(() => {
+  // jsdom 不实现 canvas；LineEditor / Timeline 只需要一个可用的 2D context。
+  HTMLCanvasElement.prototype.getContext = vi.fn(() => ({
+    clearRect: vi.fn(),
+    fillRect: vi.fn(),
+    strokeRect: vi.fn(),
+    beginPath: vi.fn(),
+    moveTo: vi.fn(),
+    lineTo: vi.fn(),
+    stroke: vi.fn(),
+    fill: vi.fn(),
+    fillText: vi.fn(),
+    arc: vi.fn(),
+    save: vi.fn(),
+    restore: vi.fn(),
+    setTransform: vi.fn(),
+    translate: vi.fn(),
+    scale: vi.fn(),
+    closePath: vi.fn(),
+    measureText: () => ({ width: 10 })
+  })) as unknown as typeof HTMLCanvasElement.prototype.getContext;
+});
+
+type Exposed<T> = { getInstance: () => T };
+
+const getInstance = <T>(wrapper: { vm: unknown }): T => (wrapper.vm as Exposed<T>).getInstance();
 
 describe("Vue bindings", () => {
   it("installs all components through the Vue plugin", () => {
@@ -23,6 +65,9 @@ describe("Vue bindings", () => {
     app.use(LiteGuiVue);
     expect(app.component("LiteGuiButton")).toBeDefined();
     expect(app.component("LiteGuiMenu")).toBeDefined();
+    expect(Object.keys(components)).toHaveLength(27);
+    expect(app.component("LiteGuiNodeEditor")).toBeDefined();
+    expect(app.component("LiteGuiTimeline")).toBeDefined();
   });
 
   it("LiteGuiButton mounts, emits click and reflects label", async () => {
@@ -248,6 +293,334 @@ describe("Vue bindings", () => {
     await leaf!.trigger("click");
 
     expect(wrapper.emitted("select")?.[0]).toEqual([{ label: "新建", path: "文件/新建" }]);
+
+    wrapper.unmount();
+  });
+
+  it("LiteGuiArea renders section slots and emits resize", async () => {
+    const wrapper = mount(LiteGuiArea, {
+      props: { sections: [50, 50] },
+      slots: {
+        "section-0": "<span class='area-left'>Left</span>",
+        "section-1": "<span class='area-right'>Right</span>"
+      },
+      attachTo: document.body
+    });
+    await nextTick();
+
+    expect(wrapper.find(".lg-vue-area").exists()).toBe(true);
+    expect(wrapper.find(".area-left").text()).toBe("Left");
+    expect(wrapper.find(".area-right").text()).toBe("Right");
+
+    wrapper.find(".lg-area").element.dispatchEvent(new Event("split_moved"));
+    expect(wrapper.emitted("resize")).toHaveLength(1);
+
+    wrapper.unmount();
+  });
+
+  it("LiteGuiArea falls back to a single content area", async () => {
+    const wrapper = mount(LiteGuiArea, {
+      slots: { default: "<span class='area-single'>Single</span>" },
+      attachTo: document.body
+    });
+    await nextTick();
+
+    expect(wrapper.findAll(".lg-area")).toHaveLength(1);
+    expect(wrapper.find(".area-single").text()).toBe("Single");
+
+    wrapper.unmount();
+  });
+
+  it("LiteGuiBox projects its default slot", async () => {
+    const wrapper = mount(LiteGuiBox, {
+      props: { stopPropagation: true },
+      slots: { default: "<span class='box-slot'>Boxed</span>" },
+      attachTo: document.body
+    });
+    await nextTick();
+
+    expect(wrapper.find(".box-slot").text()).toBe("Boxed");
+    expect(getInstance<{ stopPropagation: boolean }>(wrapper).stopPropagation).toBe(true);
+
+    wrapper.unmount();
+  });
+
+  it("LiteGuiComplexList emits select, toggle and remove", async () => {
+    const items = [{ content: "Alpha", enabled: true }, { content: "Beta" }];
+    const wrapper = mount(LiteGuiComplexList, {
+      props: { items, height: 120 },
+      attachTo: document.body
+    });
+    await nextTick();
+
+    const rows = wrapper.findAll(".lg-complex-list__item");
+    expect(rows).toHaveLength(2);
+    expect(rows[0].element.parentElement?.classList.contains("lg-is-enabled")).toBe(true);
+
+    await rows[1].trigger("mousedown");
+    expect(wrapper.emitted("select")?.[0]).toEqual([items[1]]);
+
+    await rows[0].find(".lg-complex-list__tick").trigger("mousedown");
+    expect(wrapper.emitted("toggle")?.[0]).toEqual([{ item: items[0], enabled: false }]);
+
+    await rows[1].find(".lg-complex-list__trash").trigger("mousedown");
+    expect(wrapper.emitted("remove")?.[0]).toEqual([items[1]]);
+
+    wrapper.unmount();
+  });
+
+  it("LiteGuiContextMenu opens with v-model and emits select", async () => {
+    const items = [{ title: "Copy", value: "copy" }];
+    const wrapper = mount(LiteGuiContextMenu, {
+      props: { modelValue: true, items, x: 40, y: 50 },
+      attachTo: document.body
+    });
+    await nextTick();
+
+    const menu = document.body.querySelector<HTMLElement>(".lg-context-menu");
+    expect(menu).not.toBeNull();
+    expect(wrapper.emitted("open")?.[0]).toEqual([true]);
+
+    menu!.querySelector<HTMLElement>(".lg-context-menu__item")!.click();
+    await nextTick();
+
+    expect(wrapper.emitted("select")?.[0]).toEqual([{ title: "Copy", value: "copy" }]);
+    expect(wrapper.emitted("update:modelValue")?.at(-1)).toEqual([false]);
+
+    wrapper.unmount();
+  });
+
+  it("LiteGuiHeaderBar renders slots and exposes setRight", async () => {
+    const wrapper = mount(LiteGuiHeaderBar, {
+      props: { variant: "area", title: "UV", height: 30 },
+      slots: {
+        left: "<span class='hb-left'>Left</span>",
+        right: "<span class='hb-right'>Right</span>"
+      },
+      attachTo: document.body
+    });
+    await nextTick();
+
+    expect(wrapper.find(".lg-header-bar").classes()).toContain("lg-header-bar--area");
+    expect(wrapper.find(".lg-header-bar").element.style.height).toBe("30px");
+    expect(wrapper.find(".hb-left").text()).toBe("Left");
+    expect(wrapper.find(".hb-right").text()).toBe("Right");
+
+    (wrapper.vm as unknown as { setRight: (value: string) => void }).setRight("Changed");
+    expect(wrapper.find(".lg-header-bar__right").text()).toBe("Changed");
+
+    wrapper.unmount();
+  });
+
+  it("LiteGuiImageEditor supports v-model:zoom", async () => {
+    const wrapper = mount(LiteGuiImageEditor, {
+      props: { title: "Render", zoom: 1, height: 200 },
+      attachTo: document.body
+    });
+    await nextTick();
+
+    expect(wrapper.find(".lg-image-editor__title").text()).toBe("Render");
+
+    const instance = getInstance<{ setZoom: (value: number, emit?: boolean) => void; getZoom: () => number }>(wrapper);
+    instance.setZoom(2, true);
+    expect(wrapper.emitted("update:zoom")?.[0]).toEqual([2]);
+    expect(wrapper.emitted("zoom")?.[0]).toEqual([2]);
+
+    await wrapper.setProps({ zoom: 3 });
+    expect(instance.getZoom()).toBe(3);
+
+    wrapper.unmount();
+  });
+
+  it("LiteGuiInspector renders items and emits change", async () => {
+    const wrapper = mount(LiteGuiInspector, {
+      props: { items: [{ name: "Name", type: "string", value: "Alpha" }] },
+      attachTo: document.body
+    });
+    await nextTick();
+
+    expect(wrapper.find(".inspector").exists()).toBe(true);
+    const input = wrapper.find(".inspector input");
+    await input.setValue("Beta");
+    await input.trigger("change");
+
+    expect(wrapper.emitted("change")?.at(-1)).toEqual([{ name: "Name", value: "Beta" }]);
+
+    wrapper.unmount();
+  });
+
+  it("LiteGuiLineEditor supports v-model through canvas interaction", async () => {
+    const wrapper = mount(LiteGuiLineEditor, {
+      props: {
+        modelValue: [
+          [0, 0],
+          [1, 1]
+        ],
+        width: 200,
+        height: 80
+      },
+      attachTo: document.body
+    });
+    await nextTick();
+
+    const curve = wrapper.find(".curve");
+    expect(curve.exists()).toBe(true);
+    curve.element.dispatchEvent(new MouseEvent("mousedown", { clientX: 50, clientY: 40, bubbles: true }));
+    document.dispatchEvent(new MouseEvent("mouseup", { clientX: 50, clientY: 40, bubbles: true }));
+
+    expect(wrapper.emitted("change")).toHaveLength(1);
+    expect(wrapper.emitted("update:modelValue")?.at(-1)?.[0]).toHaveLength(3);
+
+    wrapper.unmount();
+  });
+
+  it("LiteGuiNodeEditor emits select and change", async () => {
+    const wrapper = mount(LiteGuiNodeEditor, {
+      props: {
+        nodes: [
+          { id: "a", title: "A", x: 10, y: 20, outputs: [{ id: "out", name: "Out" }] },
+          { id: "b", title: "B", x: 120, y: 30, inputs: [{ id: "in", name: "In" }] }
+        ],
+        links: [{ from: "a", fromPort: "out", to: "b", toPort: "in" }]
+      },
+      attachTo: document.body
+    });
+    await nextTick();
+
+    expect(wrapper.findAll(".lg-node-editor__node")).toHaveLength(2);
+    wrapper.findAll(".lg-node-editor__node")[0].element.dispatchEvent(new MouseEvent("click", { bubbles: true }));
+    expect(wrapper.emitted("select")?.[0]).toEqual(["a"]);
+
+    getInstance<{ removeNode: (id: string) => void }>(wrapper).removeNode("b");
+    expect(wrapper.emitted("change")).toHaveLength(1);
+
+    wrapper.unmount();
+  });
+
+  it("LiteGuiStatusBar updates left and right content", async () => {
+    const wrapper = mount(LiteGuiStatusBar, {
+      props: { left: "Ready", right: ["UTF-8"], accent: "v1" },
+      attachTo: document.body
+    });
+    await nextTick();
+
+    expect(wrapper.find(".lg-status-bar__left").text()).toBe("Ready");
+    expect(wrapper.find(".lg-status-bar__right").element.children.length).toBe(2);
+
+    await wrapper.setProps({ left: "Done", right: ["Ln 1", "Col 2"] });
+    expect(wrapper.find(".lg-status-bar__left").text()).toBe("Done");
+    expect(wrapper.find(".lg-status-bar__right").element.children.length).toBe(3);
+
+    wrapper.unmount();
+  });
+
+  it("LiteGuiTextEditor supports v-model, tabs and cursor events", async () => {
+    const wrapper = mount(LiteGuiTextEditor, {
+      props: {
+        modelValue: "print(1)",
+        tabs: [
+          { id: "text", label: "Text", value: "print(1)" },
+          { id: "console", label: "Console", value: "" }
+        ]
+      },
+      attachTo: document.body
+    });
+    await nextTick();
+
+    const textarea = wrapper.find(".lg-text-editor__textarea");
+    expect((textarea.element as HTMLTextAreaElement).value).toBe("print(1)");
+
+    await textarea.setValue("print(2)");
+    expect(wrapper.emitted("update:modelValue")?.at(-1)).toEqual(["print(2)"]);
+    expect(wrapper.emitted("change")?.at(-1)).toEqual([{ tab: "text", value: "print(2)" }]);
+
+    await wrapper.find('button[data-tab="console"]').trigger("click");
+    expect(wrapper.emitted("tab")?.[0]).toEqual(["console"]);
+
+    await textarea.trigger("keyup");
+    expect(wrapper.emitted("cursor")?.length).toBeGreaterThan(0);
+
+    await wrapper.setProps({ readonly: true });
+    expect((wrapper.find(".lg-text-editor__textarea").element as HTMLTextAreaElement).readOnly).toBe(true);
+
+    wrapper.unmount();
+  });
+
+  it("LiteGuiTimeline supports v-model:frame, range and play events", async () => {
+    const wrapper = mount(LiteGuiTimeline, {
+      props: { start: 1, end: 100, frame: 1, height: 120 },
+      attachTo: document.body
+    });
+    await nextTick();
+
+    expect(wrapper.find(".lg-timeline").exists()).toBe(true);
+
+    const instance = getInstance<{
+      setFrame: (value: number, emit?: boolean) => void;
+      setRange: (start: number, end: number) => void;
+      play: () => void;
+      pause: () => void;
+    }>(wrapper);
+
+    instance.setFrame(30);
+    expect(wrapper.emitted("update:frame")?.[0]).toEqual([30]);
+
+    instance.setRange(10, 80);
+    expect(wrapper.emitted("range")?.[0]).toEqual([{ start: 10, end: 80 }]);
+
+    instance.play();
+    expect(wrapper.emitted("play")?.[0]).toEqual([true]);
+    instance.pause();
+    expect(wrapper.emitted("play")?.[1]).toEqual([false]);
+
+    wrapper.unmount();
+  });
+
+  it("LiteGuiToolbar supports v-model:active", async () => {
+    const wrapper = mount(LiteGuiToolbar, {
+      props: {
+        tools: [
+          { id: "move", label: "Move" },
+          { id: "rotate", label: "Rotate" }
+        ],
+        active: "move",
+        orientation: "horizontal"
+      },
+      attachTo: document.body
+    });
+    await nextTick();
+
+    expect(wrapper.find(".lg-toolbar").classes()).toContain("lg-toolbar--horizontal");
+    await wrapper.findAll(".lg-toolbar__tool")[1].trigger("click");
+
+    expect(wrapper.emitted("update:active")?.[0]).toEqual(["rotate"]);
+    expect(wrapper.emitted("change")?.[0]).toEqual(["rotate"]);
+
+    await wrapper.setProps({ active: "move" });
+    expect(wrapper.emitted("change")).toHaveLength(1);
+
+    wrapper.unmount();
+  });
+
+  it("LiteGuiTree renders data and emits select", async () => {
+    const data = {
+      id: "root",
+      content: "Root",
+      children: [
+        { id: "a", content: "A" },
+        { id: "b", content: "B" }
+      ]
+    };
+    const wrapper = mount(LiteGuiTree, {
+      props: { data, height: 200, allowRename: true },
+      attachTo: document.body
+    });
+    await nextTick();
+
+    expect(wrapper.findAll(".ltreeitem")).toHaveLength(3);
+    wrapper.findAll(".ltreeitem")[1].element.dispatchEvent(new MouseEvent("click", { bubbles: true }));
+
+    expect(wrapper.emitted("select")?.[0]).toEqual([data.children[0]]);
 
     wrapper.unmount();
   });

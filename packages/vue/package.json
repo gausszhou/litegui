@@ -25,7 +25,21 @@
     "./table": "./src/components/table.ts",
     "./tabs": "./src/components/tabs.ts",
     "./dragger": "./src/components/dragger.ts",
-    "./console": "./src/components/console.ts"
+    "./console": "./src/components/console.ts",
+    "./area": "./src/components/area.ts",
+    "./box": "./src/components/box.ts",
+    "./complex-list": "./src/components/complex-list.ts",
+    "./context-menu": "./src/components/context-menu.ts",
+    "./header-bar": "./src/components/header-bar.ts",
+    "./image-editor": "./src/components/image-editor.ts",
+    "./inspector": "./src/components/inspector.ts",
+    "./line-editor": "./src/components/line-editor.ts",
+    "./node-editor": "./src/components/node-editor.ts",
+    "./status-bar": "./src/components/status-bar.ts",
+    "./text-editor": "./src/components/text-editor.ts",
+    "./timeline": "./src/components/timeline.ts",
+    "./toolbar": "./src/components/toolbar.ts",
+    "./tree": "./src/components/tree.ts"
   },
   "sideEffects": false,
   "scripts": {
@@ -106,6 +120,62 @@
       "./console": {
         "types": "./dist/types/components/console.d.ts",
         "import": "./dist/components/console.js"
+      },
+      "./area": {
+        "types": "./dist/types/components/area.d.ts",
+        "import": "./dist/components/area.js"
+      },
+      "./box": {
+        "types": "./dist/types/components/box.d.ts",
+        "import": "./dist/components/box.js"
+      },
+      "./complex-list": {
+        "types": "./dist/types/components/complex-list.d.ts",
+        "import": "./dist/components/complex-list.js"
+      },
+      "./context-menu": {
+        "types": "./dist/types/components/context-menu.d.ts",
+        "import": "./dist/components/context-menu.js"
+      },
+      "./header-bar": {
+        "types": "./dist/types/components/header-bar.d.ts",
+        "import": "./dist/components/header-bar.js"
+      },
+      "./image-editor": {
+        "types": "./dist/types/components/image-editor.d.ts",
+        "import": "./dist/components/image-editor.js"
+      },
+      "./inspector": {
+        "types": "./dist/types/components/inspector.d.ts",
+        "import": "./dist/components/inspector.js"
+      },
+      "./line-editor": {
+        "types": "./dist/types/components/line-editor.d.ts",
+        "import": "./dist/components/line-editor.js"
+      },
+      "./node-editor": {
+        "types": "./dist/types/components/node-editor.d.ts",
+        "import": "./dist/components/node-editor.js"
+      },
+      "./status-bar": {
+        "types": "./dist/types/components/status-bar.d.ts",
+        "import": "./dist/components/status-bar.js"
+      },
+      "./text-editor": {
+        "types": "./dist/types/components/text-editor.d.ts",
+        "import": "./dist/components/text-editor.js"
+      },
+      "./timeline": {
+        "types": "./dist/types/components/timeline.d.ts",
+        "import": "./dist/components/timeline.js"
+      },
+      "./toolbar": {
+        "types": "./dist/types/components/toolbar.d.ts",
+        "import": "./dist/components/toolbar.js"
+      },
+      "./tree": {
+        "types": "./dist/types/components/tree.d.ts",
+        "import": "./dist/components/tree.js"
       }
     }
   },
