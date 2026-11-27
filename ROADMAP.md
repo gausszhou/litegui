@@ -54,8 +54,10 @@ v0.1 只承诺 **12 个核心组件**；`Inspector`、`Tree`、`ContextMenu` 等
   - [x] v1.0.0 冻结与发布
   - 视觉截图基线与 WebKit 矩阵列入 post-1.0 backlog
 - [x] **Phase 4（2026-11-27）**：monorepo 化
-  - pnpm workspace：`packages/{core,litegui,experimental,tests}` + `apps/{demo,editor}`
-  - 包名 `@gausszhou/litegui`、`@gausszhou/litegui-core`、`@gausszhou/litegui-experimental`，`publishConfig` 切换 `src`/`dist`
+  - pnpm workspace：`packages/{core,litegui,tests}` + `apps/{demo,editor}`
+  - 包名 `@gausszhou/litegui`、`@gausszhou/litegui-core`，`publishConfig` 切换 `src`/`dist`
+  - `Inspector`、`Tree` 不单独拆包：并入 `@gausszhou/litegui`，恢复 `LiteGUI.Inspector/Tree` 静态成员与 `./inspector`、`./tree` 子路径
+  - 只保留“API 标记 experimental”的稳定性约定，不再维护独立包
   - ESM 外置 core（单一实例），UMD 保持自包含单文件
   - ESLint flat config、Typedoc API、size / verify-umd / verify-pack / pages:build 脚本
   - CI：lint → typecheck → test → coverage → build → size → verify → e2e → docs，master 通过后发布 gh-pages
@@ -93,8 +95,7 @@ LiteGUI 用 JavaScript/TypeScript 直接创建 DOM，不依赖 React/Vue，提�
 ```text
 packages/
   core/                    # DOM/事件/状态/Widget/utils（无 CSS）
-  litegui/                 # 组件、LiteGUI 命名空间、entries、styles
-  experimental/            # Inspector、Tree
+  litegui/                 # 全部组件（含 Inspector、Tree）、LiteGUI 命名空间、entries、styles
   tests/                   # Vitest + Playwright + bench
 apps/
   demo/                    # 最小演示页
@@ -115,7 +116,7 @@ shells/                    # build.sh、gh-pages.sh
 | 反馈 | `Console` |
 | 基础设施 | `LiteGUI`、`EventMitter`、`Widget`、`Box`、`utils` |
 
-`LiteGUI` 通过静态属性暴露 19 个组件（`LiteGUI.Area`、`LiteGUI.Dialog` 等），这是对上游 litegui.js 使用方式的兼容层。
+`LiteGUI` 通过静态属性暴露 20 个组件（`LiteGUI.Area`、`LiteGUI.Dialog`、`LiteGUI.Inspector` 等），这是对上游 litegui.js 使用方式的兼容层。
 
 ---
 
@@ -319,7 +320,7 @@ shells/                    # build.sh、gh-pages.sh
 **Phase 1 退出标准**
 
 - 核心组件 P0/P1 bug 为 0；测试覆盖率核心模块 ≥ 60%（核心基础模块 ≥ 80%）。
-- 核心 ESM 包（不含 experimental）gzip ≤ 35 KB；CSS ≤ 10 KB。
+- 核心组件（不含 Inspector/Tree）ESM gzip ≤ 35 KB；CSS ≤ 10 KB。
 - v0.1.0 tag + release notes；README 状态表与真实情况一致。
 
 ### Phase 2（第 5–8 周）：工程化与体验，发布 v0.2.0
@@ -377,7 +378,7 @@ shells/                    # build.sh、gh-pages.sh
 | 构建 | 新克隆 `npm ci && npm run build` | 0 错误，≤ 3 分钟 |
 | 类型 | `tsc --noEmit` | 0 错误（ts-nocheck 文件有清单和移除期限） |
 | 测试 | 核心模块行覆盖率 | ≥ 60%（基础模块 ≥ 80%） |
-| 体积 | 核心 ESM gzip（不含 experimental） | ≤ 35 KB |
+| 体积 | 核心组件（不含 Inspector/Tree）ESM gzip | ≤ 35 KB |
 | 样式 | 核心 CSS gzip | ≤ 10 KB |
 | 运行时 | P0/P1 已知问题 | 0 |
 | 可访问性 | axe critical/serious | 0 |
@@ -408,7 +409,7 @@ shells/                    # build.sh、gh-pages.sh
 2. **默认分支**：已确认；`master` 保持默认分支，`develop` 作为开发分支，阶段完成后合并到 `master`。
 3. **包名/发布**：已确认使用 `litegui`（registry 当前未占用）；是否发布公共 npm 在 0.1.0 前决定。
 4. **兼容性**：是否必须兼容上游 litegui.js 的旧签名/全局 `LiteGUI` 用法？兼容一个 minor 还是长期保留？
-5. **大组件归属**：`Inspector`/`Tree`/`ContextMenu` 是 v0.1 必须可用，还是允许 experimental 到 0.2？
+5. **大组件归属**：`Inspector`/`Tree`/`ContextMenu` 是 v0.1 必须可用，还是允许 experimental 到 0.2？（已决：组件统一留在 `@gausszhou/litegui`，只标记 experimental）
 6. **浏览器基线**：只支持现代浏览器（推荐），还是需要兼容旧版/IE？
 7. **投入节奏**：12 周是目标还是上限？是否有其他人可以分担测试/文档？
 

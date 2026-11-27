@@ -25,6 +25,8 @@ import { Split } from "./components/Split";
 import { Table } from "./components/Table";
 import { Widget } from "@gausszhou/litegui-core";
 import { Tabs } from "./components/Tabs";
+import type { Inspector as InspectorComponent } from "./components/Inspector";
+import type { Tree as TreeComponent } from "./components/Tree";
 
 const emitter = mitt();
 
@@ -70,6 +72,10 @@ export class LiteGUI {
   static LineEditor = LineEditor;
   static Slider = Slider;
   static ComplexList = ComplexList;
+  // Inspector 与 Tree 依赖本命名空间（sizeToCSS、trigger、Dragger 等），由入口
+  // `src/index.ts` 挂载，避免 litegui.ts ↔ components 形成循环依赖。
+  declare static Inspector: typeof InspectorComponent;
+  declare static Tree: typeof TreeComponent;
 
   static root: HTMLElement
   // the top menu

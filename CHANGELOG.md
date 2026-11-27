@@ -4,13 +4,17 @@
 
 ### Changed
 
-- 仓库改为 pnpm monorepo：`packages/{core,litegui,experimental,tests}` + `apps/{demo,editor}`。
-- 包名：`litegui` → `@gausszhou/litegui`；`litegui/experimental` → `@gausszhou/litegui-experimental`；
-  新增 `@gausszhou/litegui-core`（DOM 工具、事件总线、全局状态、`Widget` 基类、通用工具）。
+- 仓库改为 pnpm monorepo：`packages/{core,litegui,tests}` + `apps/{demo,editor}`。
+- 包名：`litegui` → `@gausszhou/litegui`；新增 `@gausszhou/litegui-core`
+  （DOM 工具、事件总线、全局状态、`Widget` 基类、通用工具）。
+- `litegui/experimental` 不再单独成包：`Inspector`、`Tree` 回到 `@gausszhou/litegui`，
+  主入口恢复 `LiteGUI.Inspector` / `LiteGUI.Tree` 与同名命名导出，并新增 `./inspector`、`./tree` 子路径。
 - 构建产物从根目录 `lib/` 改为各包的 `dist/`；仓库脚本改用 pnpm（`pnpm build` / `pnpm test` 等）。
 - `@gausszhou/litegui` 新增组件命名导出（`import LiteGUI, { Table } from "@gausszhou/litegui"`）；
-  默认导出与 13 个按组件子路径保持不变。
+  默认导出与 15 个按组件子路径保持不变。
 - UMD 产物仍是自包含单文件，`window.LiteGUI` 用法不变；新增 `dist/index.cjs` 供 `require` 使用（外置 core）。
+- 主包产物重新包含 `Inspector`、`Tree`：`dist/index.cjs` 约 134 KB（gzip 35.2 KB），
+  `dist/index.umd.cjs` 约 139 KB（gzip 36.8 KB）；单包换来“一个包、一种引入方式”。
 
 ### Added
 
@@ -28,6 +32,7 @@
 
 ### Removed
 
+- `@gausszhou/litegui-experimental` 包（`packages/experimental`）：`Inspector`、`Tree` 并入 `@gausszhou/litegui`。
 - 根 `rollup.config.js`、`vite.config.js`、`package-lock.json`、旧 `lib/` 构建链。
 - `src/types/*.d.ts` 中未被引用的遗留类型声明（`LiteGUIInstance` 等）。
 

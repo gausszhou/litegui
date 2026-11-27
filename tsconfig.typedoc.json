@@ -3,5 +3,5 @@
   "compilerOptions": {
     "noEmit": true
   },
-  "include": ["packages/core/src", "packages/litegui/src", "packages/experimental/src"]
+  "include": ["packages/core/src", "packages/litegui/src"]
 }

@@ -1,7 +1,7 @@
 // TODO(phase-1): 将 prototype API 收敛到 class 类型声明后移除 @ts-nocheck
 // @ts-nocheck
 import { deprecate } from "@gausszhou/litegui-core";
-import LiteGUI from "@gausszhou/litegui";
+import LiteGUI from "../litegui";
 import { Tree } from "./Tree";
 import { purgeElement } from "@gausszhou/litegui-core";
 /**

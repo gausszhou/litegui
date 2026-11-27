@@ -9,10 +9,10 @@ description: LiteGUI 版本变更
 
 monorepo 改造：
 
-- pnpm workspace：`packages/{core,litegui,experimental,tests}` + `apps/{demo,editor}`
-- 包名改为 `@gausszhou/litegui`、`@gausszhou/litegui-core`、`@gausszhou/litegui-experimental`
+- pnpm workspace：`packages/{core,litegui,tests}` + `apps/{demo,editor}`
+- 包名改为 `@gausszhou/litegui`、`@gausszhou/litegui-core`；`Inspector`、`Tree` 不再拆包，统一回到主包
 - 产物从 `lib/` 改为各包 `dist/`；新增 ESLint、Typedoc API、size / verify-pack / pages 脚本
-- 主包新增组件命名导出，UMD 仍为自包含单文件
+- 主包新增组件命名导出；`Inspector`、`Tree` 并入主包并恢复 `LiteGUI.Inspector/Tree`，UMD 仍为自包含单文件
 - 修复二级菜单定位：与父项对齐、视口内自动翻转、清理旧子菜单
 - 文档站改为每组件独立页：真实渲染 demo + 同源示例代码，`.lg-demo` 前缀样式隔离
 - `Menu` / `ContextMenu` 新增 `container` 选项

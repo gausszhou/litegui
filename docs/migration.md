@@ -5,7 +5,7 @@ description: 0.2 到 1.0 的破坏性变更
 
 # 从 0.2 迁移
 
-## 单包 → monorepo（1.0.1）
+## 单包 → monorepo（未发布）
 
 仓库从单包改为 pnpm monorepo，包名与引入路径随之变化：
 
@@ -13,7 +13,7 @@ description: 0.2 到 1.0 的破坏性变更
 | --- | --- |
 | `litegui` | `@gausszhou/litegui` |
 | `litegui/style.css` | `@gausszhou/litegui/style.css` |
-| `litegui/experimental` | `@gausszhou/litegui-experimental` |
+| `litegui/experimental` | `@gausszhou/litegui`（或 `@gausszhou/litegui/<inspector\|tree>`） |
 | `litegui/<component>` | `@gausszhou/litegui/<component>` |
 
 其他变化：
@@ -22,28 +22,33 @@ description: 0.2 到 1.0 的破坏性变更
 - 仓库脚本从 npm 改为 pnpm（`pnpm build`、`pnpm test` 等），详见[包与导入](/packages)；
 - `@gausszhou/litegui` 新增命名导出（`import LiteGUI, { Table } from "@gausszhou/litegui"`），
   原有默认导出与子路径引入方式保持不变；
-- UMD 产物仍是自包含单文件，`window.LiteGUI` 用法不变。
+- UMD 产物仍是自包含单文件，`window.LiteGUI` 用法不变；
+- `Inspector`、`Tree` 不再单独成包：`litegui/experimental` 改为主包的命名导出或
+  `inspector` / `tree` 子路径，`LiteGUI.Inspector`、`LiteGUI.Tree` 静态成员恢复。
 
+## Inspector / Tree 回到主包
 
-## Inspector / Tree 移至 experimental
-
-0.2：
-
-```ts
-const inspector = new LiteGUI.Inspector();
-const tree = new LiteGUI.Tree(data);
-```
-
-1.0：
+0.2 与 1.0.1 的写法都继续可用：
 
 ```ts
-import { Inspector, Tree } from "@gausszhou/litegui-experimental";
+import LiteGUI, { Inspector, Tree } from "@gausszhou/litegui";
 
-const inspector = new Inspector();
-const tree = new Tree(data);
+// 命名导出
+new Inspector();
+new Tree(data);
+
+// 与 0.2 一致的静态成员写法
+new LiteGUI.Inspector();
+new LiteGUI.Tree(data);
+
+// 子路径写法
+// import { Inspector } from "@gausszhou/litegui/inspector";
+// import { Tree } from "@gausszhou/litegui/tree";
 ```
 
-主入口不再暴露 `LiteGUI.Inspector` 与 `LiteGUI.Tree`。
+拆分历史：1.0.0 曾把 `Inspector`、`Tree` 拆到 `litegui/experimental`，1.0.1 又拆成独立的
+`@gausszhou/litegui-experimental` 包；monorepo 版本取消这次拆分，组件统一放在
+`@gausszhou/litegui`，只保留“API 标记为 experimental”这一层稳定性约定。
 
 ## Table 默认转义
 

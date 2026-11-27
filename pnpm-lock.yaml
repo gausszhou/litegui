@@ -173,9 +173,6 @@ importers:
       '@gausszhou/litegui-core':
         specifier: workspace:*
         version: link:../../packages/core
-      '@gausszhou/litegui-experimental':
-        specifier: workspace:*
-        version: link:../../packages/experimental
     devDependencies:
       typescript:
         specifier: ^5.8.3
@@ -189,22 +186,6 @@ importers:
       mitt:
         specifier: ^3.0.0
         version: 3.0.1
-    devDependencies:
-      typescript:
-        specifier: ^5.8.3
-        version: 5.9.3
-      vite:
-        specifier: ^5.4.11
-        version: 5.4.21(@types/node@22.20.7)(sass@1.108.2)
-
-  packages/experimental:
-    dependencies:
-      '@gausszhou/litegui':
-        specifier: workspace:*
-        version: link:../litegui
-      '@gausszhou/litegui-core':
-        specifier: workspace:*
-        version: link:../core
     devDependencies:
       typescript:
         specifier: ^5.8.3
@@ -246,9 +227,6 @@ importers:
       '@gausszhou/litegui-core':
         specifier: workspace:*
         version: link:../core
-      '@gausszhou/litegui-experimental':
-        specifier: workspace:*
-        version: link:../experimental
     devDependencies:
       '@playwright/test':
         specifier: ^1.65.1

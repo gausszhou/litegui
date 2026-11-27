@@ -1,8 +1,7 @@
 // @ts-nocheck 示例页面沿用上游 litegui.js 的 JS 写法（隐式 any / 宽松回调），
 // 这里保留原样以便和上游示例对照；库本身仍按 strict 检查。
 import "@gausszhou/litegui/style.css";
-import LiteGUI from "@gausszhou/litegui";
-import { Inspector, Tree } from "@gausszhou/litegui-experimental";
+import LiteGUI, { Inspector, Tree } from "@gausszhou/litegui";
 
 let mainarea = null;
 let bottomPanel = null;

@@ -44,7 +44,7 @@ it("clicks", () => {
 ```
 
 覆盖率门槛在 `packages/tests/vite.config.ts`：statements/functions/lines ≥ 70%，branches ≥ 65%。
-`Inspector`/`Tree` 作为 experimental 暂不纳入覆盖率统计。
+`Inspector`/`Tree`（`packages/litegui/src/components/{Inspector,Tree}.ts`）作为 experimental 暂不纳入覆盖率统计。
 
 ## 端到端测试
 

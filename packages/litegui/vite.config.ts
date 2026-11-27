@@ -16,9 +16,11 @@ const entry = {
   list: resolve(__dirname, "src/entries/list.ts"),
   table: resolve(__dirname, "src/entries/table.ts"),
   console: resolve(__dirname, "src/entries/console.ts"),
+  inspector: resolve(__dirname, "src/entries/inspector.ts"),
+  tree: resolve(__dirname, "src/entries/tree.ts"),
 };
 
-// ESM 构建：core / lodash-es / mitt 外置，保证与 experimental 包共享同一份 core 实例。
+// ESM 构建：core / lodash-es / mitt 外置，保证 core 只有一份实例。
 export default defineConfig({
   build: {
     outDir: "dist",

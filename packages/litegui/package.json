@@ -26,7 +26,9 @@
     "./searchbox": "./src/entries/searchbox.ts",
     "./list": "./src/entries/list.ts",
     "./table": "./src/entries/table.ts",
-    "./console": "./src/entries/console.ts"
+    "./console": "./src/entries/console.ts",
+    "./inspector": "./src/entries/inspector.ts",
+    "./tree": "./src/entries/tree.ts"
   },
   "sideEffects": [
     "*.css"
@@ -109,6 +111,14 @@
       "./console": {
         "types": "./dist/types/entries/console.d.ts",
         "import": "./dist/entries/console.js"
+      },
+      "./inspector": {
+        "types": "./dist/types/entries/inspector.d.ts",
+        "import": "./dist/entries/inspector.js"
+      },
+      "./tree": {
+        "types": "./dist/types/entries/tree.d.ts",
+        "import": "./dist/entries/tree.js"
       }
     },
     "unpkg": "./dist/index.umd.cjs",
@@ -134,6 +144,8 @@
     "editor",
     "dialog",
     "panel",
-    "canvas"
+    "canvas",
+    "inspector",
+    "tree"
   ]
 }

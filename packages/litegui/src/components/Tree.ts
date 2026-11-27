@@ -31,7 +31,7 @@
 
 import { deprecate } from "@gausszhou/litegui-core";
 import { trigger } from "@gausszhou/litegui-core";
-import LiteGUI from "@gausszhou/litegui";
+import LiteGUI from "../litegui";
 
 /*********** LiteTree *****************************/
 interface TreeOptions {

@@ -12,8 +12,7 @@
   },
   "dependencies": {
     "@gausszhou/litegui": "workspace:*",
-    "@gausszhou/litegui-core": "workspace:*",
-    "@gausszhou/litegui-experimental": "workspace:*"
+    "@gausszhou/litegui-core": "workspace:*"
   },
   "devDependencies": {
     "typescript": "^5.8.3",

@@ -2,7 +2,7 @@
 
 > 无框架、原生 DOM + TypeScript 的桌面风格 Web UI 组件库。
 
-LiteGUI 面向编辑器、调试器、工具台这类需要菜单、面板、分栏、对话框、属性检查器、树和表格的 Web 应用。项目从 [jagenjo/litegui.js](https://github.com/jagenjo/litegui.js)（MIT）重构而来，并拆分为「core + 组件库 + experimental + 示例应用 + 文档站」的 pnpm monorepo。
+LiteGUI 面向编辑器、调试器、工具台这类需要菜单、面板、分栏、对话框、属性检查器、树和表格的 Web 应用。项目从 [jagenjo/litegui.js](https://github.com/jagenjo/litegui.js)（MIT）重构而来，并拆分为「core + 组件库 + 示例应用 + 文档站」的 pnpm monorepo。
 
 - 在线 Demo：https://gausszhou.github.io/litegui/demo/
 - 在线 Editor：https://gausszhou.github.io/litegui/editor/
@@ -15,8 +15,8 @@ LiteGUI 面向编辑器、调试器、工具台这类需要菜单、面板、分
 
 - **零框架依赖**：直接操作 DOM，可嵌入 React、Vue、Canvas/WebGL 编辑器或纯 HTML 页面。
 - **桌面式布局**：`Area` / `Panel` / `Split` / `Tabs` / `Dialog` / `Menu` 组合出工具台界面。
-- **稳定的核心 + 可选的 experimental**：13 个核心组件承诺 API 兼容；`Inspector`、`Tree` 单独成包，不拖累主包。
-- **可测试**：Vitest + jsdom 125 个用例（覆盖率约 72.8%），Playwright 覆盖 Chrome / Firefox。
+- **稳定的核心 + 标注的 experimental**：核心组件承诺 API 兼容；`Inspector`、`Tree`、`ContextMenu`、`Dragger`、`LineEditor`、`ComplexList` 同在 `@gausszhou/litegui` 内，但 API 标记为 experimental。
+- **可测试**：Vitest + jsdom 130 个用例（覆盖率约 73%），Playwright 覆盖 Chrome / Firefox。
 - **可交互文档**：18 个主入口组件各有独立页面，真实渲染 demo 与同源示例代码并存。
 - **可定制**：CSS 变量主题、亮/暗模式、按组件 ESM 子路径入口。
 - **monorepo**：pnpm workspace，按拓扑序构建；`publishConfig` 自动切换 `src` / `dist` 入口。
@@ -26,8 +26,7 @@ LiteGUI 面向编辑器、调试器、工具台这类需要菜单、面板、分
 | 路径 | 说明 |
 | --- | --- |
 | `packages/core` | `@gausszhou/litegui-core`：DOM 工具、事件总线、全局状态、`Widget` 基类、通用工具 |
-| `packages/litegui` | `@gausszhou/litegui`：18 个组件、`LiteGUI` 命名空间、13 个按组件入口、全局样式 |
-| `packages/experimental` | `@gausszhou/litegui-experimental`：`Inspector`、`Tree`（API 不稳定） |
+| `packages/litegui` | `@gausszhou/litegui`：全部 20 个组件（含 `Inspector`、`Tree`）、`LiteGUI` 命名空间、15 个按组件入口、全局样式 |
 | `packages/tests` | 私有：Vitest + jsdom、Playwright、Table 基准 |
 | `apps/demo` | 最小示例页 |
 | `apps/editor` | 综合示例：工具台、菜单、对话框、表格、树 |
@@ -67,8 +66,7 @@ area.split("horizontal", [240, null], true);
 ```ts
 import LiteGUI, { Table } from "@gausszhou/litegui";
 import { Button } from "@gausszhou/litegui/button";
-
-import { Inspector, Tree } from "@gausszhou/litegui-experimental";
+import { Inspector, Tree } from "@gausszhou/litegui";
 ```
 
 > 仓库内各包的 `main` / `types` 指向 `src`，方便 workspace 调试源码；`pnpm pack` /
@@ -80,7 +78,6 @@ import { Inspector, Tree } from "@gausszhou/litegui-experimental";
 | --- | --- | --- | --- | --- |
 | `@gausszhou/litegui-core` | `dist/index.js` | 复用 UMD | `dist/index.umd.cjs` | 无 |
 | `@gausszhou/litegui` | `dist/index.js` + `dist/entries/*.js` | `dist/index.cjs` | `dist/index.umd.cjs`（自包含） | `dist/style.css` |
-| `@gausszhou/litegui-experimental` | `dist/index.js` | `dist/index.cjs` | — | 复用主包样式 |
 
 ESM 与 CJS 构建都把 `@gausszhou/litegui-core` 外置，保证同一页面/进程内只有一份 core 实例；
 UMD 产物自包含，`<script src=".../index.umd.cjs">` 后 `window.LiteGUI` 即可使用。

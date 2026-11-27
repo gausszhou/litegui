@@ -22,10 +22,6 @@ export default defineConfig({
         replacement: join(packagesRoot, "core/src/index.ts"),
       },
       {
-        find: /^@gausszhou\/litegui-experimental$/,
-        replacement: join(packagesRoot, "experimental/src/index.ts"),
-      },
-      {
         find: /^@gausszhou\/litegui\/style\.css$/,
         replacement: join(packagesRoot, "litegui/src/styles/index.scss"),
       },
@@ -48,6 +44,10 @@ export default defineConfig({
       exclude: [
         "packages/litegui/src/entries/**",
         "packages/litegui/src/umd.ts",
+        // Inspector/Tree 仍为 experimental（@ts-nocheck + 上游 prototype 风格 API），
+        // 和拆分到独立包时期一样不纳入覆盖率统计。
+        "packages/litegui/src/components/Inspector.ts",
+        "packages/litegui/src/components/Tree.ts",
         "**/*.d.ts",
       ],
       reportsDirectory: join(repoRoot, "coverage"),
