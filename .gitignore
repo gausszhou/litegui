@@ -24,6 +24,7 @@ docs/.vitepress/dist
 docs/.vitepress/cache
 docs/.vitepress/temp
 docs/api
+docs/.vitepress/theme/generated/
 
 # test / build artifacts
 coverage

@@ -15,7 +15,7 @@ export default defineConfig({
   ignoreDeadLinks: true,
   head: [
     ["meta", { name: "theme-color", content: "#181818" }],
-    ["link", { rel: "icon", href: "/logo.svg" }]
+    ["link", { rel: "icon", href: `${base}logo.svg` }]
   ],
   themeConfig: {
     logo: "/logo.svg",
@@ -41,11 +41,50 @@ export default defineConfig({
       {
         text: "组件",
         items: [
-          { text: "组件概览", link: "/components" },
-          { text: "布局", link: "/components/layout" },
-          { text: "浮层", link: "/components/overlays" },
-          { text: "表单", link: "/components/forms" },
-          { text: "数据展示", link: "/components/data" }
+          { text: "组件总览", link: "/components" },
+          {
+            text: "布局",
+            collapsed: false,
+            items: [
+              { text: "Area", link: "/components/area" },
+              { text: "Box", link: "/components/box" },
+              { text: "Panel", link: "/components/panel" },
+              { text: "Split", link: "/components/split" },
+              { text: "Tabs", link: "/components/tabs" }
+            ]
+          },
+          {
+            text: "浮层",
+            collapsed: false,
+            items: [
+              { text: "Dialog", link: "/components/dialog" },
+              { text: "Menu", link: "/components/menu" },
+              { text: "ContextMenu", link: "/components/context-menu" }
+            ]
+          },
+          {
+            text: "表单",
+            collapsed: false,
+            items: [
+              { text: "Button", link: "/components/button" },
+              { text: "Checkbox", link: "/components/checkbox" },
+              { text: "Slider", link: "/components/slider" },
+              { text: "SearchBox", link: "/components/searchbox" },
+              { text: "Dragger", link: "/components/dragger" },
+              { text: "LineEditor", link: "/components/line-editor" }
+            ]
+          },
+          {
+            text: "数据展示",
+            collapsed: false,
+            items: [
+              { text: "List", link: "/components/list" },
+              { text: "ComplexList", link: "/components/complex-list" },
+              { text: "Table", link: "/components/table" },
+              { text: "Console", link: "/components/console" }
+            ]
+          },
+          { text: "实验性组件", link: "/experimental" }
         ]
       },
       {

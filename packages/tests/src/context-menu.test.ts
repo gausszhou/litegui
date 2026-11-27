@@ -54,3 +54,16 @@ describeSubmenu("ContextMenu submenu", () => {
     expectSubmenu(childCallback).toHaveBeenCalledTimes(1);
   });
 });
+
+describe("ContextMenu container", () => {
+  it("mounts into the provided container", () => {
+    const host = document.createElement("div");
+    document.body.appendChild(host);
+    const menu = new ContextMenu([{ title: "Rename" }], { left: 10, top: 10, container: host });
+
+    const menuRoot = host.querySelector(".litecontextmenu");
+    expect(menuRoot).not.toBeNull();
+    expect(menuRoot!.parentElement).toBe(host);
+    menu.close();
+  });
+});

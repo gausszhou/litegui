@@ -22,6 +22,8 @@ interface ContextMenuOptions {
     callback?: Function;
     ignore_item_callbacks?: boolean;
     autoopen?: boolean;
+    /** 菜单挂载的容器，默认 document.body；嵌入页面时传自己的容器即可 */
+    container?: HTMLElement;
 }
 
 export class ContextMenu {
@@ -130,7 +132,8 @@ export class ContextMenu {
         const rootDocument = options.event ?
             (options.event.target as Node)?.ownerDocument || document :
             document;
-        rootDocument.body.appendChild(root);
+        const mount = options.container || rootDocument.body;
+        mount.appendChild(root);
 
         // 计算位置
         this.computePosition();
@@ -241,7 +244,8 @@ export class ContextMenu {
                         parentMenu: that,
                         ignore_item_callbacks: item.submenu.ignore_item_callbacks,
                         title: item.submenu.title,
-                        autoopen: options.autoopen
+                        autoopen: options.autoopen,
+                        container: options.container
                     });
                     close_parent = false;
                 }

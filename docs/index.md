@@ -25,7 +25,7 @@ features:
   - title: 桌面式布局
     details: Area、Panel、Split、Tabs、Dialog、Menu，组合出工具台界面。
   - title: 可测试
-    details: Vitest + jsdom 120 个用例，Playwright 覆盖 Chrome/Firefox。
+    details: Vitest + jsdom 125 个用例，Playwright 覆盖 Chrome/Firefox。
   - title: 可定制
     details: CSS 变量主题、亮/暗模式、按组件 ESM 入口。
 ---

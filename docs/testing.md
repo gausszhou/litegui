@@ -48,7 +48,9 @@ it("clicks", () => {
 
 ## 端到端测试
 
-`packages/tests/e2e/pages.spec.ts` 覆盖 demo、editor、菜单、对话框、表格、Tabs 与移动端布局。
+`packages/tests/e2e/pages.spec.ts` 覆盖 demo、editor、菜单、对话框、表格、Tabs 与移动端布局；
+`packages/tests/e2e/docs.spec.ts` 逐个加载文档站的 18 个组件页，确认 demo 挂载、无运行时错误，
+并校验画廊数量、二级菜单对齐与对话框容器。
 demo 与 editor 各自是独立 app，Playwright 会依次启动两个 dev server（5173 / 5174）。
 使用系统 Chrome，并需要下载 Firefox：
 

@@ -14,6 +14,9 @@
 
 ### Added
 
+- 文档站：18 个主入口组件各有独立页面，包含可交互的真实渲染 demo 与 `<<<` 同源示例代码；
+  演示样式由构建期生成并加 `.lg-demo` 前缀，避免污染文档站。
+- `Menu`、`ContextMenu` 新增 `container` 选项，可把浮层挂到指定容器（文档 demo 与嵌入式使用）。
 - ESLint flat config、Typedoc 生成的 API 文档。
 - `pnpm size` / `pnpm verify-umd` / `pnpm verify-pack` / `pnpm pages:build` 脚本与 `shells/` 手动发布入口。
 - CI 增加 lint、coverage、体积、UMD 与 tarball 校验、Chrome/Firefox e2e，并在 master 通过后自动发布 gh-pages。

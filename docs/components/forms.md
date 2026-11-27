@@ -1,58 +1,17 @@
 ---
 title: 表单
-description: Button、Checkbox、Slider、SearchBox 与 Dragger
+description: Button / Checkbox / Slider / SearchBox / Dragger / LineEditor
 ---
 
 # 表单
 
-## Button
+| 组件 | 说明 |
+| --- | --- |
+| [Button](/components/button) | 按钮 |
+| [Checkbox](/components/checkbox) | 复选框 |
+| [Slider](/components/slider) | 滑块 |
+| [SearchBox](/components/searchbox) | 搜索输入框 |
+| [Dragger](/components/dragger) | 可拖拽数值输入 |
+| [LineEditor](/components/line-editor) | 曲线 / 关键点编辑器 |
 
-```ts
-const button = new LiteGUI.Button("Save", {
-  callback: () => console.log("saved")
-});
-panel.add(button);
-```
-
-`Button` 会触发 `click` 事件，同时调用 `options.callback`。
-
-## Checkbox
-
-```ts
-const checkbox = new LiteGUI.Checkbox(true, {
-  onChange: (value) => console.log(value)
-});
-panel.add(checkbox);
-```
-
-支持点击与 Space/Enter，`role="checkbox"`、`aria-checked` 自动同步。
-
-## Slider
-
-```ts
-const slider = new LiteGUI.Slider(0.5, { min: 0, max: 1, step: 0.01 });
-slider.onChange = (value) => console.log(value);
-panel.add(slider.root);
-```
-
-支持鼠标拖动、方向键、Home/End，并维护 `aria-valuenow`。
-
-## SearchBox
-
-```ts
-const search = new LiteGUI.SearchBox("", {
-  placeholder: "Search",
-  callback: (value) => console.log(value)
-});
-panel.add(search.root);
-```
-
-## Dragger
-
-```ts
-const number = new LiteGUI.Dragger(1.5, { min: 0, max: 10, precision: 2 });
-number.on("change", () => console.log(number.getValue()));
-panel.add(number.root);
-```
-
-> `Dragger`、`LineEditor` 属于 experimental。
+值类组件统一提供 `getValue()` / `setValue()`，通过 `onChange`、`callback` 或实例事件通知变化。

@@ -11,6 +11,8 @@ const MENU_PANEL_ITEM_CLASS_NAME = "lite-menu-panel-item";
 interface MenuOptions {
   auto_open?: boolean;
   sort_entries?: boolean;
+  /** 菜单面板挂载的容器，默认 getRoot()；嵌入页面时传自己的容器即可 */
+  container?: HTMLElement;
 }
 
 interface MenuSeparator {
@@ -75,6 +77,7 @@ export class Menu {
   sort_entries: boolean = false;
   closing_by_leave: any = null; // Timer
   static closing_time = 500;
+  container?: HTMLElement;
 
   currentMainMenuItem: MenuItem | null = null;
 
@@ -95,6 +98,7 @@ export class Menu {
     this.is_open = false;
     this.auto_open = options.auto_open || false;
     this.sort_entries = options.sort_entries || false;
+    this.container = options.container;
   }
 
   /**
@@ -404,7 +408,7 @@ export class Menu {
     // 先挂载再测量：子菜单要按父项的实际位置和面板的实际尺寸对齐
     $menu_panel.style.visibility = "hidden";
     this.panels.push($menu_panel);
-    getRoot().appendChild($menu_panel);
+    (this.container || getRoot()).appendChild($menu_panel);
 
     this.positionPanel($menu_panel, root, is_submenu);
     $menu_panel.style.visibility = "";

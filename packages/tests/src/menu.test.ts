@@ -120,8 +120,8 @@ describe("Menu positioning", () => {
   });
 
   it("flips the submenu left and keeps it inside a narrow viewport", () => {
-    vi.spyOn(document.documentElement, "clientWidth", "get").mockReturnValue(320);
-    vi.spyOn(document.documentElement, "clientHeight", "get").mockReturnValue(400);
+    vi.stubGlobal("innerWidth", 320);
+    vi.stubGlobal("innerHeight", 400);
 
     const menu = new Menu("main");
     const anchor = document.createElement("p");
@@ -133,6 +133,8 @@ describe("Menu positioning", () => {
 
     expect(panel.style.left).toBe("71px");
     expect(panel.style.top).toBe("306px");
+
+    vi.unstubAllGlobals();
   });
 
   it("closes panels at the target level and deeper", () => {
@@ -151,5 +153,21 @@ describe("Menu positioning", () => {
     expect(panels[1].isConnected).toBe(false);
     expect(panels[2].isConnected).toBe(false);
     expect(menu.panels).toHaveLength(1);
+  });
+});
+
+describe("Menu container", () => {
+  it("mounts panels into the provided container", () => {
+    const host = document.createElement("div");
+    document.body.appendChild(host);
+    const menu = new Menu("main", { container: host });
+    menu.add("File/New");
+    document.body.appendChild(menu.root);
+
+    menu.root.querySelector<HTMLElement>(".lite-menu-item")?.click();
+
+    const panel = host.querySelector(".lite-menu-panel");
+    expect(panel).not.toBeNull();
+    expect(panel!.parentElement).toBe(host);
   });
 });

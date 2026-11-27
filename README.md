@@ -16,7 +16,8 @@ LiteGUI 面向编辑器、调试器、工具台这类需要菜单、面板、分
 - **零框架依赖**：直接操作 DOM，可嵌入 React、Vue、Canvas/WebGL 编辑器或纯 HTML 页面。
 - **桌面式布局**：`Area` / `Panel` / `Split` / `Tabs` / `Dialog` / `Menu` 组合出工具台界面。
 - **稳定的核心 + 可选的 experimental**：13 个核心组件承诺 API 兼容；`Inspector`、`Tree` 单独成包，不拖累主包。
-- **可测试**：Vitest + jsdom 120 个用例（覆盖率约 72.8%），Playwright 覆盖 Chrome / Firefox。
+- **可测试**：Vitest + jsdom 125 个用例（覆盖率约 72.8%），Playwright 覆盖 Chrome / Firefox。
+- **可交互文档**：18 个主入口组件各有独立页面，真实渲染 demo 与同源示例代码并存。
 - **可定制**：CSS 变量主题、亮/暗模式、按组件 ESM 子路径入口。
 - **monorepo**：pnpm workspace，按拓扑序构建；`publishConfig` 自动切换 `src` / `dist` 入口。
 

@@ -31,3 +31,163 @@
 .vp-doc code {
   white-space: pre-wrap;
 }
+
+/* ------------------------------------------------------------------
+ * 组件 demo 容器
+ * 生成样式见 docs/.vitepress/theme/generated/litegui-demo.css（.lg-demo 前缀）
+ * ------------------------------------------------------------------ */
+.lg-demo-block {
+  margin: 24px 0;
+}
+
+.lg-demo-title {
+  margin-bottom: 8px;
+  font-weight: 600;
+  color: var(--vp-c-text-1);
+}
+
+.lg-demo {
+  position: relative;
+  padding: 16px;
+  border: 1px solid var(--vp-c-divider);
+  border-radius: 8px;
+  background: var(--lg-color-bg);
+  color: var(--lg-color-text);
+  font-family: var(--lg-font);
+}
+
+.lg-demo-loading,
+.lg-demo-error {
+  margin: 0;
+  font-size: 13px;
+  color: var(--lg-color-text-muted);
+}
+
+.lg-demo-error {
+  color: #e06c75;
+}
+
+/* demo 内部通用布局工具类（demo 组件运行时装 DOM，不能用 scoped 样式） */
+.doc-demo {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.doc-demo-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+}
+
+.doc-demo-hint {
+  margin: 0;
+  font-size: 13px;
+  color: var(--lg-color-text-muted);
+}
+
+.doc-demo-host {
+  width: 100%;
+  min-height: 40px;
+}
+
+.doc-demo-dialog-host {
+  position: relative;
+  height: 260px;
+}
+
+.doc-pane {
+  padding: 12px;
+  font-size: 13px;
+  color: var(--lg-color-text);
+}
+
+.doc-demo-area-host {
+  height: 200px;
+}
+
+.doc-demo-split-host {
+  height: 160px;
+}
+
+.doc-demo-slider-host {
+  width: 280px;
+  padding-top: 6px;
+}
+
+.doc-demo-list-host {
+  width: 240px;
+}
+
+.doc-demo-table-host {
+  overflow: auto;
+}
+
+.doc-demo-canvas-host {
+  width: 100%;
+  overflow: auto;
+}
+
+.doc-demo-console-host {
+  height: 220px;
+}
+
+.doc-demo-menu-host {
+  min-height: 150px;
+}
+
+.doc-context-target {
+  display: grid;
+  place-items: center;
+  height: 110px;
+  border: 1px dashed var(--vp-c-divider);
+  border-radius: 6px;
+  color: var(--lg-color-text-muted);
+  font-size: 13px;
+  user-select: none;
+}
+
+/* 组件总览画廊 */
+.component-group {
+  margin-top: 28px;
+}
+
+.component-group h2 {
+  margin: 0 0 12px;
+  border-top: none;
+  padding-top: 0;
+}
+
+.component-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 12px;
+}
+
+.component-card {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 14px 16px;
+  border: 1px solid var(--vp-c-divider);
+  border-radius: 8px;
+  color: inherit;
+  text-decoration: none;
+  transition: border-color 0.2s, transform 0.2s;
+}
+
+.component-card:hover {
+  border-color: var(--vp-c-brand-1);
+  transform: translateY(-2px);
+}
+
+.component-card strong {
+  color: var(--vp-c-brand-1);
+  font-size: 15px;
+}
+
+.component-card span {
+  color: var(--vp-c-text-2);
+  font-size: 13px;
+}
