@@ -19,21 +19,25 @@ export default defineConfig({
     alias: [
       {
         find: /^@gausszhou\/litegui-core$/,
-        replacement: join(packagesRoot, "core/src/index.ts"),
+        replacement: join(packagesRoot, "core/src/index.ts")
       },
       {
-        find: /^@gausszhou\/litegui\/style\.css$/,
-        replacement: join(packagesRoot, "litegui/src/styles/index.scss"),
+        find: /^@gausszhou\/litegui-components\/style\.css$/,
+        replacement: join(packagesRoot, "components/src/styles/index.scss")
+      },
+      {
+        find: /^@gausszhou\/litegui-vue$/,
+        replacement: join(packagesRoot, "vue/src/index.ts")
       },
       {
         find: /^@gausszhou\/litegui-elements$/,
-        replacement: join(packagesRoot, "elements/src/index.ts"),
+        replacement: join(packagesRoot, "elements/src/index.ts")
       },
       {
-        find: /^@gausszhou\/litegui$/,
-        replacement: join(packagesRoot, "litegui/src/index.ts"),
-      },
-    ],
+        find: /^@gausszhou\/litegui-components$/,
+        replacement: join(packagesRoot, "components/src/index.ts")
+      }
+    ]
   },
   test: {
     environment: "jsdom",
@@ -48,6 +52,7 @@ export default defineConfig({
         "packages/core/src/**/*.ts",
         "packages/components/src/**/*.ts",
         "packages/elements/src/**/*.ts",
+        "packages/vue/src/**/*.ts"
       ],
       exclude: [
         "packages/components/src/entries/**",
@@ -56,15 +61,15 @@ export default defineConfig({
         // 和拆分到独立包时期一样不纳入覆盖率统计。
         "packages/components/src/components/Inspector.ts",
         "packages/components/src/components/Tree.ts",
-        "**/*.d.ts",
+        "**/*.d.ts"
       ],
       reportsDirectory: join(repoRoot, "coverage"),
       thresholds: {
         statements: 70,
         branches: 65,
         functions: 70,
-        lines: 70,
-      },
-    } as any,
-  },
+        lines: 70
+      }
+    } as any
+  }
 });

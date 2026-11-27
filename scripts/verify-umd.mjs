@@ -9,7 +9,7 @@ const packagesDir = join(root, "packages");
 
 const sandbox = { console, window: {} };
 const context = vm.createContext(sandbox);
-const run = (file) => vm.runInContext(readFileSync(file, "utf8"), context, { filename: file });
+const run = file => vm.runInContext(readFileSync(file, "utf8"), context, { filename: file });
 const failures = [];
 
 run(join(packagesDir, "core/dist/index.umd.cjs"));
@@ -23,7 +23,7 @@ if (!core) {
   console.log(`core UMD: LiteGUICore exposes ${Object.keys(core).length} exports`);
 }
 
-run(join(packagesDir, "litegui/dist/index.umd.cjs"));
+run(join(packagesDir, "components/dist/index.umd.cjs"));
 const LiteGUI = sandbox.LiteGUI;
 if (typeof LiteGUI !== "function") {
   failures.push("litegui UMD 未挂载 window.LiteGUI 构造函数");
@@ -41,7 +41,14 @@ if (!elements) {
 } else {
   if (typeof elements.defineElements !== "function") failures.push("elements UMD 缺少 defineElements");
   const tags = Object.keys(elements.ELEMENT_TAGS ?? {});
-  for (const tag of ["litegui-button", "litegui-checkbox", "litegui-panel", "litegui-dialog", "litegui-menu", "litegui-menu-item"]) {
+  for (const tag of [
+    "litegui-button",
+    "litegui-checkbox",
+    "litegui-panel",
+    "litegui-dialog",
+    "litegui-menu",
+    "litegui-menu-item"
+  ]) {
     if (!tags.includes(tag)) failures.push(`elements UMD 缺少 ${tag}`);
   }
   console.log(`elements UMD: ${tags.length} 个自定义元素`);
