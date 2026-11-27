@@ -17,7 +17,7 @@ LiteGUI 使用 [Semantic Versioning](https://semver.org/)：
 - 组件暴露 `root: HTMLElement`；
 - 值类组件提供 `getValue()` / `setValue()`；
 - 构造函数优先接收 options 对象；
-- 样式通过 `litegui/style.css` 或子路径 `litegui/<component>` 引入。
+- 样式通过 `@gausszhou/litegui/style.css` 或子路径 `@gausszhou/litegui/<component>` 引入。
 
 ## Experimental
 

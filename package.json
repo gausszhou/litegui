@@ -1,123 +1,45 @@
 {
-  "name": "litegui",
-  "private": false,
+  "name": "litegui-monorepo",
   "version": "1.0.1",
+  "private": true,
   "type": "module",
-  "files": [
-    "lib"
-  ],
-  "main": "./lib/litegui.umd.cjs",
-  "module": "./lib/litegui.esm.js",
-  "exports": {
-    ".": {
-      "types": "./lib/types/index.d.ts",
-      "import": "./lib/litegui.esm.js",
-      "require": "./lib/litegui.umd.cjs"
-    },
-    "./style.css": "./lib/litegui.css",
-    "./package.json": "./package.json",
-    "./area": {
-      "types": "./lib/types/entries/area.d.ts",
-      "import": "./lib/entries/area.js"
-    },
-    "./panel": {
-      "types": "./lib/types/entries/panel.d.ts",
-      "import": "./lib/entries/panel.js"
-    },
-    "./split": {
-      "types": "./lib/types/entries/split.d.ts",
-      "import": "./lib/entries/split.js"
-    },
-    "./tabs": {
-      "types": "./lib/types/entries/tabs.d.ts",
-      "import": "./lib/entries/tabs.js"
-    },
-    "./dialog": {
-      "types": "./lib/types/entries/dialog.d.ts",
-      "import": "./lib/entries/dialog.js"
-    },
-    "./menu": {
-      "types": "./lib/types/entries/menu.d.ts",
-      "import": "./lib/entries/menu.js"
-    },
-    "./button": {
-      "types": "./lib/types/entries/button.d.ts",
-      "import": "./lib/entries/button.js"
-    },
-    "./checkbox": {
-      "types": "./lib/types/entries/checkbox.d.ts",
-      "import": "./lib/entries/checkbox.js"
-    },
-    "./slider": {
-      "types": "./lib/types/entries/slider.d.ts",
-      "import": "./lib/entries/slider.js"
-    },
-    "./searchbox": {
-      "types": "./lib/types/entries/searchbox.d.ts",
-      "import": "./lib/entries/searchbox.js"
-    },
-    "./list": {
-      "types": "./lib/types/entries/list.d.ts",
-      "import": "./lib/entries/list.js"
-    },
-    "./table": {
-      "types": "./lib/types/entries/table.d.ts",
-      "import": "./lib/entries/table.js"
-    },
-    "./console": {
-      "types": "./lib/types/entries/console.d.ts",
-      "import": "./lib/entries/console.js"
-    },
-    "./experimental": {
-      "types": "./lib/types/experimental.d.ts",
-      "import": "./lib/experimental.esm.js"
-    }
+  "description": "LiteGUI monorepo: framework-free desktop-style Web UI library",
+  "packageManager": "pnpm@12.3.4",
+  "engines": {
+    "node": ">=20"
   },
   "scripts": {
-    "dev": "vite",
-    "build": "npm run typecheck && npm run build:lib && npm run build:pages",
-    "build:lib": "rollup -c rollup.config.js && tsc -p tsconfig.build.json",
-    "build:pages": "vite build --base=/litegui/",
-    "lib": "npm run build:lib",
-    "format": "prettier --write src/**/*.{js,ts,css,scss}",
-    "preview": "vite preview",
-    "typecheck": "tsc --noEmit",
-    "test": "vitest run",
-    "test:watch": "vitest",
-    "docs:dev": "vitepress dev docs",
-    "docs:build": "vitepress build docs",
-    "docs:preview": "vitepress preview docs",
-    "bench": "vitest bench --run",
-    "test:e2e": "playwright test",
-    "test:coverage": "vitest run --coverage"
+    "build": "pnpm -r build",
+    "dev": "pnpm --filter @gausszhou/litegui-demo dev",
+    "dev:editor": "pnpm --filter @gausszhou/litegui-editor dev",
+    "typecheck": "pnpm -r typecheck",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "format": "prettier --write \"packages/**/*.{ts,scss}\" \"apps/**/*.{ts,js,css,html}\"",
+    "test": "pnpm -r test",
+    "test:watch": "pnpm --filter @gausszhou/litegui-tests test:watch",
+    "test:coverage": "pnpm --filter @gausszhou/litegui-tests coverage",
+    "test:e2e": "pnpm --filter @gausszhou/litegui-tests e2e",
+    "bench": "pnpm --filter @gausszhou/litegui-tests bench",
+    "size": "node scripts/size-report.mjs",
+    "verify-pack": "node scripts/verify-pack.mjs",
+    "verify-umd": "node scripts/verify-umd.mjs",
+    "docs:dev": "pnpm docs:api && vitepress dev docs --port 5178",
+    "docs:build": "pnpm docs:api && vitepress build docs",
+    "docs:serve": "vitepress serve docs",
+    "docs:api": "typedoc",
+    "pages:build": "node scripts/build-pages.mjs",
+    "remove": "rm -rf packages/*/dist packages/*/node_modules apps/*/node_modules apps/*/dist"
   },
   "devDependencies": {
-    "@playwright/test": "^1.65.1",
-    "@rollup/plugin-typescript": "^8.5.0",
-    "@types/lodash-es": "^4.17.12",
-    "@types/node": "^22.10.2",
-    "@vitest/coverage-v8": "^2.1.8",
-    "jsdom": "^25.0.1",
-    "postcss": "^8.4.49",
+    "@eslint/js": "^10.0.1",
+    "eslint": "^10.15.0",
+    "globals": "^17.14.0",
     "prettier": "^2.8.8",
-    "rollup": "^2.79.2",
-    "rollup-plugin-postcss": "^4.0.2",
-    "sass": "^1.83.4",
-    "tslib": "^2.8.1",
+    "typedoc": "0.28.20",
+    "typedoc-plugin-markdown": "4.14.1",
     "typescript": "^5.8.3",
-    "vite": "^5.4.11",
-    "vitepress": "^1.6.3",
-    "vitest": "^2.1.8"
-  },
-  "dependencies": {
-    "lodash-es": "^4.17.21",
-    "mitt": "^3.0.0"
-  },
-  "types": "./lib/types/index.d.ts",
-  "sideEffects": [
-    "*.css",
-    "**/*.css",
-    "**/*.scss"
-  ],
-  "license": "MIT"
+    "typescript-eslint": "^8.74.0",
+    "vitepress": "^1.6.3"
+  }
 }

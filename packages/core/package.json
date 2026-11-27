@@ -1,0 +1,60 @@
+{
+  "name": "@gausszhou/litegui-core",
+  "version": "1.0.1",
+  "description": "LiteGUI core: DOM helpers, event bus, global state, widget base and shared utilities",
+  "type": "module",
+  "private": false,
+  "main": "./src/index.ts",
+  "module": "./src/index.ts",
+  "types": "./src/index.ts",
+  "files": [
+    "dist"
+  ],
+  "exports": {
+    ".": "./src/index.ts",
+    "./package.json": "./package.json"
+  },
+  "sideEffects": false,
+  "scripts": {
+    "build": "vite build && tsc -p tsconfig.json --emitDeclarationOnly --declaration",
+    "typecheck": "tsc -p tsconfig.json --noEmit"
+  },
+  "dependencies": {
+    "mitt": "^3.0.0"
+  },
+  "devDependencies": {
+    "typescript": "^5.8.3",
+    "vite": "^5.4.11"
+  },
+  "publishConfig": {
+    "main": "./dist/index.umd.cjs",
+    "module": "./dist/index.js",
+    "types": "./dist/types/index.d.ts",
+    "exports": {
+      ".": {
+        "types": "./dist/types/index.d.ts",
+        "import": "./dist/index.js",
+        "require": "./dist/index.umd.cjs"
+      },
+      "./package.json": "./package.json"
+    }
+  },
+  "license": "MIT",
+  "author": "Gauss Zhou <gausszhou@qq.com>",
+  "homepage": "https://gausszhou.github.io/litegui/",
+  "bugs": {
+    "url": "https://github.com/gausszhou/litegui/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/gausszhou/litegui.git",
+    "directory": "packages/core"
+  },
+  "keywords": [
+    "litegui",
+    "dom",
+    "ui",
+    "desktop",
+    "core"
+  ]
+}

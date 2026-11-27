@@ -1,5 +1,28 @@
 # Changelog
 
+## Unreleased（monorepo 改造）
+
+### Changed
+
+- 仓库改为 pnpm monorepo：`packages/{core,litegui,experimental,tests}` + `apps/{demo,editor}`。
+- 包名：`litegui` → `@gausszhou/litegui`；`litegui/experimental` → `@gausszhou/litegui-experimental`；
+  新增 `@gausszhou/litegui-core`（DOM 工具、事件总线、全局状态、`Widget` 基类、通用工具）。
+- 构建产物从根目录 `lib/` 改为各包的 `dist/`；仓库脚本改用 pnpm（`pnpm build` / `pnpm test` 等）。
+- `@gausszhou/litegui` 新增组件命名导出（`import LiteGUI, { Table } from "@gausszhou/litegui"`）；
+  默认导出与 13 个按组件子路径保持不变。
+- UMD 产物仍是自包含单文件，`window.LiteGUI` 用法不变；新增 `dist/index.cjs` 供 `require` 使用（外置 core）。
+
+### Added
+
+- ESLint flat config、Typedoc 生成的 API 文档。
+- `pnpm size` / `pnpm verify-umd` / `pnpm verify-pack` / `pnpm pages:build` 脚本与 `shells/` 手动发布入口。
+- CI 增加 lint、coverage、体积、UMD 与 tarball 校验、Chrome/Firefox e2e，并在 master 通过后自动发布 gh-pages。
+
+### Removed
+
+- 根 `rollup.config.js`、`vite.config.js`、`package-lock.json`、旧 `lib/` 构建链。
+- `src/types/*.d.ts` 中未被引用的遗留类型声明（`LiteGUIInstance` 等）。
+
 ## 1.0.1 (2026-11-27)
 
 测试与交互修复版本。

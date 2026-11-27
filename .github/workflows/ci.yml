@@ -1,27 +1,102 @@
 name: CI
 
+permissions:
+  contents: read
+
 on:
   push:
-    branches: [master, develop]
+    branches: [master]
   pull_request:
-    branches: [master, develop]
+  workflow_dispatch:
 
 jobs:
-  verify:
+  check:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
 
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 12.3.4
+
       - uses: actions/setup-node@v4
         with:
           node-version: 22
-          cache: npm
+          cache: pnpm
 
-      - run: npm ci
-      - run: npm run typecheck
-      - run: npm run test:coverage
-      - run: npm run build
-      - run: npm run docs:build
-      - run: npx playwright install --with-deps firefox
-      - run: npm run test:e2e
-      - run: npm pack --dry-run
+      - name: Install
+        run: pnpm install --frozen-lockfile
+
+      - name: Lint
+        run: pnpm lint
+
+      - name: Typecheck
+        run: pnpm typecheck
+
+      - name: Test
+        run: pnpm test
+
+      - name: Coverage
+        run: pnpm test:coverage
+
+      - name: Build
+        run: pnpm build
+
+      - name: Bundle size
+        run: pnpm size
+
+      - name: UMD smoke test
+        run: pnpm verify-umd
+
+      - name: Verify publish tarballs
+        run: pnpm verify-pack
+
+      - name: Install Playwright Firefox
+        run: pnpm --filter @gausszhou/litegui-tests exec playwright install --with-deps firefox
+
+      - name: E2E (Chrome + Firefox)
+        run: pnpm test:e2e
+
+      - name: Docs build
+        run: pnpm docs:build
+
+  deploy:
+    # 只在 master 上的 push / 手动触发时发布，且必须等 check 全绿
+    if: github.event_name != 'pull_request' && github.ref == 'refs/heads/master'
+    needs: check
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    permissions:
+      contents: write
+    concurrency:
+      group: pages-deploy
+      cancel-in-progress: false
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 12.3.4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - name: Install
+        run: pnpm install --frozen-lockfile
+
+      - name: Build Pages artifacts (demo + editor + docs + landing page)
+        run: pnpm pages:build
+
+      - name: Publish to gh-pages
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          cd dist
+          git init -b gh-pages
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git commit -m "deploy: ${GITHUB_SHA}"
+          git push --force "https://x-access-token:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git" gh-pages

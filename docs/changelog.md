@@ -5,6 +5,15 @@ description: LiteGUI 版本变更
 
 # 更新日志
 
+## Unreleased
+
+monorepo 改造：
+
+- pnpm workspace：`packages/{core,litegui,experimental,tests}` + `apps/{demo,editor}`
+- 包名改为 `@gausszhou/litegui`、`@gausszhou/litegui-core`、`@gausszhou/litegui-experimental`
+- 产物从 `lib/` 改为各包 `dist/`；新增 ESLint、Typedoc API、size / verify-pack / pages 脚本
+- 主包新增组件命名导出，UMD 仍为自包含单文件
+
 ## 1.0.1
 
 测试与交互修复：
@@ -18,7 +27,7 @@ description: LiteGUI 版本变更
 
 ## 1.0.0
 
-- Inspector/Tree 拆分到 `litegui/experimental`
+- Inspector/Tree 拆分到 `@gausszhou/litegui-experimental`
 - HTML 安全默认值、escapeHTML、Table allowHTML
 - API 稳定性与弃用策略
 - Playwright Chrome/Firefox

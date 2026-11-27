@@ -10,7 +10,7 @@ LiteGUI 使用 CSS 变量作为主题 token，默认暗色；在 `<html>` 上设
 ## 切换主题
 
 ```ts
-import LiteGUI from "litegui";
+import LiteGUI from "@gausszhou/litegui";
 
 LiteGUI.setTheme("light");
 LiteGUI.getTheme(); // "light"
@@ -27,7 +27,7 @@ LiteGUI.init({
 
 ## 变量
 
-主题变量定义在 `src/styles/theme.scss`，构建后位于 `litegui/style.css`：
+主题变量定义在 `packages/litegui/src/styles/theme.scss`，构建后位于 `@gausszhou/litegui/style.css`：
 
 | 变量 | 用途 |
 | --- | --- |

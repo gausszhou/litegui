@@ -1,0 +1,30 @@
+{
+  "name": "@gausszhou/litegui-tests",
+  "version": "1.0.1",
+  "private": true,
+  "type": "module",
+  "description": "LiteGUI unit, integration and browser tests",
+  "scripts": {
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "coverage": "vitest run --coverage",
+    "bench": "vitest bench --run",
+    "e2e": "playwright test",
+    "e2e:install": "playwright install firefox",
+    "typecheck": "tsc -p tsconfig.json --noEmit"
+  },
+  "dependencies": {
+    "@gausszhou/litegui": "workspace:*",
+    "@gausszhou/litegui-core": "workspace:*",
+    "@gausszhou/litegui-experimental": "workspace:*"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.65.1",
+    "@types/node": "^22.10.2",
+    "@vitest/coverage-v8": "^2.1.8",
+    "jsdom": "^25.0.1",
+    "typescript": "^5.8.3",
+    "vite": "^5.4.11",
+    "vitest": "^2.1.8"
+  }
+}

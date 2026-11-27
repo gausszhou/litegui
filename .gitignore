@@ -7,18 +7,34 @@ yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
 
-node_modules
+# build output
 dist
 dist-ssr
 lib
+build
+node_modules
 *.local
 
-.vitepress/dist
-docs/.vitepress/dist
-.vitepress/cache
-docs/.vitepress/cache
-.vitepress/temp
+# deps lock（pnpm-lock.yaml 入库）
+package-lock.json
+yarn.lock
 
+# docs
+docs/.vitepress/dist
+docs/.vitepress/cache
+docs/.vitepress/temp
+docs/api
+
+# test / build artifacts
+coverage
+*.tsbuildinfo
+
+# demo smoke screenshots
+artifacts
+
+# playwright
+test-results
+playwright-report
 
 # Editor directories and files
 .vscode/*
@@ -30,15 +46,3 @@ docs/.vitepress/cache
 *.njsproj
 *.sln
 *.sw?
-
-# locks
-yarn.lock
-pnpm-lock.yaml
-
-# test / build artifacts
-coverage
-*.tsbuildinfo
-
-# playwright
-test-results
-playwright-report

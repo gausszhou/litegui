@@ -1,0 +1,22 @@
+{
+  "name": "@gausszhou/litegui-editor",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Comprehensive LiteGUI editor-style demo page",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc --noEmit && vite build",
+    "preview": "vite preview",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@gausszhou/litegui": "workspace:*",
+    "@gausszhou/litegui-core": "workspace:*",
+    "@gausszhou/litegui-experimental": "workspace:*"
+  },
+  "devDependencies": {
+    "typescript": "^5.8.3",
+    "vite": "^5.4.11"
+  }
+}

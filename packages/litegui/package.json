@@ -1,0 +1,139 @@
+{
+  "name": "@gausszhou/litegui",
+  "version": "1.0.1",
+  "description": "Framework-free desktop-style Web UI components built on native DOM + TypeScript",
+  "type": "module",
+  "private": false,
+  "main": "./src/index.ts",
+  "module": "./src/index.ts",
+  "types": "./src/index.ts",
+  "files": [
+    "dist"
+  ],
+  "exports": {
+    ".": "./src/index.ts",
+    "./style.css": "./src/styles/index.scss",
+    "./package.json": "./package.json",
+    "./area": "./src/entries/area.ts",
+    "./panel": "./src/entries/panel.ts",
+    "./split": "./src/entries/split.ts",
+    "./tabs": "./src/entries/tabs.ts",
+    "./dialog": "./src/entries/dialog.ts",
+    "./menu": "./src/entries/menu.ts",
+    "./button": "./src/entries/button.ts",
+    "./checkbox": "./src/entries/checkbox.ts",
+    "./slider": "./src/entries/slider.ts",
+    "./searchbox": "./src/entries/searchbox.ts",
+    "./list": "./src/entries/list.ts",
+    "./table": "./src/entries/table.ts",
+    "./console": "./src/entries/console.ts"
+  },
+  "sideEffects": [
+    "*.css"
+  ],
+  "scripts": {
+    "build": "vite build && vite build --config vite.cjs.config.ts && vite build --config vite.umd.config.ts && sass src/styles/index.scss dist/style.css --no-source-map && tsc -p tsconfig.json --emitDeclarationOnly --declaration",
+    "typecheck": "tsc -p tsconfig.json --noEmit"
+  },
+  "dependencies": {
+    "@gausszhou/litegui-core": "workspace:*",
+    "lodash-es": "^4.17.21",
+    "mitt": "^3.0.0"
+  },
+  "devDependencies": {
+    "@types/lodash-es": "^4.17.12",
+    "sass": "^1.83.4",
+    "typescript": "^5.8.3",
+    "vite": "^5.4.11"
+  },
+  "publishConfig": {
+    "main": "./dist/index.cjs",
+    "module": "./dist/index.js",
+    "types": "./dist/types/index.d.ts",
+    "exports": {
+      ".": {
+        "types": "./dist/types/index.d.ts",
+        "import": "./dist/index.js",
+        "require": "./dist/index.cjs"
+      },
+      "./style.css": "./dist/style.css",
+      "./package.json": "./package.json",
+      "./area": {
+        "types": "./dist/types/entries/area.d.ts",
+        "import": "./dist/entries/area.js"
+      },
+      "./panel": {
+        "types": "./dist/types/entries/panel.d.ts",
+        "import": "./dist/entries/panel.js"
+      },
+      "./split": {
+        "types": "./dist/types/entries/split.d.ts",
+        "import": "./dist/entries/split.js"
+      },
+      "./tabs": {
+        "types": "./dist/types/entries/tabs.d.ts",
+        "import": "./dist/entries/tabs.js"
+      },
+      "./dialog": {
+        "types": "./dist/types/entries/dialog.d.ts",
+        "import": "./dist/entries/dialog.js"
+      },
+      "./menu": {
+        "types": "./dist/types/entries/menu.d.ts",
+        "import": "./dist/entries/menu.js"
+      },
+      "./button": {
+        "types": "./dist/types/entries/button.d.ts",
+        "import": "./dist/entries/button.js"
+      },
+      "./checkbox": {
+        "types": "./dist/types/entries/checkbox.d.ts",
+        "import": "./dist/entries/checkbox.js"
+      },
+      "./slider": {
+        "types": "./dist/types/entries/slider.d.ts",
+        "import": "./dist/entries/slider.js"
+      },
+      "./searchbox": {
+        "types": "./dist/types/entries/searchbox.d.ts",
+        "import": "./dist/entries/searchbox.js"
+      },
+      "./list": {
+        "types": "./dist/types/entries/list.d.ts",
+        "import": "./dist/entries/list.js"
+      },
+      "./table": {
+        "types": "./dist/types/entries/table.d.ts",
+        "import": "./dist/entries/table.js"
+      },
+      "./console": {
+        "types": "./dist/types/entries/console.d.ts",
+        "import": "./dist/entries/console.js"
+      }
+    },
+    "unpkg": "./dist/index.umd.cjs",
+    "jsdelivr": "./dist/index.umd.cjs"
+  },
+  "license": "MIT",
+  "author": "Gauss Zhou <gausszhou@qq.com>",
+  "homepage": "https://gausszhou.github.io/litegui/",
+  "bugs": {
+    "url": "https://github.com/gausszhou/litegui/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/gausszhou/litegui.git",
+    "directory": "packages/litegui"
+  },
+  "keywords": [
+    "litegui",
+    "ui",
+    "components",
+    "desktop",
+    "dom",
+    "editor",
+    "dialog",
+    "panel",
+    "canvas"
+  ]
+}

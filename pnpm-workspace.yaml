@@ -1,0 +1,8 @@
+packages:
+  - "apps/*"
+  - "packages/*"
+
+# 允许执行安装脚本的依赖：esbuild 用于下载平台二进制，@parcel/watcher 是 sass 的可选监听依赖。
+allowBuilds:
+  esbuild: true
+  "@parcel/watcher": true

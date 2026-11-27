@@ -53,6 +53,12 @@ v0.1 只承诺 **12 个核心组件**；`Inspector`、`Tree`、`ContextMenu` 等
   - [x] ContextMenu 移除 `@ts-nocheck`
   - [x] v1.0.0 冻结与发布
   - 视觉截图基线与 WebKit 矩阵列入 post-1.0 backlog
+- [x] **Phase 4（2026-11-27）**：monorepo 化
+  - pnpm workspace：`packages/{core,litegui,experimental,tests}` + `apps/{demo,editor}`
+  - 包名 `@gausszhou/litegui`、`@gausszhou/litegui-core`、`@gausszhou/litegui-experimental`，`publishConfig` 切换 `src`/`dist`
+  - ESM 外置 core（单一实例），UMD 保持自包含单文件
+  - ESLint flat config、Typedoc API、size / verify-umd / verify-pack / pages:build 脚本
+  - CI：lint → typecheck → test → coverage → build → size → verify → e2e → docs，master 通过后发布 gh-pages
 
 ---
 
@@ -75,32 +81,27 @@ LiteGUI 用 JavaScript/TypeScript 直接创建 DOM，不依赖 React/Vue，提�
 | 维度 | 现状 |
 | --- | --- |
 | 语言 | TypeScript（`strict: true`），SCSS |
-| 页面构建 | Vite 3 |
-| 库构建 | Rollup 2 + `@rollup/plugin-typescript` + PostCSS |
+| 页面构建 | Vite 5（apps/*） |
+| 库构建 | Vite 5 lib 模式（ESM + UMD / CJS）+ `tsc` 声明 |
 | 运行时依赖 | `mitt`、`lodash-es` |
-| 演示 | `demo/`（最小示例）、`editor/`（综合示例，433 行） |
-| 部署 | `shells/deploy.sh` 构建后强推 `gh-pages` |
-| 包管理 | npm / pnpm 均可，但锁文件未入库 |
+| 演示 | `apps/demo`（最小示例）、`apps/editor`（综合示例） |
+| 部署 | `pnpm pages:build` + `shells/gh-pages.sh`（CI 自动发布） |
+| 包管理 | pnpm workspace（`pnpm-lock.yaml` 入库） |
 
 ### 1.3 目录结构
 
 ```text
-src/
-  index.ts                 # 库入口：样式 + LiteGUI 默认导出
-  packages/
-    index.ts               # LiteGUI 核心命名空间（约 1300 行）
-    Area.ts Panel.ts Split.ts Tabs.ts Dialog.ts
-    Menu.ts ContextMenu.ts Tree.ts
-    Table.ts List.ts ComplexList.ts
-    Inspector.ts
-    Button.ts Checkbox.ts Dragger.ts Slider.ts LineEditor.ts SearchBox.ts
-    Console.ts
-    Widget.ts EventMitter.ts Box.ts utils.ts
-  styles/                  # 全局 SCSS + 组件样式（约 2.3k 行）
-  types/                   # 旧版 .d.ts 与 LiteComponent
-demo/                      # 最小演示页
-editor/                    # 综合演示页
-shells/deploy.sh           # gh-pages 部署脚本
+packages/
+  core/                    # DOM/事件/状态/Widget/utils（无 CSS）
+  litegui/                 # 组件、LiteGUI 命名空间、entries、styles
+  experimental/            # Inspector、Tree
+  tests/                   # Vitest + Playwright + bench
+apps/
+  demo/                    # 最小演示页
+  editor/                  # 综合演示页
+docs/                      # VitePress 文档站（API 由 Typedoc 生成）
+scripts/                   # size / verify-umd / verify-pack / pages:build
+shells/                    # build.sh、gh-pages.sh
 ```
 
 ### 1.4 组件地图

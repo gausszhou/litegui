@@ -24,7 +24,7 @@ new LiteGUI.Panel({ title: "Console" });
 ## 2. 属性面板
 
 ```ts
-import { Inspector } from "litegui/experimental";
+import { Inspector } from "@gausszhou/litegui-experimental";
 
 const inspector = new Inspector();
 inspector.addString("name", "Untitled");
@@ -33,7 +33,7 @@ inspector.addSlider("opacity", 0.5, { min: 0, max: 1 });
 panel.add(inspector);
 ```
 
-> `Inspector` 与 `Tree` 通过 `litegui/experimental` 引入，API 仍为 experimental。
+> `Inspector` 与 `Tree` 通过 `@gausszhou/litegui-experimental` 引入，API 仍为 experimental。
 
 ## 3. 数据表格
 
