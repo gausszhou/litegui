@@ -2,42 +2,51 @@
  * Dark is the default. Set data-lg-theme="light" on <html> for the light theme.
  */
 
+/* 基础 token 的兜底值，与 blender.scss 保持一致。
+ * blender.scss 在其后加载，会补充组件级 token 并覆盖同名值。
+ */
 :root {
-	--lg-font: "Arial", sans-serif;
-	--lg-color-bg: #181818;
-	--lg-color-bg-alt: #333;
-	--lg-color-panel: #444;
-	--lg-color-panel-2: #333;
-	--lg-color-header: #778;
-	--lg-color-header-2: #555;
-	--lg-color-text: #aaa;
-	--lg-color-text-strong: #fff;
-	--lg-color-text-muted: #888;
-	--lg-color-accent: #fc0;
-	--lg-color-border: #222;
-	--lg-color-button: #32302d;
-	--lg-color-button-hover: #aab;
-	--lg-color-button-text: #ccc;
-	--lg-color-overlay: rgba(0, 0, 0, 0.8);
-	--lg-radius: 2px;
+	--lg-font: "Inter", "Segoe UI", "DejaVu Sans", Roboto, Arial, sans-serif;
+	--lg-color-bg: #1d1d1d;
+	--lg-color-bg-alt: #282828;
+	--lg-color-panel: #2e2e2e;
+	--lg-color-panel-2: #252525;
+	--lg-color-header: #2b2b2b;
+	--lg-color-header-2: #353535;
+	--lg-color-text: #d8d8d8;
+	--lg-color-text-strong: #f0f0f0;
+	--lg-color-text-muted: #9a9a9a;
+	--lg-color-accent: #4772b3;
+	--lg-color-accent-hover: #5885c8;
+	--lg-color-border: #3d3d3d;
+	--lg-color-border-strong: #4a4a4a;
+	--lg-color-button: #3d3d3d;
+	--lg-color-button-hover: #4a4a4a;
+	--lg-color-button-text: #e6e6e6;
+	--lg-color-overlay: rgba(0, 0, 0, 0.72);
+	--lg-radius: 3px;
+	--lg-radius-sm: 2px;
 }
 
+/* Blender Light（scripts/presets/interface_theme/Blender_Light.xml） */
 :root[data-lg-theme="light"] {
-	--lg-color-bg: #f5f6f8;
-	--lg-color-bg-alt: #e8eaf0;
-	--lg-color-panel: #ffffff;
-	--lg-color-panel-2: #eef0f5;
-	--lg-color-header: #dce3f2;
-	--lg-color-header-2: #c9d2e6;
-	--lg-color-text: #333;
-	--lg-color-text-strong: #111;
-	--lg-color-text-muted: #666;
-	--lg-color-accent: #a85f00;
-	--lg-color-border: #c8ccd6;
-	--lg-color-button: #e6e8ee;
-	--lg-color-button-hover: #cfd7ef;
-	--lg-color-button-text: #222;
-	--lg-color-overlay: rgba(20, 24, 32, 0.45);
+	--lg-color-bg: #6b6b6b;
+	--lg-color-bg-alt: #999999;
+	--lg-color-panel: #cccccc;
+	--lg-color-panel-2: #b3b3b3;
+	--lg-color-header: #adadad;
+	--lg-color-header-2: #c0c0c0;
+	--lg-color-text: #1a1a1a;
+	--lg-color-text-strong: #000000;
+	--lg-color-text-muted: #4d4d4d;
+	--lg-color-accent: #5680c2;
+	--lg-color-accent-hover: #668ccc;
+	--lg-color-border: #999999;
+	--lg-color-border-strong: #4d4d4d;
+	--lg-color-button: #dbdbdb;
+	--lg-color-button-hover: #e5e5e5;
+	--lg-color-button-text: #1a1a1a;
+	--lg-color-overlay: rgba(20, 24, 32, 0.35);
 }
 
 body {

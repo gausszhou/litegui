@@ -1,13 +1,28 @@
 /* Blender-inspired default theme
- * 默认主题：Blender 4.x 的深色、扁平、低饱和蓝强调色。
- * 结构参考 docs/design/blender-ui.md；浅色主题通过 data-lg-theme="light" 覆盖。
- * 尺寸按 Web 可读性放大，不追求 Blender 的 11px 像素级密度。
+ * 默认主题：Blender 4.5 的深色（Blender Dark）。
+ * 浅色主题：data-lg-theme="light"，对齐面板预设 Blender_Light.xml
+ * （wcol_regular / ThemeSpaceGeneric / ThemeView3D）。
+ *
+ * 尺寸按 Web 可读性放大：基础 13px、控件/行高 26px，不追求 Blender 的 11px 像素级密度。
+ *
+ * 选择器约定（重要）：
+ * - 主题变量写在 :root 与 :root[data-lg-theme="light"]，保持全局；
+ * - 组件样式使用不带 :root 前缀的普通选择器，方便文档站构建脚本给选择器加
+ *   .lg-demo 作用域（scripts/build-demo-css.mjs 会丢弃/破坏 :root 祖先选择器）。
+ * - 暗色是默认值，亮色只在 :root[data-lg-theme="light"] 下覆盖，互不污染。
  */
 
-:root:not([data-lg-theme="light"]) {
+/* ==========================================================================
+   1. Design Tokens
+   ========================================================================== */
+
+:root {
   --lg-font: "Inter", "Segoe UI", "DejaVu Sans", Roboto, Arial, sans-serif;
   --lg-font-size: 13px;
   --lg-font-size-sm: 12px;
+  --lg-font-size-xs: 11px;
+
+  /* Blender Dark（默认） */
   --lg-color-bg: #1d1d1d;
   --lg-color-bg-alt: #282828;
   --lg-color-panel: #2e2e2e;
@@ -20,390 +35,2008 @@
   --lg-color-accent: #4772b3;
   --lg-color-accent-hover: #5885c8;
   --lg-color-border: #3d3d3d;
+  --lg-color-border-strong: #4a4a4a;
   --lg-color-button: #3d3d3d;
   --lg-color-button-hover: #4a4a4a;
   --lg-color-button-text: #e6e6e6;
   --lg-color-overlay: rgba(0, 0, 0, 0.72);
+
+  /* 组件补充 token（暗色） */
+  --lg-color-input-bg: #1d1d1d;
+  --lg-color-input-border: #3d3d3d;
+  --lg-color-input-text: #e6e6e6;
+  --lg-color-placeholder: #7a7a7a;
+  --lg-color-number: #8fb4e8;
+  --lg-color-row-hover: #333333;
+  --lg-color-row-alt: rgba(255, 255, 255, 0.025);
+  --lg-color-row-selected: #4772b3;
+  --lg-color-row-semiselected: rgba(71, 114, 179, 0.28);
+  --lg-color-table-head: #353535;
+  --lg-color-table-border: #333333;
+  --lg-color-checkbox-bg: #1d1d1d;
+  --lg-color-checkbox-border: #555555;
+  --lg-color-menu-bg: #282828;
+  --lg-color-menu-border: #4a4a4a;
+  --lg-color-menu-text: #d8d8d8;
+  --lg-color-menu-hover: #4772b3;
+  --lg-color-console-bg: #151515;
+  --lg-color-console-text: #c8c8c8;
+  --lg-color-tooltip-bg: #282828;
+  --lg-color-tooltip-text: #e6e6e6;
+  --lg-color-warn: #d8b04a;
+  --lg-color-error: #d86a6a;
+  --lg-color-good: #7fbf7f;
+  --lg-color-info: #7fa7d8;
+  --lg-color-focus-ring: rgba(71, 114, 179, 0.35);
+  --lg-color-scrollbar-track: #282828;
+  --lg-color-scrollbar-thumb: #5c5c5c;
+  --lg-shadow-panel: 0 2px 12px rgba(0, 0, 0, 0.28);
+  --lg-shadow-menu: 0 8px 24px rgba(0, 0, 0, 0.6);
+
   --lg-radius: 3px;
+  --lg-radius-sm: 2px;
   --lg-header-height: 30px;
   --lg-row-height: 26px;
   --lg-control-height: 26px;
 }
 
-:root:not([data-lg-theme="light"]) body {
-  background: var(--lg-color-bg);
+/* Blender Light（reference: scripts/presets/interface_theme/Blender_Light.xml）
+ * 关键取值：ThemeSpaceGeneric back #6b6b6b / header #adadad；panel_back #cccccc；
+ * wcol_regular outline #4d4d4d / inner #dbdbdb / inner_sel #668ccc；
+ * wcol_menu_back inner #c0c0c0；wcol_menu_item inner_sel #5680c2e6；
+ * wcol_tooltip inner #19191a / text #e6e6e6。
+ */
+:root[data-lg-theme="light"] {
+  --lg-color-bg: #6b6b6b;
+  --lg-color-bg-alt: #999999;
+  --lg-color-panel: #cccccc;
+  --lg-color-panel-2: #b3b3b3;
+  --lg-color-header: #adadad;
+  --lg-color-header-2: #c0c0c0;
+  --lg-color-text: #1a1a1a;
+  --lg-color-text-strong: #000000;
+  --lg-color-text-muted: #4d4d4d;
+  --lg-color-accent: #5680c2;
+  --lg-color-accent-hover: #668ccc;
+  --lg-color-border: #999999;
+  --lg-color-border-strong: #4d4d4d;
+  --lg-color-button: #dbdbdb;
+  --lg-color-button-hover: #e5e5e5;
+  --lg-color-button-text: #1a1a1a;
+  --lg-color-overlay: rgba(20, 24, 32, 0.35);
+
+  --lg-color-input-bg: #dbdbdb;
+  --lg-color-input-border: #4d4d4d;
+  --lg-color-input-text: #1a1a1a;
+  --lg-color-placeholder: #6b6b6b;
+  --lg-color-number: #2f5fae;
+  --lg-color-row-hover: #c0c0c0;
+  --lg-color-row-alt: rgba(0, 0, 0, 0.035);
+  --lg-color-row-selected: #668ccc;
+  --lg-color-row-semiselected: rgba(86, 128, 194, 0.28);
+  --lg-color-table-head: #adadad;
+  --lg-color-table-border: #999999;
+  --lg-color-checkbox-bg: #dbdbdb;
+  --lg-color-checkbox-border: #4d4d4d;
+  --lg-color-menu-bg: #c0c0c0;
+  --lg-color-menu-border: #a6a6a6;
+  --lg-color-menu-text: #1a1a1a;
+  --lg-color-menu-hover: #668ccc;
+  /* Blender Light 的 Console 仍是深色（ThemeConsole back #1d1d1d）。 */
+  --lg-color-console-bg: #1d1d1d;
+  --lg-color-console-text: #e6e6e6;
+  --lg-color-tooltip-bg: #19191a;
+  --lg-color-tooltip-text: #e6e6e6;
+  --lg-color-warn: #ac8737;
+  --lg-color-error: #c62828;
+  --lg-color-good: #188625;
+  --lg-color-info: #1a6fc4;
+  --lg-color-focus-ring: rgba(86, 128, 194, 0.42);
+  --lg-color-scrollbar-track: #c0c0c0;
+  --lg-color-scrollbar-thumb: #808080;
+  --lg-shadow-panel: 0 2px 10px rgba(0, 0, 0, 0.18);
+  --lg-shadow-menu: 0 8px 20px rgba(0, 0, 0, 0.28);
+}
+
+/* ==========================================================================
+   2. Base / typography baseline
+   ========================================================================== */
+
+body {
+  background-color: var(--lg-color-bg);
   color: var(--lg-color-text);
   font-family: var(--lg-font);
   font-size: var(--lg-font-size);
 }
 
-:root:not([data-lg-theme="light"]) .lg-app,
-:root:not([data-lg-theme="light"]) .lg-app__wrap,
-:root:not([data-lg-theme="light"]) .lg-app__main {
-  background: var(--lg-color-bg);
+/* 文档站的 .lg-demo 容器不会继承 body 字号，因此组件根节点显式给出 13px 基线。 */
+.lg-app,
+.lg-app__wrap,
+.lg-app__main,
+.lg-area,
+.lg-box,
+.lg-panel,
+.lg-dialog,
+.lg-menu,
+.lg-tabs,
+.lg-list,
+.lg-table,
+.lg-console,
+.lg-complex-list,
+.lg-searchbox,
+.lg-checkbox,
+.lg-input,
+.lg-button,
+.lg-context-menu,
+.lg-dragger,
+.lg-slider,
+.inspector,
+.litetree {
+  font-family: var(--lg-font);
+  font-size: var(--lg-font-size);
+  color: var(--lg-color-text);
 }
 
-/* ---------- panels / dialogs ---------- */
+.lg-app,
+.lg-app__wrap,
+.lg-app__main {
+  background-color: var(--lg-color-bg);
+}
 
-:root:not([data-lg-theme="light"]) .lg-panel,
-:root:not([data-lg-theme="light"]) .lg-dialog {
+/* ---------- scrollbars ---------- */
+
+::-webkit-scrollbar {
+  width: 9px;
+  height: 9px;
+  background: var(--lg-color-scrollbar-track);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--lg-color-scrollbar-thumb);
+  border-radius: 8px;
+}
+
+::-webkit-scrollbar-corner {
+  background: var(--lg-color-scrollbar-track);
+}
+
+/* ==========================================================================
+   3. Panels / dialogs
+   ========================================================================== */
+
+.lg-panel,
+.lg-dialog {
   background: var(--lg-color-panel);
   background-image: none;
   border: 1px solid var(--lg-color-border);
   border-radius: var(--lg-radius);
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.28);
+  box-shadow: var(--lg-shadow-panel);
+  color: var(--lg-color-text);
+  box-sizing: border-box;
 }
 
-:root:not([data-lg-theme="light"]) .lg-panel__header,
-:root:not([data-lg-theme="light"]) .lg-dialog__header {
-  height: var(--lg-header-height);
+.lg-panel {
+  display: flex;
+  flex-direction: column;
+}
+
+/* 这里必须带上 .lg-panel/.lg-dialog 祖先，才能压过 layout.scss 里的
+ * `.lg-panel .lg-panel__header` 等选择器（旧 footer 是 absolute，会撑破页面）。 */
+.lg-panel .lg-panel__header,
+.lg-dialog .lg-dialog__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
   min-height: var(--lg-header-height);
+  padding: 0 8px;
   background: var(--lg-color-header);
   background-image: none;
   border-bottom: 1px solid var(--lg-color-border);
   color: var(--lg-color-text-strong);
   font-size: var(--lg-font-size);
+  font-weight: 500;
+  line-height: 1;
+  box-sizing: border-box;
+  user-select: none;
 }
 
-:root:not([data-lg-theme="light"]) .lg-panel__title,
-:root:not([data-lg-theme="light"]) .lg-dialog__title {
+.lg-panel .lg-panel__title,
+.lg-dialog .lg-dialog__title {
   font-size: var(--lg-font-size);
   font-weight: 500;
   letter-spacing: 0;
+  color: var(--lg-color-text-strong);
 }
 
-:root:not([data-lg-theme="light"]) .lg-panel__content,
-:root:not([data-lg-theme="light"]) .lg-dialog__content {
+.lg-panel .lg-panel__content,
+.lg-dialog .lg-dialog__content {
   background: var(--lg-color-panel);
   color: var(--lg-color-text);
   padding: 8px;
+  box-sizing: border-box;
 }
 
-:root:not([data-lg-theme="light"]) .lg-panel__footer,
-:root:not([data-lg-theme="light"]) .lg-dialog__footer {
+.lg-panel .lg-panel__content {
+  flex: 1 1 auto;
+  min-height: 0;
+  height: auto;
+  overflow: auto;
+}
+
+.lg-panel .lg-panel__footer,
+.lg-dialog .lg-dialog__footer {
   background: var(--lg-color-header);
   border-top: 1px solid var(--lg-color-border);
   color: var(--lg-color-text-muted);
+  font-size: var(--lg-font-size-sm);
   min-height: var(--lg-row-height);
+  box-sizing: border-box;
 }
 
-:root:not([data-lg-theme="light"]) .lg-panel__close,
-:root:not([data-lg-theme="light"]) .lg-dialog__button,
-:root:not([data-lg-theme="light"]) .lg-dialog__button--close {
+.lg-panel .lg-panel__footer {
+  position: static;
+  width: auto;
+  margin: 0;
+  padding: 3px 8px;
+  flex: 0 0 auto;
+  text-align: right;
+}
+
+/* 组件总会创建 footer；没有内容时不要留一条空操作栏。 */
+.lg-panel .lg-panel__footer:empty,
+.lg-dialog .lg-dialog__footer:empty {
+  display: none;
+}
+
+.lg-panel .lg-panel__header .lg-panel__close,
+.lg-dialog .lg-dialog__buttons .lg-button__control,
+.lg-dialog .lg-dialog__button,
+.lg-dialog .lg-dialog__button--close {
   width: 24px;
   height: 22px;
+  min-height: 22px;
   display: inline-grid;
   place-items: center;
+  padding: 0;
   background: transparent;
+  background-image: none;
   border: 1px solid transparent;
-  border-radius: 2px;
+  border-radius: var(--lg-radius-sm);
   color: var(--lg-color-text-muted);
+  box-shadow: none;
+  text-shadow: none;
 }
 
-:root:not([data-lg-theme="light"]) .lg-panel__close:hover,
-:root:not([data-lg-theme="light"]) .lg-dialog__button:hover {
+.lg-panel .lg-panel__header .lg-panel__close:hover,
+.lg-dialog .lg-dialog__buttons .lg-button__control:hover,
+.lg-dialog .lg-dialog__button:hover {
   background: var(--lg-color-header-2);
   border-color: var(--lg-color-border);
   color: var(--lg-color-text-strong);
 }
 
-/* ---------- buttons ---------- */
-
-:root:not([data-lg-theme="light"]) .lg-button {
-  min-height: var(--lg-control-height);
+.lg-dialog {
+  position: absolute;
+  z-index: 10;
+  min-width: 280px;
+  max-width: calc(100vw - 24px);
 }
 
-:root:not([data-lg-theme="light"]) button.lg-button__control {
+.lg-dialog .lg-dialog__header {
+  padding-right: 72px;
+}
+
+.lg-dialog .lg-dialog__buttons {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  background: transparent;
+  border: 0;
+}
+
+.lg-dialog .lg-dialog__content {
+  padding: 10px 12px 42px;
+}
+
+.lg-dialog .lg-dialog__footer {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  width: auto;
+  margin: 0;
+  padding: 4px 8px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 4px;
+  text-align: right;
+  background: var(--lg-color-panel);
+  border-top: 1px solid var(--lg-color-border);
+}
+
+.lg-dialog__footer .lg-button__control {
+  min-width: 72px;
+}
+
+.lg-dialog__footer--resizable {
+  cursor: s-resize;
+}
+
+.lg-modal-backdrop {
+  background-color: var(--lg-color-overlay);
+}
+
+/* ==========================================================================
+   4. Buttons
+   ========================================================================== */
+
+.lg-button {
+  display: inline-block;
+  min-height: var(--lg-control-height);
+  vertical-align: top;
+}
+
+button.lg-button__control {
   min-height: var(--lg-control-height);
   padding: 0 12px;
-  background: var(--lg-color-button);
-  background-image: none;
-  border: 1px solid #4a4a4a;
+  background: var(--lg-color-button) !important;
+  background-image: none !important;
+  border: 1px solid var(--lg-color-border-strong);
   border-radius: var(--lg-radius);
   color: var(--lg-color-button-text);
+  font-family: var(--lg-font);
   font-size: var(--lg-font-size);
-  box-shadow: none;
-  text-shadow: none;
+  line-height: 1;
+  box-shadow: none !important;
+  text-shadow: none !important;
+  vertical-align: top;
 }
 
-:root:not([data-lg-theme="light"]) button.lg-button__control:hover:not(:disabled) {
-  background: var(--lg-color-button-hover);
-  border-color: #5a5a5a;
-}
-
-:root:not([data-lg-theme="light"]) button.lg-button__control:active:not(:disabled),
-:root:not([data-lg-theme="light"]) button.lg-button__control.active {
-  background: var(--lg-color-accent);
+button.lg-button__control:hover:not(:disabled) {
+  background: var(--lg-color-button-hover) !important;
   border-color: var(--lg-color-accent);
-  color: #fff;
+  color: var(--lg-color-text-strong);
 }
 
-:root:not([data-lg-theme="light"]) button.lg-button__control:disabled {
+button.lg-button__control:active:not(:disabled),
+button.lg-button__control.active {
+  background: var(--lg-color-accent) !important;
+  border-color: var(--lg-color-accent);
+  color: #fff !important;
+}
+
+button.lg-button__control:focus-visible {
+  outline: 2px solid var(--lg-color-accent);
+  outline-offset: 1px;
+}
+
+button.lg-button__control:disabled {
   opacity: 0.45;
 }
 
-:root:not([data-lg-theme="light"]) button.lg-button__control.lg-button--close {
-  background: transparent;
+button.lg-button__control.lg-button__control--mini {
+  min-width: 22px;
+  min-height: 20px;
+  padding: 0 5px;
+  font-size: var(--lg-font-size-sm);
+}
+
+button.lg-button__control.lg-button__control--close {
+  background: transparent !important;
   border-color: transparent;
   min-width: 24px;
   padding: 0 6px;
 }
 
-/* ---------- inputs ---------- */
-
-:root:not([data-lg-theme="light"]) .lg-input,
-:root:not([data-lg-theme="light"]) .lg-searchbox {
-  min-height: var(--lg-control-height);
-  background: #1d1d1d;
-  border: 1px solid var(--lg-color-border);
-  border-radius: var(--lg-radius);
+.lg-button--small .lg-button__control,
+button.lg-button__control--small {
+  min-height: 22px;
+  padding: 0 8px;
+  font-size: var(--lg-font-size-sm);
 }
 
-:root:not([data-lg-theme="light"]) .lg-input__field,
-:root:not([data-lg-theme="light"]) .lg-searchbox__input,
-:root:not([data-lg-theme="light"]) input.lg-input__field {
+.lg-button--mini .lg-button__control {
+  min-height: 20px;
+  padding: 0 6px;
+  font-size: var(--lg-font-size-sm);
+}
+
+/* ==========================================================================
+   5. Inputs / checkbox / searchbox
+   ========================================================================== */
+
+.lg-input,
+.lg-searchbox {
+  min-height: var(--lg-control-height);
+  background: var(--lg-color-input-bg);
+  border: 1px solid var(--lg-color-input-border);
+  border-radius: var(--lg-radius);
+  box-sizing: border-box;
+}
+
+.lg-input {
+  display: inline-flex;
+  align-items: center;
+}
+
+.lg-input__field,
+.lg-searchbox__input,
+input.lg-input__field {
+  width: 100%;
   height: var(--lg-control-height);
+  min-width: 0;
   padding: 0 8px;
-  background: #1d1d1d;
+  background: transparent;
   border: 0;
-  color: #e6e6e6;
+  color: var(--lg-color-input-text);
+  font-family: var(--lg-font);
   font-size: var(--lg-font-size);
   outline: 0;
+  box-sizing: border-box;
 }
 
-:root:not([data-lg-theme="light"]) .lg-input:focus-within,
-:root:not([data-lg-theme="light"]) .lg-searchbox:focus-within {
+.lg-input__field::placeholder,
+.lg-searchbox__input::placeholder {
+  color: var(--lg-color-placeholder);
+}
+
+.lg-input:focus-within,
+.lg-searchbox:focus-within {
   border-color: var(--lg-color-accent);
-  box-shadow: 0 0 0 1px rgba(71, 114, 179, 0.35);
+  box-shadow: 0 0 0 1px var(--lg-color-focus-ring);
 }
 
-:root:not([data-lg-theme="light"]) .lg-checkbox {
-  width: 18px;
-  height: 18px;
+.lg-input.lg-is-disabled,
+.lg-input--disabled {
+  opacity: 0.55;
 }
 
-:root:not([data-lg-theme="light"]) .lg-checkbox__flag {
+.lg-searchbox {
+  padding: 0;
+  opacity: 1;
+  transition: none;
+}
+
+.lg-searchbox:hover {
+  opacity: 1;
+}
+
+.lg-dragger {
+  display: inline-flex;
+  align-items: center;
+}
+
+.lg-dragger__widget {
+  width: 7px;
+  min-width: 7px;
+  align-self: stretch;
+  background: var(--lg-color-header-2);
+  cursor: n-resize;
+}
+
+/* Checkbox: .lg-checkbox--on 在 flag 上，而不是 root 上。 */
+.lg-checkbox,
+.lg-checkbox.lg-input {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   width: 18px;
   height: 18px;
-  background: #1d1d1d;
-  border: 1px solid #555;
-  border-radius: 3px;
+  min-width: 18px;
+  min-height: 18px;
+  margin: 0 4px 0 0;
+  padding: 0;
+  background: transparent;
+  border: 0;
+  border-radius: var(--lg-radius);
+  box-shadow: none;
+  line-height: 1;
+  vertical-align: middle;
+  cursor: pointer;
+}
+
+.lg-checkbox__flag {
+  display: inline-grid;
+  place-items: center;
+  width: 16px;
+  height: 16px;
+  background: var(--lg-color-checkbox-bg);
+  border: 1px solid var(--lg-color-checkbox-border);
+  border-radius: var(--lg-radius-sm);
   color: #fff;
+  box-sizing: border-box;
 }
 
-:root:not([data-lg-theme="light"]) .lg-checkbox--on .lg-checkbox__flag {
+.lg-checkbox__flag.lg-checkbox--on {
   background: var(--lg-color-accent);
   border-color: var(--lg-color-accent);
 }
 
-/* ---------- menus ---------- */
+.lg-checkbox__flag.lg-checkbox--on::after {
+  content: "";
+  width: 3px;
+  height: 7px;
+  margin-top: -1px;
+  border: solid #fff;
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg);
+}
 
-:root:not([data-lg-theme="light"]) .lg-menu {
+.lg-checkbox:focus-visible {
+  outline: 2px solid var(--lg-color-accent);
+  outline-offset: 1px;
+}
+
+/* ==========================================================================
+   6. Menus / context menus
+   ========================================================================== */
+
+.lg-menu {
   background: transparent;
 }
 
-:root:not([data-lg-theme="light"]) .lg-menu > .lg-menu__list,
-:root:not([data-lg-theme="light"]) .lg-menu__list {
+.lg-menu__list {
+  min-height: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  padding: 0 4px;
+  margin: 0;
   background: var(--lg-color-header);
-  border: 1px solid var(--lg-color-border);
-  border-radius: var(--lg-radius);
-  box-shadow: none;
+  border-bottom: 1px solid var(--lg-color-border);
+  font-family: var(--lg-font);
 }
 
-:root:not([data-lg-theme="light"]) .lg-menu__item {
+.lg-menu__item {
   height: 28px;
-  padding: 0 9px;
+  line-height: 28px;
+  padding: 0 10px;
+  min-width: 50px;
   color: var(--lg-color-text);
   font-size: var(--lg-font-size);
+  border-radius: var(--lg-radius-sm);
 }
 
-:root:not([data-lg-theme="light"]) .lg-menu__item:hover,
-:root:not([data-lg-theme="light"]) .lg-menu__item.lg-menu__item--active {
+.lg-menu__item:hover,
+.lg-menu__item.lg-menu__item--active {
   background: var(--lg-color-header-2);
+  color: var(--lg-color-text-strong);
 }
 
-:root:not([data-lg-theme="light"]) .lg-menu__panel {
-  background: #282828;
-  border: 1px solid #4a4a4a;
+.lg-menu__panel {
+  background: var(--lg-color-menu-bg);
+  border: 1px solid var(--lg-color-menu-border);
   border-radius: var(--lg-radius);
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6);
+  box-shadow: var(--lg-shadow-menu);
   padding: 4px 0;
+  max-width: calc(100vw - 16px);
+  min-width: 180px;
+  color: var(--lg-color-menu-text);
 }
 
-:root:not([data-lg-theme="light"]) .lg-menu__panel-item {
-  height: 26px;
+.lg-menu__panel-item {
+  height: var(--lg-row-height);
+  min-height: var(--lg-row-height);
+  margin: 0;
   padding: 0 12px;
-  color: var(--lg-color-text);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--lg-color-menu-text);
   font-size: var(--lg-font-size);
+  border-radius: 0;
 }
 
-:root:not([data-lg-theme="light"]) .lg-menu__panel-item:hover {
-  background: var(--lg-color-accent);
+.lg-menu__panel-item:hover:not(.lg-menu__panel-item--disabled):not(.lg-menu__panel-item--separator),
+.lg-menu__panel-item.lg-menu__panel-item--active {
+  background: var(--lg-color-menu-hover);
   color: #fff;
 }
 
-:root:not([data-lg-theme="light"]) .lg-menu__panel-item.lg-menu__panel-item--separator {
-  height: 1px;
-  background: var(--lg-color-border);
-  margin: 4px 0;
+.lg-menu__panel-item.lg-menu__panel-item--disabled {
+  opacity: 0.5;
 }
 
-/* ---------- tabs ---------- */
+.lg-menu__panel-item.lg-menu__panel-item--separator {
+  height: 1px;
+  min-height: 1px;
+  margin: 4px 0;
+  padding: 0;
+  background: var(--lg-color-border);
+  border: 0;
+}
 
-:root:not([data-lg-theme="light"]) .lg-tabs {
+.lg-menu__panel-item.lg-menu__panel-item--has-submenu {
+  border-right: 2px solid var(--lg-color-accent);
+}
+
+.lg-menu__panel-item--checked .lg-menu__icon {
+  background-color: var(--lg-color-accent);
+}
+
+.lg-menu__icon {
+  width: 12px;
+  height: 12px;
+  flex: 0 0 auto;
+}
+
+.lg-menu__name {
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.lg-menu__more {
+  flex: 0 0 auto;
+  margin-left: auto;
+  padding-right: 2px;
+  color: var(--lg-color-text-muted);
+}
+
+.lg-context-menu {
+  background-color: var(--lg-color-menu-bg) !important;
+  border: 1px solid var(--lg-color-menu-border);
+  border-radius: var(--lg-radius);
+  box-shadow: var(--lg-shadow-menu) !important;
+  color: var(--lg-color-menu-text);
+  padding: 4px 0;
+  max-width: calc(100vw - 16px);
+}
+
+.lg-context-menu__title {
+  background: var(--lg-color-header);
+  color: var(--lg-color-text-strong);
+  padding: 4px 10px;
+  border-bottom: 1px solid var(--lg-color-border);
+}
+
+.lg-context-menu__item {
+  min-height: var(--lg-row-height);
+  padding: 3px 10px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--lg-color-menu-text);
+  border-radius: 0;
+}
+
+.lg-context-menu__item:hover:not(.lg-context-menu__item--disabled):not(.lg-context-menu__item--separator) {
+  background: var(--lg-color-menu-hover);
+  color: #fff;
+}
+
+.lg-context-menu__item--separator {
+  height: 1px;
+  min-height: 1px;
+  padding: 0;
+  margin: 4px 0;
+  background: var(--lg-color-border);
+}
+
+.lg-context-menu__item--disabled {
+  opacity: 0.5;
+}
+
+/* ==========================================================================
+   7. Tabs
+   ========================================================================== */
+
+.lg-tabs {
   background: var(--lg-color-panel);
 }
 
-:root:not([data-lg-theme="light"]) .lg-tabs__list {
+.lg-tabs .lg-tabs__list {
+  min-height: 30px;
+  padding: 0 0 0 4px;
   background: var(--lg-color-header);
   border-bottom: 1px solid var(--lg-color-border);
-  min-height: 30px;
 }
 
-:root:not([data-lg-theme="light"]) .lg-tabs__tab {
+.lg-tabs .lg-tabs__tab,
+.lg-tabs--horizontal > .lg-tabs__list > .lg-tabs__tab {
   height: 30px;
+  min-height: 30px;
+  min-width: 64px;
+  margin: 0 2px 0 0;
   padding: 0 12px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
   color: var(--lg-color-text-muted);
-  border-right: 1px solid transparent;
   font-size: var(--lg-font-size);
+  border-right: 1px solid transparent;
+  border-radius: var(--lg-radius-sm) var(--lg-radius-sm) 0 0;
+  transition: none;
 }
 
-:root:not([data-lg-theme="light"]) .lg-tabs__tab:hover {
+.lg-tabs .lg-tabs__tab:hover:not(.lg-tabs__tab--selected) {
+  background: var(--lg-color-header-2);
   color: var(--lg-color-text);
-  background: #333;
 }
 
-:root:not([data-lg-theme="light"]) .lg-tabs__tab.lg-tabs__tab--selected {
-  color: var(--lg-color-text-strong);
+.lg-tabs .lg-tabs__tab--selected {
+  color: var(--lg-color-text-strong) !important;
   background: var(--lg-color-panel);
   border-bottom: 2px solid var(--lg-color-accent);
 }
 
-/* ---------- trees / lists ---------- */
-
-:root:not([data-lg-theme="light"]) .lg-list {
-  background: #282828;
-  border: 1px solid var(--lg-color-border);
-  border-radius: var(--lg-radius);
+.lg-tabs .lg-tabs__tab--button {
+  background: var(--lg-color-button);
+  color: var(--lg-color-button-text);
 }
 
-:root:not([data-lg-theme="light"]) .lg-list__item {
-  min-height: 26px;
-  padding: 2px 8px;
+.lg-tabs .lg-tabs__panel {
+  background: var(--lg-color-panel);
   color: var(--lg-color-text);
+  padding: 4px;
+}
+
+.lg-tabs .lg-tabs__tab-close {
+  color: var(--lg-color-text-muted);
+  opacity: 0.7;
+}
+
+.lg-tabs .lg-tabs__tab-close:hover {
+  color: var(--lg-color-text-strong);
+  background: var(--lg-color-header-2);
+}
+
+.lg-tabs--vertical > .lg-tabs__list {
+  background: var(--lg-color-header);
+  border-right: 1px solid var(--lg-color-border);
+  border-bottom: 0;
+}
+
+.lg-tabs--vertical > .lg-tabs__list > .lg-tabs__tab {
+  min-height: 64px;
+  height: 64px;
+  margin: 0 0 2px;
+  padding: 0 6px;
+  border-radius: var(--lg-radius) 0 0 var(--lg-radius);
+  border-bottom: 1px solid transparent;
+}
+
+.lg-tabs--vertical > .lg-tabs__list > .lg-tabs__tab--selected {
+  border-bottom-color: transparent;
+  border-left: 2px solid var(--lg-color-accent);
+}
+
+/* ==========================================================================
+   8. Lists / complex lists
+   ========================================================================== */
+
+ul.lg-list {
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  padding: 2px 0;
+  overflow: auto;
+  list-style: none;
+  background: var(--lg-color-bg-alt);
+  border: 1px solid var(--lg-color-border);
+  border-radius: var(--lg-radius-sm);
+  box-sizing: border-box;
+}
+
+ul.lg-list li.lg-list__item {
+  min-height: var(--lg-row-height);
+  margin: 0 2px;
+  padding: 3px 10px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  list-style: none;
+  color: var(--lg-color-text);
+  font-size: var(--lg-font-size);
+  border-radius: var(--lg-radius-sm);
+  cursor: pointer;
+}
+
+ul.lg-list li.lg-list__item:hover {
+  background: var(--lg-color-row-hover);
+}
+
+ul.lg-list li.lg-is-selected {
+  position: static;
+  background: var(--lg-color-row-selected);
+  border: 0;
+  color: #fff;
+}
+
+ul.lg-list li.lg-is-selected::after,
+ul.lg-list li.lg-is-selected::before {
+  display: none;
+  content: none;
+  border: 0;
+}
+
+ul.lg-list .lg-list__arrow {
+  flex: 0 0 auto;
+  color: var(--lg-color-text-muted);
+}
+
+.lg-list__item.lg-is-selected .lg-list__arrow {
+  color: #fff;
+}
+
+.lg-complex-list {
+  background: var(--lg-color-bg-alt);
+  border: 1px solid var(--lg-color-border);
+  border-radius: var(--lg-radius);
+  color: var(--lg-color-text);
+  padding: 4px;
+  overflow: auto;
+  box-sizing: border-box;
+}
+
+.lg-complex-list__title {
+  margin: 6px 4px 2px;
+  color: var(--lg-color-text-muted);
+  font-size: var(--lg-font-size-sm);
+  font-weight: 500;
+}
+
+.lg-complex-list__item {
+  min-height: 30px;
+  margin: 3px 2px;
+  padding: 3px 6px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--lg-color-panel);
+  border: 1px solid var(--lg-color-border);
+  border-radius: var(--lg-radius-sm);
+  color: var(--lg-color-text);
+  line-height: 1.5;
+  box-sizing: border-box;
+}
+
+.lg-complex-list__item:hover {
+  background: var(--lg-color-header-2);
+}
+
+.lg-complex-list__item.lg-is-selected {
+  background: var(--lg-color-row-selected);
+  border-color: var(--lg-color-row-selected);
+  color: #fff;
+}
+
+/* ComplexList 的 addItem 会把 lg-is-selected / lg-is-enabled 加在
+ * createListItem 返回的外层 span 上，因此两种层级都要兼容。 */
+.lg-complex-list > span {
+  display: block;
+}
+
+.lg-complex-list > span.lg-is-selected .lg-complex-list__item {
+  background: var(--lg-color-row-selected);
+  border-color: var(--lg-color-row-selected);
+  color: #fff;
+}
+
+.lg-complex-list > span.lg-is-selected .lg-complex-list__item-title {
+  color: #fff;
+}
+
+.lg-complex-list > span.lg-is-enabled .lg-complex-list__tick {
+  background: var(--lg-color-accent);
+  border-color: var(--lg-color-accent);
+  color: #fff;
+}
+
+.lg-complex-list__item .lg-complex-list__item-title {
+  flex: 1 1 auto;
+  min-width: 0;
+  width: auto;
+  padding-left: 4px;
+  color: var(--lg-color-text);
+  font-size: var(--lg-font-size);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.lg-complex-list__item.lg-is-selected .lg-complex-list__item-title {
+  color: #fff;
+}
+
+.lg-complex-list__item .lg-complex-list__tick {
+  flex: 0 0 auto;
+  width: 20px;
+  height: 20px;
+  margin: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--lg-color-checkbox-bg);
+  border: 1px solid var(--lg-color-checkbox-border);
+  border-radius: var(--lg-radius-sm);
+  color: var(--lg-color-text-muted);
+  font-size: var(--lg-font-size-xs);
+  line-height: 1;
+  vertical-align: middle;
+}
+
+.lg-complex-list__item.lg-is-enabled .lg-complex-list__tick {
+  background: var(--lg-color-accent);
+  border-color: var(--lg-color-accent);
+  color: #fff;
+}
+
+/* 默认 item_code 里 tick 内含文本 "Tick"，隐藏文字用对勾代替。 */
+.lg-complex-list__tick > span {
+  font-size: 0;
+  line-height: 0;
+}
+
+.lg-complex-list__item.lg-is-enabled .lg-complex-list__tick > span::after,
+.lg-complex-list > span.lg-is-enabled .lg-complex-list__tick > span::after {
+  content: "✓";
+  font-size: 11px;
+  line-height: 1;
+  color: #fff;
+}
+
+.lg-complex-list__item.lg-is-selected .lg-complex-list__tick {
+  border-color: rgba(255, 255, 255, 0.7);
+}
+
+.lg-complex-list__item button {
+  background: var(--lg-color-button);
+  border: 1px solid var(--lg-color-border-strong);
+  border-radius: var(--lg-radius-sm);
+  color: var(--lg-color-button-text);
+  margin: 0;
+  padding: 1px 6px;
+}
+
+.lg-complex-list__item button:hover {
+  background: var(--lg-color-button-hover);
+}
+
+/* ==========================================================================
+   9. Tables
+   ========================================================================== */
+
+/* 旧样式把 table/tr/th/td 改成 block/inline-block，导致列宽错位；
+ * 这里恢复真正的表格布局，并用 table-layout:fixed 防止窄屏被长内容撑开。 */
+table.lg-table {
+  display: table;
+  width: 100%;
+  max-width: 100%;
+  height: auto;
+  margin: 0;
+  border-collapse: collapse;
+  border-spacing: 0;
+  table-layout: fixed;
+  background: var(--lg-color-bg-alt);
+  color: var(--lg-color-text);
+  font-family: var(--lg-font);
+  font-size: var(--lg-font-size-sm);
+  box-sizing: border-box;
+}
+
+table.lg-table tr {
+  display: table-row;
+  width: auto;
+  background: var(--lg-color-bg-alt);
+  border: 0;
+}
+
+table.lg-table th,
+table.lg-table td {
+  display: table-cell;
+  vertical-align: middle;
+  padding: 5px 8px;
+  border-top: 0;
+  border-left: 0;
+  border-right: 1px solid var(--lg-color-table-border);
+  border-bottom: 1px solid var(--lg-color-table-border);
+  color: var(--lg-color-text);
+  font-family: var(--lg-font);
+  font-size: var(--lg-font-size-sm);
+  line-height: 1.45;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  box-sizing: border-box;
+}
+
+table.lg-table th:last-child,
+table.lg-table td:last-child {
+  border-right: 0;
+}
+
+table.lg-table th {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  background: var(--lg-color-table-head);
+  color: var(--lg-color-text);
+  font-weight: 500;
+  text-align: left;
+}
+
+table.lg-table td {
+  color: var(--lg-color-text);
+}
+
+table.lg-table tr:nth-child(even) {
+  background: var(--lg-color-row-alt);
+}
+
+table.lg-table tr:hover {
+  background: var(--lg-color-row-hover);
+}
+
+table.lg-table tr:hover td {
+  color: var(--lg-color-text-strong);
+}
+
+/* ==========================================================================
+   10. Tree / Outliner
+   ========================================================================== */
+
+.litetree {
+  height: 100%;
+  padding: 2px 0;
+  overflow: auto;
+  background: var(--lg-color-bg-alt);
+  border: 1px solid var(--lg-color-border);
+  border-radius: var(--lg-radius-sm);
+  color: var(--lg-color-text);
+  box-sizing: border-box;
+}
+
+.litetree ul.ltreeitemchildren {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+li.ltreeitem {
+  list-style: none;
+  min-height: var(--lg-row-height);
+  margin: 0 2px;
+  padding: 0;
+  border-radius: var(--lg-radius-sm);
+  color: var(--lg-color-text);
+  cursor: pointer;
+  user-select: none;
+  box-sizing: border-box;
+}
+
+li.ltreeitem:nth-child(even) {
+  background: var(--lg-color-row-alt);
+}
+
+li.ltreeitem:hover {
+  background: var(--lg-color-row-hover);
+}
+
+li.ltreeitem.selected {
+  background: var(--lg-color-row-selected);
+  color: #fff;
+}
+
+li.ltreeitem.semiselected {
+  background: var(--lg-color-row-semiselected);
+}
+
+li.ltreeitem.hidden,
+li.ltreeitem.filtered {
+  display: none;
+}
+
+li.ltreeitem div.ltreeitemtitle {
+  min-height: var(--lg-row-height);
+  padding: 0 6px;
+  display: flex;
+  align-items: center;
+  color: inherit;
+  white-space: nowrap;
+  box-sizing: border-box;
+}
+
+li.ltreeitem div.ltreeitemtitle .precontent,
+li.ltreeitem div.ltreeitemtitle .indentblock,
+li.ltreeitem div.ltreeitemtitle .collapsebox,
+li.ltreeitem div.ltreeitemtitle .postcontent {
+  flex: 0 0 auto;
+}
+
+li.ltreeitem div.ltreeitemtitle .incontent {
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  color: inherit;
+}
+
+li.ltreeitem div.ltreeitemtitle .incontent:hover {
+  color: var(--lg-color-text-strong);
+}
+
+li.ltreeitem.selected div.ltreeitemtitle .incontent,
+li.ltreeitem.selected div.ltreeitemtitle .incontent:hover {
+  color: #fff;
+}
+
+li.ltreeitem.semiselected div.ltreeitemtitle .incontent {
+  color: var(--lg-color-text-strong);
+}
+
+li.ltreeitem div.ltreeitemtitle.dragover .incontent {
+  background: var(--lg-color-accent);
+  color: #fff;
+  padding: 1px 4px;
+  border-radius: var(--lg-radius-sm);
   font-size: var(--lg-font-size);
 }
 
-:root:not([data-lg-theme="light"]) .lg-list__item:hover {
-  background: #333;
+li.ltreeitem .ltreeitemtitle .precontent {
+  margin-right: 4px;
 }
 
-:root:not([data-lg-theme="light"]) .lg-list__item.lg-is-selected {
+li.ltreeitem .ltreeitemtitle .postcontent {
+  margin-left: 4px;
+}
+
+.listbox {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 14px;
+  height: 14px;
+  margin: 0 6px 0 0;
+  padding: 0;
+  color: var(--lg-color-text-muted);
+  font-size: 10px;
+  line-height: 1;
+  text-align: center;
+  border-radius: var(--lg-radius-sm);
+  vertical-align: middle;
+}
+
+.listbox:hover {
+  color: var(--lg-color-text-strong);
+  background: var(--lg-color-header-2);
+}
+
+.listbox.empty {
+  width: 6px;
+  height: 6px;
+  margin: 0 6px 0 4px;
+  color: transparent;
+  background: var(--lg-color-border-strong);
+  text-indent: 100%;
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+/* ==========================================================================
+   11. Inspector / Properties
+   ========================================================================== */
+
+.inspector {
+  width: 100%;
+  max-width: 100%;
+  padding: 2px 6px;
+  color: var(--lg-color-text);
+  font-size: var(--lg-font-size);
+  line-height: 1.45;
+  overflow-x: hidden;
+  box-sizing: border-box;
+}
+
+.inspector.one_line {
+  margin-bottom: 0;
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+.inspector .widget {
+  min-height: var(--lg-row-height);
+  padding: 1px 0;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  border-radius: var(--lg-radius-sm);
+  box-sizing: border-box;
+}
+
+.inspector:not(.one_line) .widget {
+  flex-wrap: nowrap;
+}
+
+.inspector .widget:hover {
+  background-color: var(--lg-color-row-hover) !important;
+}
+
+.inspector .widget.even {
+  background-color: var(--lg-color-row-alt);
+}
+
+.inspector.one_line .widget {
+  min-width: 100px;
+  display: inline-flex;
+}
+
+.inspector .wname {
+  flex: 0 0 auto;
+  width: 96px;
+  max-width: 50%;
+  padding: 0 8px 0 2px;
+  color: var(--lg-color-text-muted);
+  font-weight: 400;
+  line-height: var(--lg-row-height);
+  vertical-align: middle;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  box-sizing: border-box;
+  user-select: none;
+}
+
+.inspector.one_line .wname {
+  width: auto;
+}
+
+.inspector .wname .filling {
+  color: var(--lg-color-text-muted);
+  opacity: 0.6;
+  margin-left: 5px;
+}
+
+.inspector .wcontent,
+.inspector .info_content {
+  flex: 1 1 auto;
+  min-width: 0;
+  width: auto;
+  max-width: 100%;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  box-sizing: border-box;
+}
+
+.inspector .wcontent.full,
+.inspector .info_content.full {
+  width: 100%;
+  padding-left: 0;
+}
+
+.inspector.proportionalnamesize .wname {
+  width: 30%;
+  max-width: 30%;
+}
+
+.inspector.proportionalnamesize .wcontent,
+.inspector.proportionalnamesize .info_content {
+  width: 70%;
+}
+
+.inspector .inputfield {
+  flex: 1 1 auto;
+  min-width: 0;
+  height: 24px;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  background: var(--lg-color-input-bg);
+  border: 1px solid var(--lg-color-input-border);
+  border-radius: var(--lg-radius-sm);
+  overflow: hidden;
+  box-sizing: border-box;
+}
+
+.inspector .inputfield.full,
+.inspector .wcontent .inputfield,
+.inspector .wcontent .inputfield.full {
+  width: 100%;
+  max-width: 100%;
+}
+
+.inspector .inputfield input,
+.inspector .inputfield textarea {
+  width: 100%;
+  height: 22px;
+  min-width: 0;
+  padding: 0 6px;
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+  color: var(--lg-color-input-text);
+  font-family: var(--lg-font);
+  font-size: var(--lg-font-size-sm);
+  line-height: 1.4;
+  outline: none;
+  box-sizing: border-box;
+}
+
+.inspector .inputfield input:focus,
+.inspector .inputfield textarea:focus {
+  outline: none;
+  background: var(--lg-color-input-bg);
+  box-shadow: inset 0 0 0 1px var(--lg-color-accent);
+}
+
+.inspector .inputfield.disabled {
+  background: var(--lg-color-panel-2);
+  opacity: 0.6;
+}
+
+.inspector .inputfield.disabled input,
+.inspector .inputfield.disabled textarea {
+  color: var(--lg-color-text-muted);
+}
+
+.inspector .inputfield.textarea,
+.inspector .wcontent .inputfield.textarea {
+  height: auto;
+  min-height: 52px;
+  display: block;
+  width: 100%;
+}
+
+.inspector .inputfield.textarea textarea,
+.inspector .wcontent .inputfield textarea {
+  height: 48px;
+  padding: 4px 6px;
+  resize: vertical;
+}
+
+.inspector .inputfield.button,
+.inspector .wcontent .inputfield.button {
+  width: auto;
+  flex: 1 1 auto;
+}
+
+/* 旧样式把 Inspector 输入文字设成蓝色 #5af；亮/暗主题都改为 token 文本色。 */
+.inspector .wcontent input,
+.inspector .wcontent textarea {
+  color: var(--lg-color-input-text);
+  border: 0;
+  background-color: transparent;
+}
+
+.inspector .wcontent input.number {
+  color: var(--lg-color-number);
+  text-align: center;
+}
+
+.inspector input::placeholder,
+.inspector input::-webkit-input-placeholder {
+  color: var(--lg-color-placeholder);
+}
+
+.inspector .wcontent select {
+  width: 100%;
+  max-width: 100%;
+  height: 24px;
+  padding: 0 4px;
+  color: var(--lg-color-input-text);
+  background: var(--lg-color-input-bg);
+  border: 1px solid var(--lg-color-input-border);
+  border-radius: var(--lg-radius-sm);
+  font-family: var(--lg-font);
+  font-size: var(--lg-font-size-sm);
+  box-sizing: border-box;
+}
+
+.inspector .wcontent select.disabled {
+  background: var(--lg-color-panel-2);
+  color: var(--lg-color-text-muted);
+}
+
+/* 旧样式 `.inspector .wcontent .inputcombo select` 会把下拉框刷成近黑色。 */
+.inspector .wcontent .inputcombo select,
+.inspector .wcontent .inputcombo {
+  background: var(--lg-color-input-bg);
+  color: var(--lg-color-input-text);
+  border-color: var(--lg-color-input-border);
+}
+
+.inspector .itemvalue {
+  color: var(--lg-color-number);
+}
+
+.inspector .winfo {
+  display: block;
+  width: auto;
+  margin: 8px 6px;
+  color: var(--lg-color-text-muted);
+}
+
+/* Inspector 内部的旧 checkbox（span.flag.checkbox.on） */
+.inspector .wcontent .checkbox {
+  width: auto;
+  min-width: 44px;
+  max-width: 100%;
+  height: 22px;
+  padding: 0 8px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--lg-color-input-bg);
+  border: 1px solid var(--lg-color-input-border);
+  border-radius: var(--lg-radius-sm);
+  color: var(--lg-color-text-muted);
+  font-size: var(--lg-font-size-xs);
+  line-height: 1;
+  text-align: center;
+  margin: 0 !important;
+  cursor: pointer;
+}
+
+.inspector .wcontent .checkbox.on {
+  background: var(--lg-color-accent);
+  border-color: var(--lg-color-accent);
+  color: #fff;
+}
+
+.inspector .wcontent .flag {
+  color: var(--lg-color-text-muted);
+  font-size: var(--lg-font-size-xs);
+  margin-left: 5px;
+}
+
+.inspector .wtitle,
+.inspector .wsectiontitle {
+  position: relative;
+  min-height: var(--lg-row-height);
+  padding: 0 8px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--lg-color-header-2);
+  color: var(--lg-color-text-strong);
+  font-size: var(--lg-font-size-sm);
+  font-weight: 500;
+  border: 1px solid var(--lg-color-border);
+  border-radius: var(--lg-radius-sm);
+  box-shadow: none;
+  overflow: hidden;
+  box-sizing: border-box;
+}
+
+.inspector .wtitle {
+  margin-top: 6px;
+  color: var(--lg-color-text-muted);
+  background: var(--lg-color-header);
+}
+
+.inspector.dark .wtitle {
+  background: var(--lg-color-header);
+}
+
+.inspector .wsectiontitle {
+  margin-top: 0;
+  border-bottom: 0;
+  border-radius: var(--lg-radius-sm) var(--lg-radius-sm) 0 0;
+}
+
+.inspector .wsectiontitle .buttons {
+  position: absolute;
+  top: 3px;
+  right: 4px;
+  display: flex;
+  gap: 2px;
+}
+
+.inspector .wsectiontitle button {
+  font-size: var(--lg-font-size-xs);
+  background: var(--lg-color-button);
+  border: 1px solid var(--lg-color-border-strong);
+  color: var(--lg-color-button-text);
+  box-shadow: none;
+  padding: 0 4px;
+  margin: 0 0 0 2px;
+}
+
+.inspector .wsectioncontent {
+  padding: 4px 6px 6px;
+  background: var(--lg-color-panel-2);
+  border: 1px solid var(--lg-color-border);
+  border-top: 0;
+  border-radius: 0 0 var(--lg-radius-sm) var(--lg-radius-sm);
+  transition: none;
+}
+
+.inspector .wsection {
+  margin-bottom: 8px;
+}
+
+.inspector .wsection.selected .wsectiontitle {
   background: var(--lg-color-accent);
   color: #fff;
 }
 
-:root:not([data-lg-theme="light"]) .lg-list__item.lg-is-selected::after,
-:root:not([data-lg-theme="light"]) .lg-list__item.lg-is-selected::before {
-  display: none;
+.inspector .wsection.selected .wsectioncontent {
+  border: 1px solid var(--lg-color-accent);
+  border-top: 0;
 }
 
-:root:not([data-lg-theme="light"]) .lg-complex-list {
-  background: #282828;
-  border: 1px solid var(--lg-color-border);
-  border-radius: var(--lg-radius);
+.inspector .wsection.collapsed {
+  margin-bottom: 0;
+  padding-bottom: 0;
 }
 
-:root:not([data-lg-theme="light"]) .lg-complex-list__item {
-  background: #2e2e2e;
-  border: 1px solid var(--lg-color-border);
-  color: var(--lg-color-text);
-}
-
-/* ---------- tables ---------- */
-
-:root:not([data-lg-theme="light"]) .lg-table {
-  background: #282828;
-  color: var(--lg-color-text);
-  font-size: var(--lg-font-size-sm);
-}
-
-:root:not([data-lg-theme="light"]) .lg-table th {
-  background: #353535;
-  color: #c8c8c8;
-  border-right: 1px solid var(--lg-color-border);
+.inspector .wsection.collapsed .wsectiontitle {
   border-bottom: 1px solid var(--lg-color-border);
-  padding: 6px 8px;
-  font-weight: 500;
+  border-radius: var(--lg-radius-sm);
 }
 
-:root:not([data-lg-theme="light"]) .lg-table td {
-  border-right: 1px solid #333;
-  border-bottom: 1px solid #333;
-  padding: 5px 8px;
+.inspector .wsection.notitle {
+  margin: 0;
+  padding: 0;
 }
 
-:root:not([data-lg-theme="light"]) .lg-table tr:nth-child(even) {
-  background: rgba(255, 255, 255, 0.025);
-}
-
-:root:not([data-lg-theme="light"]) .lg-table tr:hover {
-  background: rgba(71, 114, 179, 0.14);
-}
-
-/* ---------- console ---------- */
-
-:root:not([data-lg-theme="light"]) .lg-console {
-  background: #151515;
-  border: 1px solid var(--lg-color-border);
-  border-radius: var(--lg-radius);
-  color: #c8c8c8;
-  font: 12px/1.55 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
-}
-
-:root:not([data-lg-theme="light"]) .lg-console__footer {
-  background: #252525;
+.inspector .separator {
+  width: 100%;
+  margin: 6px 0;
   border-top: 1px solid var(--lg-color-border);
+  border-bottom: 0;
 }
 
-:root:not([data-lg-theme="light"]) .lg-console__message--warn { color: #d8b04a; }
-:root:not([data-lg-theme="light"]) .lg-console__message--error { color: #d86a6a; }
-:root:not([data-lg-theme="light"]) .lg-console__message--me { color: #7fa7d8; }
-
-/* ---------- dialog ---------- */
-
-:root:not([data-lg-theme="light"]) .lg-dialog {
-  min-width: 280px;
+.inspector.one_line .separator {
+  display: inline-block;
+  width: auto;
+  height: 1em;
+  margin: 2px 5px 0;
+  border-top: 0;
+  border-left: 1px solid var(--lg-color-border);
+  border-right: 0;
 }
 
-:root:not([data-lg-theme="light"]) .lg-dialog__buttons {
-  background: var(--lg-color-header);
-  border-bottom: 1px solid var(--lg-color-border);
+.inspector .wgroup {
+  width: 100%;
+  margin-top: 2px;
 }
 
-:root:not([data-lg-theme="light"]) .lg-dialog__footer .lg-button__control {
-  min-width: 72px;
+.inspector .wgroup .wgroupheader {
+  margin-top: 0;
+  padding-left: 4px;
+  cursor: pointer;
 }
 
-/* ---------- areas / split ---------- */
+.inspector .wgroup .wgroupcontent {
+  margin-left: 10px;
+}
 
-:root:not([data-lg-theme="light"]) .lg-area {
+.inspector .wgrouptoggle {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  margin: 0 4px 0 2px;
+  color: var(--lg-color-text-muted);
+  font-size: 12px;
+  line-height: 8px;
+}
+
+.inspector .switch-section-button {
+  display: inline-block;
+  margin: 0 2px 0 0;
+  border-top: 6px solid var(--lg-color-text-muted);
+  border-left: 5px solid transparent;
+  border-right: 5px solid transparent;
+  border-bottom: 5px solid transparent;
+}
+
+.inspector .collapsed .switch-section-button {
+  margin: 0 2px 0 0;
+  border-top: 5px solid transparent;
+  border-bottom: 5px solid transparent;
+  border-left: 6px solid var(--lg-color-text-muted);
+  border-right: 5px solid transparent;
+}
+
+.inspector .wgroupheader:not(.collapsed) .switch-section-button {
+  border-top-color: var(--lg-color-text);
+  border-left-color: transparent;
+}
+
+.inspector .wgroupheader.collapsed .switch-section-button {
+  border-left-color: var(--lg-color-text);
+  border-top-color: transparent;
+}
+
+.inspector .wcontent button,
+.inspector button.litebutton,
+.inspector button.wcombobutton {
+  background: var(--lg-color-button);
+  background-image: none;
+  border: 1px solid var(--lg-color-border-strong);
+  border-radius: var(--lg-radius-sm);
+  color: var(--lg-color-button-text);
+  box-shadow: none;
+  text-shadow: none;
+}
+
+.inspector .wcontent button:hover,
+.inspector button.litebutton:hover,
+.inspector button.wcombobutton:hover {
+  background: var(--lg-color-button-hover);
+}
+
+.inspector .wcontent button.micro {
+  width: 22px;
+  margin: 0 0 0 4px;
+  padding: 0;
+}
+
+button.wcombobutton.selected {
+  background: var(--lg-color-accent) !important;
+  border-color: var(--lg-color-accent) !important;
+  color: #fff !important;
+}
+
+.inspector .wtag {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 1px 4px;
+  margin: 1px;
+  background: var(--lg-color-header-2);
+  border: 1px solid var(--lg-color-border);
+  border-radius: var(--lg-radius-sm);
+  color: var(--lg-color-text);
+}
+
+.inspector .wtag .close {
+  background: var(--lg-color-button);
+  color: var(--lg-color-text-muted);
+  padding: 0 3px;
+  border-radius: var(--lg-radius-sm);
+  cursor: pointer;
+}
+
+.inspector .wtag .close:hover {
+  background: var(--lg-color-error);
+  color: #fff;
+}
+
+.inspector ul.lite-list {
+  margin: 2px;
+  padding: 0;
+  list-style: none;
+  min-height: 2em;
+}
+
+.inspector ul.lite-list li {
+  margin: 1px 0;
+  padding: 2px 6px;
+  border-radius: var(--lg-radius-sm);
+  cursor: pointer;
+}
+
+.inspector ul.lite-list li.selected {
+  background: var(--lg-color-row-selected);
+  color: #fff;
+}
+
+.inspector ul.lite-list li:hover {
+  background: var(--lg-color-row-hover);
+  color: var(--lg-color-text-strong);
+}
+
+.inspector .row-index {
+  width: 30px;
+  text-align: center;
+  color: var(--lg-color-text-muted);
+}
+
+.inspector .row-cell {
+  flex: 1 1 auto;
+  width: auto;
+  min-width: 0;
+}
+
+.inspector .array-row {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  min-height: 26px;
+}
+
+.inspector .array-row .row-trash {
+  width: 26px;
+  flex: 0 0 auto;
+}
+
+/* ==========================================================================
+   12. Console
+   ========================================================================== */
+
+.lg-console {
+  width: 100%;
+  height: 100%;
+  background: var(--lg-color-console-bg);
+  border: 1px solid var(--lg-color-border);
+  border-radius: var(--lg-radius-sm);
+  color: var(--lg-color-console-text);
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: var(--lg-font-size-sm);
+  line-height: 1.55;
+  box-sizing: border-box;
+}
+
+.lg-console__log {
+  background: transparent;
+  color: inherit;
+  padding: 6px 8px;
+  box-sizing: border-box;
+}
+
+.lg-console__footer {
+  background: var(--lg-color-panel-2);
+  border-top: 1px solid var(--lg-color-border);
+  height: 26px;
+  box-sizing: border-box;
+}
+
+.lg-console__footer input {
+  width: 100%;
+  height: 25px;
+  padding: 0 8px;
+  background: transparent;
+  border: 0;
+  color: var(--lg-color-console-text);
+  font-family: inherit;
+  font-size: var(--lg-font-size-sm);
+  outline: none;
+}
+
+.lg-console__message--warn { color: var(--lg-color-warn); }
+.lg-console__message--error { color: #ff6b6b; }
+.lg-console__message--good { color: #8bd88b; }
+.lg-console__message--me { color: #8fb4e8; }
+.lg-console__message--log { color: var(--lg-color-console-text); }
+
+/* ==========================================================================
+   13. Tooltips
+   ========================================================================== */
+
+.lg-tooltip,
+[role="tooltip"].lg-tooltip {
+  background: var(--lg-color-tooltip-bg);
+  color: var(--lg-color-tooltip-text);
+  border: 1px solid var(--lg-color-border-strong);
+  border-radius: var(--lg-radius-sm);
+  padding: 4px 8px;
+  font-size: var(--lg-font-size-sm);
+  box-shadow: var(--lg-shadow-menu);
+}
+
+/* ==========================================================================
+   14. Areas / split / misc
+   ========================================================================== */
+
+.lg-area {
   background: var(--lg-color-bg);
 }
 
-:root:not([data-lg-theme="light"]) .lg-area__splitbar,
-:root:not([data-lg-theme="light"]) .lg-split__splitbar {
-  background: var(--lg-color-border);
+.lg-area__content {
+  background: var(--lg-color-bg);
 }
 
-:root:not([data-lg-theme="light"]) .lg-area__splitbar:hover,
-:root:not([data-lg-theme="light"]) .lg-split__splitbar:hover {
+.lg-area__splitbar,
+.lg-split__splitbar {
+  background: var(--lg-color-border-strong);
+}
+
+.lg-area__splitbar:hover,
+.lg-split__splitbar:hover {
   background: var(--lg-color-accent);
+  transition: none;
 }
 
-/* ---------- light theme keeps readable neutral surfaces ---------- */
+.lg-split__section {
+  box-sizing: border-box;
+}
 
-:root[data-lg-theme="light"] body {
-  font-family: var(--lg-font);
-  font-size: 13px;
+.lg-colorpicker-window,
+.colorpicker-window {
+  background: var(--lg-color-panel);
+  border: 1px solid var(--lg-color-border);
+  color: var(--lg-color-text);
+}
+
+/* ==========================================================================
+   15. Narrow screens: keep controls shrinkable, avoid horizontal overflow
+   ========================================================================== */
+
+@media (max-width: 480px) {
+  .lg-panel .lg-panel__content,
+  .lg-dialog .lg-dialog__content {
+    padding: 6px;
+  }
+
+  .lg-dialog .lg-dialog__content {
+    padding-bottom: 38px;
+  }
+
+  .lg-dialog {
+    min-width: 0;
+    width: calc(100vw - 16px);
+    max-width: calc(100vw - 16px);
+  }
+
+  .lg-menu__panel,
+  .lg-context-menu {
+    min-width: 0;
+    max-width: calc(100vw - 12px);
+  }
+
+  .inspector .wname {
+    width: 82px;
+  }
+
+  table.lg-table th,
+  table.lg-table td {
+    padding: 4px 5px;
+    font-size: var(--lg-font-size-xs);
+  }
+
+  .lg-tabs .lg-tabs__tab {
+    min-width: 48px;
+    padding: 0 8px;
+  }
+}
+
+/* ------------------------------------------------------------------ */
+/* Blender Light: workspace components added after the first theme pass */
+/* Palette from Blender_Light.xml: bg #6b6b6b, panel #cccccc, header    */
+/* #adadad, control #dbdbdb, border #4d4d4d, accent #5680c2.            */
+/* ------------------------------------------------------------------ */
+
+:root[data-lg-theme="light"] .lg-toolbar {
+	background: var(--lg-color-header);
+	color: var(--lg-color-text);
+}
+
+:root[data-lg-theme="light"] .lg-toolbar__tool {
+	color: var(--lg-color-text);
+}
+
+:root[data-lg-theme="light"] .lg-toolbar__tool:hover {
+	background: var(--lg-color-header-2);
+	color: var(--lg-color-text-strong);
+}
+
+:root[data-lg-theme="light"] .lg-toolbar__tool--active,
+:root[data-lg-theme="light"] .lg-toolbar__tool--active:hover {
+	background: var(--lg-color-accent);
+	border-color: var(--lg-color-accent);
+	color: #fff;
+}
+
+:root[data-lg-theme="light"] .lg-timeline {
+	--lg-timeline-bg: #999999;
+	--lg-timeline-ruler: #adadad;
+	--lg-timeline-line: #8e8e8e;
+	--lg-timeline-text: #1a1a1a;
+	--lg-timeline-key: #a05e00;
+}
+
+:root[data-lg-theme="light"] .lg-timeline,
+:root[data-lg-theme="light"] .lg-timeline__body {
+	background: var(--lg-color-bg);
+}
+
+:root[data-lg-theme="light"] .lg-text-editor {
+	background: #e6e6e6;
+	color: #1a1a1a;
+}
+
+:root[data-lg-theme="light"] .lg-text-editor__body,
+:root[data-lg-theme="light"] .lg-text-editor__textarea {
+	background: #e6e6e6;
+	color: #1a1a1a;
+}
+
+:root[data-lg-theme="light"] .lg-text-editor__gutter {
+	background: #c0c0c0;
+	color: #666;
+	border-right-color: #999;
+}
+
+:root[data-lg-theme="light"] .lg-text-editor__footer {
+	background: #c0c0c0;
+	color: #4d4d4d;
+	border-top-color: #999;
+}
+
+:root[data-lg-theme="light"] .lg-text-editor__status {
+	color: #4d4d4d;
+}
+
+:root[data-lg-theme="light"] .lg-text-editor__tab--active {
+	color: #1a1a1a;
+	background: #cccccc;
+}
+
+:root[data-lg-theme="light"] .lg-text-editor__textarea::selection {
+	background: rgba(86, 128, 194, 0.35);
+}
+
+:root[data-lg-theme="light"] .lg-image-editor {
+	background: #999999;
+	color: #1a1a1a;
+}
+
+:root[data-lg-theme="light"] .lg-image-editor__viewport {
+	background-color: #cccccc;
+	background-image: linear-gradient(45deg, #b3b3b3 25%, transparent 25%),
+		linear-gradient(-45deg, #b3b3b3 25%, transparent 25%),
+		linear-gradient(45deg, transparent 75%, #b3b3b3 75%),
+		linear-gradient(-45deg, transparent 75%, #b3b3b3 75%);
+}
+
+:root[data-lg-theme="light"] .lg-image-editor:not(.lg-image-editor--checkerboard) .lg-image-editor__viewport {
+	background-color: #808080;
+}
+
+:root[data-lg-theme="light"] .lg-image-editor__empty {
+	color: #4d4d4d;
+}
+
+:root[data-lg-theme="light"] .lg-image-editor__btn {
+	color: #1a1a1a;
+}
+
+:root[data-lg-theme="light"] .lg-image-editor__btn:hover {
+	background: #c0c0c0;
+	border-color: #4d4d4d;
+}
+
+:root[data-lg-theme="light"] .lg-node-editor {
+	background: #999999;
+	color: #1a1a1a;
+}
+
+:root[data-lg-theme="light"] .lg-node-editor__canvas {
+	background-color: #6b6b6b;
+	background-image: linear-gradient(rgba(0, 0, 0, 0.1) 1px, transparent 1px),
+		linear-gradient(90deg, rgba(0, 0, 0, 0.1) 1px, transparent 1px),
+		linear-gradient(rgba(0, 0, 0, 0.05) 1px, transparent 1px),
+		linear-gradient(90deg, rgba(0, 0, 0, 0.05) 1px, transparent 1px);
+	background-size: 80px 80px, 80px 80px, 20px 20px, 20px 20px;
+}
+
+:root[data-lg-theme="light"] .lg-node-editor__link {
+	stroke: #4d4d4d;
+}
+
+:root[data-lg-theme="light"] .lg-node-editor__node {
+	background: #cccccc;
+	border-color: #4d4d4d;
+	box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25);
+}
+
+:root[data-lg-theme="light"] .lg-node-editor__node--selected {
+	border-color: #5680c2;
+	box-shadow: 0 0 0 1px #5680c2, 0 4px 16px rgba(0, 0, 0, 0.3);
+}
+
+:root[data-lg-theme="light"] .lg-node-editor__node-header {
+	color: #1a1a1a;
+}
+
+:root[data-lg-theme="light"] .lg-node-editor__node-body {
+	background: #cccccc;
+	color: #1a1a1a;
+}
+
+:root[data-lg-theme="light"] .lg-node-editor__node-dot {
+	background: rgba(0, 0, 0, 0.5);
+	box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.6);
 }

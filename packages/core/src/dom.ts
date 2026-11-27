@@ -103,32 +103,49 @@ export function draggable(
   handle.addEventListener("mousedown", handleMouse);
   handle.style.cursor = "move";
 
-  let prevX = 0;
-  let prevY = 0;
-  let rect = container.getClientRects()[0];
-  let x = rect ? rect.left : 0;
-  let y = rect ? rect.top : 0;
+  let startX = 0;
+  let startY = 0;
+  let originLeft = 0;
+  let originTop = 0;
 
-  container.style.position = "absolute";
-  container.style.left = x + "px";
-  container.style.top = y + "px";
+  /**
+   * 把 viewport 坐标转换成相对 offsetParent 的绝对定位坐标。
+   *
+   * 这是 Dialog 拖拽跳动的根因：以前只在初始化时缓存 getClientRects()，
+   * 但 absolute 的 left/top 是相对最近的定位祖先（通常 .lg-app），
+   * 二者坐标系不同；而且 setPosition()/center() 之后缓存不会同步。
+   */
+  function positionInOffsetParent(): { left: number; top: number } {
+    const rect = container.getBoundingClientRect();
+    const parent = container.offsetParent as HTMLElement | null;
+    if (parent) {
+      const parentRect = parent.getBoundingClientRect();
+      return {
+        left: rect.left - parentRect.left + parent.scrollLeft,
+        top: rect.top - parentRect.top + parent.scrollTop
+      };
+    }
+    return { left: rect.left + window.scrollX, top: rect.top + window.scrollY };
+  }
 
   function handleMouse(e: MouseEvent) {
     if (e.type === "mousedown") {
-      if (!rect) {
-        rect = container.getClientRects()[0];
-        x = rect ? rect.left : 0;
-        y = rect ? rect.top : 0;
-      }
-
       if (onIsDraggable && onIsDraggable(container, e) === false) {
         e.stopPropagation();
         e.preventDefault();
         return false;
       }
 
-      prevX = e.clientX;
-      prevY = e.clientY;
+      // 每次开始拖动都重新取当前位置，setPosition()/center()/窗口 resize 后不会跳。
+      const current = positionInOffsetParent();
+      originLeft = current.left;
+      originTop = current.top;
+      container.style.position = "absolute";
+      container.style.left = `${originLeft}px`;
+      container.style.top = `${originTop}px`;
+      startX = e.clientX;
+      startY = e.clientY;
+
       document.addEventListener("mousemove", handleMouse);
       document.addEventListener("mouseup", handleMouse);
       if (onStart) onStart(container, e);
@@ -145,12 +162,10 @@ export function draggable(
     }
 
     if (e.type === "mousemove") {
-      x += e.clientX - prevX;
-      y += e.clientY - prevY;
-      prevX = e.clientX;
-      prevY = e.clientY;
-      container.style.left = x + "px";
-      container.style.top = y + "px";
+      const left = originLeft + (e.clientX - startX);
+      const top = originTop + (e.clientY - startY);
+      container.style.left = `${left}px`;
+      container.style.top = `${top}px`;
     }
     return true;
   }

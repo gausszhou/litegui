@@ -1,0 +1,211 @@
+/* HeaderBar — application top bar and editor area headers.
+ * BEM: .lg-header-bar, --topbar/--area, __left/__center/__right/__title/__button/__tab
+ */
+
+.lg-header-bar {
+	display: flex;
+	align-items: center;
+	flex: 0 0 auto;
+	min-width: 0;
+	height: var(--lg-header-height, 30px);
+	padding: 0 4px;
+	background: var(--lg-color-bg);
+	border-bottom: 1px solid var(--lg-color-border);
+	color: var(--lg-color-text);
+	font-family: var(--lg-font);
+	font-size: var(--lg-font-size-sm, 12px);
+	overflow: hidden;
+	user-select: none;
+}
+
+.lg-header-bar--topbar {
+	height: 32px;
+	padding: 0;
+	background: var(--lg-color-bg);
+}
+
+.lg-header-bar--area {
+	height: 30px;
+	padding: 0 4px;
+	background: var(--lg-color-header);
+}
+
+.lg-header-bar__left,
+.lg-header-bar__center,
+.lg-header-bar__right {
+	display: flex;
+	align-items: center;
+	min-width: 0;
+	height: 100%;
+}
+
+.lg-header-bar__left {
+	flex: 0 0 auto;
+}
+
+.lg-header-bar__center {
+	flex: 1 1 auto;
+	overflow: hidden;
+}
+
+.lg-header-bar__right {
+	flex: 0 0 auto;
+	margin-left: auto;
+	gap: 3px;
+	padding-right: 4px;
+}
+
+.lg-header-bar__text {
+	white-space: nowrap;
+}
+
+.lg-header-bar__brand {
+	display: grid;
+	place-items: center;
+	width: 42px;
+	height: 32px;
+	flex: 0 0 42px;
+	color: var(--lg-color-text-strong);
+}
+
+.lg-header-bar__brand svg {
+	width: 18px;
+	height: 18px;
+}
+
+.lg-header-bar__title {
+	display: inline-flex;
+	align-items: center;
+	gap: 5px;
+	height: 22px;
+	padding: 0 4px;
+	color: var(--lg-color-text-muted);
+	white-space: nowrap;
+	flex: 0 0 auto;
+}
+
+.lg-header-bar__title-text {
+	color: var(--lg-color-text);
+}
+
+.lg-header-bar__icon {
+	display: inline-grid;
+	place-items: center;
+	width: 15px;
+	height: 15px;
+	color: var(--lg-color-text-muted);
+}
+
+.lg-header-bar__icon svg {
+	width: 15px;
+	height: 15px;
+	display: block;
+}
+
+.lg-header-bar__spacer {
+	flex: 1 1 auto;
+	min-width: 8px;
+}
+
+.lg-header-bar__dot {
+	width: 6px;
+	height: 6px;
+	border-radius: 50%;
+	background: var(--lg-color-accent);
+	box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.65);
+	flex: 0 0 6px;
+}
+
+.lg-header-bar__tabs {
+	display: flex;
+	align-items: stretch;
+	height: 100%;
+	min-width: 0;
+	overflow: hidden;
+}
+
+.lg-header-bar__tab {
+	height: 100%;
+	padding: 0 7px;
+	border: 0;
+	border-bottom: 2px solid transparent;
+	background: transparent;
+	color: var(--lg-color-text-muted);
+	font-family: var(--lg-font);
+	font-size: 12px;
+	white-space: nowrap;
+	cursor: pointer;
+	flex: 0 0 auto;
+}
+
+.lg-header-bar__tab:hover {
+	background: var(--lg-color-header-2);
+	color: var(--lg-color-text);
+}
+
+.lg-header-bar__tab--active {
+	background: var(--lg-color-bg-alt);
+	border-bottom-color: var(--lg-color-accent);
+	color: var(--lg-color-text-strong);
+}
+
+.lg-header-bar__button {
+	display: inline-flex;
+	align-items: center;
+	gap: 4px;
+	height: 22px;
+	padding: 0 5px;
+	border: 1px solid transparent;
+	border-radius: var(--lg-radius, 2px);
+	background: transparent;
+	color: var(--lg-color-text);
+	font-family: var(--lg-font);
+	font-size: var(--lg-font-size-sm, 12px);
+	white-space: nowrap;
+	cursor: pointer;
+	flex: 0 0 auto;
+}
+
+.lg-header-bar__button:hover {
+	background: var(--lg-color-header-2);
+	border-color: var(--lg-color-border);
+}
+
+.lg-header-bar__button--active,
+.lg-header-bar__button.active {
+	background: var(--lg-color-accent);
+	border-color: var(--lg-color-accent);
+	color: #fff;
+}
+
+.lg-header-bar__icon-button {
+	display: inline-grid;
+	place-items: center;
+	width: 24px;
+	height: 22px;
+	padding: 0;
+	border: 1px solid transparent;
+	border-radius: var(--lg-radius, 2px);
+	background: transparent;
+	color: var(--lg-color-text);
+	cursor: pointer;
+	flex: 0 0 auto;
+}
+
+.lg-header-bar__icon-button:hover {
+	background: var(--lg-color-header-2);
+	border-color: var(--lg-color-border);
+}
+
+.lg-header-bar__icon-button--active,
+.lg-header-bar__icon-button.active {
+	background: var(--lg-color-accent);
+	border-color: var(--lg-color-accent);
+	color: #fff;
+}
+
+.lg-header-bar__icon-button svg {
+	width: 13px;
+	height: 13px;
+	display: block;
+}

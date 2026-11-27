@@ -1,0 +1,168 @@
+/* Timeline — ruler, playhead, keyframes and playback controls.
+ * BEM: .lg-timeline, __header/__menus/__controls/__icon-btn/__frame-box/__body/__canvas
+ */
+
+.lg-timeline {
+	--lg-timeline-bg: var(--lg-color-bg-alt, #282828);
+	--lg-timeline-ruler: #1d1d1d;
+	--lg-timeline-line: #3d3d3d;
+	--lg-timeline-text: #9a9a9a;
+	--lg-timeline-key: #d8b04a;
+
+	display: flex;
+	flex-direction: column;
+	min-height: 0;
+	background: var(--lg-color-bg);
+	border-top: 1px solid var(--lg-color-border);
+	font-family: var(--lg-font);
+	font-size: var(--lg-font-size-sm, 12px);
+	color: var(--lg-color-text);
+	user-select: none;
+}
+
+.lg-timeline__header {
+	display: flex;
+	align-items: center;
+	gap: 2px;
+	height: 30px;
+	min-height: 30px;
+	padding: 0 4px;
+	background: var(--lg-color-header);
+	border-bottom: 1px solid var(--lg-color-border);
+	overflow: hidden;
+}
+
+.lg-timeline__menus {
+	display: flex;
+	align-items: center;
+	gap: 1px;
+	flex: 0 0 auto;
+}
+
+.lg-timeline__menu {
+	height: 22px;
+	padding: 0 6px;
+	border: 1px solid transparent;
+	border-radius: var(--lg-radius, 2px);
+	background: transparent;
+	color: var(--lg-color-text);
+	font-family: var(--lg-font);
+	font-size: var(--lg-font-size-sm, 12px);
+	white-space: nowrap;
+	cursor: pointer;
+}
+
+.lg-timeline__menu:hover {
+	background: var(--lg-color-header-2);
+	border-color: var(--lg-color-border);
+}
+
+.lg-timeline__menu.active {
+	background: var(--lg-color-header-2);
+}
+
+.lg-timeline__spacer {
+	flex: 1 1 auto;
+	min-width: 6px;
+}
+
+.lg-timeline__controls {
+	display: flex;
+	align-items: center;
+	gap: 1px;
+	flex: 0 1 auto;
+	min-width: 0;
+}
+
+.lg-timeline__icon-btn {
+	display: inline-grid;
+	place-items: center;
+	width: 22px;
+	height: 22px;
+	padding: 0;
+	border: 1px solid transparent;
+	border-radius: var(--lg-radius, 2px);
+	background: transparent;
+	color: var(--lg-color-text);
+	cursor: pointer;
+	flex: 0 0 auto;
+}
+
+.lg-timeline__icon-btn:hover {
+	background: var(--lg-color-header-2);
+	border-color: var(--lg-color-border);
+}
+
+.lg-timeline__icon-btn--active {
+	background: var(--lg-color-accent);
+	border-color: var(--lg-color-accent);
+	color: #fff;
+}
+
+.lg-timeline__icon-btn svg {
+	width: 11px;
+	height: 11px;
+	display: block;
+}
+
+.lg-timeline__frame-box {
+	display: inline-flex;
+	align-items: center;
+	height: 22px;
+	margin: 0 2px;
+	border: 1px solid var(--lg-color-border);
+	border-radius: var(--lg-radius, 2px);
+	background: #1d1d1d;
+	overflow: hidden;
+	flex: 0 0 auto;
+}
+
+.lg-timeline__number {
+	width: 42px;
+	height: 100%;
+	padding: 0 2px;
+	border: 0;
+	outline: 0;
+	background: #1d1d1d;
+	color: #e6e6e6;
+	font-family: var(--lg-font);
+	font-size: var(--lg-font-size-sm, 12px);
+	text-align: center;
+	appearance: textfield;
+	-moz-appearance: textfield;
+}
+
+.lg-timeline__number::-webkit-inner-spin-button,
+.lg-timeline__number::-webkit-outer-spin-button {
+	appearance: none;
+	-webkit-appearance: none;
+	margin: 0;
+}
+
+.lg-timeline__label {
+	display: grid;
+	place-items: center;
+	height: 100%;
+	padding: 0 3px;
+	border-left: 1px solid var(--lg-color-border);
+	color: var(--lg-color-text-muted);
+	font-size: 10px;
+	cursor: ew-resize;
+}
+
+.lg-timeline__body {
+	position: relative;
+	flex: 1 1 auto;
+	min-height: 0;
+	background: var(--lg-timeline-bg);
+}
+
+.lg-timeline__canvas {
+	position: absolute;
+	inset: 0;
+	display: block;
+	width: 100%;
+	height: 100%;
+	cursor: ew-resize;
+	touch-action: none;
+}

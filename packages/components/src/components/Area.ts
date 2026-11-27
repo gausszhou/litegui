@@ -208,7 +208,7 @@ export class Area extends EventMitter {
     if (section.root.style.display !== "none") {
       return false; // already visible
     } else {
-      section.root.style.display = "inline-block";
+      section.root.style.display = this.direction === "vertical" ? "block" : "inline-block";
     }
 
     // get current section size
@@ -226,7 +226,7 @@ export class Area extends EventMitter {
     });
 
     // show splitbar
-    if (this.splitbar) this.splitbar.style.display = "inline-block";
+    if (this.splitbar) this.splitbar.style.display = this.direction === "vertical" ? "block" : "inline-block";
 
     // resize
     this.sendResizeEvent();
@@ -269,11 +269,15 @@ export class Area extends EventMitter {
     if (this.sections.length) throw "cannot split twice";
 
     //create areas
+    // 纵向分割时每个 section 都是 100% 宽，用 block 排版；
+    // 若继续用 inline-block，分割条这种几像素高的元素会被父级行高（strut）撑出空隙，
+    // 导致下方 section 被顶出容器。
+    const section_display = direction === "vertical" ? "block" : "inline-block";
     const area1 = new Area({ content_id: this.content.id }, false);
-    area1.root.style.display = "inline-block";
+    area1.root.style.display = section_display;
 
     const area2 = new Area();
-    area2.root.style.display = "inline-block";
+    area2.root.style.display = section_display;
 
     let splitinfo = "";
     let splitbar = null;
@@ -282,6 +286,7 @@ export class Area extends EventMitter {
     if (editable) {
       splitinfo = " - " + (Area.SPLITBAR_SIZE + 2) + "px"; // 2 px margin
       splitbar = this.createSplitbar(direction);
+      splitbar.style.display = section_display;
       this.splitbar = splitbar;
     }
 

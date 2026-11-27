@@ -33,7 +33,14 @@
     "./complex-list": "./src/entries/complex-list.ts",
     "./context-menu": "./src/entries/context-menu.ts",
     "./dragger": "./src/entries/dragger.ts",
-    "./line-editor": "./src/entries/line-editor.ts"
+    "./line-editor": "./src/entries/line-editor.ts",
+    "./header-bar": "./src/entries/header-bar.ts",
+    "./status-bar": "./src/entries/status-bar.ts",
+    "./timeline": "./src/entries/timeline.ts",
+    "./toolbar": "./src/entries/toolbar.ts",
+    "./node-editor": "./src/entries/node-editor.ts",
+    "./text-editor": "./src/entries/text-editor.ts",
+    "./image-editor": "./src/entries/image-editor.ts"
   },
   "sideEffects": [
     "*.css"
@@ -144,6 +151,34 @@
       "./line-editor": {
         "types": "./dist/types/entries/line-editor.d.ts",
         "import": "./dist/entries/line-editor.js"
+      },
+      "./header-bar": {
+        "types": "./dist/types/entries/header-bar.d.ts",
+        "import": "./dist/entries/header-bar.js"
+      },
+      "./status-bar": {
+        "types": "./dist/types/entries/status-bar.d.ts",
+        "import": "./dist/entries/status-bar.js"
+      },
+      "./timeline": {
+        "types": "./dist/types/entries/timeline.d.ts",
+        "import": "./dist/entries/timeline.js"
+      },
+      "./toolbar": {
+        "types": "./dist/types/entries/toolbar.d.ts",
+        "import": "./dist/entries/toolbar.js"
+      },
+      "./node-editor": {
+        "types": "./dist/types/entries/node-editor.d.ts",
+        "import": "./dist/entries/node-editor.js"
+      },
+      "./text-editor": {
+        "types": "./dist/types/entries/text-editor.d.ts",
+        "import": "./dist/entries/text-editor.js"
+      },
+      "./image-editor": {
+        "types": "./dist/types/entries/image-editor.d.ts",
+        "import": "./dist/entries/image-editor.js"
       }
     },
     "unpkg": "./dist/index.umd.cjs",

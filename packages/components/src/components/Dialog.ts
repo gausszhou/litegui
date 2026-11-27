@@ -405,7 +405,7 @@ export class Dialog extends EventMitter implements LiteComponent {
     // 启用拖拽
     if (options.draggable) {
       this.draggable = true;
-      const header = panel.querySelector<HTMLElement>(".panel-header");
+      const header = panel.querySelector<HTMLElement>(".lg-dialog__header");
       draggable(
         panel,
         header || panel,
@@ -550,7 +550,7 @@ export class Dialog extends EventMitter implements LiteComponent {
 
     // 如果启用了拖拽，重新绑定拖拽事件
     if (this.draggable) {
-      draggable(panel);
+      draggable(panel, panel.querySelector<HTMLElement>(".lg-dialog__header") || panel);
     }
 
     // 将面板添加到父元素

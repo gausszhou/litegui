@@ -1,0 +1,128 @@
+/* ImageEditor — image canvas with pan, zoom, fit and 1:1.
+ * BEM: .lg-image-editor, __header/__title/__subtitle/__zoom/__btn/__viewport/__stage/__image/__empty
+ */
+
+.lg-image-editor {
+	display: flex;
+	flex-direction: column;
+	min-width: 0;
+	min-height: 0;
+	height: 100%;
+	background: #1a1a1a;
+	color: var(--lg-color-text);
+	font-family: var(--lg-font);
+	font-size: var(--lg-font-size-sm, 12px);
+	overflow: hidden;
+}
+
+.lg-image-editor__header {
+	display: flex;
+	align-items: center;
+	gap: 4px;
+	height: 30px;
+	min-height: 30px;
+	padding: 0 6px;
+	background: var(--lg-color-header);
+	border-bottom: 1px solid var(--lg-color-border);
+}
+
+.lg-image-editor__title {
+	color: var(--lg-color-text);
+	white-space: nowrap;
+}
+
+.lg-image-editor__subtitle {
+	color: var(--lg-color-text-muted);
+	font-size: 11px;
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
+
+.lg-image-editor__spacer {
+	flex: 1 1 auto;
+}
+
+.lg-image-editor__btn {
+	height: 22px;
+	min-width: 24px;
+	padding: 0 6px;
+	border: 1px solid transparent;
+	border-radius: var(--lg-radius, 2px);
+	background: transparent;
+	color: var(--lg-color-text);
+	font-family: var(--lg-font);
+	font-size: var(--lg-font-size-sm, 12px);
+	cursor: pointer;
+}
+
+.lg-image-editor__btn:hover {
+	background: var(--lg-color-header-2);
+	border-color: var(--lg-color-border);
+}
+
+.lg-image-editor__zoom {
+	min-width: 44px;
+	text-align: center;
+	color: var(--lg-color-text);
+	font-size: 11px;
+}
+
+.lg-image-editor__viewport {
+	position: relative;
+	flex: 1 1 auto;
+	min-height: 0;
+	overflow: hidden;
+	display: grid;
+	place-items: center;
+	background-color: #2a2a2a;
+	background-image: linear-gradient(45deg, #222 25%, transparent 25%),
+		linear-gradient(-45deg, #222 25%, transparent 25%),
+		linear-gradient(45deg, transparent 75%, #222 75%),
+		linear-gradient(-45deg, transparent 75%, #222 75%);
+	background-size: 18px 18px;
+	background-position: 0 0, 0 9px, 9px -9px, -9px 0;
+	cursor: grab;
+	touch-action: none;
+}
+
+.lg-image-editor:not(.lg-image-editor--checkerboard) .lg-image-editor__viewport {
+	background-image: none;
+	background-color: #232323;
+}
+
+.lg-image-editor__viewport--dragging {
+	cursor: grabbing;
+}
+
+.lg-image-editor__stage {
+	transform-origin: center center;
+	will-change: transform;
+	display: grid;
+	place-items: center;
+	pointer-events: none;
+}
+
+.lg-image-editor__image {
+	display: block;
+	max-width: none;
+	max-height: none;
+	border: 1px solid #3d3d3d;
+	image-rendering: auto;
+	user-select: none;
+	-webkit-user-drag: none;
+}
+
+.lg-image-editor__image:not(.lg-image-editor__image--loaded) {
+	display: none;
+}
+
+.lg-image-editor__empty {
+	position: absolute;
+	left: 50%;
+	top: 50%;
+	transform: translate(-50%, -50%);
+	color: #777;
+	font-size: 12px;
+	pointer-events: none;
+}

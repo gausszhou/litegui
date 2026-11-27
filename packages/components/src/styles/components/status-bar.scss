@@ -1,0 +1,43 @@
+/* StatusBar — bottom status line.
+ * BEM: .lg-status-bar, __left/__right/__item/__accent
+ */
+
+.lg-status-bar {
+	display: flex;
+	align-items: center;
+	gap: 10px;
+	height: 26px;
+	min-height: 26px;
+	padding: 0 8px;
+	background: var(--lg-color-bg);
+	border-top: 1px solid var(--lg-color-border);
+	color: var(--lg-color-text-muted);
+	font-family: var(--lg-font);
+	font-size: var(--lg-font-size-sm, 12px);
+	overflow: hidden;
+	user-select: none;
+}
+
+.lg-status-bar__left {
+	flex: 1 1 auto;
+	min-width: 0;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+.lg-status-bar__right {
+	display: flex;
+	align-items: center;
+	gap: 10px;
+	flex: 0 0 auto;
+	white-space: nowrap;
+}
+
+.lg-status-bar__item {
+	color: var(--lg-color-text-muted);
+}
+
+.lg-status-bar__accent {
+	color: var(--lg-color-accent-hover, var(--lg-color-accent));
+}

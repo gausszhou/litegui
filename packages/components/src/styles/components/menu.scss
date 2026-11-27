@@ -43,27 +43,49 @@
 .lg-menu__panel-item {
 	font-size: 14px;
 	color: #aaa;
-	padding: 2px;
-	margin: 2px;
-	padding-left: 2px;
+	padding: 0 12px;
+	/* 平直深色下拉：条目铺满整行，hover 不内缩（与 Blender 菜单一致） */
+	margin: 0;
 	-moz-user-select: none;
 	-webkit-user-select: none;
 	user-select: none;
 	cursor: pointer;
-  display: flex;
-  align-items: center;
-  white-space: nowrap;
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	white-space: nowrap;
 }
 
 .lg-menu__panel-item .lg-menu__icon {
 	display: inline-block;
+	flex: 0 0 auto;
 	width: 12px;
 	height: 12px;
-	margin: 2px;
+	margin: 0;
 	vertical-align: top;
 }
+
+/* 没有图标（也没有勾选标记）时不要占位，让文字和 Blender 一样靠左 */
+.lg-menu__panel-item .lg-menu__icon:empty {
+	display: none;
+}
+
 .lg-menu__panel-item .lg-menu__name {
   flex: 1;
+}
+
+.lg-menu__panel-item .lg-menu__shortcut {
+	flex: 0 0 auto;
+	margin-left: 16px;
+	color: var(--lg-color-text-muted);
+	font-size: 11px;
+	letter-spacing: 0.02em;
+	opacity: 0.9;
+}
+
+.lg-menu__panel-item:hover .lg-menu__shortcut {
+	color: #fff;
+	opacity: 1;
 }
 
 .lg-menu__panel-item--checked .lg-menu__icon {
@@ -71,7 +93,8 @@
 }
 
 .lg-menu__panel-item .lg-menu__more {
-	float: right;
+	flex: 0 0 auto;
+	margin-left: auto;
 	padding-right: 5px;
 }
 

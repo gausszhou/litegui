@@ -99,6 +99,37 @@ export class Menu {
     this.auto_open = options.auto_open || false;
     this.sort_entries = options.sort_entries || false;
     this.container = options.container;
+
+    this.bindDismissEvents();
+  }
+
+  /** 点击菜单外面或按 Esc 收起面板，避免下拉菜单“关不掉” */
+  private bindDismissEvents() {
+    const close = () => {
+      if (!this.is_open) return;
+      this.is_open = false;
+      this.hideMenuPanel();
+    };
+
+    const isInside = (target: EventTarget | null) => {
+      if (!(target instanceof Node)) return false;
+      if (this.root.contains(target)) return true;
+      return this.panels.some((panel) => panel.contains(target));
+    };
+
+    document.addEventListener(
+      "mousedown",
+      (e: MouseEvent) => {
+        if (!this.is_open) return;
+        if (isInside(e.target)) return;
+        close();
+      },
+      true
+    );
+
+    document.addEventListener("keydown", (e: KeyboardEvent) => {
+      if (e.key === "Escape" || e.key === "Esc") close();
+    });
   }
 
   /**
@@ -316,6 +347,14 @@ export class Menu {
         name.className = "lg-menu__name";
         name.textContent = menu_item.name;
         $menu_item.append(icon, name);
+        // 快捷键说明（如 data.shortcut: "Ctrl+S"），右对齐显示
+        const shortcut = menu_item.data && menu_item.data.shortcut;
+        if (shortcut) {
+          const shortcut_element = document.createElement("span");
+          shortcut_element.className = "lg-menu__shortcut";
+          shortcut_element.textContent = String(shortcut);
+          $menu_item.appendChild(shortcut_element);
+        }
         if (has_submenu) {
           const more = document.createElement("span");
           more.className = "lg-menu__more";

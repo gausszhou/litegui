@@ -1,0 +1,114 @@
+/* TextEditor — text/code editor with line numbers, tabs and Ln/Col footer.
+ * BEM: .lg-text-editor, __tabs/__tab/__body/__gutter/__textarea/__footer
+ */
+
+.lg-text-editor {
+	display: flex;
+	flex-direction: column;
+	min-width: 0;
+	min-height: 0;
+	height: 100%;
+	background: #1e1e1e;
+	color: #d8d8d8;
+	font-family: var(--lg-font);
+	font-size: var(--lg-font-size-sm, 12px);
+	overflow: hidden;
+}
+
+.lg-text-editor__tabs {
+	display: flex;
+	align-items: center;
+	gap: 2px;
+	height: 30px;
+	min-height: 30px;
+	padding: 0 6px;
+	background: var(--lg-color-header);
+	border-bottom: 1px solid var(--lg-color-border);
+}
+
+.lg-text-editor__tab {
+	height: 24px;
+	padding: 0 10px;
+	border: 0;
+	border-bottom: 2px solid transparent;
+	background: transparent;
+	color: var(--lg-color-text-muted);
+	font-family: var(--lg-font);
+	font-size: var(--lg-font-size-sm, 12px);
+	cursor: pointer;
+}
+
+.lg-text-editor__tab:hover {
+	color: var(--lg-color-text);
+}
+
+.lg-text-editor__tab--active {
+	color: var(--lg-color-text-strong);
+	border-bottom-color: var(--lg-color-accent);
+}
+
+.lg-text-editor__meta {
+	margin-left: auto;
+	padding: 0 4px;
+	color: var(--lg-color-text-muted);
+	font-size: 11px;
+	white-space: nowrap;
+}
+
+.lg-text-editor__body {
+	display: flex;
+	flex: 1 1 auto;
+	min-height: 0;
+	overflow: hidden;
+	background: #1e1e1e;
+}
+
+.lg-text-editor__gutter {
+	width: 46px;
+	flex: 0 0 46px;
+	padding: 8px 8px 8px 0;
+	text-align: right;
+	color: #5a5a5a;
+	background: #252525;
+	border-right: 1px solid #333;
+	font: 12px/1.6 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+	white-space: pre;
+	overflow: hidden;
+	user-select: none;
+}
+
+.lg-text-editor__textarea {
+	flex: 1 1 auto;
+	min-width: 0;
+	padding: 8px 12px;
+	border: 0;
+	outline: 0;
+	resize: none;
+	background: #1e1e1e;
+	color: #d8d8d8;
+	font: 12px/1.6 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+	tab-size: 4;
+	white-space: pre;
+	overflow: auto;
+	user-select: text;
+}
+
+.lg-text-editor__textarea::selection {
+	background: rgba(71, 114, 179, 0.55);
+}
+
+.lg-text-editor__footer {
+	display: flex;
+	align-items: center;
+	height: 24px;
+	min-height: 24px;
+	padding: 0 8px;
+	background: #252525;
+	border-top: 1px solid #333;
+	color: #8a8a8a;
+	font-size: 11px;
+}
+
+.lg-text-editor__status {
+	color: #b8b8b8;
+}

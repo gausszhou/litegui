@@ -22,7 +22,14 @@ const entry = {
   "complex-list": resolve(__dirname, "src/entries/complex-list.ts"),
   "context-menu": resolve(__dirname, "src/entries/context-menu.ts"),
   dragger: resolve(__dirname, "src/entries/dragger.ts"),
-  "line-editor": resolve(__dirname, "src/entries/line-editor.ts")
+  "line-editor": resolve(__dirname, "src/entries/line-editor.ts"),
+  "header-bar": resolve(__dirname, "src/entries/header-bar.ts"),
+  "status-bar": resolve(__dirname, "src/entries/status-bar.ts"),
+  timeline: resolve(__dirname, "src/entries/timeline.ts"),
+  toolbar: resolve(__dirname, "src/entries/toolbar.ts"),
+  "node-editor": resolve(__dirname, "src/entries/node-editor.ts"),
+  "text-editor": resolve(__dirname, "src/entries/text-editor.ts"),
+  "image-editor": resolve(__dirname, "src/entries/image-editor.ts")
 };
 
 // ESM 构建：core / lodash-es / mitt 外置，保证 core 只有一份实例。

@@ -12,3 +12,10 @@
 @use "./widgets.scss";
 @use "./theme.scss";
 @use "./blender.scss";
+@use "./components/header-bar.scss";
+@use "./components/status-bar.scss";
+@use "./components/timeline.scss";
+@use "./components/toolbar.scss";
+@use "./components/node-editor.scss";
+@use "./components/text-editor.scss";
+@use "./components/image-editor.scss";

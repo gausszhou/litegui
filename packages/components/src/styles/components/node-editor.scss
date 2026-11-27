@@ -1,0 +1,181 @@
+/* NodeEditor — node graph canvas with draggable nodes and links.
+ * BEM: .lg-node-editor, __canvas/__links/__nodes/__node/__port/__link/__hint
+ */
+
+.lg-node-editor {
+	position: relative;
+	display: flex;
+	flex-direction: column;
+	min-width: 0;
+	min-height: 0;
+	height: 100%;
+	background: #2b2b2b;
+	color: var(--lg-color-text);
+	font-family: var(--lg-font);
+	font-size: var(--lg-font-size-sm, 12px);
+	overflow: hidden;
+	outline: 0;
+	user-select: none;
+}
+
+.lg-node-editor__canvas {
+	position: relative;
+	flex: 1 1 auto;
+	min-height: 0;
+	overflow: hidden;
+	background-color: #2b2b2b;
+	background-image: linear-gradient(rgba(255, 255, 255, 0.045) 1px, transparent 1px),
+		linear-gradient(90deg, rgba(255, 255, 255, 0.045) 1px, transparent 1px),
+		linear-gradient(rgba(255, 255, 255, 0.025) 1px, transparent 1px),
+		linear-gradient(90deg, rgba(255, 255, 255, 0.025) 1px, transparent 1px);
+	background-size: 80px 80px, 80px 80px, 20px 20px, 20px 20px;
+	cursor: default;
+	touch-action: none;
+}
+
+.lg-node-editor__links {
+	position: absolute;
+	inset: 0;
+	width: 100%;
+	height: 100%;
+	overflow: visible;
+	pointer-events: none;
+	z-index: 1;
+}
+
+.lg-node-editor__link {
+	fill: none;
+	stroke: #a8b4c4;
+	stroke-width: 1.5;
+	stroke-linecap: round;
+	opacity: 0.85;
+	pointer-events: none;
+}
+
+.lg-node-editor__link--temp {
+	stroke: var(--lg-color-accent);
+	stroke-dasharray: 5 4;
+	opacity: 0.9;
+}
+
+.lg-node-editor__nodes {
+	position: absolute;
+	inset: 0;
+	z-index: 2;
+}
+
+.lg-node-editor__node {
+	position: absolute;
+	width: 172px;
+	background: #2e2e2e;
+	border: 1px solid #1b1b1b;
+	border-radius: 4px;
+	box-shadow: 0 4px 14px rgba(0, 0, 0, 0.42);
+	overflow: hidden;
+	cursor: default;
+}
+
+.lg-node-editor__node--selected {
+	border-color: #f0a030;
+	box-shadow: 0 0 0 1px #f0a030, 0 4px 16px rgba(0, 0, 0, 0.5);
+}
+
+.lg-node-editor__node-header {
+	display: flex;
+	align-items: center;
+	gap: 5px;
+	height: 26px;
+	padding: 0 8px;
+	background: var(--lg-node-color, #5b7d5b);
+	color: #f2f2f2;
+	cursor: grab;
+}
+
+.lg-node-editor__node-header:active {
+	cursor: grabbing;
+}
+
+.lg-node-editor__node-title {
+	flex: 1 1 auto;
+	min-width: 0;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+	font-size: 12px;
+}
+
+.lg-node-editor__node-dot {
+	width: 7px;
+	height: 7px;
+	border-radius: 50%;
+	background: rgba(255, 255, 255, 0.7);
+	box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.35);
+	flex: 0 0 7px;
+}
+
+.lg-node-editor__node-body {
+	padding: 6px;
+	background: #2e2e2e;
+}
+
+.lg-node-editor__ports {
+	display: flex;
+	justify-content: space-between;
+	gap: 10px;
+}
+
+.lg-node-editor__port-col {
+	display: flex;
+	flex-direction: column;
+	gap: 5px;
+	min-width: 0;
+}
+
+.lg-node-editor__port-col--output {
+	align-items: flex-end;
+}
+
+.lg-node-editor__port {
+	display: flex;
+	align-items: center;
+	gap: 5px;
+	height: 18px;
+	min-width: 0;
+	color: #c8c8c8;
+	cursor: crosshair;
+}
+
+.lg-node-editor__port-name {
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	max-width: 92px;
+	font-size: 11px;
+}
+
+.lg-node-editor__dot {
+	width: 8px;
+	height: 8px;
+	border-radius: 50%;
+	background: #3d3d3d;
+	border: 1px solid #c8c8c8;
+	flex: 0 0 8px;
+	transition: background 0.1s ease;
+}
+
+.lg-node-editor__port:hover .lg-node-editor__dot,
+.lg-node-editor__port--linked .lg-node-editor__dot {
+	background: var(--lg-color-accent);
+	border-color: #dce6f5;
+}
+
+.lg-node-editor__hint {
+	position: absolute;
+	right: 10px;
+	bottom: 8px;
+	z-index: 3;
+	color: #8e8e8e;
+	font-size: 10px;
+	pointer-events: none;
+	text-shadow: 0 1px 1px #000;
+}
