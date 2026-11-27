@@ -26,14 +26,14 @@ import { LiteGuiButton, LiteGuiCheckbox } from "@gausszhou/litegui-vue";
 
 ## 组件
 
-| 组件 | 主要 props | 事件 / v-model |
-| --- | --- | --- |
-| `<LiteGuiButton>` | `label`、`size`、`disabled` | `@click` |
-| `<LiteGuiCheckbox>` | `modelValue`、`disabled` | `v-model`、`@change` |
-| `<LiteGuiSlider>` | `modelValue`、`min`、`max`、`step` | `v-model`、`@change` |
-| `<LiteGuiPanel>` | `title`、`height`、`closable` | `@close`，默认插槽 |
-| `<LiteGuiDialog>` | `modelValue`、`title`、`width`、`height`、`closable` | `v-model`、`@close`，默认插槽 |
-| `<LiteGuiMenu>` | `items`（嵌套 `{ label, children, disabled }`） | `@select` → `{ label, path }` |
+| 组件                | 主要 props                                           | 事件 / v-model                |
+| ------------------- | ---------------------------------------------------- | ----------------------------- |
+| `<LiteGuiButton>`   | `label`、`size`、`disabled`                          | `@click`                      |
+| `<LiteGuiCheckbox>` | `modelValue`、`disabled`                             | `v-model`、`@change`          |
+| `<LiteGuiSlider>`   | `modelValue`、`min`、`max`、`step`                   | `v-model`、`@change`          |
+| `<LiteGuiPanel>`    | `title`、`height`、`closable`                        | `@close`，默认插槽            |
+| `<LiteGuiDialog>`   | `modelValue`、`title`、`width`、`height`、`closable` | `v-model`、`@close`，默认插槽 |
+| `<LiteGuiMenu>`     | `items`（嵌套 `{ label, children, disabled }`）      | `@select` → `{ label, path }` |
 
 ```vue
 <script setup lang="ts">

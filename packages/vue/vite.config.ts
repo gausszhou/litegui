@@ -10,7 +10,11 @@ const entry = {
   slider: resolve(__dirname, "src/components/slider.ts"),
   panel: resolve(__dirname, "src/components/panel.ts"),
   dialog: resolve(__dirname, "src/components/dialog.ts"),
-  menu: resolve(__dirname, "src/components/menu.ts")
+  menu: resolve(__dirname, "src/components/menu.ts"),
+  table: resolve(__dirname, "src/components/table.ts"),
+  list: resolve(__dirname, "src/components/list.ts"),
+  split: resolve(__dirname, "src/components/split.ts"),
+  searchbox: resolve(__dirname, "src/components/searchbox.ts")
 };
 
 export default defineConfig({

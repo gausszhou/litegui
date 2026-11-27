@@ -18,7 +18,11 @@
     "./panel": "./src/components/panel.ts",
     "./dialog": "./src/components/dialog.ts",
     "./menu": "./src/components/menu.ts",
-    "./package.json": "./package.json"
+    "./package.json": "./package.json",
+    "./list": "./src/components/list.ts",
+    "./searchbox": "./src/components/searchbox.ts",
+    "./split": "./src/components/split.ts",
+    "./table": "./src/components/table.ts"
   },
   "sideEffects": false,
   "scripts": {
@@ -71,7 +75,23 @@
         "types": "./dist/types/components/menu.d.ts",
         "import": "./dist/components/menu.js"
       },
-      "./package.json": "./package.json"
+      "./package.json": "./package.json",
+      "./list": {
+        "types": "./dist/types/components/list.d.ts",
+        "import": "./dist/components/list.js"
+      },
+      "./searchbox": {
+        "types": "./dist/types/components/searchbox.d.ts",
+        "import": "./dist/components/searchbox.js"
+      },
+      "./split": {
+        "types": "./dist/types/components/split.d.ts",
+        "import": "./dist/components/split.js"
+      },
+      "./table": {
+        "types": "./dist/types/components/table.d.ts",
+        "import": "./dist/components/table.js"
+      }
     }
   },
   "license": "MIT",

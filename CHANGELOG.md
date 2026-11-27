@@ -4,7 +4,7 @@
 
 ### Added
 
-- 新增 `@gausszhou/litegui-vue`：Vue 3 绑定，依赖 `@gausszhou/litegui-components`，首批封装 Button / Checkbox / Slider / Panel / Dialog / Menu，支持 props、`v-model`、slots 与 `app.use()` 插件注册。
+- 新增 `@gausszhou/litegui-vue`：Vue 3 绑定，依赖 `@gausszhou/litegui-components`，首批封装 Button / Checkbox / Slider / Panel / Dialog / Menu，并补充 Table / List / Split / SearchBox，支持 props、`v-model`、slots 与 `app.use()` 插件注册。
 - 新增文档页 `docs/vue.md` 与实时示例。
 
 ## Unreleased（目录调整）

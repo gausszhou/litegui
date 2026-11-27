@@ -38,13 +38,27 @@ import {
   LiteGuiButton,
   LiteGuiCheckbox,
   LiteGuiDialog,
+  LiteGuiList,
   LiteGuiMenu,
   LiteGuiPanel,
-  LiteGuiSlider
+  LiteGuiSearchBox,
+  LiteGuiSlider,
+  LiteGuiSplit,
+  LiteGuiTable
 } from "@gausszhou/litegui-vue";
 
 const checked = ref(true);
 const volume = ref(35);
+const keyword = ref("");
+const selected = ref("Alpha");
+const columns = [
+  { name: "名称", field: "name" },
+  { name: "值", field: "value" }
+];
+const rows = [
+  { name: "Alpha", value: 1 },
+  { name: "Beta", value: 2 }
+];
 const dialogOpen = ref(false);
 const menuItems = [
   { label: "文件", children: [{ label: "新建" }, { label: "打开" }] }
@@ -116,6 +130,46 @@ Menu 通过 `items` 声明菜单树：
 
 ```ts
 const menuItems = [{ label: "文件", children: [{ label: "新建" }, { label: "打开" }] }];
+```
+
+Table、List、SearchBox 和 Split 同样是薄封装：
+
+<div class="lg-demo">
+  <LiteGuiSearchBox v-model="keyword" placeholder="搜索" />
+  <LiteGuiList v-model="selected" :items="['Alpha', 'Beta']" />
+</div>
+
+```vue
+<LiteGuiSearchBox v-model="keyword" placeholder="搜索" />
+<LiteGuiList v-model="selected" :items="['Alpha', 'Beta']" />
+```
+
+<div class="lg-demo">
+  <LiteGuiTable :columns="columns" :rows="rows" :height="180" />
+</div>
+
+```vue
+<LiteGuiTable :columns="columns" :rows="rows" :height="180" />
+```
+
+Split 用 `section-*` 命名插槽填充每个分区：
+
+<div class="lg-demo">
+  <LiteGuiSplit :sections="[50, 50]" style="height: 160px; width: 100%">
+    <template #section-0>
+      <div style="padding: 12px">左侧</div>
+    </template>
+    <template #section-1>
+      <div style="padding: 12px">右侧</div>
+    </template>
+  </LiteGuiSplit>
+</div>
+
+```vue
+<LiteGuiSplit :sections="[50, 50]" style="height: 160px">
+  <template #section-0><div>左侧</div></template>
+  <template #section-1><div>右侧</div></template>
+</LiteGuiSplit>
 ```
 
 ## 组件 API

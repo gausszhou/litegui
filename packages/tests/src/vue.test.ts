@@ -5,8 +5,12 @@ import LiteGuiVue, {
   LiteGuiButton,
   LiteGuiCheckbox,
   LiteGuiDialog,
+  LiteGuiList,
   LiteGuiMenu,
   LiteGuiPanel,
+  LiteGuiSearchBox,
+  LiteGuiSplit,
+  LiteGuiTable,
   LiteGuiSlider
 } from "@gausszhou/litegui-vue";
 
@@ -95,6 +99,76 @@ describe("Vue bindings", () => {
 
     expect(wrapper.emitted("update:modelValue")?.[0]).toEqual([false]);
     expect(wrapper.emitted("close")).toHaveLength(1);
+
+    wrapper.unmount();
+  });
+
+  it("LiteGuiTable renders columns and updates rows", async () => {
+    const wrapper = mount(LiteGuiTable, {
+      props: {
+        columns: [{ name: "名称", field: "name" }],
+        rows: [{ name: "A" }]
+      },
+      attachTo: document.body
+    });
+    await nextTick();
+
+    expect(wrapper.find("table.litetable").text()).toContain("名称");
+    expect(wrapper.find("table.litetable").text()).toContain("A");
+
+    await wrapper.setProps({ rows: [{ name: "B" }] });
+    await nextTick();
+    expect(wrapper.find("table.litetable").text()).toContain("B");
+
+    wrapper.unmount();
+  });
+
+  it("LiteGuiList selects items and emits v-model", async () => {
+    const wrapper = mount(LiteGuiList, {
+      props: { items: ["A", "B"], modelValue: "A" },
+      attachTo: document.body
+    });
+    await nextTick();
+
+    expect(wrapper.find(".list-item.selected").text()).toContain("A");
+
+    await wrapper.findAll(".list-item")[1].trigger("click");
+
+    expect(wrapper.emitted("update:modelValue")?.at(-1)).toEqual(["B"]);
+
+    wrapper.unmount();
+  });
+
+  it("LiteGuiSplit renders section slots", async () => {
+    const wrapper = mount(LiteGuiSplit, {
+      props: { sections: [50, 50] },
+      slots: {
+        "section-0": "<span class='left'>Left</span>",
+        "section-1": "<span class='right'>Right</span>"
+      },
+      attachTo: document.body
+    });
+    await nextTick();
+
+    expect(wrapper.findAll(".split-section")).toHaveLength(2);
+    expect(wrapper.find(".left").text()).toBe("Left");
+    expect(wrapper.find(".right").text()).toBe("Right");
+
+    wrapper.unmount();
+  });
+
+  it("LiteGuiSearchBox emits changes", async () => {
+    const wrapper = mount(LiteGuiSearchBox, {
+      props: { modelValue: "a" },
+      attachTo: document.body
+    });
+    await nextTick();
+
+    const input = wrapper.find("input");
+    await input.setValue("b");
+    await input.trigger("change");
+
+    expect(wrapper.emitted("update:modelValue")?.at(-1)).toEqual(["b"]);
 
     wrapper.unmount();
   });
