@@ -15,13 +15,13 @@ export default defineConfig({
   },
   webServer: [
     {
-      command: "pnpm --filter @gausszhou/litegui-demo dev -- --host 127.0.0.1 --port 5173",
+      command: "pnpm --filter @gausszhou/litegui-demo dev",
       url: DEMO_URL,
       reuseExistingServer: true,
       timeout: 120_000,
     },
     {
-      command: "pnpm --filter @gausszhou/litegui-editor dev -- --host 127.0.0.1 --port 5174",
+      command: "pnpm --filter @gausszhou/litegui-editor dev",
       url: EDITOR_URL,
       reuseExistingServer: true,
       timeout: 120_000,
