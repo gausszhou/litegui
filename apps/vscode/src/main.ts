@@ -466,7 +466,8 @@ const TITLEBAR_ICONS = {
     '<path d="M3 6a2 2 0 0 1 2-2h7v16H5a2 2 0 0 1-2-2z" fill="currentColor" stroke="none"/>' +
     '<rect x="3" y="4" width="18" height="16" rx="2"/><path d="M12 4v16"/>',
   layoutPanel: '<rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 14h18"/>',
-  layoutSplit: '<rect x="3" y="4" width="18" height="16" rx="2"/><path d="M12 4v16"/>'
+  layoutCustomize:
+    '<rect x="3.5" y="4.5" width="6.5" height="6.5" rx="1"/><rect x="14" y="4.5" width="6.5" height="6.5" rx="1"/><rect x="3.5" y="13" width="6.5" height="6.5" rx="1"/><rect x="14" y="13" width="6.5" height="6.5" rx="1"/>'
 };
 
 function titlebarIcon(name: keyof typeof TITLEBAR_ICONS): string {
@@ -544,9 +545,16 @@ const layoutActivityButton = createTitlebarButton(
 layoutActivityButton.id = "layout-activity";
 const layoutPanelButton = createTitlebarButton("app-titlebar__layout", "Toggle Panel", titlebarIcon("layoutPanel"));
 layoutPanelButton.id = "layout-panel";
-const layoutMinimapButton = createTitlebarButton("app-titlebar__layout", "Toggle Minimap", titlebarIcon("layoutSplit"));
-layoutMinimapButton.id = "layout-minimap";
-titlebar.setRight([layoutSidebarButton, layoutActivityButton, layoutPanelButton, layoutMinimapButton]);
+const layoutCustomizeButton = createTitlebarButton(
+  "app-titlebar__layout",
+  "Customize Layout",
+  titlebarIcon("layoutCustomize")
+);
+layoutCustomizeButton.id = "layout-customize";
+layoutCustomizeButton.setAttribute("data-menu-anchor", "");
+layoutCustomizeButton.setAttribute("aria-haspopup", "menu");
+layoutCustomizeButton.setAttribute("aria-expanded", "false");
+titlebar.setRight([layoutSidebarButton, layoutActivityButton, layoutPanelButton, layoutCustomizeButton]);
 
 document.querySelector<HTMLElement>("#titlebar-host")!.appendChild(titlebar.root);
 
@@ -586,7 +594,6 @@ function syncTitlebarControls(): void {
   layoutSidebarButton.setAttribute("aria-pressed", String(!shell.classList.contains("sidebar-hidden")));
   layoutActivityButton.setAttribute("aria-pressed", String(!shell.classList.contains("activity-hidden")));
   layoutPanelButton.setAttribute("aria-pressed", String(!terminalDrawer.hidden));
-  layoutMinimapButton.setAttribute("aria-pressed", String(minimapEnabled));
 }
 
 titlebarBack.addEventListener("click", () => stepNavigation(-1));
@@ -594,7 +601,9 @@ titlebarForward.addEventListener("click", () => stepNavigation(1));
 layoutSidebarButton.addEventListener("click", () => toggleSidebar());
 layoutActivityButton.addEventListener("click", () => toggleActivityBar());
 layoutPanelButton.addEventListener("click", () => toggleTerminal());
-layoutMinimapButton.addEventListener("click", () => toggleMinimap());
+layoutCustomizeButton.addEventListener("click", () =>
+  toggleLauncherMenu("layout", layoutCustomizeButton, buildLayoutMenu())
+);
 chatButton.addEventListener("click", () => showToast("Chat is not available in this demo."));
 chatMenuButton.addEventListener("click", () => toggleLauncherMenu("chat", chatMenuButton, buildChatMenu()));
 avatarButton.addEventListener("click", () => toggleLauncherMenu("titlebar-account", avatarButton, buildAccountMenu()));
@@ -753,6 +762,8 @@ branchItem.appendChild(branchLabel);
 const syncItem = statusIconItem("sync", "", "Synchronize Changes");
 const errorsItem = statusIconItem("error", "0", "No errors");
 const warningsItem = statusIconItem("warning", "0", "No warnings");
+const errorsLabel = errorsItem.querySelector<HTMLElement>(".app-status__label")!;
+const warningsLabel = warningsItem.querySelector<HTMLElement>(".app-status__label")!;
 const gitGraphItem = statusItem("Git Graph");
 gitGraphItem.title = "Git Graph";
 const remoteNameItem = statusItem("LiteGUI Dev Space: local");
@@ -766,8 +777,10 @@ const statusEncoding = statusItem("UTF-8");
 const statusEol = statusItem("LF");
 
 const statusLanguage = document.createElement("span");
-statusLanguage.className = "app-status__item";
+statusLanguage.id = "status-language";
+statusLanguage.className = "app-status__item app-status__item--clickable";
 statusLanguage.title = "Select language mode";
+statusLanguage.setAttribute("data-menu-anchor", "");
 statusLanguage.innerHTML =
   '<span class="app-status__icon app-status__lang-icon"></span><span class="app-status__label"></span>';
 
@@ -787,6 +800,68 @@ function setStatusLanguage(language: string): void {
   const label = statusLanguage.querySelector<HTMLElement>(".app-status__label")!;
   icon.textContent = LANGUAGE_ICONS[language] ?? "TXT";
   label.textContent = language;
+}
+
+const LANGUAGE_MODES: Array<{ id: string; label: string }> = [
+  { id: "typescript", label: "TypeScript" },
+  { id: "javascript", label: "JavaScript" },
+  { id: "json", label: "JSON" },
+  { id: "css", label: "CSS" },
+  { id: "html", label: "HTML" },
+  { id: "markdown", label: "Markdown" },
+  { id: "xml", label: "XML" },
+  { id: "plaintext", label: "Plain Text" }
+];
+
+function buildLanguageMenu(): FlyoutItem[] {
+  const current = activeTab()?.file.language ?? "Plain Text";
+  return LANGUAGE_MODES.map(mode => ({
+    label: mode.label,
+    checked: mode.label === current,
+    action: () => applyLanguage(mode)
+  }));
+}
+
+function applyLanguage(mode: { id: string; label: string }): void {
+  const record = activeTab();
+  const model = record?.editor.getModel();
+  if (!record || !model) return;
+  monaco.editor.setModelLanguage(model, mode.id);
+  record.file.language = mode.label;
+  setStatusLanguage(mode.label);
+  showToast(`Language: ${mode.label}`);
+}
+
+function updateDiagnosticsStatus(): void {
+  const model = activeEditor()?.getModel();
+  const markers = model ? monaco.editor.getModelMarkers({ resource: model.uri }) : [];
+  let errors = 0;
+  let warnings = 0;
+  for (const marker of markers) {
+    if (marker.severity === monaco.MarkerSeverity.Error) errors += 1;
+    else if (marker.severity === monaco.MarkerSeverity.Warning) warnings += 1;
+  }
+  errorsLabel.textContent = String(errors);
+  warningsLabel.textContent = String(warnings);
+  errorsItem.title = errors === 1 ? "1 error" : `${errors} errors`;
+  warningsItem.title = warnings === 1 ? "1 warning" : `${warnings} warnings`;
+}
+
+function updateEditorStatus(): void {
+  const record = activeTab();
+  const model = record?.editor.getModel();
+  if (!record || !model) {
+    statusSpaces.textContent = "Spaces: 2";
+    statusEol.textContent = "LF";
+    setStatusLanguage("Plain Text");
+    updateDiagnosticsStatus();
+    return;
+  }
+  const options = model.getOptions();
+  statusSpaces.textContent = options.insertSpaces ? `Spaces: ${options.tabSize}` : `Tab Size: ${options.tabSize}`;
+  statusEol.textContent = model.getEOL() === "\r\n" ? "CRLF" : "LF";
+  setStatusLanguage(record.file.language);
+  updateDiagnosticsStatus();
 }
 setStatusLanguage("Plain Text");
 
@@ -818,14 +893,24 @@ const statusActions: Array<[HTMLElement, string]> = [
   [warningsItem, "No warnings detected."],
   [gitGraphItem, "Git Graph (demo)"],
   [remoteNameItem, "Remote: LiteGUI Dev Space"],
-  [layoutItem, "Layout controls (demo)"],
-  [formatterItem, "Format document with Prettier"],
   [bellItem, "No new notifications"]
 ];
 for (const [element, message] of statusActions) {
   element.classList.add("app-status__item--clickable");
   element.addEventListener("click", () => showToast(message));
 }
+
+statusLanguage.addEventListener("click", () => toggleLauncherMenu("language", statusLanguage, buildLanguageMenu()));
+
+layoutItem.classList.add("app-status__item--clickable");
+layoutItem.setAttribute("data-menu-anchor", "");
+layoutItem.addEventListener("click", () => toggleLauncherMenu("layout-status", layoutItem, buildLayoutMenu()));
+
+formatterItem.classList.add("app-status__item--clickable");
+formatterItem.addEventListener("click", () => {
+  activeEditor()?.getAction("editor.action.formatDocument")?.run();
+  showToast("Formatted with Prettier");
+});
 
 /* terminal */
 const terminal = new Console({ prompt: "$" });
@@ -1210,7 +1295,10 @@ function openFile(path: string): void {
     record.dirty = true;
     updateTabTitle(path);
     updateBranchStatus();
-    if (activePath === path) updateBreadcrumb(path);
+    if (activePath === path) {
+      updateBreadcrumb(path);
+      updateEditorStatus();
+    }
   });
 
   editor.onDidChangeCursorPosition(({ position }) => {
@@ -1228,8 +1316,8 @@ function activateFile(path: string): void {
   activePath = path;
   setEmptyState(false);
   updateBreadcrumb(path);
-  setStatusLanguage(record.file.language);
   statusEncoding.textContent = "UTF-8";
+  updateEditorStatus();
   record.editor.layout();
   updateStatusForEditor(record.editor);
   highlightTreeFile(path);
@@ -1270,7 +1358,7 @@ function closeFile(path: string): void {
     setEmptyState(true);
     updateBreadcrumb(null);
     updateStatusForEditor(null);
-    setStatusLanguage("Plain Text");
+    updateEditorStatus();
     highlightTreeFile(null);
   }
 }
@@ -1668,6 +1756,18 @@ function buildManageMenu(): FlyoutItem[] {
   ];
 }
 
+function buildLayoutMenu(): FlyoutItem[] {
+  return [
+    { label: "Primary Side Bar", checked: !shell.classList.contains("sidebar-hidden"), action: () => toggleSidebar() },
+    { label: "Activity Bar", checked: !shell.classList.contains("activity-hidden"), action: () => toggleActivityBar() },
+    { label: "Panel", checked: !terminalDrawer.hidden, action: () => toggleTerminal() },
+    { label: "Minimap", checked: minimapEnabled, action: () => toggleMinimap() },
+    { separator: true },
+    { label: "Comfortable", checked: density === "comfortable", action: () => setDensity("comfortable") },
+    { label: "Compact", checked: density === "compact", action: () => setDensity("compact") }
+  ];
+}
+
 function buildChatMenu(): FlyoutItem[] {
   return [
     { label: "Open Chat", action: () => showToast("Chat is not available in this demo.") },
@@ -1819,6 +1919,13 @@ function openLauncherMenu(source: string, anchor: HTMLButtonElement, items: Flyo
     const left = Math.min(Math.max(8, anchorRect.right - menuRect.width), window.innerWidth - menuRect.width - 8);
     menu.style.left = `${Math.round(left)}px`;
     menu.style.top = `${Math.round(anchorRect.bottom + 4)}px`;
+  } else if (anchor.closest(".app-status")) {
+    menu.classList.add("app-menu-flyout--titlebar");
+    const anchorRect = anchor.getBoundingClientRect();
+    const menuRect = menu.getBoundingClientRect();
+    const left = Math.min(Math.max(8, anchorRect.left), window.innerWidth - menuRect.width - 8);
+    menu.style.left = `${Math.round(left)}px`;
+    menu.style.bottom = `${Math.round(window.innerHeight - anchorRect.top + 4)}px`;
   } else {
     const activity = document.querySelector<HTMLElement>(".app-activity");
     const status = document.querySelector<HTMLElement>(".app-status");
@@ -1974,3 +2081,4 @@ document.addEventListener("keydown", event => {
 setSidebarView("explorer");
 openFile("src/main.ts");
 syncTitlebarControls();
+monaco.editor.onDidChangeMarkers(() => updateDiagnosticsStatus());

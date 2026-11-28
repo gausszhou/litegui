@@ -263,3 +263,20 @@ test("title bar history and layout controls work", async ({ page }) => {
 
   expect(errors).toEqual([]);
 });
+
+test("status bar language and layout menus work", async ({ page }) => {
+  const errors = collectPageErrors(page);
+  await page.goto(VSCODE_URL, { waitUntil: "networkidle" });
+
+  await page.locator("#layout-customize").click();
+  await expect(page.locator(".app-menu-flyout__item", { hasText: "Primary Side Bar" })).toBeVisible();
+  await page.locator(".app-menu-flyout__item", { hasText: "Minimap" }).click();
+  await expect(page.locator(".app-menu-flyout")).toHaveCount(0);
+
+  await page.locator("#status-language").click();
+  await expect(page.locator(".app-menu-flyout__item", { hasText: "JSON" })).toBeVisible();
+  await page.locator(".app-menu-flyout__item", { hasText: "JSON" }).click();
+  await expect(page.locator("#status-language")).toContainText("JSON");
+
+  expect(errors).toEqual([]);
+});
