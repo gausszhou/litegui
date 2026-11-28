@@ -1,5 +1,17 @@
 # Changelog
 
+## Unreleased（LightCraft 示例）
+
+### Added
+
+- 新增 `apps/lightcraft`：参考 ArtCraft LightCraft（https://getartcraft.com/apps/lightcraft）的照片图库与非破坏性显影工作台。图库视图提供相册/日期/评分筛选、搜索、缩略图网格与胶片条；显影视图提供 CPU 显影管线（白平衡、曝光、高光/阴影、黑白场、色调曲线、8 色带色彩混合器、三向颜色分级、纹理/清晰度/去雾、锐化/降噪、暗角与颗粒）、线性/径向/天空/主体遮罩与遮罩再调整、实时 RGB 直方图、按住 `\` 的前后分屏对比，以及按原始分辨率导出 JPEG/PNG 与本地图片导入。
+- 24 张演示照片由 Canvas 程序化绘制（`src/photos.ts`，无外部图片依赖），覆盖群山、海岸、沙漠、花园、夜空等相册，并带模拟的相机/镜头/曝光元数据。
+- 新增 Playwright e2e 覆盖（`packages/tests/e2e/lightcraft.spec.ts`），并接入 `pages:build`、根脚本 `dev:lightcraft` 与 Playwright dev server。
+
+### Changed
+
+- 显影面板复用 LiteGUI 的 `HeaderBar` 与 `Toolbar`（右侧模块栏），其余控件为自绘滑杆、曲线、色轮与直方图，保持与 VectorCraft 一致的主题 token（`--lg-*`）。
+
 ## Unreleased（Viewport 组件化）
 
 ### Added
