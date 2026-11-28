@@ -12,7 +12,8 @@
   },
   "dependencies": {
     "@gausszhou/litegui-components": "workspace:*",
-    "@gausszhou/litegui-core": "workspace:*"
+    "@gausszhou/litegui-core": "workspace:*",
+    "opentype.js": "^2.0.0"
   },
   "devDependencies": {
     "typescript": "^5.8.3",

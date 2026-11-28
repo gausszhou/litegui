@@ -7,36 +7,50 @@ import {
   createObject,
   cloneObject,
   deserializeDocument,
+  uid,
   serializeDocument,
   unionBounds,
   isText,
   paintLabel,
   gradientCss,
+  pointsBounds,
   type Paint,
   type Vec2,
   type VecDocument,
   type VecObject
 } from "./scene";
 import { downloadPng, downloadText, documentSvg, Stage } from "./stage";
+import { buildFontCss, textToOutlinePath } from "./display-font";
+import { buildMenu, openModal, positionMenu, type MenuItem } from "./overlay";
+import { showAboutDialog, showHistoryDialog, showSearchDialog, showShortcutsDialog } from "./dialogs";
+import { nearestPointIndex, nearestSegment, pointInPolygon, simplifyPoints, smoothPoints } from "./path-tools";
+import { round } from "./number";
 import { PanelsController, type AlignMode, type EditorContext, type ScreenRect, type UiState } from "./panels";
 
-interface MenuItem {
-  label?: string;
-  shortcut?: string;
-  action?: () => void;
-  separator?: boolean;
-  disabled?: boolean;
-  checked?: boolean;
+interface Snapshot {
+  doc: string;
+  selection: string[];
+}
+
+interface DragOrigin {
+  id: string;
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+  rotation: number;
 }
 
 interface DragState {
-  mode: "move" | "resize" | "marquee" | "pan" | "rotate" | "create" | "brush" | null;
+  mode: "move" | "resize" | "marquee" | "pan" | "rotate" | "create" | "brush" | "lasso" | "anchor" | null;
   startDoc: Vec2;
   startScreen: Vec2;
   lastScreen: Vec2;
   handleIndex?: string;
   objectId?: string;
-  origins: Array<{ id: string; x: number; y: number; width: number; height: number }>;
+  origins: DragOrigin[];
+  pointIndex?: number;
+  lassoPoints?: Vec2[];
   startAngle: number;
   moved: boolean;
   historyPushed: boolean;
@@ -71,7 +85,7 @@ const TOOLS: ToolbarTool[] = [
   { id: "zoom", label: "Zoom", shortcut: "Z", icon: icon("zoom", 17) }
 ];
 
-const RAIL = [
+const RAIL_MAIN = [
   { id: "properties", title: "Properties", icon: "properties" },
   { id: "layers", title: "Layers", icon: "layers" },
   { id: "libraries", title: "Libraries", icon: "libraries" },
@@ -90,8 +104,13 @@ const RAIL = [
   { id: "comment", title: "Comments", icon: "comment" },
   { id: "history", title: "History", icon: "history" },
   { id: "actions", title: "Actions", icon: "actions" },
-  { id: "export", title: "Export", icon: "export" },
-  { id: "settings", title: "Settings", icon: "settings" }
+  { id: "export", title: "Export", icon: "export" }
+];
+
+const RAIL_FOOT = [
+  { id: "settings", title: "Settings", icon: "settings" },
+  { id: "help", title: "Help", icon: "help" },
+  { id: "pointer", title: "Selection", icon: "pointer" }
 ];
 
 const TOOL_SHORTCUTS: Record<string, string> = {
@@ -129,6 +148,7 @@ const MOUNT = `<div class="vc-app">
         <div class="vc-float vc-appearance" id="vc-appearance"></div>
         <div class="vc-ctxbar" id="vc-ctxbar" hidden></div>
         <div class="vc-marquee" id="vc-marquee" hidden></div>
+        <svg class="vc-lasso" id="vc-lasso"><path id="vc-lasso-path"/></svg>
       </div>
     </main>
     <div class="vc-sidebar-wrap">
@@ -147,13 +167,28 @@ const MOUNT = `<div class="vc-app">
       <button class="vc-status-btn vc-zoom-btn" id="vc-zoom" title="Zoom level">100%</button>
       <button class="vc-status-btn" id="vc-rotation" title="Rotation">0°</button>
       <span class="vc-status-sep"></span>
-      <button class="vc-status-btn vc-icon-only" data-status-action="prev-artboard" title="Previous artboard">${icon("navPrev", 13)}</button>
-      <button class="vc-status-btn vc-icon-only" data-status-action="fit" title="Fit artboard (Ctrl+0)">${icon("fit", 13)}</button>
-      <button class="vc-status-btn vc-icon-only" data-status-action="next-artboard" title="Next artboard">${icon("navNext", 13)}</button>
+      <button class="vc-status-btn vc-icon-only" data-status-action="prev-artboard" title="Previous artboard">${icon(
+        "navPrev",
+        13
+      )}</button>
+      <button class="vc-status-btn vc-icon-only" data-status-action="fit" title="Fit artboard (Ctrl+0)">${icon(
+        "fit",
+        13
+      )}</button>
+      <button class="vc-status-btn vc-icon-only" data-status-action="next-artboard" title="Next artboard">${icon(
+        "navNext",
+        13
+      )}</button>
       <span class="vc-status-sep"></span>
       <span class="vc-artboard-chip" id="vc-artboard">1 Artboard 1</span>
-      <button class="vc-status-btn vc-icon-only" data-status-action="prev-artboard" title="Previous artboard">${icon("chevronLeft", 12)}</button>
-      <button class="vc-status-btn vc-icon-only" data-status-action="next-artboard" title="Next artboard">${icon("chevronRight", 12)}</button>
+      <button class="vc-status-btn vc-icon-only" data-status-action="prev-artboard" title="Previous artboard">${icon(
+        "chevronLeft",
+        12
+      )}</button>
+      <button class="vc-status-btn vc-icon-only" data-status-action="next-artboard" title="Next artboard">${icon(
+        "chevronRight",
+        12
+      )}</button>
       <span class="vc-select-state" id="vc-selection-state">No Selection</span>
       <span class="vc-spacer"></span>
       <span class="vc-status-stats" id="vc-stats">render 0.0 ms · ul 0.0 ms · 60 fps</span>
@@ -178,7 +213,12 @@ class Editor implements EditorContext {
     appearancePos: null,
     outlineMode: false,
     showGrid: false,
-    showRulers: false
+    showRulers: false,
+    unit: "pt",
+    alignToPoint: true,
+    alignToGrid: false,
+    keyboardIncrement: 1,
+    scaleStrokes: true
   };
   selection: string[] = ["neon-title"];
   tool = "select";
@@ -187,14 +227,16 @@ class Editor implements EditorContext {
   private toolbar!: Toolbar;
   private viewport!: HTMLElement;
   private marquee!: HTMLElement;
+  private lasso!: SVGSVGElement;
+  private lassoPath!: SVGPathElement;
   private zoomButton!: HTMLButtonElement;
   private hintElement!: HTMLElement;
   private selectionState!: HTMLElement;
   private statsElement!: HTMLElement;
   private rotationButton!: HTMLButtonElement;
   private docMeta!: HTMLElement;
-  private history: Array<{ doc: string; selection: string[] }> = [];
-  private future: Array<{ doc: string; selection: string[] }> = [];
+  private history: Snapshot[] = [];
+  private future: Snapshot[] = [];
   private clipboard: VecObject[] | null = null;
   private fileInput!: HTMLInputElement;
   private menu: HTMLElement | null = null;
@@ -202,7 +244,7 @@ class Editor implements EditorContext {
   private drag: DragState | null = null;
   private spaceDown = false;
   private fillPaint: Paint = "#ffffff";
-  private strokePaint: Paint = "#ff3fae";
+  private strokePaint: Paint = "#000000";
   private penId: string | null = null;
   private renderTime = 0;
   private uiTime = 0;
@@ -210,7 +252,9 @@ class Editor implements EditorContext {
   private fps = 60;
   private fpsStamp = performance.now();
   private toastTimer = 0;
-  private defaultHint = "Click the object to select | Shift+Click to select multiple objects | Alt+Drag the object to duplicate";
+  private measureMode = false;
+  private defaultHint =
+    "Click the object to select | Shift+Click to select multiple objects | Alt+Drag the object to duplicate";
 
   start() {
     const app = document.querySelector<HTMLElement>("#app");
@@ -218,6 +262,8 @@ class Editor implements EditorContext {
     app.innerHTML = MOUNT;
     this.viewport = document.querySelector<HTMLElement>("#vc-viewport")!;
     this.marquee = document.querySelector<HTMLElement>("#vc-marquee")!;
+    this.lasso = document.querySelector<SVGSVGElement>("#vc-lasso")!;
+    this.lassoPath = document.querySelector<SVGPathElement>("#vc-lasso-path")!;
     this.zoomButton = document.querySelector<HTMLButtonElement>("#vc-zoom")!;
     this.rotationButton = document.querySelector<HTMLButtonElement>("#vc-rotation")!;
     this.hintElement = document.querySelector<HTMLElement>("#vc-hint")!;
@@ -242,6 +288,11 @@ class Editor implements EditorContext {
     this.stage.element.addEventListener("wheel", this.onWheel, { passive: false });
     this.stage.element.addEventListener("dblclick", this.onDoubleClick);
     this.stage.element.addEventListener("contextmenu", this.onContextMenu);
+    this.stage.element.addEventListener("pointermove", event => {
+      if (!this.measureMode) return;
+      const point = this.stage.screenToDoc(event.clientX, event.clientY);
+      this.hintElement.textContent = `X: ${point.x.toFixed(1)} pt   Y: ${point.y.toFixed(1)} pt`;
+    });
 
     this.panels = new PanelsController(
       {
@@ -315,7 +366,10 @@ class Editor implements EditorContext {
       <div class="vc-window-controls">
         <button class="vc-window-btn" data-top-action="minimize" title="Minimize">${icon("minimize", 13)}</button>
         <button class="vc-window-btn" data-top-action="maximize" title="Maximize">${icon("maximize", 12)}</button>
-        <button class="vc-window-btn vc-window-btn--close" data-top-action="close" title="Close">${icon("close", 12)}</button>
+        <button class="vc-window-btn vc-window-btn--close" data-top-action="close" title="Close">${icon(
+          "close",
+          12
+        )}</button>
       </div>`;
     right.addEventListener("click", event => {
       const target = (event.target as HTMLElement).closest<HTMLElement>("[data-top-action]");
@@ -331,7 +385,7 @@ class Editor implements EditorContext {
         this.toast("Discord 社区：示例未接入");
         break;
       case "search":
-        this.toast("搜索命令：示例未接入");
+        this.showSearch();
         break;
       case "workspace":
         this.openMenu(
@@ -347,7 +401,8 @@ class Editor implements EditorContext {
         this.toast("浏览器环境无法最小化窗口");
         break;
       case "maximize":
-        this.toast("VectorCraft 已全屏显示");
+        if (document.fullscreenElement) void document.exitFullscreen();
+        else void document.documentElement.requestFullscreen().catch(() => this.toast("浏览器拒绝了全屏请求"));
         break;
       case "close":
         this.toast("浏览器环境不关闭标签页");
@@ -376,9 +431,25 @@ class Editor implements EditorContext {
         <button class="vc-colorstack-fill" data-swatch="fill" aria-label="Fill"></button>
         <button class="vc-colorstack-stroke" data-swatch="stroke" aria-label="Stroke"></button>
       </div>
-      <button class="vc-mini-btn vc-swatch-swap" data-swatch="swap" title="Swap Fill and Stroke (Shift+X)">${icon("transform", 12)}</button>
-      <button class="vc-mini-btn vc-swatch-default" data-swatch="default" title="Default Fill and Stroke (D)">${icon("rect", 12)}</button>
-      <button class="vc-mini-btn vc-swatch-screen" data-swatch="screen" title="Screen Mode">${icon("target", 13)}</button>`;
+      <button class="vc-mini-btn vc-swatch-swap" data-swatch="swap" title="Swap Fill and Stroke (Shift+X)">${icon(
+        "swap",
+        13
+      )}</button>
+      <button class="vc-mini-btn vc-swatch-default" data-swatch="default" title="Default Fill and Stroke (D)">${icon(
+        "defaultColors",
+        13
+      )}</button>
+      <button class="vc-mini-btn vc-swatch-screen" data-swatch="screen" title="Screen Mode">${icon(
+        "screenMode",
+        13
+      )}</button>
+      <div class="vc-swatch-chips">
+        <button class="vc-swatch-chip" data-swatch="gradient" title="Gradient Fill">${icon(
+          "gradientSwatch",
+          12
+        )}</button>
+        <button class="vc-swatch-chip" data-swatch="none" title="No Fill">${icon("noneSwatch", 12)}</button>
+      </div>`;
     swatches.addEventListener("click", event => {
       const target = (event.target as HTMLElement).closest<HTMLElement>("[data-swatch]");
       if (!target) return;
@@ -391,17 +462,16 @@ class Editor implements EditorContext {
     const rail = document.querySelector<HTMLElement>("#vc-rail")!;
     rail.innerHTML = `
       <div class="vc-rail-group">
-        ${RAIL.slice(0, 19)
-          .map(
-            item =>
-              `<button class="vc-rail-btn" data-rail="${item.id}" title="${item.title}">${icon(item.icon, 18)}</button>`
-          )
-          .join("")}
+        ${RAIL_MAIN.map(
+          item =>
+            `<button class="vc-rail-btn" data-rail="${item.id}" title="${item.title}">${icon(item.icon, 18)}</button>`
+        ).join("")}
       </div>
       <div class="vc-rail-foot">
-        <button class="vc-rail-btn" data-rail="settings" title="Settings">${icon("settings", 18)}</button>
-        <button class="vc-rail-btn" data-rail="help" title="Help">${icon("help", 18)}</button>
-        <button class="vc-rail-btn" data-rail="pointer" title="Selection">${icon("pointer", 18)}</button>
+        ${RAIL_FOOT.map(
+          item =>
+            `<button class="vc-rail-btn" data-rail="${item.id}" title="${item.title}">${icon(item.icon, 18)}</button>`
+        ).join("")}
       </div>`;
     rail.addEventListener("click", event => {
       const target = (event.target as HTMLElement).closest<HTMLElement>("[data-rail]");
@@ -445,6 +515,34 @@ class Editor implements EditorContext {
         this.syncRail();
         this.panels.scrollToAlign();
         break;
+      case "transform":
+        this.focusSidebar("properties");
+        this.panels.scrollTo('[data-section="transform"]');
+        break;
+      case "opacity":
+        this.focusSidebar("properties");
+        this.panels.scrollTo('[data-section="appearance"]');
+        break;
+      case "symbols":
+        this.focusSidebar("libraries");
+        break;
+      case "artboard":
+        this.focusSidebar("properties");
+        this.panels.scrollTo(".vc-section--title");
+        break;
+      case "guides":
+        this.toggleGrid();
+        this.toast(`Grid ${this.ui.showGrid ? "shown" : "hidden"}`);
+        break;
+      case "measure":
+        this.toggleMeasure();
+        break;
+      case "history":
+        this.showHistory();
+        break;
+      case "actions":
+        void this.exportSvg();
+        break;
       case "effects":
         this.toggleGlow();
         break;
@@ -454,11 +552,11 @@ class Editor implements EditorContext {
       case "help":
         this.showShortcuts();
         break;
-      case "history":
-        this.toast(`History：${this.history.length} 步可撤销`);
+      case "pointer":
+        this.setTool("select");
         break;
       case "settings":
-        this.toast("Settings：示例未接入");
+        this.toast("Settings：仅提供深色主题");
         break;
       default:
         this.toast(`${id}：面板示例未接入`);
@@ -504,15 +602,15 @@ class Editor implements EditorContext {
         { label: "Save", shortcut: "Ctrl S", action: () => this.saveDocument() },
         { label: "Save As…", action: () => this.saveDocument() },
         { separator: true },
-        { label: "Export SVG…", action: () => this.exportSvg() },
+        { label: "Export SVG…", action: () => void this.exportSvg() },
         { label: "Export PNG…", shortcut: "Alt Shift P", action: () => void this.exportPng() },
         { separator: true },
         { label: "Document Setup…", action: () => this.toast("Document Setup：800 × 1000 pt · 72 ppi · RGB") },
         { label: "Print…", shortcut: "Ctrl P", action: () => this.toast("Print：示例未接入") }
       ],
       Edit: [
-        { label: "Undo", shortcut: "Ctrl Z", action: () => this.undo() },
-        { label: "Redo", shortcut: "Shift Ctrl Z", action: () => this.redo() },
+        { label: "Undo", shortcut: "Ctrl Z", disabled: this.history.length === 0, action: () => this.undo() },
+        { label: "Redo", shortcut: "Shift Ctrl Z", disabled: this.future.length === 0, action: () => this.redo() },
         { separator: true },
         { label: "Cut", shortcut: "Ctrl X", action: () => this.cutSelection() },
         { label: "Copy", shortcut: "Ctrl C", action: () => this.copySelection() },
@@ -532,14 +630,18 @@ class Editor implements EditorContext {
         { label: "Arrange: Send to Back", shortcut: "Shift Ctrl [", action: () => this.sendToBack() },
         { separator: true },
         { label: "Lock", shortcut: "Ctrl 2", action: () => this.selection.forEach(id => this.toggleLock(id)) },
-        { label: "Unlock All", shortcut: "Alt Ctrl 2", action: () => this.doc.objects.forEach(object => (object.locked = false)) },
+        {
+          label: "Unlock All",
+          shortcut: "Alt Ctrl 2",
+          action: () => this.doc.objects.forEach(object => (object.locked = false))
+        },
         { label: "Hide", shortcut: "Ctrl 3", action: () => this.selection.forEach(id => this.toggleVisibility(id)) },
         { separator: true },
-        { label: "Group", shortcut: "Ctrl G", action: () => this.toast("Group：示例未接入（对象已按图层顺序绘制）") },
-        { label: "Ungroup", shortcut: "Shift Ctrl G", action: () => this.toast("Ungroup：示例未接入") }
+        { label: "Group", shortcut: "Ctrl G", action: () => this.groupSelection() },
+        { label: "Ungroup", shortcut: "Shift Ctrl G", action: () => this.ungroupSelection() }
       ],
       Type: [
-        { label: "Create Outlines", shortcut: "Shift Ctrl O", action: () => this.outlineSelection() },
+        { label: "Create Outlines", shortcut: "Shift Ctrl O", action: () => void this.outlineSelection() },
         { label: "Font Size Increase", shortcut: "Ctrl Shift >", action: () => this.stepFontSize(4) },
         { label: "Font Size Decrease", shortcut: "Ctrl Shift <", action: () => this.stepFontSize(-4) },
         { separator: true },
@@ -571,9 +673,27 @@ class Editor implements EditorContext {
         { label: "Actual Size", shortcut: "Ctrl 1", action: () => this.setZoomPercent(100) },
         { label: "Zoom to Selection", shortcut: "Ctrl 2", action: () => this.zoomToSelection() },
         { separator: true },
-        { label: "Show Rulers", shortcut: "Ctrl R", checked: this.ui.showRulers, action: () => this.toggleRulers() },
-        { label: "Show Grid", shortcut: "Ctrl '", checked: this.ui.showGrid, action: () => this.toggleGrid() },
-        { label: "Outline Mode", shortcut: "Ctrl Y", checked: this.ui.outlineMode, action: () => this.toggleOutlineMode() }
+        {
+          label: "Show Rulers",
+          shortcut: "Ctrl R",
+          checked: this.ui.showRulers,
+          command: "show-rulers",
+          action: () => this.toggleRulers()
+        },
+        {
+          label: "Show Grid",
+          shortcut: "Ctrl '",
+          checked: this.ui.showGrid,
+          command: "show-grid",
+          action: () => this.toggleGrid()
+        },
+        {
+          label: "Outline Mode",
+          shortcut: "Ctrl Y",
+          checked: this.ui.outlineMode,
+          command: "outline-mode",
+          action: () => this.toggleOutlineMode()
+        }
       ],
       Window: [
         { label: "Properties", action: () => this.focusSidebar("properties") },
@@ -588,7 +708,10 @@ class Editor implements EditorContext {
       Help: [
         { label: "Keyboard Shortcuts", action: () => this.showShortcuts() },
         { label: "About VectorCraft", action: () => this.showAbout() },
-        { label: "LiteGUI Documentation", action: () => window.open("https://gausszhou.github.io/litegui/docs/", "_blank") }
+        {
+          label: "LiteGUI Documentation",
+          action: () => window.open("https://gausszhou.github.io/litegui/docs/", "_blank")
+        }
       ]
     };
   }
@@ -599,32 +722,10 @@ class Editor implements EditorContext {
       return;
     }
     this.closeMenu();
-    const menu = document.createElement("div");
-    menu.className = "vc-menu";
-    for (const item of items) {
-      if (item.separator) {
-        const separator = document.createElement("div");
-        separator.className = "vc-menu-sep";
-        menu.appendChild(separator);
-        continue;
-      }
-      const row = document.createElement("button");
-      row.type = "button";
-      row.className = `vc-menu-item${item.disabled ? " is-disabled" : ""}`;
-      row.innerHTML = `<span class="vc-menu-check">${item.checked ? "✓" : ""}</span><span class="vc-menu-label">${
-        item.label ?? ""
-      }</span><span class="vc-menu-shortcut">${item.shortcut ?? ""}</span>`;
-      row.addEventListener("click", () => {
-        this.closeMenu();
-        if (!item.disabled) item.action?.();
-      });
-      menu.appendChild(row);
-    }
+    const menu = buildMenu(items, () => this.closeMenu());
     document.body.appendChild(menu);
     const rect = anchor.getBoundingClientRect();
-    const width = menu.offsetWidth;
-    menu.style.left = `${Math.max(6, Math.min(rect.left, window.innerWidth - width - 8))}px`;
-    menu.style.top = `${Math.min(rect.bottom + 4, window.innerHeight - menu.offsetHeight - 8)}px`;
+    positionMenu(menu, rect.left, rect.bottom + 4);
     this.menu = menu;
     this.menuAnchor = anchor;
     anchor.classList.add("is-open");
@@ -642,6 +743,21 @@ class Editor implements EditorContext {
 
   selectedObjects(): VecObject[] {
     return this.doc.objects.filter(object => this.selection.includes(object.id));
+  }
+
+  private editableSelection(): VecObject[] {
+    return this.selectedObjects().filter(object => !object.locked);
+  }
+
+  /** 点集对象（钢笔/画笔/山体）的包围盒与 base 同步，保证 Transform 与画面一致。 */
+  private syncPointBounds(object: VecObject) {
+    if (!object.points?.length) return;
+    const bounds = pointsBounds(object.points);
+    object.x = round(bounds.x);
+    object.y = round(bounds.y);
+    object.width = round(bounds.width);
+    object.height = round(bounds.height);
+    object.base = { ...bounds };
   }
 
   primaryObject(): VecObject | null {
@@ -669,15 +785,24 @@ class Editor implements EditorContext {
   update(id: string, patch: Partial<VecObject>, record = true) {
     const object = this.doc.objects.find(item => item.id === id);
     if (!object) return;
+    if (object.locked) {
+      this.toast("对象已锁定，请先在图层面板中解锁");
+      this.refresh();
+      return;
+    }
     if (record) this.pushHistory();
     Object.assign(object, patch);
     this.refresh();
   }
 
   updateSelection(patch: Partial<VecObject>, record = true) {
-    if (!this.selection.length) return;
+    const objects = this.editableSelection();
+    if (!objects.length) {
+      if (this.selection.length) this.toast("对象已锁定，请先在图层面板中解锁");
+      return;
+    }
     if (record) this.pushHistory();
-    for (const object of this.selectedObjects()) Object.assign(object, patch);
+    for (const object of objects) Object.assign(object, patch);
     this.refresh();
   }
 
@@ -725,11 +850,16 @@ class Editor implements EditorContext {
     const fillSwatch = document.querySelector<HTMLElement>(".vc-colorstack-fill");
     const strokeSwatch = document.querySelector<HTMLElement>(".vc-colorstack-stroke");
     if (fillSwatch) {
-      fillSwatch.style.background = primary ? (primary.fill === "none" ? "" : this.cssPaint(primary.fill)) : this.fillPaint;
+      fillSwatch.style.background = primary
+        ? primary.fill === "none"
+          ? ""
+          : this.cssPaint(primary.fill)
+        : this.fillPaint;
       fillSwatch.classList.toggle("is-none", primary?.fill === "none");
     }
     if (strokeSwatch) {
-      strokeSwatch.style.borderColor = primary && primary.stroke !== "none" ? this.cssPaint(primary.stroke) : this.strokePaint;
+      strokeSwatch.style.borderColor =
+        primary && primary.stroke !== "none" ? this.cssPaint(primary.stroke) : this.strokePaint;
       strokeSwatch.classList.toggle("is-none", primary ? primary.stroke === "none" : false);
     }
     this.syncRail();
@@ -740,6 +870,15 @@ class Editor implements EditorContext {
     this.fillPaint = paint;
     this.updateChrome();
     this.toast(`默认填充：${paintLabel(paint)}`);
+  }
+
+  defaultPaint(): { fill: Paint; stroke: Paint } {
+    return { fill: this.fillPaint, stroke: this.strokePaint };
+  }
+
+  setUi(patch: Partial<UiState>) {
+    Object.assign(this.ui, patch);
+    this.refresh();
   }
 
   private cssPaint(paint: Paint): string {
@@ -772,19 +911,28 @@ class Editor implements EditorContext {
       case "rotate":
         return "Drag to rotate the selection around its centre";
       case "eraser":
-        return "Click an object to erase it (demo)";
+        return "Click an object to erase it";
+      case "lasso":
+        return "拖动圈选对象 · Esc 取消";
+      case "group":
+        return "点击编组对象以选中整组";
+      case "anchor":
+        return "拖动路径锚点 · 需先选中路径";
+      case "penAdd":
+        return "在选中的路径上点击以添加锚点";
+      case "penRemove":
+        return "点击锚点删除 · 至少保留 2 个";
+      case "pathEraser":
+        return "点击路径锚点删除该点";
       case "scissors":
       case "knife":
+        return "点击开放路径在落点处切开";
       case "smooth":
+        return "平滑选中路径的锚点";
       case "shaper":
-      case "pathEraser":
-      case "lasso":
-      case "group":
-      case "penAdd":
-      case "penRemove":
-      case "anchor":
+        return "拖动创建形状";
       case "verticalType":
-        return "该工具为视觉示例，交互请使用 Selection / Pen / Type";
+        return "点击画布创建竖排文字";
       default:
         return this.defaultHint;
     }
@@ -819,7 +967,9 @@ class Editor implements EditorContext {
   }
 
   private updateStats() {
-    this.statsElement.textContent = `render ${this.renderTime.toFixed(1)} ms · ul ${this.uiTime.toFixed(1)} ms · ${this.fps} fps`;
+    this.statsElement.textContent = `render ${this.renderTime.toFixed(1)} ms · ul ${this.uiTime.toFixed(1)} ms · ${
+      this.fps
+    } fps`;
   }
 
   /* ------------------------- 历史 ------------------------- */
@@ -852,7 +1002,7 @@ class Editor implements EditorContext {
     this.toast("Redo");
   }
 
-  private restore(entry: { doc: string; selection: string[] }) {
+  private restore(entry: Snapshot) {
     const parsed = deserializeDocument(entry.doc);
     if (!parsed) return;
     this.doc = parsed;
@@ -863,32 +1013,45 @@ class Editor implements EditorContext {
   /* ------------------------- 编辑操作 ------------------------- */
 
   deleteSelection() {
-    if (!this.selection.length) return;
+    const removable = this.editableSelection();
+    if (!removable.length) {
+      if (this.selection.length) this.toast("对象已锁定，无法删除");
+      return;
+    }
     this.pushHistory();
-    this.doc.objects = this.doc.objects.filter(object => !this.selection.includes(object.id));
-    this.selection = [];
+    const ids = new Set(removable.map(object => object.id));
+    this.doc.objects = this.doc.objects.filter(object => !ids.has(object.id));
+    this.selection = this.selection.filter(id => !ids.has(id));
     this.refresh();
-    this.toast("Deleted");
+    this.toast(`Deleted ${removable.length} object(s)`);
   }
 
   duplicateSelection() {
-    if (!this.selection.length) {
+    const objects = this.editableSelection();
+    if (!objects.length) {
       this.toast("Select an object first");
       return;
     }
     this.pushHistory();
-    const clones = this.selectedObjects().map(object => {
+    this.selection = this.insertClones(objects, 16, 16, "copy");
+    this.refresh();
+    this.toast("Duplicated");
+  }
+
+  private insertClones(objects: VecObject[], dx: number, dy: number, prefix: string): string[] {
+    const groupMap = new Map<string, string>();
+    return objects.map(object => {
       const clone = cloneObject(object);
-      clone.id = `${object.id}-copy-${Math.random().toString(36).slice(2, 6)}`;
-      clone.x += 16;
-      clone.y += 16;
-      clone.name = object.name;
+      clone.id = `${object.id}-${prefix}-${Math.random().toString(36).slice(2, 6)}`;
+      clone.x += dx;
+      clone.y += dy;
+      if (object.groupId) {
+        if (!groupMap.has(object.groupId)) groupMap.set(object.groupId, uid("group"));
+        clone.groupId = groupMap.get(object.groupId);
+      }
       this.doc.objects.push(clone);
       return clone.id;
     });
-    this.selection = clones;
-    this.refresh();
-    this.toast("Duplicated");
   }
 
   copySelection() {
@@ -909,15 +1072,7 @@ class Editor implements EditorContext {
       return;
     }
     this.pushHistory();
-    const ids = this.clipboard.map(object => {
-      const clone = cloneObject(object);
-      clone.id = `${object.id}-paste-${Math.random().toString(36).slice(2, 6)}`;
-      clone.x += 24;
-      clone.y += 24;
-      this.doc.objects.push(clone);
-      return clone.id;
-    });
-    this.selection = ids;
+    this.selection = this.insertClones(this.clipboard, 24, 24, "paste");
     this.refresh();
     this.toast("Pasted");
   }
@@ -927,7 +1082,9 @@ class Editor implements EditorContext {
   }
 
   selectInverse() {
-    this.select(this.doc.objects.filter(object => !this.selection.includes(object.id) && !object.locked).map(object => object.id));
+    this.select(
+      this.doc.objects.filter(object => !this.selection.includes(object.id) && !object.locked).map(object => object.id)
+    );
   }
 
   selectSameFill() {
@@ -946,19 +1103,21 @@ class Editor implements EditorContext {
   }
 
   bringToFront() {
-    if (!this.selection.length) return;
+    const moving = this.editableSelection();
+    if (!moving.length) return;
     this.pushHistory();
-    const moving = this.selectedObjects();
-    this.doc.objects = [...this.doc.objects.filter(object => !this.selection.includes(object.id)), ...moving];
+    const ids = new Set(moving.map(object => object.id));
+    this.doc.objects = [...this.doc.objects.filter(object => !ids.has(object.id)), ...moving];
     this.refresh();
     this.toast("Brought to Front");
   }
 
   sendToBack() {
-    if (!this.selection.length) return;
+    const moving = this.editableSelection();
+    if (!moving.length) return;
     this.pushHistory();
-    const moving = this.selectedObjects();
-    this.doc.objects = [...moving, ...this.doc.objects.filter(object => !this.selection.includes(object.id))];
+    const ids = new Set(moving.map(object => object.id));
+    this.doc.objects = [...moving, ...this.doc.objects.filter(object => !ids.has(object.id))];
     this.refresh();
     this.toast("Sent to Back");
   }
@@ -1001,30 +1160,52 @@ class Editor implements EditorContext {
     this.toast(primary.glow > 0 ? "Outer Glow added" : "Outer Glow removed");
   }
 
-  outlineSelection() {
-    const texts = this.selectedObjects().filter(object => isText(object));
+  async outlineSelection() {
+    const texts = this.editableSelection().filter(object => isText(object));
     if (!texts.length) {
       this.toast("Create Outlines 需要选中文本对象");
       return;
     }
-    this.pushHistory();
-    for (const object of texts) {
-      object.outlined = true;
-      object.glow = 0;
-      object.name = object.name.includes("(Outlines)") ? object.name : `${object.name} (Outlines)`;
+    if (texts.some(object => object.vertical)) {
+      this.toast("竖排文字暂不支持 Create Outlines");
+      return;
     }
-    this.refresh();
-    this.toast("已创建轮廓（演示：以描边方式渲染）");
+    try {
+      const outlines = await Promise.all(texts.map(async object => ({ object, d: await textToOutlinePath(object) })));
+      this.pushHistory();
+      for (const { object, d } of outlines) {
+        if (!d) continue;
+        object.kind = "path";
+        object.pathData = d;
+        object.points = undefined;
+        object.closed = true;
+        object.base = { x: object.x, y: object.y, width: object.width, height: object.height };
+        object.text = undefined;
+        object.subline = undefined;
+        object.textLength = undefined;
+        object.letterSpacing = undefined;
+        object.stroke = "none";
+        object.strokeWidth = 0;
+        object.name = object.name.includes("(Outlines)") ? object.name : `${object.name} (Outlines)`;
+      }
+      this.refresh();
+      this.toast("已转换为真实字形轮廓（可编辑锚点由字形路径提供）");
+    } catch {
+      this.toast("字体加载失败，无法创建轮廓");
+    }
   }
 
   alignSelection(mode: AlignMode) {
-    const objects = this.selectedObjects();
-    if (!objects.length) return;
+    const objects = this.editableSelection();
+    if (!objects.length) {
+      this.toast("请选择未锁定的对象");
+      return;
+    }
     this.pushHistory();
     const union = unionBounds(objects);
     if (!union) return;
     const artboard = { x: 0, y: 0, width: this.doc.width, height: this.doc.height };
-    const target = objects.length > 1 && union ? union : artboard;
+    const target = objects.length > 1 ? union : artboard;
     for (const object of objects) {
       switch (mode) {
         case "left":
@@ -1053,7 +1234,7 @@ class Editor implements EditorContext {
   }
 
   distributeSelection(axis: "h" | "v") {
-    const objects = this.selectedObjects();
+    const objects = this.editableSelection();
     if (objects.length < 3) {
       this.toast("分布需要至少 3 个对象");
       return;
@@ -1079,13 +1260,13 @@ class Editor implements EditorContext {
   }
 
   rotateSelection(degrees: number) {
-    const primary = this.primaryObject();
-    if (!primary) {
+    const objects = this.editableSelection();
+    if (!objects.length) {
       this.toast("Select an object first");
       return;
     }
     this.pushHistory();
-    for (const object of this.selectedObjects()) object.rotation = (object.rotation + degrees + 360) % 360;
+    for (const object of objects) object.rotation = (object.rotation + degrees + 360) % 360;
     this.refresh();
   }
 
@@ -1093,10 +1274,180 @@ class Editor implements EditorContext {
     const primary = this.primaryObject();
     if (!primary || !isText(primary)) return;
     this.pushHistory();
-    for (const object of this.selectedObjects()) {
+    for (const object of this.editableSelection()) {
       if (isText(object)) object.fontSize = Math.max(4, (object.fontSize ?? 24) + delta);
     }
     this.refresh();
+  }
+
+  private updateLassoPath(points: Vec2[]) {
+    const d = points
+      .map((point, index) => {
+        const local = this.stage.docToLocal(point);
+        return `${index === 0 ? "M" : "L"}${Math.round(local.x)} ${Math.round(local.y)}`;
+      })
+      .join(" ");
+    this.lassoPath.setAttribute("d", d);
+  }
+
+  private insertPoint(object: VecObject, docPoint: Vec2) {
+    if (nearestPointIndex(object, docPoint, 4 / this.stage.zoomLevel) >= 0) {
+      this.toast("该位置已有锚点");
+      return;
+    }
+    const hit = nearestSegment(object.points ?? [], docPoint, object.closed ?? false);
+    if (!hit || hit.distance > 16 / this.stage.zoomLevel) {
+      this.toast("请靠近路径添加锚点");
+      return;
+    }
+    this.pushHistory();
+    object.points?.splice(hit.index + 1, 0, { x: round(hit.point.x), y: round(hit.point.y) });
+    this.syncPointBounds(object);
+    this.refresh();
+    this.toast("已添加锚点");
+  }
+
+  private removePointNear(object: VecObject, docPoint: Vec2, threshold: number) {
+    const index = nearestPointIndex(object, docPoint, threshold);
+    if (index < 0) {
+      this.toast("请点击路径上的锚点");
+      return;
+    }
+    this.pushHistory();
+    object.points?.splice(index, 1);
+    if (!object.points || object.points.length < 2) {
+      this.doc.objects = this.doc.objects.filter(item => item.id !== object.id);
+      this.selection = this.selection.filter(id => id !== object.id);
+      this.refresh();
+      this.toast("路径点不足，已删除路径");
+      return;
+    }
+    this.syncPointBounds(object);
+    this.refresh();
+    this.toast("已删除锚点");
+  }
+
+  private splitPathAt(object: VecObject, docPoint: Vec2) {
+    if (!object.points || object.points.length < 3 || object.closed) {
+      this.toast("仅支持切开开放路径");
+      return;
+    }
+    const hit = nearestSegment(object.points, docPoint, false);
+    if (!hit) return;
+    const first = [...object.points.slice(0, hit.index + 1), { x: round(hit.point.x), y: round(hit.point.y) }];
+    const second = [{ x: round(hit.point.x), y: round(hit.point.y) }, ...object.points.slice(hit.index + 1)];
+    if (first.length < 2 || second.length < 2) {
+      this.toast("切口太靠近端点");
+      return;
+    }
+    this.pushHistory();
+    const make = (points: Vec2[], suffix: string) => {
+      const clone = cloneObject(object);
+      clone.id = uid("path");
+      clone.points = points;
+      clone.pathData = undefined;
+      clone.closed = false;
+      clone.base = pointsBounds(points);
+      clone.x = round(clone.base.x);
+      clone.y = round(clone.base.y);
+      clone.width = round(clone.base.width);
+      clone.height = round(clone.base.height);
+      clone.name = `${object.name} ${suffix}`;
+      return clone;
+    };
+    const left = make(first, "A");
+    const right = make(second, "B");
+    const index = this.doc.objects.findIndex(item => item.id === object.id);
+    this.doc.objects.splice(index, 1, left, right);
+    this.selection = [left.id, right.id];
+    this.refresh();
+    this.toast("已切开路径");
+  }
+
+  private smoothSelection() {
+    const paths = this.editableSelection().filter(
+      object => object.points && object.points.length > 2 && !object.pathData
+    );
+    if (!paths.length) {
+      this.toast("请先选中一条路径");
+      return;
+    }
+    this.pushHistory();
+    for (const object of paths) {
+      object.points = smoothPoints(object.points ?? []).map(point => ({ x: round(point.x), y: round(point.y) }));
+      this.syncPointBounds(object);
+    }
+    this.refresh();
+    this.toast("已平滑路径");
+  }
+
+  groupSelection() {
+    const objects = this.editableSelection();
+    if (objects.length < 2) {
+      this.toast("请选择至少两个对象再编组");
+      return;
+    }
+    this.pushHistory();
+    const groupId = uid("group");
+    for (const object of objects) object.groupId = groupId;
+    this.refresh();
+    this.toast(`已编组 ${objects.length} 个对象`);
+  }
+
+  ungroupSelection() {
+    const objects = this.editableSelection().filter(object => object.groupId);
+    if (!objects.length) {
+      this.toast("选中的对象不在编组中");
+      return;
+    }
+    this.pushHistory();
+    for (const object of objects) object.groupId = undefined;
+    this.refresh();
+    this.toast("已取消编组");
+  }
+
+  offsetPath() {
+    const objects = this.editableSelection();
+    if (!objects.length) {
+      this.toast("请先选择对象");
+      return;
+    }
+    this.pushHistory();
+    const copies = objects.map(object => {
+      const clone = cloneObject(object);
+      clone.id = uid("offset");
+      clone.name = `${object.name} Offset`;
+      clone.fill = "none";
+      clone.stroke = object.fill === "none" ? "#ffffff" : object.fill;
+      clone.strokeWidth = Math.max(2, (object.strokeWidth || 0) + 10);
+      clone.pathData = object.pathData;
+      this.doc.objects.push(clone);
+      return clone.id;
+    });
+    this.selection = copies;
+    this.refresh();
+    this.toast("已创建 Offset Path（以描边近似）");
+  }
+
+  simplifySelection() {
+    const paths = this.editableSelection().filter(
+      object => object.points && object.points.length > 2 && !object.pathData
+    );
+    if (!paths.length) {
+      this.toast("请先选中一条点集路径");
+      return;
+    }
+    this.pushHistory();
+    for (const object of paths) {
+      object.points = simplifyPoints(object.points ?? [], 2.5);
+      object.base = pointsBounds(object.points);
+      object.x = round(object.base.x);
+      object.y = round(object.base.y);
+      object.width = round(object.base.width);
+      object.height = round(object.base.height);
+    }
+    this.refresh();
+    this.toast("已简化路径");
   }
 
   editPrimaryText() {
@@ -1242,16 +1593,16 @@ class Editor implements EditorContext {
     this.fileInput.value = "";
   }
 
-  private exportSvg() {
+  private async exportSvg() {
     const name = this.doc.name.replace(/\.(vectorcraft|json)$/i, "");
-    downloadText(`${name}.svg`, documentSvg(this.doc));
+    downloadText(`${name}.svg`, documentSvg(this.doc, await buildFontCss()));
     this.toast("已导出 SVG");
   }
 
   private async exportPng() {
     const name = this.doc.name.replace(/\.(vectorcraft|json)$/i, "");
     try {
-      await downloadPng(this.doc, `${name}.png`, 2);
+      await downloadPng(this.doc, `${name}.png`, 2, await buildFontCss());
       this.toast("已导出 PNG（2×）");
     } catch {
       this.toast("PNG 导出失败");
@@ -1280,7 +1631,10 @@ class Editor implements EditorContext {
       case "swap": {
         const primary = this.primaryObject();
         if (primary) {
-          this.updateSelection({ fill: primary.stroke === "none" ? "#ffffff" : primary.stroke, stroke: primary.fill }, true);
+          this.updateSelection(
+            { fill: primary.stroke === "none" ? "#ffffff" : primary.stroke, stroke: primary.fill },
+            true
+          );
         } else {
           const swap = this.fillPaint;
           this.fillPaint = this.strokePaint;
@@ -1297,6 +1651,12 @@ class Editor implements EditorContext {
       case "screen":
         this.toast("Screen Mode：示例未接入");
         break;
+      case "gradient":
+        this.updateSelection({ fill: "url(#vc-sunset-1)" }, true);
+        break;
+      case "none":
+        this.updateSelection({ fill: "none" }, true);
+        break;
       default:
         break;
     }
@@ -1312,16 +1672,7 @@ class Editor implements EditorContext {
     const screen = { x: event.clientX, y: event.clientY };
 
     if (event.button === 1 || this.spaceDown || this.tool === "hand") {
-      this.beginDrag({
-        mode: "pan",
-        startDoc: docPoint,
-        startScreen: screen,
-        lastScreen: screen,
-        origins: [],
-        startAngle: 0,
-        moved: false,
-        historyPushed: false
-      });
+      this.startDrag("pan", docPoint, screen);
       event.preventDefault();
       return;
     }
@@ -1333,19 +1684,29 @@ class Editor implements EditorContext {
       return;
     }
 
+    if (this.tool === "lasso") {
+      this.startDrag("lasso", docPoint, screen, { lassoPoints: [docPoint] });
+      this.lasso.style.display = "block";
+      this.updateLassoPath([docPoint]);
+      event.preventDefault();
+      return;
+    }
+
     const handle = target.closest<HTMLElement>("[data-handle]");
-    if (handle && this.selection.length) {
-      this.beginDrag({
-        mode: "resize",
-        startDoc: docPoint,
-        startScreen: screen,
-        lastScreen: screen,
+    const handleObject = handle?.dataset.objId ? this.doc.objects.find(item => item.id === handle.dataset.objId) : null;
+    const canResize = this.tool === "select" || this.tool === "direct" || this.tool === "group";
+    if (handle && canResize && this.selection.length && handleObject && !handleObject.locked) {
+      this.startDrag("resize", docPoint, screen, {
         handleIndex: handle.dataset.handle ?? "0",
-        objectId: handle.dataset.objId,
-        origins: this.selectedObjects().map(object => ({ id: object.id, x: object.x, y: object.y, width: object.width, height: object.height })),
-        startAngle: 0,
-        moved: false,
-        historyPushed: false
+        objectId: handleObject.id,
+        origins: this.selectedObjects().map(item => ({
+          id: item.id,
+          x: item.x,
+          y: item.y,
+          width: item.width,
+          height: item.height,
+          rotation: item.rotation
+        }))
       });
       event.preventDefault();
       return;
@@ -1356,12 +1717,18 @@ class Editor implements EditorContext {
     const object = objectId ? this.doc.objects.find(item => item.id === objectId) ?? null : null;
 
     if (this.tool === "type") {
-      this.createText(docPoint);
+      this.createText(docPoint, false);
       event.preventDefault();
       return;
     }
 
-    if (["rect", "ellipse", "polygon", "star", "line", "brush", "pencil"].includes(this.tool)) {
+    if (this.tool === "verticalType") {
+      this.createText(docPoint, true);
+      event.preventDefault();
+      return;
+    }
+
+    if (["rect", "ellipse", "polygon", "star", "line", "brush", "pencil", "shaper"].includes(this.tool)) {
       this.beginCreate(docPoint, screen);
       event.preventDefault();
       return;
@@ -1381,17 +1748,61 @@ class Editor implements EditorContext {
       return;
     }
 
+    if (this.tool === "anchor") {
+      const path = object?.points ? object : this.editableSelection().find(item => item.points && !item.pathData);
+      const index = path ? nearestPointIndex(path, docPoint, 16 / this.stage.zoomLevel) : -1;
+      if (path && index >= 0) {
+        this.select([path.id]);
+        this.startDrag("anchor", docPoint, screen, { objectId: path.id, pointIndex: index });
+      } else {
+        this.toast("点击路径上的锚点进行拖动");
+      }
+      event.preventDefault();
+      return;
+    }
+
+    if (this.tool === "penAdd" || this.tool === "penRemove" || this.tool === "pathEraser") {
+      const path = object?.points ? object : this.editableSelection().find(item => item.points && !item.pathData);
+      if (!path || path.locked) {
+        this.toast("请先选中一条路径");
+        return;
+      }
+      if (this.tool === "penAdd") this.insertPoint(path, docPoint);
+      else
+        this.removePointNear(
+          path,
+          docPoint,
+          this.tool === "penRemove" ? 18 / this.stage.zoomLevel : 14 / this.stage.zoomLevel
+        );
+      event.preventDefault();
+      return;
+    }
+
+    if (this.tool === "scissors" || this.tool === "knife") {
+      const path = object?.points ? object : this.editableSelection().find(item => item.points && !item.pathData);
+      if (path && !path.locked) this.splitPathAt(path, docPoint);
+      else this.toast("剪刀/刻刀需要点击一条开放路径");
+      event.preventDefault();
+      return;
+    }
+
+    if (this.tool === "smooth") {
+      this.smoothSelection();
+      event.preventDefault();
+      return;
+    }
+
     if (this.tool === "rotate" && object) {
-      this.select([object.id]);
-      this.beginDrag({
-        mode: "rotate",
-        startDoc: docPoint,
-        startScreen: screen,
-        lastScreen: screen,
-        origins: this.selectedObjects().map(item => ({ id: item.id, x: item.x, y: item.y, width: item.width, height: item.height })),
-        startAngle: Math.atan2(docPoint.y - this.selectionCenter().y, docPoint.x - this.selectionCenter().x),
-        moved: false,
-        historyPushed: false
+      if (!this.selection.includes(object.id)) this.select([object.id]);
+      this.startDrag("rotate", docPoint, screen, {
+        origins: this.selectedObjects().map(item => ({
+          id: item.id,
+          x: item.x,
+          y: item.y,
+          width: item.width,
+          height: item.height,
+          rotation: item.rotation
+        }))
       });
       event.preventDefault();
       return;
@@ -1408,17 +1819,21 @@ class Editor implements EditorContext {
         this.select([object.id], true);
         return;
       }
-      if (!this.selection.includes(object.id)) this.select([object.id]);
+      if (object.groupId) {
+        this.select(this.doc.objects.filter(item => item.groupId === object.groupId).map(item => item.id));
+      } else if (!this.selection.includes(object.id)) {
+        this.select([object.id]);
+      }
       if (event.altKey) this.duplicateSelection();
-      this.beginDrag({
-        mode: "move",
-        startDoc: docPoint,
-        startScreen: screen,
-        lastScreen: screen,
-        origins: this.selectedObjects().map(item => ({ id: item.id, x: item.x, y: item.y, width: item.width, height: item.height })),
-        startAngle: 0,
-        moved: false,
-        historyPushed: false
+      this.startDrag("move", docPoint, screen, {
+        origins: this.selectedObjects().map(item => ({
+          id: item.id,
+          x: item.x,
+          y: item.y,
+          width: item.width,
+          height: item.height,
+          rotation: item.rotation
+        }))
       });
       event.preventDefault();
       return;
@@ -1430,16 +1845,7 @@ class Editor implements EditorContext {
   };
 
   private startMarquee(docPoint: Vec2, screen: Vec2) {
-    this.beginDrag({
-      mode: "marquee",
-      startDoc: docPoint,
-      startScreen: screen,
-      lastScreen: screen,
-      origins: [],
-      startAngle: 0,
-      moved: false,
-      historyPushed: false
-    });
+    this.startDrag("marquee", docPoint, screen);
     this.marquee.hidden = false;
     this.marquee.style.left = `${screen.x - this.viewport.getBoundingClientRect().left}px`;
     this.marquee.style.top = `${screen.y - this.viewport.getBoundingClientRect().top}px`;
@@ -1447,8 +1853,18 @@ class Editor implements EditorContext {
     this.marquee.style.height = "0px";
   }
 
-  private beginDrag(drag: DragState) {
-    this.drag = drag;
+  private startDrag(mode: DragState["mode"], startDoc: Vec2, startScreen: Vec2, extra: Partial<DragState> = {}) {
+    this.drag = {
+      mode,
+      startDoc,
+      startScreen,
+      lastScreen: startScreen,
+      origins: [],
+      startAngle: 0,
+      moved: false,
+      historyPushed: false,
+      ...extra
+    };
   }
 
   private localX(event: { clientX: number }): number {
@@ -1480,6 +1896,32 @@ class Editor implements EditorContext {
 
     const delta = { x: docPoint.x - drag.startDoc.x, y: docPoint.y - drag.startDoc.y };
 
+    if (drag.mode === "lasso") {
+      const points = drag.lassoPoints ?? [];
+      const last = points[points.length - 1];
+      if (Math.hypot(docPoint.x - last.x, docPoint.y - last.y) > 2 / this.stage.zoomLevel) {
+        points.push(docPoint);
+        drag.lassoPoints = points;
+        this.updateLassoPath(points);
+      }
+      drag.moved = true;
+      return;
+    }
+
+    if (drag.mode === "anchor") {
+      const object = this.doc.objects.find(item => item.id === drag.objectId);
+      if (!object?.points || object.locked || drag.pointIndex === undefined) return;
+      if (!drag.moved) {
+        this.pushHistory();
+        drag.moved = true;
+        drag.historyPushed = true;
+      }
+      object.points[drag.pointIndex] = { x: round(docPoint.x), y: round(docPoint.y) };
+      this.syncPointBounds(object);
+      this.renderStageOnly();
+      return;
+    }
+
     if (drag.mode === "marquee") {
       const left = Math.min(drag.startScreen.x, event.clientX);
       const top = Math.min(drag.startScreen.y, event.clientY);
@@ -1500,9 +1942,9 @@ class Editor implements EditorContext {
       }
       for (const origin of drag.origins) {
         const object = this.doc.objects.find(item => item.id === origin.id);
-        if (!object) continue;
-        object.x = Math.round((origin.x + delta.x) * 10) / 10;
-        object.y = Math.round((origin.y + delta.y) * 10) / 10;
+        if (!object || object.locked) continue;
+        object.x = round(origin.x + delta.x);
+        object.y = round(origin.y + delta.y);
       }
       this.renderStageOnly();
       return;
@@ -1530,9 +1972,8 @@ class Editor implements EditorContext {
       const degrees = ((angle - drag.startAngle) * 180) / Math.PI;
       for (const origin of drag.origins) {
         const object = this.doc.objects.find(item => item.id === origin.id);
-        if (!object) continue;
-        object.rotation = Math.round((((object.rotation + degrees) % 360) + 360) % 360);
-        drag.startAngle = angle;
+        if (!object || object.locked) continue;
+        object.rotation = Math.round((((origin.rotation + degrees) % 360) + 360) % 360);
       }
       this.renderStageOnly();
       return;
@@ -1553,23 +1994,17 @@ class Editor implements EditorContext {
       const last = object.points[object.points.length - 1];
       const distance = Math.hypot(docPoint.x - last.x, docPoint.y - last.y);
       if (distance < 2 / this.stage.zoomLevel) return;
-      object.points.push({ x: Math.round(docPoint.x * 10) / 10, y: Math.round(docPoint.y * 10) / 10 });
-      const xs = object.points.map(point => point.x);
-      const ys = object.points.map(point => point.y);
-      object.x = Math.min(...xs);
-      object.y = Math.min(...ys);
-      object.width = Math.max(1, Math.max(...xs) - object.x);
-      object.height = Math.max(1, Math.max(...ys) - object.y);
+      object.points.push({ x: round(docPoint.x), y: round(docPoint.y) });
+      this.syncPointBounds(object);
       this.renderStageOnly();
     }
   };
 
   private applyResize(drag: DragState, delta: Vec2) {
     const handle = drag.handleIndex ?? "2";
-    const origin = drag.origins[0];
-    if (!origin) return;
-    const object = this.doc.objects.find(item => item.id === origin.id);
-    if (!object) return;
+    const object = this.doc.objects.find(item => item.id === drag.objectId);
+    const origin = drag.origins.find(item => item.id === drag.objectId);
+    if (!origin || !object || object.locked) return;
     let { x, y, width, height } = origin;
     if (handle.startsWith("m")) {
       const index = Number.parseInt(handle.slice(1), 10);
@@ -1611,16 +2046,35 @@ class Editor implements EditorContext {
           break;
       }
     }
-    object.x = Math.round(Math.min(x, x + width) * 10) / 10;
-    object.y = Math.round(Math.min(y, y + height) * 10) / 10;
-    object.width = Math.max(1, Math.round(Math.abs(width) * 10) / 10);
-    object.height = Math.max(1, Math.round(Math.abs(height) * 10) / 10);
+    object.x = round(Math.min(x, x + width));
+    object.y = round(Math.min(y, y + height));
+    object.width = Math.max(1, round(Math.abs(width)));
+    object.height = Math.max(1, round(Math.abs(height)));
   }
 
   private onPointerUp = () => {
     const drag = this.drag;
     if (!drag) return;
     this.drag = null;
+
+    if (drag.mode === "lasso") {
+      this.lasso.style.display = "none";
+      const polygon = drag.lassoPoints ?? [];
+      if (polygon.length > 2) {
+        const hits = this.doc.objects.filter(object => {
+          if (!object.visible || object.locked) return false;
+          const center = { x: object.x + object.width / 2, y: object.y + object.height / 2 };
+          return pointInPolygon(center, polygon);
+        });
+        this.select(hits.map(object => object.id));
+      }
+      return;
+    }
+
+    if (drag.mode === "anchor") {
+      this.refresh();
+      return;
+    }
 
     if (drag.mode === "marquee") {
       this.marquee.hidden = true;
@@ -1680,15 +2134,21 @@ class Editor implements EditorContext {
     object.height = Math.max(1, Math.round(Math.abs(dy) * 10) / 10);
     if (this.tool === "line" && object.points) {
       object.points = [
-        { x: Math.round(start.x * 10) / 10, y: Math.round(start.y * 10) / 10 },
-        { x: Math.round(current.x * 10) / 10, y: Math.round(current.y * 10) / 10 }
+        { x: round(start.x), y: round(start.y) },
+        { x: round(current.x), y: round(current.y) }
       ];
+      this.syncPointBounds(object);
     }
   }
 
   private beginCreate(point: Vec2, screen: Vec2) {
     this.pushHistory();
-    const kind = this.tool === "line" || this.tool === "brush" || this.tool === "pencil" ? "path" : (this.tool as VecObject["kind"]);
+    const kind =
+      this.tool === "line" || this.tool === "brush" || this.tool === "pencil"
+        ? "path"
+        : this.tool === "shaper"
+        ? "polygon"
+        : (this.tool as VecObject["kind"]);
     const stroke = this.strokePaint === "none" ? "#ff3fae" : this.strokePaint;
     const object = createObject({
       kind,
@@ -1700,54 +2160,52 @@ class Editor implements EditorContext {
         this.tool === "rect"
           ? "Rectangle"
           : this.tool === "ellipse"
-            ? "Ellipse"
-            : this.tool === "polygon"
-              ? "Polygon"
-              : this.tool === "star"
-                ? "Star"
-                : this.tool === "line"
-                  ? "Line"
-                  : "Brush Path",
+          ? "Ellipse"
+          : this.tool === "polygon"
+          ? "Polygon"
+          : this.tool === "star"
+          ? "Star"
+          : this.tool === "line"
+          ? "Line"
+          : this.tool === "shaper"
+          ? "Shaper Shape"
+          : "Brush Path",
       fill: this.tool === "line" || this.tool === "brush" || this.tool === "pencil" ? "none" : this.fillPaint,
       stroke: this.tool === "line" || this.tool === "brush" || this.tool === "pencil" ? stroke : "none",
       strokeWidth: this.tool === "line" ? 3 : this.tool === "brush" ? 5 : 0,
       points: kind === "path" ? [{ x: point.x, y: point.y }] : undefined,
       closed: false,
-      sides: this.tool === "polygon" ? 6 : this.tool === "star" ? 5 : undefined,
+      sides: this.tool === "polygon" || this.tool === "shaper" ? 6 : this.tool === "star" ? 5 : undefined,
       innerRatio: this.tool === "star" ? 0.45 : undefined
     });
+    if (object.points?.length) this.syncPointBounds(object);
     this.doc.objects.push(object);
     this.selection = [object.id];
     this.stage.setSelection(this.selection);
-    this.beginDrag({
-      mode: this.tool === "brush" || this.tool === "pencil" ? "brush" : "create",
-      startDoc: point,
-      startScreen: screen,
-      lastScreen: screen,
+    this.startDrag(this.tool === "brush" || this.tool === "pencil" ? "brush" : "create", point, screen, {
       objectId: object.id,
-      origins: [],
-      startAngle: 0,
-      moved: false,
       historyPushed: true
     });
     this.refresh();
   }
 
-  private createText(point: Vec2) {
+  private createText(point: Vec2, vertical: boolean) {
     this.pushHistory();
+    const fontSize = 36;
     const object = createObject({
       kind: "text",
-      x: Math.round(point.x),
+      x: Math.round(point.x - (vertical ? fontSize : 0)),
       y: Math.round(point.y - 30),
-      width: 280,
-      height: 60,
-      name: "Type",
+      width: vertical ? fontSize * 1.15 : 280,
+      height: vertical ? fontSize * 1.05 * 4 : 60,
+      name: vertical ? "Vertical Type" : "Type",
       text: "Type something",
-      fontSize: 36,
-      fontWeight: 500,
+      fontSize,
+      fontWeight: 700,
       letterSpacing: 0,
       align: "center",
-      fontFamily: '"Inter", "Segoe UI", Arial, sans-serif',
+      vertical,
+      fontFamily: '"VectorCraft", "Chakra Petch", "Segoe UI", sans-serif',
       fill: this.fillPaint === "none" ? "#ffffff" : this.fillPaint
     });
     this.doc.objects.push(object);
@@ -1785,7 +2243,8 @@ class Editor implements EditorContext {
       this.finishPen(true);
       return;
     }
-    object.points.push({ x: point.x, y: point.y });
+    object.points.push({ x: round(point.x), y: round(point.y) });
+    this.syncPointBounds(object);
     this.refresh();
   }
 
@@ -1821,7 +2280,7 @@ class Editor implements EditorContext {
 
   private onDoubleClick = (event: MouseEvent) => {
     if (this.penId) {
-      this.finishPen(true);
+      this.finishPen(false);
       return;
     }
     const target = event.target as Element;
@@ -1832,125 +2291,143 @@ class Editor implements EditorContext {
   };
 
   private editText(object: VecObject) {
-    const backdrop = document.createElement("div");
-    backdrop.className = "vc-modal-backdrop";
-    backdrop.innerHTML = `<div class="vc-modal vc-modal--text">
-      <header class="vc-modal-head"><span>${icon("type", 14)} Edit Text</span><button class="vc-mini-btn" data-modal="close">${icon("close", 12)}</button></header>
-      <div class="vc-modal-body">
-        <textarea class="vc-textarea" spellcheck="false"></textarea>
-        <p class="vc-modal-hint">Enter 换行 · Ctrl+Enter 应用 · Esc 取消</p>
-      </div>
-      <footer class="vc-modal-foot"><button class="vc-quick-btn" data-modal="cancel">Cancel</button><button class="vc-quick-btn vc-quick-btn--primary" data-modal="apply">Apply</button></footer>
-    </div>`;
-    document.body.appendChild(backdrop);
-    const textarea = backdrop.querySelector<HTMLTextAreaElement>(".vc-textarea")!;
-    textarea.value = object.text ?? "";
-    textarea.focus();
-    textarea.select();
-
-    const apply = () => {
-      const value = textarea.value;
-      this.pushHistory();
-      object.text = value;
-      if (object.name === "Type") object.name = value.slice(0, 24) || "Type";
-      backdrop.remove();
-      this.refresh();
-    };
-    const cancel = () => backdrop.remove();
-
-    backdrop.addEventListener("click", event => {
-      const action = (event.target as HTMLElement).closest<HTMLElement>("[data-modal]")?.dataset.modal;
-      if (action === "apply") apply();
-      else if (action === "cancel" || action === "close") cancel();
-    });
-    textarea.addEventListener("keydown", event => {
-      if (event.key === "Enter" && (event.ctrlKey || event.metaKey)) {
-        event.preventDefault();
-        apply();
+    openModal(
+      `<div class="vc-modal vc-modal--text">
+        <header class="vc-modal-head"><span>${icon(
+          "type",
+          14
+        )} Edit Text</span><button class="vc-mini-btn" data-modal="close">${icon("close", 12)}</button></header>
+        <div class="vc-modal-body">
+          <textarea class="vc-textarea" spellcheck="false"></textarea>
+          <p class="vc-modal-hint">Enter 换行 · Ctrl+Enter 应用 · Esc 取消</p>
+        </div>
+        <footer class="vc-modal-foot"><button class="vc-quick-btn" data-text="cancel">Cancel</button><button class="vc-quick-btn vc-quick-btn--primary" data-text="apply">Apply</button></footer>
+      </div>`,
+      ({ root, close }) => {
+        const textarea = root.querySelector<HTMLTextAreaElement>(".vc-textarea")!;
+        textarea.value = object.text ?? "";
+        textarea.focus();
+        textarea.select();
+        const apply = () => {
+          const value = textarea.value;
+          this.pushHistory();
+          object.text = value;
+          if (object.vertical) {
+            const lines = Math.max(1, [...value].length);
+            object.height = round(Math.max(object.fontSize ?? 36, lines * (object.fontSize ?? 36) * 1.05));
+          }
+          if (object.name === "Type" || object.name === "Vertical Type")
+            object.name = value.slice(0, 24) || object.name;
+          close();
+          this.refresh();
+        };
+        root.addEventListener("click", event => {
+          const action = (event.target as HTMLElement).closest<HTMLElement>("[data-text]")?.dataset.text;
+          if (action === "apply") apply();
+          else if (action === "cancel") close();
+        });
+        textarea.addEventListener("keydown", event => {
+          if (event.key === "Enter" && (event.ctrlKey || event.metaKey)) {
+            event.preventDefault();
+            apply();
+          }
+          if (event.key === "Escape") {
+            event.preventDefault();
+            close();
+          }
+        });
       }
-      if (event.key === "Escape") {
-        event.preventDefault();
-        cancel();
+    );
+  }
+
+  showDocumentSetup() {
+    openModal(
+      `<div class="vc-modal vc-doc-modal">
+        <header class="vc-modal-head"><span>${icon(
+          "artboard",
+          14
+        )} Document Setup</span><button class="vc-mini-btn" data-modal="close">${icon("close", 12)}</button></header>
+        <div class="vc-modal-body vc-doc-form">
+          <label><span>Name</span><input class="vc-input" data-doc="name" value="${this.doc.name.replace(
+            /"/g,
+            "&quot;"
+          )}" /></label>
+          <label><span>Width</span><input class="vc-input" data-doc="width" value="${this.doc.width}" /></label>
+          <label><span>Height</span><input class="vc-input" data-doc="height" value="${this.doc.height}" /></label>
+          <p class="vc-modal-hint">尺寸单位为 pt，修改后画板按新尺寸裁剪。</p>
+        </div>
+        <footer class="vc-modal-foot"><button class="vc-quick-btn" data-doc="cancel">Cancel</button><button class="vc-quick-btn vc-quick-btn--primary" data-doc="apply">Apply</button></footer>
+      </div>`,
+      ({ root, close }) => {
+        const field = (name: string) => root.querySelector<HTMLInputElement>(`[data-doc="${name}"]`)!;
+        root.addEventListener("click", event => {
+          const action = (event.target as HTMLElement).closest<HTMLElement>("[data-doc]")?.dataset.doc;
+          if (action === "cancel") close();
+          if (action === "apply") {
+            const width = Number.parseFloat(field("width").value);
+            const height = Number.parseFloat(field("height").value);
+            const name = field("name").value.trim();
+            if (!Number.isFinite(width) || !Number.isFinite(height) || width < 10 || height < 10) {
+              this.toast("请输入有效的画板尺寸");
+              return;
+            }
+            this.pushHistory();
+            this.doc.name = name || this.doc.name;
+            this.doc.width = round(width);
+            this.doc.height = round(height);
+            close();
+            this.stage.setDocument(this.doc);
+            this.refresh();
+            this.toast("Document updated");
+          }
+        });
       }
+    );
+  }
+
+  private toggleMeasure() {
+    this.measureMode = !this.measureMode;
+    this.stage.element.classList.toggle("is-measuring", this.measureMode);
+    this.toast(this.measureMode ? "测量模式：移动鼠标查看坐标" : "已退出测量模式");
+    if (!this.measureMode) this.hintElement.textContent = this.hintForTool();
+  }
+
+  private showHistory() {
+    showHistoryDialog({
+      undoCount: this.history.length,
+      redoCount: this.future.length,
+      undo: () => this.undo(),
+      redo: () => this.redo()
     });
+  }
+
+  private showSearch() {
+    showSearchDialog([
+      { label: "Fit Artboard", run: () => this.zoomFit() },
+      { label: "Actual Size", run: () => this.setZoomPercent(100) },
+      { label: "Zoom to Selection", run: () => this.zoomToSelection() },
+      { label: "Export SVG", run: () => void this.exportSvg() },
+      { label: "Export PNG", run: () => void this.exportPng() },
+      { label: "Create Outlines", run: () => void this.outlineSelection() },
+      { label: "Duplicate Selection", run: () => this.duplicateSelection() },
+      { label: "Delete Selection", run: () => this.deleteSelection() },
+      { label: "Group", run: () => this.groupSelection() },
+      { label: "Ungroup", run: () => this.ungroupSelection() },
+      { label: "Toggle Rulers", run: () => this.toggleRulers() },
+      { label: "Toggle Grid", run: () => this.toggleGrid() },
+      { label: "Outline Mode", run: () => this.toggleOutlineMode() },
+      { label: "Reset Workspace", run: () => this.resetWorkspace() },
+      { label: "Keyboard Shortcuts", run: () => this.showShortcuts() },
+      { label: "About VectorCraft", run: () => this.showAbout() }
+    ]);
   }
 
   private showShortcuts() {
-    const shortcuts: Array<[string, string]> = [
-      ["V", "Selection"],
-      ["A", "Direct Selection"],
-      ["P", "Pen"],
-      ["M", "Rectangle"],
-      ["L", "Ellipse"],
-      ["T", "Type"],
-      ["B", "Paintbrush"],
-      ["H", "Hand"],
-      ["Z", "Zoom"],
-      ["Space + Drag", "Pan"],
-      ["Ctrl + Wheel", "Zoom"],
-      ["Ctrl + 0", "Fit Artboard"],
-      ["Ctrl + 1", "Actual Size"],
-      ["Ctrl + Z / Shift + Ctrl + Z", "Undo / Redo"],
-      ["Ctrl + D", "Duplicate"],
-      ["Ctrl + G", "Group（示例）"],
-      ["Ctrl + A", "Select All"],
-      ["Delete", "Delete selection"],
-      ["Arrows", "Nudge 1 pt（Shift 10 pt）"],
-      ["Shift + Ctrl + O", "Create Outlines"]
-    ];
-    const backdrop = document.createElement("div");
-    backdrop.className = "vc-modal-backdrop";
-    backdrop.innerHTML = `<div class="vc-modal">
-      <header class="vc-modal-head"><span>${icon("help", 14)} Keyboard Shortcuts</span><button class="vc-mini-btn" data-modal="close">${icon(
-        "close",
-        12
-      )}</button></header>
-      <div class="vc-modal-body">
-        <div class="vc-shortcut-grid">${shortcuts
-          .map(([key, label]) => `<kbd>${key}</kbd><span>${label}</span>`)
-          .join("")}</div>
-      </div>
-      <footer class="vc-modal-foot"><span class="vc-modal-hint">LiteGUI VectorCraft demo</span></footer>
-    </div>`;
-    document.body.appendChild(backdrop);
-    const close = () => backdrop.remove();
-    backdrop.addEventListener("click", event => {
-      const element = event.target as HTMLElement;
-      if (element === backdrop || element.closest("[data-modal]")) close();
-    });
-    backdrop.addEventListener("keydown", event => {
-      if (event.key === "Escape") close();
-    });
-    backdrop.tabIndex = -1;
-    backdrop.focus();
+    showShortcutsDialog();
   }
 
   private showAbout() {
-    const backdrop = document.createElement("div");
-    backdrop.className = "vc-modal-backdrop";
-    backdrop.innerHTML = `<div class="vc-modal vc-modal--about">
-      <header class="vc-modal-head"><span>${icon("logo", 18)} VectorCraft</span><button class="vc-mini-btn" data-modal="close">${icon(
-        "close",
-        12
-      )}</button></header>
-      <div class="vc-modal-body">
-        <p><b>VectorCraft</b> 是一个参考 Adobe Illustrator 工作台的矢量设计示例，使用 LiteGUI 组件与原生 DOM/SVG 构建。</p>
-        <p>特性：SVG 矢量渲染 · 画板/标尺 · 选择/拖拽/缩放/旋转 · 文本与外发光 · 图层面板 · 属性面板 · SVG/PNG 导出。</p>
-        <p class="vc-modal-hint">LiteGUI monorepo · apps/vectorcraft</p>
-      </div>
-      <footer class="vc-modal-foot"><button class="vc-quick-btn vc-quick-btn--primary" data-modal="close">Close</button></footer>
-    </div>`;
-    document.body.appendChild(backdrop);
-    const close = () => backdrop.remove();
-    backdrop.addEventListener("click", event => {
-      const element = event.target as HTMLElement;
-      if (element === backdrop || element.closest("[data-modal]")) close();
-    });
-    backdrop.addEventListener("keydown", event => {
-      if (event.key === "Escape") close();
-    });
-    backdrop.tabIndex = -1;
-    backdrop.focus();
+    showAboutDialog();
   }
 
   private onContextMenu = (event: MouseEvent) => {
@@ -1986,30 +2463,9 @@ class Editor implements EditorContext {
 
   private openMenuAt(x: number, y: number, items: MenuItem[]) {
     this.closeMenu();
-    const menu = document.createElement("div");
-    menu.className = "vc-menu";
-    for (const item of items) {
-      if (item.separator) {
-        const separator = document.createElement("div");
-        separator.className = "vc-menu-sep";
-        menu.appendChild(separator);
-        continue;
-      }
-      const row = document.createElement("button");
-      row.type = "button";
-      row.className = "vc-menu-item";
-      row.innerHTML = `<span class="vc-menu-check"></span><span class="vc-menu-label">${item.label ?? ""}</span><span class="vc-menu-shortcut">${
-        item.shortcut ?? ""
-      }</span>`;
-      row.addEventListener("click", () => {
-        this.closeMenu();
-        item.action?.();
-      });
-      menu.appendChild(row);
-    }
+    const menu = buildMenu(items, () => this.closeMenu());
     document.body.appendChild(menu);
-    menu.style.left = `${Math.max(6, Math.min(x, window.innerWidth - menu.offsetWidth - 8))}px`;
-    menu.style.top = `${Math.max(6, Math.min(y, window.innerHeight - menu.offsetHeight - 8))}px`;
+    positionMenu(menu, x, y);
     this.menu = menu;
   }
 
@@ -2074,7 +2530,7 @@ class Editor implements EditorContext {
           return;
         case "o":
           event.preventDefault();
-          if (event.shiftKey) this.outlineSelection();
+          if (event.shiftKey) void this.outlineSelection();
           else this.fileInput.click();
           return;
         case "0":
@@ -2105,7 +2561,8 @@ class Editor implements EditorContext {
           return;
         case "g":
           event.preventDefault();
-          this.toast("Group：示例未接入");
+          if (event.shiftKey) this.ungroupSelection();
+          else this.groupSelection();
           return;
         default:
           break;
@@ -2120,7 +2577,7 @@ class Editor implements EditorContext {
 
     if (key === "Enter" && this.penId) {
       event.preventDefault();
-      this.finishPen(true);
+      this.finishPen(false);
       return;
     }
 

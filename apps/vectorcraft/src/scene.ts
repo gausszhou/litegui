@@ -58,12 +58,16 @@ export interface VecObject {
   /** 标题下方的副行（与标题同属一个文本对象，类似 Illustrator 的多行文本框架）。 */
   subline?: SubLine;
   align?: "left" | "center" | "right";
-  /** 演示用的「转轮廓」状态：只渲染描边。 */
-  outlined?: boolean;
+  /** 竖排文本。 */
+  vertical?: boolean;
 
   /* 路径 / 折线 */
   points?: Vec2[];
   closed?: boolean;
+  /** 完整 SVG path 数据（用于 Create Outlines 生成的真实字形轮廓）。 */
+  pathData?: string;
+  /** 点集所在的原始包围盒；渲染时映射到 x/y/width/height，使 Transform 可移动与缩放路径。 */
+  base?: { x: number; y: number; width: number; height: number };
 
   /* 多边形 / 星形 */
   sides?: number;
@@ -72,6 +76,9 @@ export interface VecObject {
   /* 星点 */
   seed?: number;
   count?: number;
+
+  /** 编组 id：同一组对象在选择/移动时作为一个整体。 */
+  groupId?: string;
 }
 
 export interface SubLine {
@@ -84,6 +91,7 @@ export interface SubLine {
   glowColor: string;
   /** 相对主行基线的纵向偏移（文档单位）。 */
   offset: number;
+  weight?: number;
 }
 
 export interface VecDocument {
@@ -95,8 +103,7 @@ export interface VecDocument {
 
 export const ARTBOARD = { width: 800, height: 1000, horizon: 568 } as const;
 
-export const TECHNO_FONT =
-  '"Michroma", "Orbitron", "Bank Gothic", "Eurostile", "Arial Black", "Segoe UI", sans-serif';
+export const TECHNO_FONT = '"VectorCraft", "Chakra Petch", "Segoe UI", sans-serif';
 export const UI_FONT = '"Inter", "Segoe UI", "Helvetica Neue", Arial, sans-serif';
 
 export interface GradientDef {
@@ -188,16 +195,7 @@ export const GRADIENTS: Record<string, GradientDef> = {
   }
 };
 
-export const NEON_PALETTE = [
-  "#ff3fae",
-  "#ff74d8",
-  "#b14cff",
-  "#6f5cff",
-  "#29e7ff",
-  "#ffd166",
-  "#ff6b6b",
-  "#1b0b3a"
-];
+export const NEON_PALETTE = ["#ff3fae", "#ff74d8", "#b14cff", "#6f5cff", "#29e7ff", "#ffd166", "#ff6b6b", "#1b0b3a"];
 
 export const INK_PALETTE = ["#ffffff", "#f2f0ff", "#c9c6e0", "#6b6b7a", "#22202e", "#101018"];
 
@@ -221,10 +219,6 @@ export function paintLabel(paint: Paint): string {
   return paint.toUpperCase();
 }
 
-export function isGradient(paint: Paint): boolean {
-  return gradientOf(paint) !== null;
-}
-
 export function gradientCss(paint: Paint): string {
   const gradient = gradientOf(paint);
   const stops: Array<[number, string]> = gradient ? gradient.stops : [[0, paint]];
@@ -235,15 +229,26 @@ export function isText(object: VecObject): boolean {
   return object.kind === "text";
 }
 
-export function boundsOf(object: VecObject): { x: number; y: number; width: number; height: number } {
-  return { x: object.x, y: object.y, width: object.width, height: object.height };
-}
-
 export interface Bounds {
   x: number;
   y: number;
   width: number;
   height: number;
+}
+
+export function pointsBounds(points: Vec2[]): Bounds {
+  if (!points.length) return { x: 0, y: 0, width: 1, height: 1 };
+  let left = Infinity;
+  let top = Infinity;
+  let right = -Infinity;
+  let bottom = -Infinity;
+  for (const point of points) {
+    left = Math.min(left, point.x);
+    top = Math.min(top, point.y);
+    right = Math.max(right, point.x);
+    bottom = Math.max(bottom, point.y);
+  }
+  return { x: left, y: top, width: Math.max(1, right - left), height: Math.max(1, bottom - top) };
 }
 
 export function unionBounds(objects: VecObject[]): Bounds | null {
@@ -282,24 +287,13 @@ export function rotatedCorners(object: VecObject): Vec2[] {
   });
 }
 
-export function pointInBounds(point: Vec2, bounds: Bounds): boolean {
-  return point.x >= bounds.x && point.x <= bounds.x + bounds.width && point.y >= bounds.y && point.y <= bounds.y + bounds.height;
-}
-
 export function cloneObject(object: VecObject): VecObject {
   return {
     ...object,
     points: object.points?.map(point => ({ ...point })),
+    base: object.base ? { ...object.base } : undefined,
     subline: object.subline ? { ...object.subline } : undefined
   };
-}
-
-export function cloneDocument(doc: VecDocument): VecDocument {
-  return { ...doc, objects: doc.objects.map(cloneObject) };
-}
-
-export function slugId(name: string): string {
-  return name.toLowerCase().replace(/[^a-z0-9]+/g, "-");
 }
 
 /* ------------------------------------------------------------------ */
@@ -358,6 +352,33 @@ export function defaultName(kind: ShapeKind): string {
       return "Stars";
     case "mountains":
       return "Mountains";
+    default:
+      return "Object";
+  }
+}
+
+export function kindLabel(kind: ShapeKind): string {
+  switch (kind) {
+    case "text":
+      return "Type";
+    case "stars":
+      return "Symbol";
+    case "grid":
+      return "Group";
+    case "sun":
+      return "Shape";
+    case "mountains":
+      return "Path";
+    case "path":
+      return "Path";
+    case "rect":
+      return "Rect";
+    case "ellipse":
+      return "Ellipse";
+    case "polygon":
+      return "Polygon";
+    case "star":
+      return "Star";
     default:
       return "Object";
   }
@@ -435,6 +456,7 @@ export function createNeonDocument(): VecDocument {
     y: 400,
     width,
     height: 220,
+    base: { x: 0, y: 400, width, height: 220 },
     fill: "url(#vc-mountain)",
     stroke: "rgba(255, 120, 220, 0.22)",
     strokeWidth: 1,
@@ -445,8 +467,8 @@ export function createNeonDocument(): VecDocument {
       { x: 196, y: 472 },
       { x: 256, y: 428 },
       { x: 305, y: 500 },
-      { x: 342, y: horizon + 2 },
-      { x: 458, y: horizon + 2 },
+      { x: 318, y: horizon + 2 },
+      { x: 482, y: horizon + 2 },
       { x: 505, y: 455 },
       { x: 580, y: 418 },
       { x: 632, y: 505 },
@@ -497,13 +519,13 @@ export function createNeonDocument(): VecDocument {
       fontSize: 21,
       letterSpacing: 6,
       textLength: 470,
+      weight: 400,
       fill: "#9bd8ff",
       glow: 12,
       glowColor: "#3aa8ff",
       offset: 33
     }
   });
-
 
   const credit = createObject({
     id: "neon-credit",
@@ -514,9 +536,9 @@ export function createNeonDocument(): VecDocument {
     width: 400,
     height: 24,
     text: "made with VectorCraft",
-    fontFamily: UI_FONT,
+    fontFamily: TECHNO_FONT,
     fontSize: 14,
-    fontWeight: 500,
+    fontWeight: 400,
     letterSpacing: 2,
     textLength: 225,
     align: "center",
@@ -551,7 +573,16 @@ export function deserializeDocument(raw: string): VecDocument | null {
       name: typeof data.name === "string" ? data.name : "untitled.vectorcraft",
       width: typeof data.width === "number" ? data.width : ARTBOARD.width,
       height: typeof data.height === "number" ? data.height : ARTBOARD.height,
-      objects: objects.map(object => createObject({ ...object, kind: object.kind ?? "rect", x: object.x ?? 0, y: object.y ?? 0, width: object.width ?? 10, height: object.height ?? 10 }))
+      objects: objects.map(object =>
+        createObject({
+          ...object,
+          kind: object.kind ?? "rect",
+          x: object.x ?? 0,
+          y: object.y ?? 0,
+          width: object.width ?? 10,
+          height: object.height ?? 10
+        })
+      )
     };
   } catch {
     return null;

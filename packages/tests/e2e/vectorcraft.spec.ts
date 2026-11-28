@@ -29,7 +29,7 @@ test("layer selection, transform editing and undo work", async ({ page }) => {
   await page.click("[data-tab='layers']");
   await expect(page.locator(".vc-layer-row")).toHaveCount(7);
 
-  await page.locator(".vc-layer-row", { hasText: "Sun" }).click();
+  await page.locator('[data-layer-id="neon-sun"]').click();
   await page.click("[data-tab='properties']");
 
   await expect(page.locator("#vc-selection-state")).toHaveText("Selection");
@@ -81,11 +81,11 @@ test("menus open and close, view toggles update the stage", async ({ page }) => 
 
   await expect(page.locator(".vc-rulers")).toBeHidden();
   await page.locator("[data-menu='View']").click();
-  await page.locator(".vc-menu-item", { hasText: "Show Rulers" }).click();
+  await page.locator('[data-command="show-rulers"]').click();
   await expect(page.locator(".vc-rulers")).toBeVisible();
 
   await page.locator("[data-menu='View']").click();
-  await page.locator(".vc-menu-item", { hasText: "Outline Mode" }).click();
+  await page.locator('[data-command="outline-mode"]').click();
   await expect(page.locator(".vc-stage.is-outline")).toHaveCount(1);
 });
 
@@ -93,8 +93,8 @@ test("layer visibility and library swatches affect the artwork", async ({ page }
   await page.goto(VECTORCRAFT_URL);
 
   await page.click("[data-tab='layers']");
-  const creditRow = page.locator(".vc-layer-row", { hasText: "made with VectorCraft" }).first();
-  const creditLayer = page.locator(".vc-world [data-obj]", { hasText: "made with VectorCraft" });
+  const creditRow = page.locator('[data-layer-id="neon-credit"]');
+  const creditLayer = page.locator('.vc-world [data-obj="neon-credit"]');
   await expect(creditLayer).toHaveCount(1);
 
   await creditRow.locator("[data-layer-action='visible']").click();

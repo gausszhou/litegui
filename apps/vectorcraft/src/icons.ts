@@ -102,12 +102,17 @@ export const icons: Record<string, string> = {
   ruler: `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3.4 15.2 15.2 3.4l5.4 5.4L8.8 20.6Z" ${stroke}/><path d="m7 15.4 1.8-1.8M10.4 12l1.8-1.8M13.8 8.6l1.8-1.8" ${stroke}/></svg>`,
   textBox: `<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3.6" y="4.6" width="16.8" height="14.8" rx="1" ${stroke}/><path d="M8.6 9.4h6.8M12 9.4v6.2" ${stroke}/></svg>`,
   transparency: `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 4h16v16H4Z" ${stroke}/><path d="M4 10h6V4M16 20v-6h4M10 20v-4h-6" ${stroke} opacity=".6"/></svg>`,
+  swap: `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 8h13l-3-3M20 16H7l3 3" ${stroke}/></svg>`,
+  defaultColors: `<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3.2" y="3.2" width="11" height="11" fill="#fff" stroke="currentColor" stroke-width="1.2"/><rect x="9.8" y="9.8" width="11" height="11" fill="#111" stroke="currentColor" stroke-width="1.2"/></svg>`,
+  screenMode: `<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="2.8" y="4.4" width="18.4" height="12.4" rx="1" ${stroke}/><path d="M8.8 20.4h6.4M12 16.8v3.6" ${stroke}/></svg>`,
+  gradientSwatch: `<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3.4" y="4.4" width="17.2" height="15.2" rx="1" ${stroke}/><path d="M6.6 16.8 13 7.6h4.4l-6.6 9.2Z" fill="currentColor" opacity=".8"/></svg>`,
+  noneSwatch: `<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3.4" y="3.4" width="17.2" height="17.2" rx="1" ${stroke}/><path d="M4.6 19.4 19.4 4.6" ${stroke}/></svg>`,
   wand: `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="m4.4 19.6 11-11M13.8 4.2l1.2 2.8 2.8 1.2-2.8 1.2-1.2 2.8-1.2-2.8L9.8 8.2l2.8-1.2Z" ${stroke}/></svg>`
 };
 
 export function icon(name: string, size = 16, className = ""): string {
   const svg = icons[name] ?? icons.rect;
-  return `<span class="vc-icon${className ? ` ${className}` : ""}" style="width:${size}px;height:${size}px" aria-hidden="true">${svg}</span>`;
+  return `<span class="vc-icon${
+    className ? ` ${className}` : ""
+  }" style="width:${size}px;height:${size}px" aria-hidden="true">${svg}</span>`;
 }
-
-export type IconName = keyof typeof icons;

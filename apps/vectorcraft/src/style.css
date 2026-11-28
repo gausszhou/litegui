@@ -1,3 +1,19 @@
+@font-face {
+  font-family: "VectorCraft";
+  src: url("./assets/chakra-petch-regular.ttf") format("truetype");
+  font-weight: 400;
+  font-style: normal;
+  font-display: block;
+}
+
+@font-face {
+  font-family: "VectorCraft";
+  src: url("./assets/chakra-petch-bold.ttf") format("truetype");
+  font-weight: 700;
+  font-style: normal;
+  font-display: block;
+}
+
 /* VectorCraft — Illustrator 风格深色工作台。
  * 所有界面色板都从参考截图中采样：冷灰色面板 + 霓虹紫粉画板。
  */
@@ -420,9 +436,31 @@ button {
   color: #fff;
 }
 
-.vc-swatch-swap .vc-icon {
-  transform: rotate(90deg);
-  color: #9aa3b2;
+.vc-swatch-chips {
+  display: flex;
+  gap: 4px;
+}
+
+.vc-swatch-chip {
+  display: grid;
+  place-items: center;
+  width: 16px;
+  height: 14px;
+  padding: 0;
+  border: 0;
+  border-radius: 2px;
+  background: transparent;
+  color: #b9c1cf;
+}
+
+.vc-swatch-chip:hover {
+  color: #fff;
+}
+
+.vc-swatch-swap .vc-icon,
+.vc-swatch-default .vc-icon,
+.vc-swatch-screen .vc-icon {
+  color: #b9c1cf;
 }
 
 /* 编辑区 */
@@ -691,6 +729,23 @@ button {
 }
 
 /* 包围选框 */
+.vc-lasso {
+  position: absolute;
+  inset: 0;
+  z-index: 19;
+  width: 100%;
+  height: 100%;
+  display: none;
+  pointer-events: none;
+}
+
+.vc-lasso path {
+  fill: rgba(127, 162, 255, 0.12);
+  stroke: var(--vc-selection);
+  stroke-width: 1;
+  stroke-dasharray: 4 3;
+}
+
 .vc-marquee {
   position: absolute;
   z-index: 20;
@@ -1130,6 +1185,107 @@ button {
   background: transparent;
 }
 
+/* 文档属性面板 */
+.vc-doc-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  min-height: 28px;
+  color: #c3cbd7;
+  font-size: 11.5px;
+}
+
+.vc-doc-row > span:last-child {
+  color: #98a1b0;
+}
+
+.vc-select--inline {
+  width: 132px;
+  height: 24px;
+  margin: 0;
+}
+
+.vc-doc-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px;
+  margin-top: 8px;
+}
+
+.vc-doc-actions .vc-quick-btn {
+  height: 28px;
+}
+
+.vc-icon-row {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.vc-icon-toggle {
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 26px;
+  border: 1px solid #313845;
+  border-radius: 3px;
+  background: #1f242c;
+  color: #a7b0be;
+}
+
+.vc-icon-toggle:hover {
+  background: #323a47;
+  color: #fff;
+}
+
+.vc-icon-toggle.is-active {
+  border-color: #4d6da8;
+  background: #33415c;
+  color: #eaf1ff;
+}
+
+.vc-inline-field {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  color: #8b93a2;
+  font-size: 10.5px;
+}
+
+.vc-inline-field .vc-input {
+  width: 48px;
+  height: 24px;
+  padding: 0 6px;
+  border: 1px solid #313845;
+  border-radius: 3px;
+  background: #1f242c;
+  text-align: right;
+}
+
+.vc-modal.vc-doc-modal {
+  width: 420px;
+}
+
+.vc-doc-form label {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 10px;
+  color: #c3cbd7;
+  font-size: 11.5px;
+}
+
+.vc-doc-form .vc-input {
+  width: 200px;
+  height: 28px;
+  padding: 0 8px;
+  border: 1px solid #313845;
+  border-radius: 3px;
+  background: #1f242c;
+}
+
 /* 分组 */
 .vc-section {
   padding: 9px 0 11px;
@@ -1330,9 +1486,10 @@ button {
 }
 
 .vc-check {
-  display: inline-flex;
+  display: flex;
   align-items: center;
   gap: 6px;
+  margin: 4px 0;
   color: #b6bec9;
   font-size: 11.5px;
   cursor: pointer;
@@ -2024,6 +2181,48 @@ button {
 .vc-shortcut-grid span {
   color: #aeb6c3;
   font-size: 11.5px;
+}
+
+.vc-search-input {
+  width: 100%;
+  height: 32px;
+  margin-bottom: 10px;
+  padding: 0 9px;
+  border: 1px solid #313845;
+  border-radius: 4px;
+  background: #1f242c;
+  color: #eef3fb;
+  font-size: 12px;
+  outline: none;
+}
+
+.vc-search-input:focus {
+  border-color: #4d6da8;
+}
+
+.vc-search-list {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  max-height: 260px;
+  overflow-y: auto;
+}
+
+.vc-search-item {
+  height: 30px;
+  padding: 0 9px;
+  border: 1px solid #2f3644;
+  border-radius: 3px;
+  background: #1f242c;
+  color: #dfe6f2;
+  font-size: 11.5px;
+  text-align: left;
+}
+
+.vc-search-item:hover,
+.vc-search-item.is-first {
+  border-color: #4d6da8;
+  background: #2b3a55;
 }
 
 /* 提示条 */

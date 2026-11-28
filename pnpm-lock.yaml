@@ -187,22 +187,6 @@ importers:
         specifier: ^5.4.11
         version: 5.4.21(@types/node@22.20.7)(sass@1.108.2)
 
-  apps/vscode:
-    dependencies:
-      '@gausszhou/litegui-components':
-        specifier: workspace:*
-        version: link:../../packages/components
-      monaco-editor:
-        specifier: ^0.58.0
-        version: 0.58.0
-    devDependencies:
-      typescript:
-        specifier: ^5.8.3
-        version: 5.9.3
-      vite:
-        specifier: ^5.4.11
-        version: 5.4.21(@types/node@22.20.7)(sass@1.108.2)
-
   apps/vectorcraft:
     dependencies:
       '@gausszhou/litegui-components':
@@ -211,6 +195,25 @@ importers:
       '@gausszhou/litegui-core':
         specifier: workspace:*
         version: link:../../packages/core
+      opentype.js:
+        specifier: ^2.0.0
+        version: 2.0.0
+    devDependencies:
+      typescript:
+        specifier: ^5.8.3
+        version: 5.9.3
+      vite:
+        specifier: ^5.4.11
+        version: 5.4.21(@types/node@22.20.7)(sass@1.108.2)
+
+  apps/vscode:
+    dependencies:
+      '@gausszhou/litegui-components':
+        specifier: workspace:*
+        version: link:../../packages/components
+      monaco-editor:
+        specifier: ^0.58.0
+        version: 0.58.0
     devDependencies:
       typescript:
         specifier: ^5.8.3
@@ -1895,6 +1898,10 @@ packages:
 
   oniguruma-to-es@3.1.1:
     resolution: {integrity: sha512-bUH8SDvPkH3ho3dvwJwfonjlQ4R80vjyvrU8YpxuROddv55vAEJrTuCuCVUhhsHbtlD9tGGbaNApGQckXhS8iQ==}
+
+  opentype.js@2.0.0:
+    resolution: {integrity: sha512-kCyjv6xdDY1W/jLWZ/L3QhhTlKUqDZMQ5+Jdlw12b3dXkKNpYBqqlMMj0YDQPShWFTMwgZI1hG14kN3XUDSg/A==}
+    hasBin: true
 
   optionator@0.9.4:
     resolution: {integrity: sha512-6IpQ7mKUxRcZNLIObR0hz7lxsapSSIYNZJwXPGeF0mTVqGKFIXj1DQcMoT22S3ROcLyY/rz0PWaWZ9ayWmad9g==}
@@ -3958,6 +3965,8 @@ snapshots:
       emoji-regex-xs: 1.0.0
       regex: 6.1.0
       regex-recursion: 6.0.2
+
+  opentype.js@2.0.0: {}
 
   optionator@0.9.4:
     dependencies:

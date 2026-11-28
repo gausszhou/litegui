@@ -18,6 +18,12 @@
 - 新增 `apps/vectorcraft`：参考 Illustrator 工作台的矢量设计示例。SVG 渲染 Neon Drive 海报，包含画板/标尺、选择/拖拽/缩放/旋转、钢笔与形状工具、文本框架与外发光、图层面板、属性/对齐/快速操作、浮动外观面板、上下文工具栏、撤销重做以及 SVG/PNG/`.vectorcraft` 导出。
 - 新增 Playwright e2e 覆盖（`packages/tests/e2e/vectorcraft.spec.ts`），并接入 `pages:build`、根脚本 `dev:vectorcraft` 与 Playwright dev server。
 
+### Changed
+
+- VectorCraft 引入打包的 Chakra Petch 显示字体（SIL OFL 1.1）与真实字形轮廓转换（Create Outlines）。
+- 修复多选缩放/旋转作用于错误对象、锁定对象仍可编辑、路径与山体 Transform 不同步、太阳条纹遮罩复用等问题。
+- 补齐套索、编组、锚点增删/拖动、剪刀/刻刀、平滑、形状工具与竖排文字；新增无选中文档属性面板、命令搜索、历史面板、文档设置与 Offset Path/Simplify。
+
 ## Unreleased（CSS class BEM 化）
 
 ### Changed

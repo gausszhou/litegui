@@ -3,10 +3,12 @@ import {
   type Vec2,
   type VecDocument,
   type VecObject,
+  pointsBounds,
   rotatedCorners,
   unionBounds,
   UI_FONT
 } from "./scene";
+import { round } from "./number";
 
 const RULER = 22;
 const HANDLE = 7;
@@ -18,15 +20,11 @@ interface View {
 }
 
 function esc(value: string): string {
-  return value
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;");
+  return value.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
 }
 
 function n(value: number): string {
-  return `${Math.round(value * 100) / 100}`;
+  return `${round(value, 2)}`;
 }
 
 /* ------------------------------------------------------------------ */
@@ -43,7 +41,9 @@ function glowFilterMarkup(id: string, radius: number, color: string, strength = 
   const blur = Math.max(0.5, radius / 2.6);
   return `<filter id="${id}" x="-40%" y="-70%" width="180%" height="240%" color-interpolation-filters="sRGB">
     <feDropShadow dx="0" dy="0" stdDeviation="${n(blur)}" flood-color="${color}" flood-opacity="${n(0.85 * strength)}"/>
-    <feDropShadow dx="0" dy="0" stdDeviation="${n(blur * 2.6)}" flood-color="${color}" flood-opacity="${n(0.55 * strength)}"/>
+    <feDropShadow dx="0" dy="0" stdDeviation="${n(blur * 2.6)}" flood-color="${color}" flood-opacity="${n(
+    0.55 * strength
+  )}"/>
   </filter>`;
 }
 
@@ -75,16 +75,28 @@ export function buildDefs(doc: VecDocument): string {
     })
     .join("");
 
-  const sun = doc.objects.find(object => object.kind === "sun");
-  const sunMask = sun
-    ? `<mask id="vc-sun-mask" maskUnits="userSpaceOnUse" x="${n(sun.x - 40)}" y="${n(sun.y - 40)}" width="${n(sun.width + 80)}" height="${n(sun.height + 80)}">
-        <rect x="${n(sun.x - 40)}" y="${n(sun.y - 40)}" width="${n(sun.width + 80)}" height="${n(sun.height + 80)}" fill="#fff"/>
-        ${Array.from({ length: 7 }, (_, index) => {
-          const barY = sun.y + 96 + index * 25;
-          return `<rect x="${n(sun.x - 40)}" y="${n(barY)}" width="${n(sun.width + 80)}" height="10" fill="#000"/>`;
+  const sunMasks = doc.objects
+    .filter(object => object.kind === "sun" && object.visible)
+    .map(sun => {
+      const pad = 40;
+      const start = sun.y + sun.height * 0.22;
+      const gap = sun.height * 0.065;
+      const bar = sun.height * 0.027;
+      return `<mask id="vc-sun-mask-${esc(sun.id)}" maskUnits="userSpaceOnUse" x="${n(sun.x - pad)}" y="${n(
+        sun.y - pad
+      )}" width="${n(sun.width + pad * 2)}" height="${n(sun.height + pad * 2)}">
+        <rect x="${n(sun.x - pad)}" y="${n(sun.y - pad)}" width="${n(sun.width + pad * 2)}" height="${n(
+        sun.height + pad * 2
+      )}" fill="#fff"/>
+        ${Array.from({ length: 8 }, (_, index) => {
+          const barY = start + index * gap;
+          return `<rect x="${n(sun.x - pad)}" y="${n(barY)}" width="${n(sun.width + pad * 2)}" height="${n(
+            bar
+          )}" fill="#000"/>`;
         }).join("")}
-      </mask>`
-    : "";
+      </mask>`;
+    })
+    .join("");
 
   const ground = doc.objects.find(object => object.kind === "grid");
   const groundClip = ground
@@ -104,7 +116,7 @@ export function buildDefs(doc: VecDocument): string {
       <feGaussianBlur stdDeviation="16"/>
     </filter>
     <clipPath id="vc-artboard-clip"><rect x="0" y="0" width="${n(doc.width)}" height="${n(doc.height)}"/></clipPath>
-    ${sunMask}
+    ${sunMasks}
     ${groundClip}
     <filter id="vc-grid-glow" x="-10%" y="-10%" width="120%" height="120%" color-interpolation-filters="sRGB">
       <feGaussianBlur stdDeviation="3.2"/>
@@ -122,7 +134,10 @@ function objectBody(object: VecObject): string {
   const filter = object.glow > 0 ? ` filter="url(#vc-glow-${object.id})"` : "";
   const fill = paintAttribute(object.fill);
   const stroke = paintAttribute(object.stroke);
-  const strokeAttrs = object.stroke !== "none" && object.strokeWidth > 0 ? ` stroke="${stroke}" stroke-width="${n(object.strokeWidth)}"` : "";
+  const strokeAttrs =
+    object.stroke !== "none" && object.strokeWidth > 0
+      ? ` stroke="${stroke}" stroke-width="${n(object.strokeWidth)}"`
+      : "";
 
   switch (object.kind) {
     case "rect":
@@ -134,8 +149,10 @@ function objectBody(object: VecObject): string {
     case "sun": {
       const cx = object.x + object.width / 2;
       const cy = object.y + object.height / 2;
-      const mask = object.kind === "sun" ? ' mask="url(#vc-sun-mask)"' : "";
-      return `<ellipse cx="${n(cx)}" cy="${n(cy)}" rx="${n(object.width / 2)}" ry="${n(object.height / 2)}" fill="${fill}"${strokeAttrs}${mask}${filter}/>`;
+      const mask = object.kind === "sun" ? ` mask="url(#vc-sun-mask-${esc(object.id)})"` : "";
+      return `<ellipse cx="${n(cx)}" cy="${n(cy)}" rx="${n(object.width / 2)}" ry="${n(
+        object.height / 2
+      )}" fill="${fill}"${strokeAttrs}${mask}${filter}/>`;
     }
 
     case "polygon":
@@ -147,18 +164,27 @@ function objectBody(object: VecObject): string {
       const total = object.kind === "star" ? sides * 2 : sides;
       for (let index = 0; index < total; index += 1) {
         const outer = object.kind === "star" ? index % 2 === 0 : true;
-        const ratio = outer ? 1 : (object.innerRatio ?? 0.45);
+        const ratio = outer ? 1 : object.innerRatio ?? 0.45;
         const angle = (Math.PI * 2 * index) / total - Math.PI / 2;
-        points.push(`${n(cx + Math.cos(angle) * (object.width / 2) * ratio)} ${n(cy + Math.sin(angle) * (object.height / 2) * ratio)}`);
+        points.push(
+          `${n(cx + Math.cos(angle) * (object.width / 2) * ratio)} ${n(
+            cy + Math.sin(angle) * (object.height / 2) * ratio
+          )}`
+        );
       }
       return `<polygon points="${points.join(" ")}" fill="${fill}"${strokeAttrs}${filter}/>`;
     }
 
     case "path": {
+      if (object.pathData) {
+        return `<path d="${object.pathData}" fill="${fill}"${strokeAttrs} stroke-linecap="round" stroke-linejoin="round"${filter}/>`;
+      }
       const points = object.points ?? [];
       if (points.length < 2) return "";
       const d = points.map((point, index) => `${index === 0 ? "M" : "L"}${n(point.x)} ${n(point.y)}`).join(" ");
-      return `<path d="${d}${object.closed ? " Z" : ""}" fill="${object.closed ? fill : "none"}"${strokeAttrs} stroke-linecap="round" stroke-linejoin="round"${filter}/>`;
+      return `<path d="${d}${object.closed ? " Z" : ""}" fill="${
+        object.closed ? fill : "none"
+      }"${strokeAttrs} stroke-linecap="round" stroke-linejoin="round"${filter}/>`;
     }
 
     case "text": {
@@ -168,28 +194,44 @@ function objectBody(object: VecObject): string {
       const anchor = align === "left" ? "start" : align === "right" ? "end" : "middle";
       const x = align === "left" ? object.x : align === "right" ? object.x + object.width : object.x + object.width / 2;
       const baseline = object.y + fontSize * 0.72;
-      const outlined = object.outlined === true;
-      const textFill = outlined ? "none" : fill;
-      const textStroke = outlined ? ` stroke="${fill}" stroke-width="${n(Math.max(0.6, fontSize * 0.016))}"` : "";
+      const textFill = fill;
+      const textStroke = "";
       const length =
-        object.textLength !== undefined
-          ? ` textLength="${n(object.textLength)}" lengthAdjust="spacingAndGlyphs"`
-          : "";
-      let markup = `<text x="${n(x)}" y="${n(baseline)}" text-anchor="${anchor}" font-family="${esc(
-        object.fontFamily ?? UI_FONT
-      )}" font-size="${n(fontSize)}" font-weight="${object.fontWeight ?? 400}" letter-spacing="${n(letterSpacing)}" fill="${textFill}"${length}${textStroke}${filter}>${esc(
-        object.text ?? ""
-      )}</text>`;
+        object.textLength !== undefined ? ` textLength="${n(object.textLength)}" lengthAdjust="spacingAndGlyphs"` : "";
+      let markup: string;
+      if (object.vertical) {
+        const lineHeight = fontSize * 1.05;
+        const chars = [...(object.text ?? "")];
+        const centerX = object.x + object.width / 2;
+        markup = `<text x="${n(centerX)}" text-anchor="middle" font-family="${esc(
+          object.fontFamily ?? UI_FONT
+        )}" font-size="${n(fontSize)}" font-weight="${object.fontWeight ?? 400}" fill="${textFill}"${filter}>${chars
+          .map(
+            (char, index) =>
+              `<tspan x="${n(centerX)}" y="${n(baseline + index * lineHeight)}">${esc(
+                char === " " ? "\u00a0" : char
+              )}</tspan>`
+          )
+          .join("")}</text>`;
+      } else {
+        markup = `<text x="${n(x)}" y="${n(baseline)}" text-anchor="${anchor}" font-family="${esc(
+          object.fontFamily ?? UI_FONT
+        )}" font-size="${n(fontSize)}" font-weight="${object.fontWeight ?? 400}" letter-spacing="${n(
+          letterSpacing
+        )}" fill="${textFill}"${length}${textStroke}${filter}>${esc(object.text ?? "")}</text>`;
+      }
       const subline = object.subline;
       if (subline) {
         const subLength =
-          subline.textLength !== undefined ? ` textLength="${n(subline.textLength)}" lengthAdjust="spacingAndGlyphs"` : "";
+          subline.textLength !== undefined
+            ? ` textLength="${n(subline.textLength)}" lengthAdjust="spacingAndGlyphs"`
+            : "";
         const subFilter = subline.glow > 0 ? ` filter="url(#vc-glow-${object.id}-sub)"` : "";
         markup += `<text x="${n(x)}" y="${n(baseline + subline.offset)}" text-anchor="${anchor}" font-family="${esc(
           object.fontFamily ?? UI_FONT
-        )}" font-size="${n(subline.fontSize)}" font-weight="500" letter-spacing="${n(subline.letterSpacing)}" fill="${esc(
-          subline.fill
-        )}"${subLength}${subFilter}>${esc(subline.text)}</text>`;
+        )}" font-size="${n(subline.fontSize)}" font-weight="${subline.weight ?? 400}" letter-spacing="${n(
+          subline.letterSpacing
+        )}" fill="${esc(subline.fill)}"${subLength}${subFilter}>${esc(subline.text)}</text>`;
       }
       return markup;
     }
@@ -205,17 +247,19 @@ function objectBody(object: VecObject): string {
         const y = object.y + random() * height;
         const radius = 0.5 + random() * 1.6;
         const opacity = 0.25 + random() * 0.75;
-        dots.push(`<circle cx="${n(x)}" cy="${n(y)}" r="${n(radius)}" fill="${esc(object.fill)}" opacity="${n(opacity)}"/>`);
+        dots.push(
+          `<circle cx="${n(x)}" cy="${n(y)}" r="${n(radius)}" fill="${esc(object.fill)}" opacity="${n(opacity)}"/>`
+        );
       }
       for (let index = 0; index < 6; index += 1) {
         const x = object.x + random() * span;
         const y = object.y + random() * height * 0.9;
         dots.push(
-          `<path d="M${n(x)} ${n(y - 5)} L${n(x + 1.2)} ${n(y - 1.2)} L${n(x + 5)} ${n(y)} L${n(
-            x + 1.2
-          )} ${n(y + 1.2)} L${n(x)} ${n(y + 5)} L${n(x - 1.2)} ${n(y + 1.2)} L${n(x - 5)} ${n(y)} L${n(
-            x - 1.2
-          )} ${n(y - 1.2)} Z" fill="#ffffff" opacity="0.9"/>`
+          `<path d="M${n(x)} ${n(y - 5)} L${n(x + 1.2)} ${n(y - 1.2)} L${n(x + 5)} ${n(y)} L${n(x + 1.2)} ${n(
+            y + 1.2
+          )} L${n(x)} ${n(y + 5)} L${n(x - 1.2)} ${n(y + 1.2)} L${n(x - 5)} ${n(y)} L${n(x - 1.2)} ${n(
+            y - 1.2
+          )} Z" fill="#ffffff" opacity="0.9"/>`
         );
       }
       return `<g${filter}>${dots.join("")}</g>`;
@@ -224,15 +268,18 @@ function objectBody(object: VecObject): string {
     case "mountains": {
       const points = object.points ?? [];
       if (points.length < 3) return "";
-      const left = points.filter(point => point.x <= object.x + object.width / 2);
-      const right = points.filter(point => point.x >= object.x + object.width / 2);
+      const base = object.base ?? pointsBounds(points);
+      const mid = base.x + base.width / 2;
+      const baseline = base.y + base.height;
+      const left = points.filter(point => point.x <= mid);
+      const right = points.filter(point => point.x >= mid);
       const shape = (list: Vec2[]) => {
         if (list.length < 2) return "";
         const first = list[0];
         const last = list[list.length - 1];
-        return `<path d="${list.map((point, index) => `${index === 0 ? "M" : "L"}${n(point.x)} ${n(point.y)}`).join(" ")} L${n(
-          last.x
-        )} ${n(object.y + object.height)} L${n(first.x)} ${n(object.y + object.height)} Z" fill="${fill}"${
+        return `<path d="${list
+          .map((point, index) => `${index === 0 ? "M" : "L"}${n(point.x)} ${n(point.y)}`)
+          .join(" ")} L${n(last.x)} ${n(baseline)} L${n(first.x)} ${n(baseline)} Z" fill="${fill}"${
           strokeAttrs ? ` ${strokeAttrs.trim()}` : ""
         }${filter}/>`;
       };
@@ -259,18 +306,22 @@ function objectBody(object: VecObject): string {
       const lineData = [...vertical, ...horizontal].join(" ");
       const neon = object.stroke === "none" ? "#ff2fa8" : object.stroke;
       return `<g>
-        <rect x="${n(object.x)}" y="${n(object.y)}" width="${n(object.width)}" height="${n(object.height)}" fill="${fill}"/>
+        <rect x="${n(object.x)}" y="${n(object.y)}" width="${n(object.width)}" height="${n(
+        object.height
+      )}" fill="${fill}"/>
         <g clip-path="url(#vc-ground-clip)">
           <ellipse cx="${n(vanishX)}" cy="${n(horizon + 14)}" rx="${n(object.width * 0.55)}" ry="${n(
-            object.height * 0.24
-          )}" fill="url(#vc-horizon)" opacity="0.2"/>
+        object.height * 0.24
+      )}" fill="url(#vc-horizon)" opacity="0.2"/>
           <g stroke="${esc(neon)}" stroke-width="2.4" opacity="0.24" filter="url(#vc-grid-glow)" fill="none">
             <path d="${lineData}"/>
           </g>
           <g stroke="${esc(neon)}" stroke-width="1.2" opacity="0.9" fill="none">
             <path d="${lineData}"/>
           </g>
-          <path d="M${n(object.x)} ${n(horizon)} H${n(object.x + object.width)}" stroke="#ff8fe0" stroke-width="1.4" opacity="0.9"/>
+          <path d="M${n(object.x)} ${n(horizon)} H${n(
+        object.x + object.width
+      )}" stroke="#ff8fe0" stroke-width="1.4" opacity="0.9"/>
         </g>
       </g>`;
     }
@@ -284,20 +335,30 @@ function objectMarkup(object: VecObject): string {
   if (!object.visible) return "";
   const body = objectBody(object);
   if (!body) return "";
+  const base = object.base ?? (object.points?.length ? pointsBounds(object.points) : undefined);
+  const geometry =
+    base && (object.kind === "path" || object.kind === "mountains")
+      ? ` transform="translate(${n(object.x)} ${n(object.y)}) scale(${n(object.width / base.width)} ${n(
+          object.height / base.height
+        )}) translate(${n(-base.x)} ${n(-base.y)})"`
+      : "";
   const centreX = object.x + object.width / 2;
   const centreY = object.y + object.height / 2;
   const transform = object.rotation ? ` transform="rotate(${n(object.rotation)} ${n(centreX)} ${n(centreY)})"` : "";
-  return `<g data-obj="${esc(object.id)}"${object.locked ? ' data-locked="true"' : ""} opacity="${n(
-    object.opacity
-  )}"${transform}>${body}</g>`;
+  return `<g data-obj="${esc(object.id)}" opacity="${n(object.opacity)}"${transform}>${
+    geometry ? `<g${geometry}>${body}</g>` : body
+  }</g>`;
 }
 
 export function artworkMarkup(doc: VecDocument): string {
   return doc.objects.map(object => objectMarkup(object)).join("");
 }
 
-export function documentSvg(doc: VecDocument): string {
-  return `<svg xmlns="http://www.w3.org/2000/svg" width="${doc.width}" height="${doc.height}" viewBox="0 0 ${doc.width} ${doc.height}">
+export function documentSvg(doc: VecDocument, fontCss = ""): string {
+  return `<svg xmlns="http://www.w3.org/2000/svg" width="${doc.width}" height="${doc.height}" viewBox="0 0 ${
+    doc.width
+  } ${doc.height}">
+    ${fontCss}
     ${buildDefs(doc)}
     <g clip-path="url(#vc-artboard-clip)">${artworkMarkup(doc)}</g>
   </svg>`;
@@ -431,7 +492,9 @@ export class Stage {
       ${buildDefs(doc)}
       <rect class="vc-canvas-hit" x="0" y="0" width="${width}" height="${height}" fill="transparent"/>
       <g class="vc-world" transform="${world}">
-        <rect class="vc-artboard-shadow" x="6" y="14" width="${doc.width}" height="${doc.height}" fill="rgba(0,0,0,0.55)" filter="url(#vc-artboard-shadow)"/>
+        <rect class="vc-artboard-shadow" x="6" y="14" width="${doc.width}" height="${
+      doc.height
+    }" fill="rgba(0,0,0,0.55)" filter="url(#vc-artboard-shadow)"/>
         <g clip-path="url(#vc-artboard-clip)">${artworkMarkup(doc)}</g>
         <rect class="vc-artboard-frame" x="0" y="0" width="${doc.width}" height="${doc.height}"/>
       </g>
@@ -451,18 +514,18 @@ export class Stage {
       parts.push(`<polygon class="vc-select-box" points="${points}"/>`);
       corners.forEach((corner, index) => {
         parts.push(
-          `<rect class="vc-handle" data-handle="${index}" data-obj-id="${esc(object.id)}" x="${n(corner.x - HANDLE / 2)}" y="${n(
-            corner.y - HANDLE / 2
-          )}" width="${HANDLE}" height="${HANDLE}" rx="0.8"/>`
+          `<rect class="vc-handle" data-handle="${index}" data-obj-id="${esc(object.id)}" x="${n(
+            corner.x - HANDLE / 2
+          )}" y="${n(corner.y - HANDLE / 2)}" width="${HANDLE}" height="${HANDLE}" rx="0.8"/>`
         );
       });
       for (let index = 0; index < 4; index += 1) {
         const a = corners[index];
         const b = corners[(index + 1) % 4];
         parts.push(
-          `<circle class="vc-handle-mid" data-handle="m${index}" data-obj-id="${esc(object.id)}" cx="${n((a.x + b.x) / 2)}" cy="${n(
-            (a.y + b.y) / 2
-          )}" r="2.1"/>`
+          `<circle class="vc-handle-mid" data-handle="m${index}" data-obj-id="${esc(object.id)}" cx="${n(
+            (a.x + b.x) / 2
+          )}" cy="${n((a.y + b.y) / 2)}" r="2.1"/>`
         );
       }
     }
@@ -473,9 +536,9 @@ export class Stage {
         y: union.y * this.view.zoom + this.view.y
       };
       parts.push(
-        `<rect class="vc-select-union" x="${n(screen.x)}" y="${n(screen.y)}" width="${n(union.width * this.view.zoom)}" height="${n(
-          union.height * this.view.zoom
-        )}"/>`
+        `<rect class="vc-select-union" x="${n(screen.x)}" y="${n(screen.y)}" width="${n(
+          union.width * this.view.zoom
+        )}" height="${n(union.height * this.view.zoom)}"/>`
       );
     }
     return parts.join("");
@@ -491,9 +554,9 @@ export class Stage {
     for (let y = step; y < doc.height; y += step) {
       lines.push(`<path d="M0 ${y} H${doc.width}" class="vc-artboard-grid-line"/>`);
     }
-    return `<g class="vc-artboard-grid" pointer-events="none" transform="translate(${n(this.view.x)} ${n(this.view.y)}) scale(${n(
-      this.view.zoom
-    )})">${lines.join("")}</g>`;
+    return `<g class="vc-artboard-grid" pointer-events="none" transform="translate(${n(this.view.x)} ${n(
+      this.view.y
+    )}) scale(${n(this.view.zoom)})">${lines.join("")}</g>`;
   }
 
   private rulersMarkup(width: number, height: number): string {
@@ -507,7 +570,7 @@ export class Stage {
     const topTicks: string[] = [];
     const leftTicks: string[] = [];
 
-    const startDocX = Math.floor((-originX / zoom) / step) * step;
+    const startDocX = Math.floor(-originX / zoom / step) * step;
     const endDocX = (width - originX) / zoom;
     for (let value = startDocX; value <= endDocX; value += minor) {
       const x = originX + value * zoom;
@@ -521,7 +584,7 @@ export class Stage {
       }
     }
 
-    const startDocY = Math.floor((-originY / zoom) / step) * step;
+    const startDocY = Math.floor(-originY / zoom / step) * step;
     const endDocY = (height - originY) / zoom;
     for (let value = startDocY; value <= endDocY; value += minor) {
       const y = originY + value * zoom;
@@ -539,23 +602,23 @@ export class Stage {
       }
     }
 
-    const artboardTop = originX;
-    const artboardLeft = originY;
+    const artboardRectX = originX;
+    const artboardRectY = originY;
 
     return `
       <rect class="vc-ruler-bg" x="0" y="0" width="${width}" height="${RULER}"/>
       <rect class="vc-ruler-bg" x="0" y="0" width="${RULER}" height="${height}"/>
-      <rect class="vc-ruler-artboard" x="${n(artboardTop)}" y="${RULER - 2}" width="${n(this.doc.width * zoom)}" height="2"/>
-      <rect class="vc-ruler-artboard" x="${RULER - 2}" y="${n(artboardLeft)}" width="2" height="${n(this.doc.height * zoom)}"/>
+      <rect class="vc-ruler-artboard" x="${n(artboardRectX)}" y="${RULER - 2}" width="${n(
+      this.doc.width * zoom
+    )}" height="2"/>
+      <rect class="vc-ruler-artboard" x="${RULER - 2}" y="${n(artboardRectY)}" width="2" height="${n(
+      this.doc.height * zoom
+    )}"/>
       ${topTicks.join("")}
       ${leftTicks.join("")}
       <rect class="vc-ruler-corner" x="0" y="0" width="${RULER}" height="${RULER}"/>
       <path d="M${n(RULER)} 0 V${height} M0 ${n(RULER)} H${width}" class="vc-ruler-edge"/>
     `;
-  }
-
-  exportSvg(): string {
-    return documentSvg(this.doc);
   }
 }
 
@@ -575,8 +638,8 @@ export function downloadText(filename: string, content: string, type = "image/sv
   setTimeout(() => URL.revokeObjectURL(url), 2000);
 }
 
-export async function downloadPng(doc: VecDocument, filename: string, scale = 2): Promise<void> {
-  const svg = documentSvg(doc);
+export async function downloadPng(doc: VecDocument, filename: string, scale = 2, fontCss = ""): Promise<void> {
+  const svg = documentSvg(doc, fontCss);
   const blob = new Blob([svg], { type: "image/svg+xml;charset=utf-8" });
   const url = URL.createObjectURL(blob);
   try {

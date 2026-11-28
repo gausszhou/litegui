@@ -1,4 +1,5 @@
 import { icon } from "./icons";
+import { round } from "./number";
 import {
   GRADIENTS,
   INK_PALETTE,
@@ -9,12 +10,13 @@ import {
   gradientCss,
   gradientOf,
   paintLabel,
-  isText
+  isText,
+  kindLabel,
+  shapeGlyph
 } from "./scene";
 
 export type SidebarTab = "properties" | "layers" | "libraries";
 export type AlignMode = "left" | "hcenter" | "right" | "top" | "vcenter" | "bottom";
-export type ToolId = string;
 
 export interface FloatingPosition {
   left: number;
@@ -31,6 +33,11 @@ export interface UiState {
   outlineMode: boolean;
   showGrid: boolean;
   showRulers: boolean;
+  unit: "pt" | "px" | "mm";
+  alignToPoint: boolean;
+  alignToGrid: boolean;
+  keyboardIncrement: number;
+  scaleStrokes: boolean;
 }
 
 export interface ScreenRect {
@@ -57,6 +64,8 @@ export interface EditorContext {
   toggleLock(id: string): void;
   toggleVisibility(id: string): void;
   outlineSelection(): void;
+  offsetPath(): void;
+  simplifySelection(): void;
   alignSelection(mode: AlignMode): void;
   distributeSelection(axis: "h" | "v"): void;
   zoomFit(): void;
@@ -65,9 +74,14 @@ export interface EditorContext {
   openLibraryTab(): void;
   toggleGlow(): void;
   setDefaultPaint(paint: Paint): void;
+  defaultPaint(): { fill: Paint; stroke: Paint };
+  setUi(patch: Partial<UiState>): void;
+  toggleRulers(): void;
+  toggleGrid(): void;
+  showDocumentSetup(): void;
 }
 
-const fmt = (value: number): string => `${Math.round(value * 100) / 100}`;
+const fmt = (value: number): string => `${round(value, 2)}`;
 
 function swatchMarkup(paint: Paint, extraClass = ""): string {
   const gradient = gradientOf(paint);
@@ -75,17 +89,24 @@ function swatchMarkup(paint: Paint, extraClass = ""): string {
     return `<span class="vc-swatch vc-swatch--none ${extraClass}" title="None"></span>`;
   }
   if (gradient) {
-    return `<span class="vc-swatch vc-swatch--gradient ${extraClass}" style="background:${gradientCss(paint)}" title="${gradient.label}"></span>`;
+    return `<span class="vc-swatch vc-swatch--gradient ${extraClass}" style="background:${gradientCss(paint)}" title="${
+      gradient.label
+    }"></span>`;
   }
   return `<span class="vc-swatch ${extraClass}" style="background:${paint}" title="${paint.toUpperCase()}"></span>`;
 }
 
-function numberField(label: string, value: number, prop: string, options: { unit?: string; step?: number; id?: string } = {}): string {
+function numberField(
+  label: string,
+  value: number,
+  prop: string,
+  options: { unit?: string; step?: number; id?: string } = {}
+): string {
   return `<label class="vc-field">
     <span class="vc-field-label">${label}</span>
-    <input class="vc-input" type="text" inputmode="decimal" spellcheck="false" value="${fmt(value)}" data-prop="${prop}" ${
-      options.id ? `data-id="${options.id}"` : ""
-    } data-step="${options.step ?? 1}" />
+    <input class="vc-input" type="text" inputmode="decimal" spellcheck="false" value="${fmt(
+      value
+    )}" data-prop="${prop}" ${options.id ? `data-id="${options.id}"` : ""} data-step="${options.step ?? 1}" />
     ${options.unit ? `<span class="vc-field-unit">${options.unit}</span>` : ""}
   </label>`;
 }
@@ -103,7 +124,9 @@ function paragraphControls(object: VecObject): string {
     ${buttons
       .map(
         ([mode, title, path], index) =>
-          `<button type="button" class="vc-mini-btn${align === mode && index < 4 ? " is-active" : ""}" title="${title}" data-align="${mode}">
+          `<button type="button" class="vc-mini-btn${
+            align === mode && index < 4 ? " is-active" : ""
+          }" title="${title}" data-align="${mode}">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round">${path}</svg>
           </button>`
       )
@@ -139,7 +162,7 @@ function transformSection(object: VecObject | null): string {
   if (!object) {
     return `<div class="vc-empty">未选择对象。点击画布中的对象，或在图层面板中选择。</div>`;
   }
-  return `<div class="vc-section">
+  return `<div class="vc-section" data-section="transform">
     <div class="vc-section-head"><span>Transform</span><div class="vc-section-tools">
       <button class="vc-mini-btn" data-action="toggle-constrain" title="锁定比例">${icon("link", 13)}</button>
     </div></div>
@@ -169,8 +192,7 @@ function transformSection(object: VecObject | null): string {
 function characterSection(object: VecObject | null): string {
   if (!object || !isText(object)) return "";
   const families: Array<[string, string]> = [
-    ["Michroma (Extended)", '"Michroma", "Orbitron", "Bank Gothic", "Eurostile", "Arial Black", "Segoe UI", sans-serif'],
-    ["Arial Black", '"Arial Black", "Arial Bold", sans-serif'],
+    ["Chakra Petch (VectorCraft)", '"VectorCraft", "Chakra Petch", "Segoe UI", sans-serif'],
     ["Inter", '"Inter", "Segoe UI", Arial, sans-serif'],
     ["Georgia", 'Georgia, "Times New Roman", serif'],
     ["Courier", '"Courier New", monospace']
@@ -179,38 +201,44 @@ function characterSection(object: VecObject | null): string {
     [300, "Light"],
     [400, "Regular"],
     [500, "Medium"],
-    [600, "Semibold"],
-    [700, "Bold"],
-    [800, "Extra Bold"],
-    [900, "Black"]
+    [700, "Bold"]
   ];
   return `<div class="vc-section">
-    <div class="vc-section-head"><span>Character</span><button class="vc-mini-btn" data-action="character-options" title="更多">${icon("more", 14)}</button></div>
+    <div class="vc-section-head"><span>Character</span><button class="vc-mini-btn" data-action="character-options" title="更多">${icon(
+      "more",
+      14
+    )}</button></div>
     <select class="vc-select" data-prop="fontFamily" data-id="${object.id}">
       ${families
         .map(
           ([label, stack]) =>
-            `<option value="${stack.replace(/"/g, "&quot;")}" ${object.fontFamily === stack ? "selected" : ""}>${label}</option>`
+            `<option value="${stack.replace(/"/g, "&quot;")}" ${
+              object.fontFamily === stack ? "selected" : ""
+            }>${label}</option>`
         )
         .join("")}
     </select>
     <select class="vc-select" data-prop="fontWeight" data-id="${object.id}">
-      ${weights.map(([value, label]) => `<option value="${value}" ${object.fontWeight === value ? "selected" : ""}>${label}</option>`).join("")}
+      ${weights
+        .map(
+          ([value, label]) =>
+            `<option value="${value}" ${object.fontWeight === value ? "selected" : ""}>${label}</option>`
+        )
+        .join("")}
     </select>
     <div class="vc-field-line vc-field-line--two">
       ${numberField("T", object.fontSize ?? 48, "fontSize", { unit: "pt" })}
       ${numberField("A", object.lineHeight ?? Math.round((object.fontSize ?? 48) * 1.2), "lineHeight", { unit: "pt" })}
     </div>
     <div class="vc-field-line vc-field-line--two">
-      ${numberField("VA", object.letterSpacing ?? 0, "letterSpacing", {})}
-      ${numberField("VA", 0, "kerning", {})}
+      ${numberField("VA", object.letterSpacing ?? 0, "letterSpacing", { unit: "pt" })}
     </div>
   </div>`;
 }
 
 function appearanceSection(object: VecObject | null): string {
   if (!object) return "";
-  return `<div class="vc-section">
+  return `<div class="vc-section" data-section="appearance">
     <div class="vc-section-head"><span>Appearance</span></div>
     <div class="vc-appearance-row">
       ${swatchMarkup(object.fill)}<span class="vc-app-label">Fill</span>
@@ -223,7 +251,9 @@ function appearanceSection(object: VecObject | null): string {
     </div>
     <div class="vc-appearance-row">
       <span class="vc-app-label vc-app-label--wide">Opacity</span>
-      <input class="vc-input vc-input--tiny" type="text" inputmode="decimal" value="${Math.round(object.opacity * 100)}" data-prop="opacity" data-id="${object.id}" />%
+      <input class="vc-input vc-input--tiny" type="text" inputmode="decimal" value="${Math.round(
+        object.opacity * 100
+      )}" data-prop="opacity" data-id="${object.id}" />%
       <span class="vc-spacer"></span>
       <button class="vc-mini-btn" data-action="opacity-more" title="更多">${icon("more", 14)}</button>
     </div>
@@ -243,9 +273,99 @@ function quickActionsSection(): string {
   </div>`;
 }
 
+function displayUnit(value: number, unit: UiState["unit"]): number {
+  const factor = unit === "mm" ? 25.4 / 72 : unit === "px" ? 96 / 72 : 1;
+  return round(value * factor, 2);
+}
+
+function documentBody(ctx: EditorContext): string {
+  const paint = ctx.defaultPaint();
+  const units: Array<[string, string]> = [
+    ["pt", "Points"],
+    ["px", "Pixels"],
+    ["mm", "Millimeters"]
+  ];
+  return `
+    <div class="vc-section" data-section="document">
+      <div class="vc-section-head"><span>Document</span></div>
+      <div class="vc-doc-row"><span>Size</span><span>${displayUnit(ctx.doc.width, ctx.ui.unit)} × ${displayUnit(
+    ctx.doc.height,
+    ctx.ui.unit
+  )} ${ctx.ui.unit}</span></div>
+      <label class="vc-doc-row"><span>Units</span>
+        <select class="vc-select vc-select--inline" data-unit>
+          ${units
+            .map(
+              ([value, label]) =>
+                `<option value="${value}" ${ctx.ui.unit === value ? "selected" : ""}>${label}</option>`
+            )
+            .join("")}
+        </select>
+      </label>
+      <div class="vc-doc-actions">
+        <button class="vc-quick-btn" data-action="doc-setup">Document Setup…</button>
+        <button class="vc-quick-btn" data-action="edit-artboards">Edit Artboards</button>
+      </div>
+    </div>
+    <div class="vc-section" data-section="document-appearance">
+      <div class="vc-section-head"><span>Appearance</span></div>
+      <div class="vc-appearance-row">${swatchMarkup(paint.fill)}<span class="vc-app-label">Fill</span></div>
+      <div class="vc-appearance-row">
+        ${swatchMarkup(paint.stroke)}<span class="vc-app-label">Stroke</span>
+        <span class="vc-stroke-value">${displayUnit(1, ctx.ui.unit)} ${ctx.ui.unit}</span>
+      </div>
+    </div>
+    <div class="vc-section" data-section="rulers-grid">
+      <div class="vc-section-head"><span>Rulers &amp; Grid</span></div>
+      <div class="vc-icon-row">
+        <button class="vc-icon-toggle${
+          ctx.ui.showRulers ? " is-active" : ""
+        }" data-action="toggle-rulers" title="Toggle Rulers">${icon("ruler", 15)}</button>
+        <button class="vc-icon-toggle${
+          ctx.ui.showGrid ? " is-active" : ""
+        }" data-action="toggle-grid" title="Toggle Grid">${icon("grid", 15)}</button>
+      </div>
+    </div>
+    <div class="vc-section" data-section="guides">
+      <div class="vc-section-head"><span>Guides</span></div>
+      <div class="vc-doc-actions">
+        <button class="vc-quick-btn" data-action="show-guides">Show Guides</button>
+        <button class="vc-quick-btn" data-action="lock-guides">Lock Guides</button>
+      </div>
+    </div>
+    <div class="vc-section" data-section="align-options">
+      <div class="vc-section-head"><span>Align Options</span></div>
+      <label class="vc-check"><input type="checkbox" data-pref="alignToPoint" ${
+        ctx.ui.alignToPoint ? "checked" : ""
+      } /><span>Align to Point</span></label>
+      <label class="vc-check"><input type="checkbox" data-pref="alignToGrid" ${
+        ctx.ui.alignToGrid ? "checked" : ""
+      } /><span>Align to Grid</span></label>
+    </div>
+    <div class="vc-section" data-section="preferences">
+      <div class="vc-section-head"><span>Preferences</span></div>
+      <label class="vc-doc-row"><span>Keyboard Increment</span>
+        <span class="vc-inline-field"><input class="vc-input" type="text" inputmode="decimal" value="${
+          ctx.ui.keyboardIncrement
+        }" data-pref-number="keyboardIncrement" /> ${ctx.ui.unit}</span>
+      </label>
+      <label class="vc-check"><input type="checkbox" data-pref="scaleStrokes" ${
+        ctx.ui.scaleStrokes ? "checked" : ""
+      } /><span>Scale Strokes &amp; Effects</span></label>
+    </div>
+    <div class="vc-section" data-section="quick-actions">
+      <div class="vc-section-head"><span>Quick Actions</span></div>
+      <div class="vc-quick-grid">
+        <button class="vc-quick-btn" data-action="doc-setup">Document Setup…</button>
+        <button class="vc-quick-btn" data-action="preferences">Preferences…</button>
+      </div>
+    </div>`;
+}
+
 function propertiesBody(ctx: EditorContext): string {
   const object = ctx.primaryObject();
-  const isType = object ? isText(object) : false;
+  if (!object) return documentBody(ctx);
+  const isType = isText(object);
   return `
     <div class="vc-section vc-section--title">
       <div class="vc-section-head"><span>${isType ? "Type" : object ? "Object" : "Artboard"}</span>
@@ -257,9 +377,19 @@ function propertiesBody(ctx: EditorContext): string {
     </div>
     ${transformSection(object)}
     ${characterSection(object)}
-    ${isType ? `<div class="vc-section"><div class="vc-section-head"><span>Paragraph</span></div>${paragraphControls(object as VecObject)}</div>` : ""}
+    ${
+      isType
+        ? `<div class="vc-section"><div class="vc-section-head"><span>Paragraph</span></div>${paragraphControls(
+            object as VecObject
+          )}</div>`
+        : ""
+    }
     ${appearanceSection(object)}
-    ${object ? `<div class="vc-section"><div class="vc-section-head"><span>Align</span></div>${alignControls()}</div>` : ""}
+    ${
+      object
+        ? `<div class="vc-section"><div class="vc-section-head"><span>Align</span></div>${alignControls()}</div>`
+        : ""
+    }
     ${quickActionsSection()}
   `;
 }
@@ -277,17 +407,18 @@ function layersBody(ctx: EditorContext): string {
     <div class="vc-layer-list">
       ${objects
         .map(
-          object => `<div class="vc-layer-row${selected.has(object.id) ? " is-selected" : ""}${object.visible ? "" : " is-hidden"}" data-layer-id="${object.id}">
-          <button class="vc-layer-icon" data-layer-action="visible" data-id="${object.id}" title="${object.visible ? "隐藏" : "显示"}">${icon(
-            object.visible ? "eye" : "eyeOff",
-            13
-          )}</button>
-          <button class="vc-layer-icon${object.locked ? " is-on" : ""}" data-layer-action="lock" data-id="${object.id}" title="${
-            object.locked ? "解锁" : "锁定"
-          }">${icon(object.locked ? "lock" : "unlock", 12)}</button>
-          <span class="vc-layer-glyph">${object.kind === "text" ? "T" : object.kind === "grid" ? "▦" : object.kind === "stars" ? "✳" : "▭"}</span>
+          object => `<div class="vc-layer-row${selected.has(object.id) ? " is-selected" : ""}${
+            object.visible ? "" : " is-hidden"
+          }" data-layer-id="${object.id}">
+          <button class="vc-layer-icon" data-layer-action="visible" data-id="${object.id}" title="${
+            object.visible ? "隐藏" : "显示"
+          }">${icon(object.visible ? "eye" : "eyeOff", 13)}</button>
+          <button class="vc-layer-icon${object.locked ? " is-on" : ""}" data-layer-action="lock" data-id="${
+            object.id
+          }" title="${object.locked ? "解锁" : "锁定"}">${icon(object.locked ? "lock" : "unlock", 12)}</button>
+          <span class="vc-layer-glyph">${shapeGlyph(object.kind)}</span>
           <span class="vc-layer-name" title="${object.name}">${object.name}</span>
-          <span class="vc-layer-kind">${object.kind === "text" ? "Type" : object.kind === "stars" ? "Symbol" : "Path"}</span>
+          <span class="vc-layer-kind">${kindLabel(object.kind)}</span>
         </div>`
         )
         .join("")}
@@ -302,15 +433,24 @@ function layersBody(ctx: EditorContext): string {
 function librariesBody(_ctx: EditorContext): string {
   const gradients = Object.values(GRADIENTS).slice(0, 6);
   return `<div class="vc-lib-section">
-      <div class="vc-section-head"><span>Swatches</span><button class="vc-mini-btn" data-action="lib-menu">${icon("more", 14)}</button></div>
+      <div class="vc-section-head"><span>Swatches</span><button class="vc-mini-btn" data-action="lib-menu">${icon(
+        "more",
+        14
+      )}</button></div>
       <div class="vc-lib-grid">
-        ${NEON_PALETTE.map(color => `<button class="vc-lib-swatch" style="background:${color}" data-swatch="${color}" title="${color.toUpperCase()}"></button>`).join("")}
+        ${NEON_PALETTE.map(
+          color =>
+            `<button class="vc-lib-swatch" style="background:${color}" data-swatch="${color}" title="${color.toUpperCase()}"></button>`
+        ).join("")}
       </div>
     </div>
     <div class="vc-lib-section">
       <div class="vc-section-head"><span>Ink &amp; Paper</span></div>
       <div class="vc-lib-grid">
-        ${INK_PALETTE.map(color => `<button class="vc-lib-swatch" style="background:${color}" data-swatch="${color}" title="${color.toUpperCase()}"></button>`).join("")}
+        ${INK_PALETTE.map(
+          color =>
+            `<button class="vc-lib-swatch" style="background:${color}" data-swatch="${color}" title="${color.toUpperCase()}"></button>`
+        ).join("")}
       </div>
     </div>
     <div class="vc-lib-section">
@@ -319,7 +459,11 @@ function librariesBody(_ctx: EditorContext): string {
         ${gradients
           .map(
             gradient =>
-              `<button class="vc-lib-gradient" style="background:${gradientCss(`url(#${gradient.id})`)}" data-gradient="url(#${gradient.id})" title="${gradient.label}"><span>${gradient.label}</span></button>`
+              `<button class="vc-lib-gradient" style="background:${gradientCss(
+                `url(#${gradient.id})`
+              )}" data-gradient="url(#${gradient.id})" title="${gradient.label}"><span>${
+                gradient.label
+              }</span></button>`
           )
           .join("")}
       </div>
@@ -327,8 +471,8 @@ function librariesBody(_ctx: EditorContext): string {
     <div class="vc-lib-section">
       <div class="vc-section-head"><span>Type Styles</span></div>
       <div class="vc-lib-styles">
-        <button class="vc-lib-style" data-style="display"><b>NEON DRIVE</b><span>Display · 104 pt</span></button>
-        <button class="vc-lib-style" data-style="caption"><b>made with VectorCraft</b><span>Caption · 15 pt</span></button>
+        <button class="vc-lib-style" data-style="display"><b>NEON DRIVE</b><span>Display · 149 pt</span></button>
+        <button class="vc-lib-style" data-style="caption"><b>made with VectorCraft</b><span>Caption · 14 pt</span></button>
       </div>
     </div>
     <p class="vc-lib-hint">${icon("info", 13)} 点击色板应用到当前选中对象，未选中时应用到新建图形。</p>`;
@@ -347,7 +491,10 @@ export class PanelsController {
   private popover: HTMLElement | null = null;
   private drag: { pointerId: number; offsetX: number; offsetY: number } | null = null;
 
-  constructor(hosts: { sidebar: HTMLElement; appearance: HTMLElement; contextBar: HTMLElement; viewport: HTMLElement }, ctx: EditorContext) {
+  constructor(
+    hosts: { sidebar: HTMLElement; appearance: HTMLElement; contextBar: HTMLElement; viewport: HTMLElement },
+    ctx: EditorContext
+  ) {
     this.sidebar = hosts.sidebar;
     this.appearance = hosts.appearance;
     this.contextBar = hosts.contextBar;
@@ -382,21 +529,36 @@ export class PanelsController {
     this.sidebar.innerHTML = `
       <div class="vc-panel-head">
         <div class="vc-tabs" role="tablist">
-          <button class="vc-tab${ctx.ui.sidebarTab === "properties" ? " is-active" : ""}" data-tab="properties" role="tab">Properties</button>
-          <button class="vc-tab${ctx.ui.sidebarTab === "layers" ? " is-active" : ""}" data-tab="layers" role="tab">Layers</button>
-          <button class="vc-tab${ctx.ui.sidebarTab === "libraries" ? " is-active" : ""}" data-tab="libraries" role="tab">Libraries</button>
+          <button class="vc-tab${
+            ctx.ui.sidebarTab === "properties" ? " is-active" : ""
+          }" data-tab="properties" role="tab">Properties</button>
+          <button class="vc-tab${
+            ctx.ui.sidebarTab === "layers" ? " is-active" : ""
+          }" data-tab="layers" role="tab">Layers</button>
+          <button class="vc-tab${
+            ctx.ui.sidebarTab === "libraries" ? " is-active" : ""
+          }" data-tab="libraries" role="tab">Libraries</button>
         </div>
-        <button class="vc-icon-btn vc-panel-menu" data-action="panel-menu" title="面板菜单">${icon("hamburger", 15)}</button>
+        <button class="vc-icon-btn vc-panel-menu" data-action="panel-menu" title="面板菜单">${icon(
+          "hamburger",
+          15
+        )}</button>
       </div>
       <div class="vc-panel-scroll">
-        ${ctx.ui.sidebarTab === "layers" ? layersBody(ctx) : ctx.ui.sidebarTab === "libraries" ? librariesBody(ctx) : propertiesBody(ctx)}
+        ${
+          ctx.ui.sidebarTab === "layers"
+            ? layersBody(ctx)
+            : ctx.ui.sidebarTab === "libraries"
+            ? librariesBody(ctx)
+            : propertiesBody(ctx)
+        }
       </div>`;
   }
 
   renderAppearance() {
     const ctx = this.ctx;
     const object = ctx.primaryObject();
-    if (!ctx.ui.showAppearance) {
+    if (!ctx.ui.showAppearance || !object) {
       this.appearance.hidden = true;
       return;
     }
@@ -415,10 +577,16 @@ export class PanelsController {
         ? `
         <div class="vc-app-row">
           ${swatchMarkup(object.fill)}<span class="vc-app-name">Type</span>
-          <span class="vc-app-trail">${swatchMarkup(object.fill, "vc-swatch--mini")}${swatchMarkup(object.stroke, "vc-swatch--mini")}</span>
+          <span class="vc-app-trail">${swatchMarkup(object.fill, "vc-swatch--mini")}${swatchMarkup(
+            object.stroke,
+            "vc-swatch--mini"
+          )}</span>
         </div>
         <div class="vc-app-row">
-          <button class="vc-app-eye" data-action="fill-eye" title="切换填充">${icon(object.fill === "none" ? "eyeOff" : "eye", 13)}</button>
+          <button class="vc-app-eye" data-action="fill-eye" title="切换填充">${icon(
+            object.fill === "none" ? "eyeOff" : "eye",
+            13
+          )}</button>
           <span class="vc-app-name vc-app-name--sub">Characters</span>
           <span class="vc-app-trail">${swatchMarkup(object.fill, "vc-swatch--mini")}${swatchMarkup(
             object.stroke,
@@ -427,12 +595,18 @@ export class PanelsController {
         </div>`
         : `
         <div class="vc-app-row">${swatchMarkup(object.fill)}<span class="vc-app-name">Path</span>
-          <span class="vc-app-trail">${swatchMarkup(object.fill, "vc-swatch--mini")}${swatchMarkup(object.stroke, "vc-swatch--mini")}</span></div>`
+          <span class="vc-app-trail">${swatchMarkup(object.fill, "vc-swatch--mini")}${swatchMarkup(
+            object.stroke,
+            "vc-swatch--mini"
+          )}</span></div>`
       : `<div class="vc-app-row vc-app-row--empty">未选择对象</div>`;
 
     const glowRow = object
       ? `<div class="vc-app-row vc-app-row--effect">
-          <button class="vc-app-eye" data-action="glow-eye" title="切换外发光">${icon(object.glow > 0 ? "eye" : "eyeOff", 13)}</button>
+          <button class="vc-app-eye" data-action="glow-eye" title="切换外发光">${icon(
+            object.glow > 0 ? "eye" : "eyeOff",
+            13
+          )}</button>
           <span class="vc-app-chevron">${icon("chevronRight", 11)}</span>
           <span class="vc-app-name vc-app-name--sub">Outer Glow</span>
           <span class="vc-app-trail vc-app-trail--fx">${icon("fx", 12)}</span>
@@ -444,7 +618,10 @@ export class PanelsController {
         <span class="vc-float-title">Appearance</span>
         <div class="vc-float-actions">
           <button class="vc-mini-btn" data-action="appearance-menu" title="面板菜单">${icon("hamburger", 14)}</button>
-          <button class="vc-mini-btn" data-action="appearance-collapse" title="折叠">${icon("chevronRight", 13)}</button>
+          <button class="vc-mini-btn" data-action="appearance-collapse" title="折叠">${icon(
+            "chevronRight",
+            13
+          )}</button>
         </div>
       </header>
       <div class="vc-float-body">
@@ -452,9 +629,9 @@ export class PanelsController {
         ${glowRow}
         <div class="vc-app-row vc-app-row--opacity">
           <span class="vc-app-name">Opacity:</span>
-          <input class="vc-app-opacity" type="text" inputmode="decimal" value="${object ? Math.round(object.opacity * 100) : 100}" data-prop="opacity" data-id="${
-            object ? object.id : ""
-          }" />%
+          <input class="vc-app-opacity" type="text" inputmode="decimal" value="${
+            object ? Math.round(object.opacity * 100) : 100
+          }" data-prop="opacity" data-id="${object ? object.id : ""}" />%
           <span class="vc-app-default">Default</span>
         </div>
       </div>
@@ -479,14 +656,30 @@ export class PanelsController {
     }
     this.contextBar.hidden = false;
     this.contextBar.innerHTML = `
-      <button class="vc-ctx-btn" data-action="outline" title="Create Outlines">${icon("type", 15)}<span>Create Outlines</span></button>
-      <button class="vc-ctx-btn" data-action="duplicate" title="Duplicate (Ctrl+D)">${icon("duplicate", 15)}<span>Duplicate</span></button>
+      ${
+        isText(object)
+          ? `<button class="vc-ctx-btn" data-action="outline" title="Create Outlines">${icon(
+              "type",
+              15
+            )}<span>Create Outlines</span></button>`
+          : ""
+      }
+      <button class="vc-ctx-btn" data-action="duplicate" title="Duplicate (Ctrl+D)">${icon(
+        "duplicate",
+        15
+      )}<span>Duplicate</span></button>
       <span class="vc-ctx-sep"></span>
       <button class="vc-ctx-swatch" data-action="fill" title="Fill">${swatchMarkup(object.fill)}</button>
       <button class="vc-ctx-swatch" data-action="stroke" title="Stroke">${swatchMarkup(object.stroke)}</button>
       <button class="vc-ctx-icon" data-action="palette" title="Color Picker">${icon("color", 16)}</button>
-      <button class="vc-ctx-icon" data-action="hide" title="隐藏">${icon(object.visible ? "eye" : "eyeOff", 15)}</button>
-      <button class="vc-ctx-icon" data-action="lock" title="锁定">${icon(object.locked ? "lock" : "unlock", 15)}</button>
+      <button class="vc-ctx-icon" data-action="hide" title="隐藏">${icon(
+        object.visible ? "eye" : "eyeOff",
+        15
+      )}</button>
+      <button class="vc-ctx-icon" data-action="lock" title="锁定">${icon(
+        object.locked ? "lock" : "unlock",
+        15
+      )}</button>
       <button class="vc-ctx-icon" data-action="more" title="更多">${icon("more", 15)}</button>`;
 
     const width = this.contextBar.offsetWidth || 380;
@@ -529,7 +722,7 @@ export class PanelsController {
 
     const swatch = target.closest<HTMLElement>("[data-swatch]");
     if (swatch?.dataset.swatch) {
-      this.applyPaint("#" + swatch.dataset.swatch.replace("#", ""));
+      this.applyPaint(swatch.dataset.swatch);
       return;
     }
     const gradient = target.closest<HTMLElement>("[data-gradient]");
@@ -566,7 +759,11 @@ export class PanelsController {
         break;
       case "toggle-stroke":
       case "add-stroke":
-        if (object) ctx.updateSelection({ stroke: object.stroke === "none" ? "#ffffff" : "none", strokeWidth: object.stroke === "none" ? 2 : 0 }, true);
+        if (object)
+          ctx.updateSelection(
+            { stroke: object.stroke === "none" ? "#ffffff" : "none", strokeWidth: object.stroke === "none" ? 2 : 0 },
+            true
+          );
         break;
       case "add-fill":
         if (object) ctx.updateSelection({ fill: object.fill === "none" ? "#ffffff" : object.fill }, true);
@@ -587,13 +784,30 @@ export class PanelsController {
         ctx.duplicateSelection();
         break;
       case "offset-path":
-        ctx.toast("Offset Path：示例未接入");
+        ctx.offsetPath();
         break;
       case "simplify":
-        ctx.toast("Simplify：示例未接入");
+        ctx.simplifySelection();
         break;
       case "doc-setup":
-        ctx.toast("Document Setup：800 × 1000 pt · RGB");
+      case "edit-artboards":
+        ctx.showDocumentSetup();
+        break;
+      case "toggle-rulers":
+        ctx.toggleRulers();
+        break;
+      case "toggle-grid":
+        ctx.toggleGrid();
+        break;
+      case "show-guides":
+        ctx.toggleRulers();
+        ctx.toast("已显示标尺；参考线示例未接入");
+        break;
+      case "lock-guides":
+        ctx.toast("锁定参考线：示例未接入");
+        break;
+      case "preferences":
+        ctx.toast("Preferences：可在属性面板中调整键盘增量与缩放描边");
         break;
       case "reset-rotation":
         ctx.updateSelection({ rotation: 0 }, true);
@@ -620,6 +834,20 @@ export class PanelsController {
 
   private onSidebarChange = (event: Event) => {
     const target = event.target as HTMLInputElement | HTMLSelectElement;
+    if (target.hasAttribute("data-unit")) {
+      this.ctx.setUi({ unit: target.value as UiState["unit"] });
+      return;
+    }
+    if (target.dataset.pref) {
+      const key = target.dataset.pref as "alignToPoint" | "alignToGrid" | "scaleStrokes";
+      this.ctx.setUi({ [key]: target instanceof HTMLInputElement ? target.checked : Boolean(target.value) });
+      return;
+    }
+    if (target.dataset.prefNumber) {
+      const value = Number.parseFloat(target.value);
+      if (Number.isFinite(value)) this.ctx.setUi({ keyboardIncrement: Math.max(0.1, value) });
+      return;
+    }
     const prop = target.dataset.prop;
     if (!prop) return;
     const id = target.dataset.id || this.ctx.primaryObject()?.id;
@@ -648,10 +876,6 @@ export class PanelsController {
     const value = Number.parseFloat(raw.replace(/[^\d.-]/g, ""));
     if (!Number.isFinite(value)) {
       this.ctx.refresh();
-      return;
-    }
-    if (prop === "kerning") {
-      this.ctx.toast("Kerning：示例未接入");
       return;
     }
     if (prop === "opacity") {
@@ -694,9 +918,9 @@ export class PanelsController {
       return;
     }
     if (style === "display") {
-      ctx.updateSelection({ fontSize: 104, letterSpacing: 5, fontWeight: 700, glow: 22 }, true);
+      ctx.updateSelection({ fontSize: 149, letterSpacing: 4, fontWeight: 700, glow: 24 }, true);
     } else {
-      ctx.updateSelection({ fontSize: 15, letterSpacing: 1.6, fontWeight: 500, glow: 0 }, true);
+      ctx.updateSelection({ fontSize: 14, letterSpacing: 2, fontWeight: 400, glow: 0 }, true);
     }
   }
 
@@ -720,7 +944,11 @@ export class PanelsController {
         if (object) this.ctx.updateSelection({ fill: object.fill === "none" ? "#ffffff" : object.fill }, true);
         break;
       case "add-stroke":
-        if (object) this.ctx.updateSelection({ stroke: object.stroke === "none" ? "#ffffff" : object.stroke, strokeWidth: object.strokeWidth || 2 }, true);
+        if (object)
+          this.ctx.updateSelection(
+            { stroke: object.stroke === "none" ? "#ffffff" : object.stroke, strokeWidth: object.strokeWidth || 2 },
+            true
+          );
         break;
       case "clear-appearance":
         this.ctx.updateSelection({ glow: 0, stroke: "none", strokeWidth: 0 }, true);
@@ -823,22 +1051,29 @@ export class PanelsController {
     const popover = document.createElement("div");
     popover.className = "vc-popover vc-color-popover";
     popover.innerHTML = `
-      <div class="vc-popover-head"><span>${target === "fill" ? "Fill" : "Stroke"}</span><button class="vc-mini-btn" data-action="close">${icon(
-        "close",
-        12
-      )}</button></div>
+      <div class="vc-popover-head"><span>${
+        target === "fill" ? "Fill" : "Stroke"
+      }</span><button class="vc-mini-btn" data-action="close">${icon("close", 12)}</button></div>
       <div class="vc-popover-body">
         <div class="vc-color-current">${swatchMarkup(current)}<input class="vc-input" data-color-hex value="${
-          current.startsWith("#") ? current.toUpperCase() : ""
-        }" placeholder="#FF3FAE" />${target === "stroke" ? '<input class="vc-input vc-input--tiny" data-stroke-width value="' + object.strokeWidth + '" />' : ""}</div>
+      current.startsWith("#") ? current.toUpperCase() : ""
+    }" placeholder="#FF3FAE" />${
+      target === "stroke"
+        ? '<input class="vc-input vc-input--tiny" data-stroke-width value="' + object.strokeWidth + '" />'
+        : ""
+    }</div>
         <div class="vc-lib-grid vc-lib-grid--popover">
-          ${[...NEON_PALETTE, ...INK_PALETTE].map(color => `<button class="vc-lib-swatch" style="background:${color}" data-swatch="${color}"></button>`).join("")}
+          ${[...NEON_PALETTE, ...INK_PALETTE]
+            .map(color => `<button class="vc-lib-swatch" style="background:${color}" data-swatch="${color}"></button>`)
+            .join("")}
         </div>
         <div class="vc-gradient-list">
           ${Object.values(GRADIENTS)
             .map(
               gradient =>
-                `<button class="vc-lib-gradient" style="background:${gradientCss(`url(#${gradient.id})`)}" data-gradient="url(#${gradient.id})" title="${gradient.label}"></button>`
+                `<button class="vc-lib-gradient" style="background:${gradientCss(
+                  `url(#${gradient.id})`
+                )}" data-gradient="url(#${gradient.id})" title="${gradient.label}"></button>`
             )
             .join("")}
         </div>
@@ -907,6 +1142,10 @@ export class PanelsController {
       return;
     }
     this.openColorPopover(anchor ?? this.contextBar, kind);
+  }
+
+  scrollTo(selector: string) {
+    this.sidebar.querySelector<HTMLElement>(selector)?.scrollIntoView({ block: "center", behavior: "smooth" });
   }
 
   scrollToAlign() {
