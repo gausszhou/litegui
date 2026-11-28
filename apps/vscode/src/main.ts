@@ -601,11 +601,18 @@ const TITLEBAR_ICONS = {
     '<path d="M20.5 11.5a8.5 8.5 0 0 1-12.3 7.6L4 20.5l1.4-4.4a8.5 8.5 0 1 1 15.1-4.6Z"/>' +
     '<path d="M12.9 6.6 13.7 8.6 15.7 9.4 13.7 10.2 12.9 12.2 12.1 10.2 10.1 9.4 12.1 8.6Z" fill="currentColor" stroke="none"/>',
   layoutSidebar:
-    '<rect x="3" y="4" width="18" height="16" rx="2"/><path d="M9 4v16"/><rect x="12.8" y="7.4" width="4.6" height="3.6" rx="1"/><rect x="12.8" y="13" width="4.6" height="3.6" rx="1"/>',
+    '<rect x="3" y="4" width="18" height="16" rx="2"/><path d="M9 4v16"/><rect x="4.8" y="6.4" width="2.6" height="2.8" rx="0.8" fill="currentColor" stroke="none"/><rect x="4.8" y="10.6" width="2.6" height="2.8" rx="0.8" fill="currentColor" stroke="none"/>',
+  layoutSidebarOff:
+    '<rect x="3" y="4" width="18" height="16" rx="2"/><path d="M9 4v16" stroke-dasharray="2 2.5"/><rect x="12.8" y="7.4" width="4.6" height="3.6" rx="1"/><rect x="12.8" y="13" width="4.6" height="3.6" rx="1"/>',
   layoutActivity:
     '<path d="M3 6a2 2 0 0 1 2-2h7v16H5a2 2 0 0 1-2-2z" fill="currentColor" stroke="none"/>' +
     '<rect x="3" y="4" width="18" height="16" rx="2"/><path d="M12 4v16"/>',
-  layoutPanel: '<rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 14h18"/>',
+  layoutActivityOff:
+    '<rect x="3" y="4" width="18" height="16" rx="2"/><path d="M12 4v16" stroke-dasharray="2 2.5"/>',
+  layoutPanel:
+    '<rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 14h18"/><rect x="4" y="14.8" width="16" height="4.2" rx="1" fill="currentColor" stroke="none" opacity="0.55"/>',
+  layoutPanelOff:
+    '<rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 14h18" stroke-dasharray="2 2.5"/>',
   layoutCustomize:
     '<rect x="3.5" y="4.5" width="6.5" height="6.5" rx="1"/><rect x="14" y="4.5" width="6.5" height="6.5" rx="1"/><rect x="3.5" y="13" width="6.5" height="6.5" rx="1"/><rect x="14" y="13" width="6.5" height="6.5" rx="1"/>'
 };
@@ -730,9 +737,24 @@ function stepNavigation(delta: number): void {
 }
 
 function syncTitlebarControls(): void {
-  layoutSidebarButton.setAttribute("aria-pressed", String(!shell.classList.contains("sidebar-hidden")));
-  layoutActivityButton.setAttribute("aria-pressed", String(!shell.classList.contains("activity-hidden")));
-  layoutPanelButton.setAttribute("aria-pressed", String(!terminalDrawer.hidden));
+  const sidebarVisible = !shell.classList.contains("sidebar-hidden");
+  const activityVisible = !shell.classList.contains("activity-hidden");
+  const panelVisible = !terminalDrawer.hidden;
+
+  layoutSidebarButton.innerHTML = titlebarIcon(sidebarVisible ? "layoutSidebar" : "layoutSidebarOff");
+  layoutSidebarButton.title = `${sidebarVisible ? "Hide" : "Show"} Primary Side Bar`;
+  layoutSidebarButton.setAttribute("aria-label", layoutSidebarButton.title);
+  layoutSidebarButton.setAttribute("aria-pressed", String(sidebarVisible));
+
+  layoutActivityButton.innerHTML = titlebarIcon(activityVisible ? "layoutActivity" : "layoutActivityOff");
+  layoutActivityButton.title = `${activityVisible ? "Hide" : "Show"} Activity Bar`;
+  layoutActivityButton.setAttribute("aria-label", layoutActivityButton.title);
+  layoutActivityButton.setAttribute("aria-pressed", String(activityVisible));
+
+  layoutPanelButton.innerHTML = titlebarIcon(panelVisible ? "layoutPanel" : "layoutPanelOff");
+  layoutPanelButton.title = `${panelVisible ? "Hide" : "Show"} Panel`;
+  layoutPanelButton.setAttribute("aria-label", layoutPanelButton.title);
+  layoutPanelButton.setAttribute("aria-pressed", String(panelVisible));
 }
 
 titlebarBack.addEventListener("click", () => stepNavigation(-1));

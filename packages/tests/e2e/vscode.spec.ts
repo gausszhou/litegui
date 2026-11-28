@@ -271,20 +271,30 @@ test("title bar history and layout controls work", async ({ page }) => {
   await page.locator("#nav-forward").click();
   await expect(page.locator("#editor-tabs .lg-tabs__tab--selected .lg-tabs__tab-title")).toHaveText("package.json");
 
+  const sidebarIcon = await page.locator("#layout-sidebar").innerHTML();
   await page.locator("#layout-sidebar").click();
   await expect(page.locator("#app-shell")).toHaveClass(/sidebar-hidden/);
+  expect(await page.locator("#layout-sidebar").innerHTML()).not.toBe(sidebarIcon);
+  expect(await page.locator("#layout-sidebar").getAttribute("title")).toContain("Show");
   await page.locator("#layout-sidebar").click();
   await expect(page.locator("#app-shell")).not.toHaveClass(/sidebar-hidden/);
+  expect(await page.locator("#layout-sidebar").innerHTML()).toBe(sidebarIcon);
 
+  const panelIcon = await page.locator("#layout-panel").innerHTML();
   await page.locator("#layout-panel").click();
   await expect(page.locator("#terminal-drawer")).toBeVisible();
+  expect(await page.locator("#layout-panel").innerHTML()).not.toBe(panelIcon);
   await page.locator("#layout-panel").click();
   await expect(page.locator("#terminal-drawer")).toBeHidden();
+  expect(await page.locator("#layout-panel").innerHTML()).toBe(panelIcon);
 
+  const activityIcon = await page.locator("#layout-activity").innerHTML();
   await page.locator("#layout-activity").click();
   await expect(page.locator("#app-shell")).toHaveClass(/activity-hidden/);
+  expect(await page.locator("#layout-activity").innerHTML()).not.toBe(activityIcon);
   await page.locator("#layout-activity").click();
   await expect(page.locator("#app-shell")).not.toHaveClass(/activity-hidden/);
+  expect(await page.locator("#layout-activity").innerHTML()).toBe(activityIcon);
 
   await page.locator("#titlebar-account").click();
   await expect(page.locator(".app-menu-flyout__item", { hasText: "You are not signed in" })).toBeVisible();
