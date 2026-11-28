@@ -1227,6 +1227,10 @@ body {
   min-width: 240px;
 }
 
+.app-menu-flyout--app {
+  min-width: 300px;
+}
+
 .app-menu-flyout__item {
   position: relative;
   display: flex;

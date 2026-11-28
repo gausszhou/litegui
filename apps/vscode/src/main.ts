@@ -2275,11 +2275,11 @@ function openLauncherMenu(source: string, anchor: HTMLButtonElement, items: Flyo
     menu.style.left = `${Math.round(left)}px`;
     menu.style.top = `${Math.round(anchorRect.bottom + 4)}px`;
   } else if (anchor.closest(".app-activity__menu")) {
-    menu.classList.add("app-menu-flyout--titlebar");
+    menu.classList.add("app-menu-flyout--titlebar", "app-menu-flyout--app");
     const anchorRect = anchor.getBoundingClientRect();
     const activity = document.querySelector<HTMLElement>(".app-activity");
-    menu.style.left = `${Math.round(activity ? activity.getBoundingClientRect().right : 48)}px`;
-    menu.style.top = `${Math.round(anchorRect.bottom + 4)}px`;
+    menu.style.left = `${Math.round((activity ? activity.getBoundingClientRect().right : 48) + 4)}px`;
+    menu.style.top = `${Math.round(anchorRect.top)}px`;
   } else if (anchor.closest(".app-sidebar")) {
     menu.classList.add("app-menu-flyout--titlebar");
     const anchorRect = anchor.getBoundingClientRect();
@@ -2306,6 +2306,9 @@ function openLauncherMenu(source: string, anchor: HTMLButtonElement, items: Flyo
   flyoutRoot = menu;
   flyoutSource = source;
   anchor.setAttribute("aria-expanded", "true");
+  if (source === "app-menu") {
+    menu.querySelector<HTMLElement>(".app-menu-flyout__item:not(.app-menu-flyout__item--disabled)")?.focus();
+  }
 
   const dismiss = (event: MouseEvent) => {
     const target = event.target as HTMLElement | null;

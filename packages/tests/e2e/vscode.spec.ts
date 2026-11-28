@@ -107,6 +107,7 @@ test("activity menu opens the File submenu", async ({ page }) => {
   await page.locator("#activity-menu").click();
   const root = page.locator(".app-menu-flyout--root");
   await expect(root).toBeVisible();
+  await expect(root.locator(".app-menu-flyout__item").first()).toBeFocused();
   await expect(root.locator(".app-menu-flyout__label")).toHaveText([
     "File",
     "Edit",
@@ -117,6 +118,11 @@ test("activity menu opens the File submenu", async ({ page }) => {
     "Terminal",
     "Help"
   ]);
+
+  const menuBox = await root.boundingBox();
+  const headerBox = await page.locator(".app-sidebar .lg-panel__header").boundingBox();
+  expect(menuBox && headerBox).toBeTruthy();
+  expect(Math.abs((menuBox?.y ?? 0) - (headerBox?.y ?? 0))).toBeLessThanOrEqual(1);
 
   await root.locator(".app-menu-flyout__item", { hasText: "File" }).hover();
   const submenu = page.locator(".app-menu-flyout--submenu");
