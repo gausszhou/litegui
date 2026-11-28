@@ -860,6 +860,8 @@ tree.root.addEventListener(
 const editorTabs = new Tabs({ id: "editor-tabs" });
 editorTabs.root.classList.add("app-editor-tabs");
 editorStack.insertBefore(editorTabs.root, editorEmpty);
+// VS Code 的顺序是 Tab 栏 → 面包屑 → 编辑器，把面包屑放到 Tab 列表下方。
+editorTabs.root.insertBefore(breadcrumb, editorTabs.list.nextSibling);
 editorTabs.onchange = (id: string) => activateFile(id);
 
 /* status bar */

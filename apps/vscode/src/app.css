@@ -384,9 +384,11 @@ body {
 
 .app-sidebar .lg-panel__header {
   display: flex;
-  flex: 0 0 auto;
+  flex: 0 0 35px;
   align-items: center;
   gap: 4px;
+  height: 35px;
+  box-sizing: border-box;
   padding: 0 4px 0 8px;
   border-bottom: 1px solid var(--lg-color-border);
   background: var(--lg-color-header);
