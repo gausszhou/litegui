@@ -36,6 +36,7 @@
     "dev:lightcraft": "pnpm --filter @gausszhou/litegui-lightcraft dev",
     "dev:photocraft": "pnpm --filter @gausszhou/litegui-photocraft dev",
     "dev:filmcraft": "pnpm --filter @gausszhou/litegui-filmcraft dev",
+    "dev:cadcraft": "pnpm --filter @gausszhou/litegui-cadcraft dev",
     "dev:vscode": "pnpm --filter @gausszhou/litegui-vscode dev"
   },
   "devDependencies": {

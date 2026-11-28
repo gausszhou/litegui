@@ -7,6 +7,7 @@
  *   dist/vectorcraft/ apps/vectorcraft Illustrator 风格矢量设计工作台
  *   dist/lightcraft/  apps/lightcraft  照片图库与非破坏性显影工作台
  *   dist/filmcraft/  apps/filmcraft 视频剪辑器
+ *   dist/cadcraft/  apps/cadcraft CAD 制图工作台
  *   dist/docs/    VitePress 文档站 + Typedoc API（base 由 DOCS_BASE 决定，默认 /litegui/docs/）
  *   dist/index.html  站点入口页
  *   dist/.nojekyll   跳过 GitHub Pages 的 Jekyll 处理
@@ -38,6 +39,7 @@ run("pnpm --filter @gausszhou/litegui-photocraft build");
 run("pnpm --filter @gausszhou/litegui-vectorcraft build");
 run("pnpm --filter @gausszhou/litegui-lightcraft build");
 run("pnpm --filter @gausszhou/litegui-filmcraft build");
+run("pnpm --filter @gausszhou/litegui-cadcraft build");
 run("pnpm docs:build");
 
 writeFileSync(join(distDir, ".nojekyll"), "");
@@ -51,6 +53,7 @@ const expected = [
   join(distDir, "vectorcraft", "index.html"),
   join(distDir, "lightcraft", "index.html"),
   join(distDir, "filmcraft", "index.html"),
+  join(distDir, "cadcraft", "index.html"),
   join(distDir, "docs", "index.html")
 ];
 const missing = expected.filter(file => !existsSync(file));
@@ -62,6 +65,7 @@ if (missing.length) {
 
 console.log("\nPages 产物已生成：");
 console.log(`  vscode: ${join(distDir, "vscode")}`);
+console.log(`  cadcraft: ${join(distDir, "cadcraft")}`);
 console.log(`  docs:   ${join(distDir, "docs")}（base: ${docsBase}）`);
 console.log(`  root:   ${join(distDir, "index.html")}`);
 
@@ -158,6 +162,10 @@ function landingPage() {
         <a class="card" href="./filmcraft/">
           <strong>FilmCraft</strong>
           <span>非线性视频剪辑器：源/节目监视器、时间线、调色与导出</span>
+        </a>
+        <a class="card" href="./cadcraft/">
+          <strong>CADCraft</strong>
+          <span>CAD 制图：命令行、图层、标注与图纸空间</span>
         </a>
       </nav>
       <p class="meta">MIT License · <a href="https://github.com/gausszhou/litegui">GitHub</a></p>

@@ -174,7 +174,7 @@ importers:
         specifier: ^5.4.11
         version: 5.4.21(@types/node@22.20.7)(sass@1.108.2)
 
-  apps/lightcraft:
+  apps/cadcraft:
     dependencies:
       '@gausszhou/litegui-components':
         specifier: workspace:*
@@ -188,6 +188,19 @@ importers:
         version: 5.4.21(@types/node@22.20.7)(sass@1.108.2)
 
   apps/filmcraft:
+    dependencies:
+      '@gausszhou/litegui-components':
+        specifier: workspace:*
+        version: link:../../packages/components
+    devDependencies:
+      typescript:
+        specifier: ^5.8.3
+        version: 5.9.3
+      vite:
+        specifier: ^5.4.11
+        version: 5.4.21(@types/node@22.20.7)(sass@1.108.2)
+
+  apps/lightcraft:
     dependencies:
       '@gausszhou/litegui-components':
         specifier: workspace:*
