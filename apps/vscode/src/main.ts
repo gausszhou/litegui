@@ -13,7 +13,6 @@ import {
   ContextMenu,
   Dialog,
   HeaderBar,
-  Menu,
   Panel,
   SearchBox,
   StatusBar,
@@ -52,10 +51,21 @@ if (!app) throw new Error("#app missing");
 app.innerHTML = `
   <div class="app-shell" id="app-shell">
     <div class="app-titlebar" id="titlebar-host"></div>
-    <div class="app-menubar" id="menubar-host"></div>
 
     <div class="app-workbench">
       <div class="app-activity">
+        <button
+          type="button"
+          class="app-activity__menu"
+          id="activity-menu"
+          data-menu-anchor
+          title="Menu"
+          aria-label="Application Menu"
+          aria-haspopup="menu"
+          aria-expanded="false"
+        >
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
+        </button>
         <div class="app-activity__tools" id="activity-host"></div>
         <div class="app-activity__bottom">
           <button
@@ -717,33 +727,6 @@ commandCenter.addEventListener("click", event => {
   searchBox.input.focus();
 });
 
-/* menu bar */
-const menu = new Menu("app-menu");
-menu.add("File/New File", { callback: () => newFile() });
-menu.add("File/Save", { callback: () => saveActiveFile() });
-menu.add("File/Close Editor", { callback: () => activePath && closeFile(activePath) });
-menu.add("File/Open File", { callback: () => searchBox.input.focus() });
-menu.add("Edit/Undo", { callback: () => editCommand("undo") });
-menu.add("Edit/Redo", { callback: () => editCommand("redo") });
-menu.add("Edit/Find", { callback: () => searchBox.input.focus() });
-menu.add("Edit/Command Palette", { callback: () => openCommandPalette() });
-menu.add("Selection/Select All", { callback: () => selectAllActive() });
-menu.add("Selection/Expand Selection", {
-  callback: () => activeEditor()?.trigger("app", "editor.action.smartSelect.expand", null)
-});
-menu.add("View/Command Palette", { callback: () => openCommandPalette() });
-menu.add("View/Toggle Sidebar", { callback: () => toggleSidebar() });
-menu.add("View/Toggle Minimap", { callback: () => toggleMinimap() });
-menu.add("View/Toggle Theme", { callback: () => toggleTheme() });
-menu.add("Go/Go to File", { callback: () => searchBox.input.focus() });
-menu.add("Go/Next Editor", { callback: () => cycleEditor(1) });
-menu.add("Go/Previous Editor", { callback: () => cycleEditor(-1) });
-menu.add("Run/Run Current File", { callback: () => runCurrentFile() });
-menu.add("Run/Run Tests", { callback: () => runTests() });
-menu.add("Terminal/Toggle Terminal", { callback: () => toggleTerminal() });
-menu.add("Terminal/Clear Terminal", { callback: () => terminal.clear() });
-menu.add("Help/About LiteGUI VS Code", { callback: () => openAboutDialog() });
-document.querySelector<HTMLElement>("#menubar-host")!.appendChild(menu.root);
 
 /* activity bar */
 const activityIcons = {
@@ -776,6 +759,11 @@ const accountButton = document.querySelector<HTMLButtonElement>("#account-button
 const manageButton = document.querySelector<HTMLButtonElement>("#manage-button")!;
 accountButton.addEventListener("click", () => toggleLauncherMenu("account", accountButton, buildAccountMenu()));
 manageButton.addEventListener("click", () => toggleLauncherMenu("manage", manageButton, buildManageMenu()));
+
+const activityMenuButton = document.querySelector<HTMLButtonElement>("#activity-menu")!;
+activityMenuButton.addEventListener("click", () =>
+  toggleLauncherMenu("app-menu", activityMenuButton, buildAppMenu())
+);
 
 /* sidebar */
 const sidebarPanel = new Panel({ title: "Explorer", width: "100%", height: "100%", className: "app-sidebar-panel" });
@@ -2040,6 +2028,78 @@ function buildManageMenu(): FlyoutItem[] {
   ];
 }
 
+function buildAppMenu(): FlyoutItem[] {
+  return [
+    {
+      label: "File",
+      submenu: [
+        { label: "New Text File", action: () => newFile() },
+        { label: "New File…", action: () => newFile() },
+        { label: "Open File…", action: () => searchBox.input.focus() },
+        { separator: true },
+        { label: "Save", shortcut: "Ctrl+S", action: () => saveActiveFile() },
+        { label: "Close Editor", action: () => activePath && closeFile(activePath) }
+      ]
+    },
+    {
+      label: "Edit",
+      submenu: [
+        { label: "Undo", shortcut: "Ctrl+Z", action: () => editCommand("undo") },
+        { label: "Redo", shortcut: "Ctrl+Y", action: () => editCommand("redo") },
+        { separator: true },
+        { label: "Find", shortcut: "Ctrl+F", action: () => searchBox.input.focus() },
+        { label: "Command Palette…", shortcut: "Ctrl+Shift+P", action: () => openCommandPalette() }
+      ]
+    },
+    {
+      label: "Selection",
+      submenu: [
+        { label: "Select All", shortcut: "Ctrl+A", action: () => selectAllActive() },
+        {
+          label: "Expand Selection",
+          shortcut: "Shift+Alt+Right",
+          action: () => activeEditor()?.trigger("app", "editor.action.smartSelect.expand", null)
+        }
+      ]
+    },
+    {
+      label: "View",
+      submenu: [
+        { label: "Command Palette…", shortcut: "Ctrl+Shift+P", action: () => openCommandPalette() },
+        { label: "Toggle Sidebar", shortcut: "Ctrl+B", action: () => toggleSidebar() },
+        { label: "Toggle Minimap", action: () => toggleMinimap() },
+        { label: "Toggle Theme", action: () => toggleTheme() }
+      ]
+    },
+    {
+      label: "Go",
+      submenu: [
+        { label: "Go to File…", shortcut: "Ctrl+P", action: () => searchBox.input.focus() },
+        { label: "Next Editor", action: () => cycleEditor(1) },
+        { label: "Previous Editor", action: () => cycleEditor(-1) }
+      ]
+    },
+    {
+      label: "Run",
+      submenu: [
+        { label: "Run Current File", action: () => runCurrentFile() },
+        { label: "Run Tests", action: () => runTests() }
+      ]
+    },
+    {
+      label: "Terminal",
+      submenu: [
+        { label: "Toggle Terminal", shortcut: "Ctrl+`", action: () => toggleTerminal() },
+        { label: "Clear Terminal", action: () => terminal.clear() }
+      ]
+    },
+    {
+      label: "Help",
+      submenu: [{ label: "About LiteGUI VS Code", action: () => openAboutDialog() }]
+    }
+  ];
+}
+
 function buildSidebarMenu(): FlyoutItem[] {
   return [
     { label: "New File", action: () => newFile() },
@@ -2213,6 +2273,12 @@ function openLauncherMenu(source: string, anchor: HTMLButtonElement, items: Flyo
     const menuRect = menu.getBoundingClientRect();
     const left = Math.min(Math.max(8, anchorRect.right - menuRect.width), window.innerWidth - menuRect.width - 8);
     menu.style.left = `${Math.round(left)}px`;
+    menu.style.top = `${Math.round(anchorRect.bottom + 4)}px`;
+  } else if (anchor.closest(".app-activity__menu")) {
+    menu.classList.add("app-menu-flyout--titlebar");
+    const anchorRect = anchor.getBoundingClientRect();
+    const activity = document.querySelector<HTMLElement>(".app-activity");
+    menu.style.left = `${Math.round(activity ? activity.getBoundingClientRect().right : 48)}px`;
     menu.style.top = `${Math.round(anchorRect.bottom + 4)}px`;
   } else if (anchor.closest(".app-sidebar")) {
     menu.classList.add("app-menu-flyout--titlebar");

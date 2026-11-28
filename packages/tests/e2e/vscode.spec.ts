@@ -16,7 +16,9 @@ test("vscode boots the VS Code-style shell without errors", async ({ page }) => 
   await page.goto(VSCODE_URL, { waitUntil: "networkidle" });
 
   await expect(page).toHaveTitle("LiteGUI VS Code");
-  await expect(page.locator(".lg-menu__item")).toHaveText([
+  await expect(page.locator("#activity-menu")).toBeVisible();
+  await page.locator("#activity-menu").click();
+  await expect(page.locator(".app-menu-flyout--root .app-menu-flyout__label")).toHaveText([
     "File",
     "Edit",
     "Selection",
@@ -26,6 +28,7 @@ test("vscode boots the VS Code-style shell without errors", async ({ page }) => 
     "Terminal",
     "Help"
   ]);
+  await page.keyboard.press("Escape");
   await expect(page.locator(".lg-toolbar__tool")).toHaveCount(5);
   await expect(page.locator(".app-tree .ltreeitem")).toHaveCount(19);
   await expect(page.locator(".app-titlebar .lg-searchbox__input")).toBeVisible();
@@ -97,16 +100,37 @@ test("the editor accepts typing and tracks the cursor in the status bar", async 
   expect(errors).toEqual([]);
 });
 
-test("menu bar opens and closes the File menu", async ({ page }) => {
+test("activity menu opens the File submenu", async ({ page }) => {
   const errors = collectPageErrors(page);
   await page.goto(VSCODE_URL, { waitUntil: "networkidle" });
 
-  await page.locator(".lg-menu__item", { hasText: "File" }).click();
-  await expect(page.locator(".lg-menu__panel")).toBeVisible();
-  await expect(page.locator(".lg-menu__panel-item")).toHaveText(["New File", "Save", "Close Editor", "Open File"]);
+  await page.locator("#activity-menu").click();
+  const root = page.locator(".app-menu-flyout--root");
+  await expect(root).toBeVisible();
+  await expect(root.locator(".app-menu-flyout__label")).toHaveText([
+    "File",
+    "Edit",
+    "Selection",
+    "View",
+    "Go",
+    "Run",
+    "Terminal",
+    "Help"
+  ]);
 
-  await page.locator(".lg-menu__item", { hasText: "File" }).click();
-  await expect(page.locator(".lg-menu__panel")).toHaveCount(0);
+  await root.locator(".app-menu-flyout__item", { hasText: "File" }).hover();
+  const submenu = page.locator(".app-menu-flyout--submenu");
+  await expect(submenu).toBeVisible();
+  await expect(submenu.locator(".app-menu-flyout__label")).toHaveText([
+    "New Text File",
+    "New File…",
+    "Open File…",
+    "Save",
+    "Close Editor"
+  ]);
+
+  await page.keyboard.press("Escape");
+  await expect(root).toHaveCount(0);
   expect(errors).toEqual([]);
 });
 
