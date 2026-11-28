@@ -452,10 +452,157 @@ function countFiles(node: FsNode | null): number {
 
 const titlebar = new HeaderBar({ variant: "topbar" });
 
-const searchBox = new SearchBox("", { placeholder: "Search files" });
-searchBox.root.classList.add("app-title-search");
-titlebar.setCenter(searchBox.root);
+const TITLEBAR_ICONS = {
+  logo: '<path d="M23.15 2.587 18.21.21a1.494 1.494 0 0 0-1.705.29l-9.46 8.63-4.12-3.128a.999.999 0 0 0-1.276.057L.327 7.261A1 1 0 0 0 .326 8.74L3.899 12 .326 15.26a1 1 0 0 0 .001 1.479L1.65 17.94a.999.999 0 0 0 1.276.057l4.12-3.128 9.46 8.63a1.492 1.492 0 0 0 1.704.29l4.942-2.377A1.5 1.5 0 0 0 24 20.06V3.939a1.5 1.5 0 0 0-.85-1.352zm-5.146 14.861L10.826 12l7.178-5.448v10.896z"/>',
+  back: '<path d="M15 4 7 12l8 8"/>',
+  forward: '<path d="m9 4 8 8-8 8"/>',
+  chevronDown: '<path d="m6 9 6 6 6-6"/>',
+  chat:
+    '<path d="M20.5 11.5a8.5 8.5 0 0 1-12.3 7.6L4 20.5l1.4-4.4a8.5 8.5 0 1 1 15.1-4.6Z"/>' +
+    '<path d="M12.9 6.6 13.7 8.6 15.7 9.4 13.7 10.2 12.9 12.2 12.1 10.2 10.1 9.4 12.1 8.6Z" fill="currentColor" stroke="none"/>',
+  layoutSidebar:
+    '<rect x="3" y="4" width="18" height="16" rx="2"/><path d="M9 4v16"/><rect x="12.8" y="7.4" width="4.6" height="3.6" rx="1"/><rect x="12.8" y="13" width="4.6" height="3.6" rx="1"/>',
+  layoutActivity:
+    '<path d="M3 6a2 2 0 0 1 2-2h7v16H5a2 2 0 0 1-2-2z" fill="currentColor" stroke="none"/>' +
+    '<rect x="3" y="4" width="18" height="16" rx="2"/><path d="M12 4v16"/>',
+  layoutPanel: '<rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 14h18"/>',
+  layoutSplit: '<rect x="3" y="4" width="18" height="16" rx="2"/><path d="M12 4v16"/>'
+};
+
+function titlebarIcon(name: keyof typeof TITLEBAR_ICONS): string {
+  return `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${TITLEBAR_ICONS[name]}</svg>`;
+}
+
+function createTitlebarButton(className: string, label: string, html: string): HTMLButtonElement {
+  const button = document.createElement("button");
+  button.type = "button";
+  button.className = className;
+  button.setAttribute("aria-label", label);
+  button.title = label;
+  button.innerHTML = html;
+  return button;
+}
+
+const brandLogo = document.createElement("span");
+brandLogo.className = "app-titlebar__logo";
+brandLogo.title = "LiteGUI VS Code";
+brandLogo.innerHTML = `<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">${TITLEBAR_ICONS.logo}</svg>`;
+titlebar.setLeft(brandLogo);
+
+const searchBox = new SearchBox("", { placeholder: "LiteGUI VS Code" });
+searchBox.root.classList.add("app-command-center__field");
+
+const titlebarBack = createTitlebarButton("app-titlebar__icon-button", "Go Back", titlebarIcon("back"));
+titlebarBack.id = "nav-back";
+titlebarBack.disabled = true;
+
+const titlebarForward = createTitlebarButton("app-titlebar__icon-button", "Go Forward", titlebarIcon("forward"));
+titlebarForward.id = "nav-forward";
+titlebarForward.disabled = true;
+
+const commandCenter = document.createElement("div");
+commandCenter.className = "app-command-center";
+const commandDivider = document.createElement("span");
+commandDivider.className = "app-command-center__divider";
+const chatButton = createTitlebarButton("app-command-center__button", "Open Chat", titlebarIcon("chat"));
+const chatMenuButton = createTitlebarButton(
+  "app-command-center__button app-command-center__more",
+  "Chat options",
+  titlebarIcon("chevronDown")
+);
+chatMenuButton.setAttribute("data-menu-anchor", "");
+chatMenuButton.setAttribute("aria-haspopup", "menu");
+chatMenuButton.setAttribute("aria-expanded", "false");
+commandCenter.append(searchBox.root, commandDivider, chatButton, chatMenuButton);
+
+const avatarButton = document.createElement("button");
+avatarButton.type = "button";
+avatarButton.className = "app-titlebar__avatar";
+avatarButton.id = "titlebar-account";
+avatarButton.setAttribute("data-menu-anchor", "");
+avatarButton.setAttribute("aria-label", "Accounts");
+avatarButton.setAttribute("aria-haspopup", "menu");
+avatarButton.setAttribute("aria-expanded", "false");
+avatarButton.title = "Accounts";
+
+const titlebarCenter = document.createElement("div");
+titlebarCenter.className = "app-titlebar__center";
+titlebarCenter.append(titlebarBack, titlebarForward, commandCenter, avatarButton);
+titlebar.setCenter(titlebarCenter);
+
+const layoutSidebarButton = createTitlebarButton(
+  "app-titlebar__layout",
+  "Toggle Primary Side Bar",
+  titlebarIcon("layoutSidebar")
+);
+layoutSidebarButton.id = "layout-sidebar";
+const layoutActivityButton = createTitlebarButton(
+  "app-titlebar__layout",
+  "Toggle Activity Bar",
+  titlebarIcon("layoutActivity")
+);
+layoutActivityButton.id = "layout-activity";
+const layoutPanelButton = createTitlebarButton("app-titlebar__layout", "Toggle Panel", titlebarIcon("layoutPanel"));
+layoutPanelButton.id = "layout-panel";
+const layoutMinimapButton = createTitlebarButton("app-titlebar__layout", "Toggle Minimap", titlebarIcon("layoutSplit"));
+layoutMinimapButton.id = "layout-minimap";
+titlebar.setRight([layoutSidebarButton, layoutActivityButton, layoutPanelButton, layoutMinimapButton]);
+
 document.querySelector<HTMLElement>("#titlebar-host")!.appendChild(titlebar.root);
+
+/* title bar history navigation + layout state */
+const navigationHistory: string[] = [];
+let navigationIndex = -1;
+
+function updateNavButtons(): void {
+  titlebarBack.disabled = navigationIndex <= 0;
+  titlebarForward.disabled = navigationIndex >= navigationHistory.length - 1;
+}
+
+function pushNavigation(path: string): void {
+  if (navigationIndex >= 0 && navigationHistory[navigationIndex] === path) {
+    updateNavButtons();
+    return;
+  }
+  navigationHistory.splice(navigationIndex + 1);
+  navigationHistory.push(path);
+  if (navigationHistory.length > 80) navigationHistory.shift();
+  navigationIndex = navigationHistory.length - 1;
+  updateNavButtons();
+}
+
+function stepNavigation(delta: number): void {
+  let next = navigationIndex + delta;
+  while (next >= 0 && next < navigationHistory.length && !findFile(navigationHistory[next])) {
+    next += delta;
+  }
+  if (next < 0 || next >= navigationHistory.length) return;
+  navigationIndex = next;
+  openFile(navigationHistory[next]);
+  updateNavButtons();
+}
+
+function syncTitlebarControls(): void {
+  layoutSidebarButton.setAttribute("aria-pressed", String(!shell.classList.contains("sidebar-hidden")));
+  layoutActivityButton.setAttribute("aria-pressed", String(!shell.classList.contains("activity-hidden")));
+  layoutPanelButton.setAttribute("aria-pressed", String(!terminalDrawer.hidden));
+  layoutMinimapButton.setAttribute("aria-pressed", String(minimapEnabled));
+}
+
+titlebarBack.addEventListener("click", () => stepNavigation(-1));
+titlebarForward.addEventListener("click", () => stepNavigation(1));
+layoutSidebarButton.addEventListener("click", () => toggleSidebar());
+layoutActivityButton.addEventListener("click", () => toggleActivityBar());
+layoutPanelButton.addEventListener("click", () => toggleTerminal());
+layoutMinimapButton.addEventListener("click", () => toggleMinimap());
+chatButton.addEventListener("click", () => showToast("Chat is not available in this demo."));
+chatMenuButton.addEventListener("click", () => toggleLauncherMenu("chat", chatMenuButton, buildChatMenu()));
+avatarButton.addEventListener("click", () => toggleLauncherMenu("titlebar-account", avatarButton, buildAccountMenu()));
+commandCenter.addEventListener("click", event => {
+  const target = event.target as HTMLElement;
+  if (target.closest(".app-command-center__button")) return;
+  searchBox.input.focus();
+});
 
 /* menu bar */
 const menu = new Menu("app-menu");
@@ -1086,6 +1233,7 @@ function activateFile(path: string): void {
   record.editor.layout();
   updateStatusForEditor(record.editor);
   highlightTreeFile(path);
+  pushNavigation(path);
 }
 
 function closeFile(path: string): void {
@@ -1200,6 +1348,7 @@ function copyPath(path: string): void {
 
 function setTerminalOpen(open: boolean): void {
   terminalDrawer.hidden = !open;
+  syncTitlebarControls();
   if (open) terminal.$input.focus();
 }
 
@@ -1367,11 +1516,18 @@ palette.querySelectorAll<HTMLElement>("[data-close]").forEach(element => {
 
 function toggleSidebar(): void {
   shell.classList.toggle("sidebar-hidden");
+  syncTitlebarControls();
+}
+
+function toggleActivityBar(): void {
+  shell.classList.toggle("activity-hidden");
+  syncTitlebarControls();
 }
 
 function toggleMinimap(): void {
   minimapEnabled = !minimapEnabled;
   openTabs.forEach(record => record.editor.updateOptions({ minimap: { enabled: minimapEnabled } }));
+  syncTitlebarControls();
   showToast(minimapEnabled ? "Minimap enabled" : "Minimap disabled");
 }
 
@@ -1512,6 +1668,16 @@ function buildManageMenu(): FlyoutItem[] {
   ];
 }
 
+function buildChatMenu(): FlyoutItem[] {
+  return [
+    { label: "Open Chat", action: () => showToast("Chat is not available in this demo.") },
+    { label: "Inline Chat", action: () => showToast("Inline Chat is not available in this demo.") },
+    { label: "New Chat", action: () => showToast("New chat (demo)") },
+    { separator: true },
+    { label: "Chat Settings…", action: () => openSettings() }
+  ];
+}
+
 function buildAccountMenu(): FlyoutItem[] {
   return [
     { label: "You are not signed in", disabled: true },
@@ -1635,8 +1801,9 @@ function closeLauncherMenu(): void {
   flyoutSource = null;
   flyoutCleanup?.();
   flyoutCleanup = null;
-  accountButton.setAttribute("aria-expanded", "false");
-  manageButton.setAttribute("aria-expanded", "false");
+  document.querySelectorAll<HTMLElement>("[data-menu-anchor]").forEach(element => {
+    element.setAttribute("aria-expanded", "false");
+  });
 }
 
 function openLauncherMenu(source: string, anchor: HTMLButtonElement, items: FlyoutItem[]): void {
@@ -1645,12 +1812,21 @@ function openLauncherMenu(source: string, anchor: HTMLButtonElement, items: Flyo
   const menu = buildFlyout(items, 1);
   document.body.appendChild(menu);
 
-  const activity = document.querySelector<HTMLElement>(".app-activity");
-  const status = document.querySelector<HTMLElement>(".app-status");
-  const left = activity ? activity.getBoundingClientRect().right : 48;
-  const bottom = status ? window.innerHeight - status.getBoundingClientRect().top : 26;
-  menu.style.left = `${Math.round(left)}px`;
-  menu.style.bottom = `${Math.round(bottom)}px`;
+  if (anchor.closest(".app-titlebar")) {
+    menu.classList.add("app-menu-flyout--titlebar");
+    const anchorRect = anchor.getBoundingClientRect();
+    const menuRect = menu.getBoundingClientRect();
+    const left = Math.min(Math.max(8, anchorRect.right - menuRect.width), window.innerWidth - menuRect.width - 8);
+    menu.style.left = `${Math.round(left)}px`;
+    menu.style.top = `${Math.round(anchorRect.bottom + 4)}px`;
+  } else {
+    const activity = document.querySelector<HTMLElement>(".app-activity");
+    const status = document.querySelector<HTMLElement>(".app-status");
+    const left = activity ? activity.getBoundingClientRect().right : 48;
+    const bottom = status ? window.innerHeight - status.getBoundingClientRect().top : 26;
+    menu.style.left = `${Math.round(left)}px`;
+    menu.style.bottom = `${Math.round(bottom)}px`;
+  }
 
   flyoutRoot = menu;
   flyoutSource = source;
@@ -1797,3 +1973,4 @@ document.addEventListener("keydown", event => {
 
 setSidebarView("explorer");
 openFile("src/main.ts");
+syncTitlebarControls();

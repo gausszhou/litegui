@@ -29,6 +29,9 @@ test("vscode boots the VS Code-style shell without errors", async ({ page }) => 
   await expect(page.locator(".lg-toolbar__tool")).toHaveCount(5);
   await expect(page.locator(".app-tree .ltreeitem")).toHaveCount(19);
   await expect(page.locator(".app-titlebar .lg-searchbox__input")).toBeVisible();
+  await expect(page.locator("#nav-back")).toBeDisabled();
+  await expect(page.locator("#nav-forward")).toBeDisabled();
+  await expect(page.locator(".app-titlebar__layout")).toHaveCount(4);
 
   await expect(page.locator("#editor-tabs .lg-tabs__tab")).toHaveCount(1);
   await expect(page.locator("#editor-tabs .lg-tabs__tab--selected .lg-tabs__tab-title")).toHaveText("main.ts");
@@ -220,5 +223,43 @@ test("the bottom-left Manage menu mirrors the VS Code manage flyout", async ({ p
   await page.keyboard.press("ArrowDown");
   await page.keyboard.press("Enter");
   await expect(page.locator("#command-palette")).toBeVisible();
+  expect(errors).toEqual([]);
+});
+
+test("title bar history and layout controls work", async ({ page }) => {
+  const errors = collectPageErrors(page);
+  await page.goto(VSCODE_URL, { waitUntil: "networkidle" });
+
+  await page.locator(".app-tree .ltreeitem", { hasText: "package.json" }).click();
+  await expect(page.locator("#editor-tabs .lg-tabs__tab--selected .lg-tabs__tab-title")).toHaveText("package.json");
+  await expect(page.locator("#nav-back")).toBeEnabled();
+
+  await page.locator("#nav-back").click();
+  await expect(page.locator("#editor-tabs .lg-tabs__tab--selected .lg-tabs__tab-title")).toHaveText("main.ts");
+  await expect(page.locator("#nav-forward")).toBeEnabled();
+
+  await page.locator("#nav-forward").click();
+  await expect(page.locator("#editor-tabs .lg-tabs__tab--selected .lg-tabs__tab-title")).toHaveText("package.json");
+
+  await page.locator("#layout-sidebar").click();
+  await expect(page.locator("#app-shell")).toHaveClass(/sidebar-hidden/);
+  await page.locator("#layout-sidebar").click();
+  await expect(page.locator("#app-shell")).not.toHaveClass(/sidebar-hidden/);
+
+  await page.locator("#layout-panel").click();
+  await expect(page.locator("#terminal-drawer")).toBeVisible();
+  await page.locator("#layout-panel").click();
+  await expect(page.locator("#terminal-drawer")).toBeHidden();
+
+  await page.locator("#layout-activity").click();
+  await expect(page.locator("#app-shell")).toHaveClass(/activity-hidden/);
+  await page.locator("#layout-activity").click();
+  await expect(page.locator("#app-shell")).not.toHaveClass(/activity-hidden/);
+
+  await page.locator("#titlebar-account").click();
+  await expect(page.locator(".app-menu-flyout__item", { hasText: "You are not signed in" })).toBeVisible();
+  await page.keyboard.press("Escape");
+  await expect(page.locator(".app-menu-flyout")).toHaveCount(0);
+
   expect(errors).toEqual([]);
 });
