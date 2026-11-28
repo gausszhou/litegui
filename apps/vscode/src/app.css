@@ -65,7 +65,7 @@ body {
   place-items: center;
   width: 44px;
   height: 100%;
-  color: var(--lg-color-accent-hover, #5885c8);
+  color: #3794ff;
 }
 
 .app-titlebar__logo svg {
