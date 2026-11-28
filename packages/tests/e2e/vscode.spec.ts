@@ -302,6 +302,12 @@ test("explorer mirrors VS Code file tree chrome", async ({ page }) => {
   await expect(page.locator(".app-timeline__body")).toBeVisible();
   await expect(page.locator(".app-timeline__item")).toHaveCount(3);
 
+  const srcRow = page.locator('[data-item_id="dir:src"]');
+  await srcRow.click();
+  await expect(page.locator('[data-item_id="dir:src/components"]')).toBeHidden();
+  await srcRow.click();
+  await expect(page.locator('[data-item_id="dir:src/components"]')).toBeVisible();
+
   await page.locator('.app-tree-action[data-tree-action="new-file"]').click();
   await expect(page.locator("#editor-tabs .lg-tabs__tab--selected .lg-tabs__tab-title")).toContainText("untitled-1.ts");
   await expect(page.locator(".app-tree .ltreeitem")).toHaveCount(20);

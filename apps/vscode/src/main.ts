@@ -853,6 +853,14 @@ tree.root.addEventListener(
       event.preventDefault();
       event.stopPropagation();
       toggleFolder(caret.dataset.folderPath ?? "");
+      return;
+    }
+    const row = target.closest?.(".ltreeitem") as HTMLElement | null;
+    const itemId = row?.dataset.item_id ?? "";
+    if (itemId.startsWith("dir:")) {
+      // 让 Tree 先处理选中，再切换目录展开状态（与 VS Code 单击目录行一致）。
+      const folderPath = itemId === "dir:root" ? "" : itemId.slice(4);
+      window.setTimeout(() => toggleFolder(folderPath), 0);
     }
   },
   true
