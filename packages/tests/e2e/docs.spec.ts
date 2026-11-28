@@ -44,6 +44,29 @@ test("component gallery lists all entry pages", async ({ page }) => {
   await expect(page.locator(".component-card")).toHaveCount(COMPONENT_PAGES.length);
 });
 
+test("complex-list demo shows item titles and selects on click", async ({ page }) => {
+  await page.goto(`${DOCS_URL}components/complex-list`);
+  await expect(page.locator(".lg-demo-loading")).toHaveCount(0, { timeout: 15_000 });
+
+  const titles = page.locator(".lg-demo .lg-complex-list__item-title");
+  await expect(titles).toHaveText(["背景", "角色", "特效"]);
+  await expect(page.locator(".lg-demo .lg-complex-list__tick")).toHaveCount(3);
+
+  await page.locator(".lg-demo .lg-complex-list > span").nth(1).click();
+  await expect(page.locator(".lg-demo .doc-demo-hint")).toContainText("角色");
+  await expect(page.locator(".lg-demo .lg-complex-list > span.lg-is-selected")).toHaveCount(1);
+});
+
+test("dragger demo commits typed values on Enter", async ({ page }) => {
+  await page.goto(`${DOCS_URL}components/dragger`);
+  await expect(page.locator(".lg-demo-loading")).toHaveCount(0, { timeout: 15_000 });
+
+  const input = page.locator(".lg-demo input").first();
+  await input.fill("3.5");
+  await input.press("Enter");
+  await expect(page.locator(".lg-demo .doc-demo-hint")).toContainText("3.5");
+});
+
 test("menu demo opens a submenu aligned with its parent item", async ({ page }) => {
   await page.goto(`${DOCS_URL}components/menu`);
   await page.locator(".lg-demo .lg-menu__item", { hasText: "文件" }).click();

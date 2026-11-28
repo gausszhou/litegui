@@ -8,7 +8,7 @@ export default defineConfig({
     strictPort: true
   },
   build: {
-    outDir: "../../dist/coder",
+    outDir: "../../dist/vscode",
     emptyOutDir: true
   }
 });

@@ -13,8 +13,7 @@ description: monorepo 中各个包的职责、产物与引入方式
 | `packages/components` | `@gausszhou/litegui-components` | 全部组件（含标记为 experimental 的 `Inspector`、`Tree`）、`LiteGUI` 命名空间、按组件子路径入口、全局样式 |
 | `packages/elements`   | `@gausszhou/litegui-elements`   | 可选 Web Components 适配层；Shadow DOM、`tokens.css`、按元素子路径入口                                   |
 | `packages/tests`      | `@gausszhou/litegui-tests`      | 私有：Vitest + Playwright 测试与基准                                                                     |
-| `apps/coder`          | `@gausszhou/litegui-coder`      | 私有：VS Code 风格代码编辑器                                                                                           |
-| `apps/editor`         | `@gausszhou/litegui-editor`     | 私有：综合示例                                                                                           |
+| `apps/vscode`         | `@gausszhou/litegui-vscode`     | 私有：VS Code 风格代码编辑器                                                                                           |
 
 ## 依赖关系
 

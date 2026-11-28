@@ -14,8 +14,7 @@
     "e2e",
     "vite.config.ts",
     "playwright.config.ts",
-    "../../apps/coder/src",
-    "../../apps/editor/src",
+    "../../apps/vscode/src",
     "../../apps/blender/src"
   ]
 }

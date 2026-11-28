@@ -1,8 +1,7 @@
 import { defineConfig, devices } from "@playwright/test";
 
-// coder / editor / blender / photocraft 各自是独立 app，分别起 dev server。
-const CODER_URL = process.env.LITEGUI_CODER_URL ?? "http://127.0.0.1:5173/";
-const EDITOR_URL = process.env.LITEGUI_EDITOR_URL ?? "http://127.0.0.1:5174/";
+// vscode / blender / photocraft 各自是独立 app，分别起 dev server。
+const VSCODE_URL = process.env.LITEGUI_VSCODE_URL ?? "http://127.0.0.1:5173/";
 const BLENDER_URL = process.env.LITEGUI_BLENDER_URL ?? "http://127.0.0.1:5175/";
 const PHOTOCRAFT_URL = process.env.LITEGUI_PHOTOCRAFT_URL ?? "http://127.0.0.1:5176/";
 const DOCS_URL = process.env.LITEGUI_DOCS_URL ?? "http://127.0.0.1:5178/litegui/docs/";
@@ -18,14 +17,8 @@ export default defineConfig({
   },
   webServer: [
     {
-      command: "pnpm --filter @gausszhou/litegui-coder dev",
-      url: CODER_URL,
-      reuseExistingServer: true,
-      timeout: 120_000,
-    },
-    {
-      command: "pnpm --filter @gausszhou/litegui-editor dev",
-      url: EDITOR_URL,
+      command: "pnpm --filter @gausszhou/litegui-vscode dev",
+      url: VSCODE_URL,
       reuseExistingServer: true,
       timeout: 120_000,
     },

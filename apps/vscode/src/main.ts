@@ -1,6 +1,12 @@
 // @ts-nocheck
 import "@gausszhou/litegui-components/style.css";
 import "./app.css";
+import * as monaco from "monaco-editor";
+import editorWorker from "monaco-editor/editor/editor.worker.js?worker";
+import jsonWorker from "monaco-editor/language/json/json.worker.js?worker";
+import cssWorker from "monaco-editor/language/css/css.worker.js?worker";
+import htmlWorker from "monaco-editor/language/html/html.worker.js?worker";
+import tsWorker from "monaco-editor/language/typescript/ts.worker.js?worker";
 import {
   Button,
   Console,
@@ -12,10 +18,29 @@ import {
   SearchBox,
   StatusBar,
   Tabs,
-  TextEditor,
   Toolbar,
   Tree
 } from "@gausszhou/litegui-components";
+
+self.MonacoEnvironment = {
+  getWorker(_workerId: string, label: string) {
+    if (label === "json") return new jsonWorker();
+    if (label === "css" || label === "scss" || label === "less") return new cssWorker();
+    if (label === "html" || label === "handlebars" || label === "razor") return new htmlWorker();
+    if (label === "typescript" || label === "javascript") return new tsWorker();
+    return new editorWorker();
+  }
+};
+
+// The demo project lives in memory only, so module resolution diagnostics are noise.
+monaco.typescript.typescriptDefaults.setDiagnosticsOptions({
+  noSemanticValidation: true,
+  noSyntaxValidation: false
+});
+monaco.typescript.javascriptDefaults.setDiagnosticsOptions({
+  noSemanticValidation: true,
+  noSyntaxValidation: false
+});
 
 /* ------------------------------------------------------------------ */
 /* shell                                                               */
@@ -30,7 +55,35 @@ app.innerHTML = `
     <div class="app-menubar" id="menubar-host"></div>
 
     <div class="app-workbench">
-      <div class="app-activity" id="activity-host"></div>
+      <div class="app-activity">
+        <div class="app-activity__tools" id="activity-host"></div>
+        <div class="app-activity__bottom">
+          <button
+            type="button"
+            class="app-activity__action"
+            id="account-button"
+            data-menu-anchor
+            title="Accounts"
+            aria-label="Accounts"
+            aria-haspopup="menu"
+            aria-expanded="false"
+          >
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="10" r="3"/><path d="M5.6 18.2a7.6 7.6 0 0 1 12.8 0"/></svg>
+          </button>
+          <button
+            type="button"
+            class="app-activity__action"
+            id="manage-button"
+            data-menu-anchor
+            title="Manage"
+            aria-label="Manage"
+            aria-haspopup="menu"
+            aria-expanded="false"
+          >
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09a1.65 1.65 0 0 0-1.08-1.51 1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09a1.65 1.65 0 0 0 1.51-1.08 1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33h.08a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51h.08a1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82v.08a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+          </button>
+        </div>
+      </div>
       <aside class="app-sidebar" id="sidebar-host"></aside>
 
       <main class="app-editor-area">
@@ -38,12 +91,11 @@ app.innerHTML = `
         <div class="app-editor-main">
           <div class="app-editor-stack" id="editor-stack">
             <div class="app-editor-empty" id="editor-empty">
-              <strong>LiteGUI Code</strong>
+              <strong>LiteGUI VS Code</strong>
               <span>Open a file from the Explorer</span>
               <span>Press Ctrl+Shift+P for commands</span>
             </div>
           </div>
-          <aside class="app-minimap"><pre id="minimap"></pre></aside>
         </div>
       </main>
     </div>
@@ -73,7 +125,6 @@ const shell = document.querySelector<HTMLElement>("#app-shell")!;
 const breadcrumb = document.querySelector<HTMLElement>("#breadcrumb")!;
 const editorStack = document.querySelector<HTMLElement>("#editor-stack")!;
 const editorEmpty = document.querySelector<HTMLElement>("#editor-empty")!;
-const minimap = document.querySelector<HTMLElement>("#minimap")!;
 const terminalDrawer = document.querySelector<HTMLElement>("#terminal-drawer")!;
 
 /* ------------------------------------------------------------------ */
@@ -105,7 +156,7 @@ function dir(name: string, children: FsNode[]): FsFolder {
   return { kind: "folder", name, path: "", children };
 }
 
-const project: FsFolder = dir("LITEGUI-CODE", [
+const project: FsFolder = dir("LITEGUI-VSCODE", [
   dir("src", [
     dir("components", [
       file(
@@ -229,7 +280,7 @@ app.start();
 <html lang="en">
   <head>
     <meta charset="utf-8" />
-    <title>LiteGUI Code</title>
+    <title>LiteGUI VS Code</title>
   </head>
   <body>
     <div id="app"></div>
@@ -264,7 +315,7 @@ app.start();
   file(
     "README.md",
     "Markdown",
-    `# LiteGUI Code
+    `# LiteGUI VS Code
 
 A VS Code-style code editor built with LiteGUI components.
 
@@ -287,7 +338,7 @@ A VS Code-style code editor built with LiteGUI components.
     "package.json",
     "JSON",
     `{
-  "name": "litegui-code",
+  "name": "litegui-vscode",
   "version": "1.0.0",
   "private": true,
   "type": "module",
@@ -401,22 +452,9 @@ function countFiles(node: FsNode | null): number {
 
 const titlebar = new HeaderBar({ variant: "topbar" });
 
-const brandIcon = document.createElement("span");
-brandIcon.className = "app-brand-icon";
-brandIcon.innerHTML =
-  '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M8 4 2 12l6 8"/><path d="m16 4 6 8-6 8"/></svg>';
-const brandTitle = document.createElement("span");
-brandTitle.className = "app-brand-title";
-brandTitle.textContent = "LiteGUI Code";
-titlebar.setLeft([brandIcon, brandTitle]);
-
 const searchBox = new SearchBox("", { placeholder: "Search files" });
 searchBox.root.classList.add("app-title-search");
 titlebar.setCenter(searchBox.root);
-
-const commandsButton = new Button("Commands", { callback: () => openCommandPalette() });
-const themeButton = new Button("Light theme", { callback: () => toggleTheme() });
-titlebar.setRight([commandsButton.root, themeButton.root]);
 document.querySelector<HTMLElement>("#titlebar-host")!.appendChild(titlebar.root);
 
 /* menu bar */
@@ -429,8 +467,10 @@ menu.add("Edit/Undo", { callback: () => editCommand("undo") });
 menu.add("Edit/Redo", { callback: () => editCommand("redo") });
 menu.add("Edit/Find", { callback: () => searchBox.input.focus() });
 menu.add("Edit/Command Palette", { callback: () => openCommandPalette() });
-menu.add("Selection/Select All", { callback: () => activeEditor()?.textarea.select() });
-menu.add("Selection/Expand Selection", { callback: () => activeEditor()?.textarea.select() });
+menu.add("Selection/Select All", { callback: () => selectAllActive() });
+menu.add("Selection/Expand Selection", {
+  callback: () => activeEditor()?.trigger("app", "editor.action.smartSelect.expand", null)
+});
 menu.add("View/Command Palette", { callback: () => openCommandPalette() });
 menu.add("View/Toggle Sidebar", { callback: () => toggleSidebar() });
 menu.add("View/Toggle Minimap", { callback: () => toggleMinimap() });
@@ -442,7 +482,7 @@ menu.add("Run/Run Current File", { callback: () => runCurrentFile() });
 menu.add("Run/Run Tests", { callback: () => runTests() });
 menu.add("Terminal/Toggle Terminal", { callback: () => toggleTerminal() });
 menu.add("Terminal/Clear Terminal", { callback: () => terminal.clear() });
-menu.add("Help/About LiteGUI Code", { callback: () => openAboutDialog() });
+menu.add("Help/About LiteGUI VS Code", { callback: () => openAboutDialog() });
 document.querySelector<HTMLElement>("#menubar-host")!.appendChild(menu.root);
 
 /* activity bar */
@@ -470,6 +510,12 @@ const activityBar = new Toolbar({
 });
 activityBar.on("change", id => setSidebarView(String(id)));
 document.querySelector<HTMLElement>("#activity-host")!.appendChild(activityBar.root);
+
+/* bottom-left launcher buttons (Accounts / Manage) */
+const accountButton = document.querySelector<HTMLButtonElement>("#account-button")!;
+const manageButton = document.querySelector<HTMLButtonElement>("#manage-button")!;
+accountButton.addEventListener("click", () => toggleLauncherMenu("account", accountButton, buildAccountMenu()));
+manageButton.addEventListener("click", () => toggleLauncherMenu("manage", manageButton, buildManageMenu()));
 
 /* sidebar */
 const sidebarPanel = new Panel({ title: "Explorer", width: "100%", height: "100%", className: "app-sidebar-panel" });
@@ -501,20 +547,137 @@ editorStack.insertBefore(editorTabs.root, editorEmpty);
 editorTabs.onchange = (id: string) => activateFile(id);
 
 /* status bar */
-const statusBar = new StatusBar({ left: "main" });
-const statusErrors = statusItem("0 errors");
-const statusWarnings = statusItem("0 warnings");
-const statusPosition = statusItem("Ln 1, Col 1");
-const statusEncoding = statusItem("UTF-8");
-const statusLanguage = statusItem("Plain Text");
-statusBar.setRight([statusErrors, statusWarnings, statusPosition, statusEncoding, statusLanguage]);
+const statusBar = new StatusBar();
 document.querySelector<HTMLElement>("#status-host")!.appendChild(statusBar.root);
+statusBar.leftElement.classList.add("app-status__left");
+statusBar.rightElement.classList.add("app-status__right");
+
+const STATUS_ICONS = {
+  remote: '<path d="m9 5-5 4 5 4"/><path d="m15 5 5 4-5 4"/>',
+  branch:
+    '<circle cx="6" cy="5" r="2"/><circle cx="6" cy="19" r="2"/><circle cx="18" cy="7" r="2"/><path d="M6 7v10M18 9v2a4 4 0 0 1-4 4H9"/>',
+  sync: '<path d="M20 11a8 8 0 0 0-14.9-3"/><path d="M4 4v4h4"/><path d="M4 13a8 8 0 0 0 14.9 3"/><path d="M20 20v-4h-4"/>',
+  error: '<circle cx="12" cy="12" r="9"/><path d="m9 9 6 6M15 9l-6 6"/>',
+  warning: '<path d="M12 3 2.5 20h19z"/><path d="M12 9.5v4.5"/><path d="M12 18v.01"/>',
+  layout:
+    '<rect x="3" y="3" width="8" height="8" rx="1"/><rect x="13" y="3" width="8" height="8" rx="1"/><rect x="3" y="13" width="8" height="8" rx="1"/><rect x="13" y="13" width="8" height="8" rx="1"/>',
+  formatter: '<path d="m5 19 .8-3.2L16.6 5a2.1 2.1 0 0 1 3 3L8.8 18.8z"/><path d="m14.8 6.8 2.9 2.9"/>',
+  bell: '<path d="M18 8a6 6 0 1 0-12 0c0 6-3 7-3 9h18c0-2-3-3-3-9"/><path d="M10 21h4"/>'
+};
+
+function statusIcon(name: keyof typeof STATUS_ICONS): string {
+  return `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">${STATUS_ICONS[name]}</svg>`;
+}
 
 function statusItem(text: string): HTMLElement {
   const element = document.createElement("span");
-  element.className = "lg-status-bar__item";
+  element.className = "app-status__item";
   element.textContent = text;
   return element;
+}
+
+function statusIconItem(name: keyof typeof STATUS_ICONS, label: string, title: string): HTMLElement {
+  const element = document.createElement("span");
+  element.className = "app-status__item";
+  element.title = title;
+  element.innerHTML = `<span class="app-status__icon">${statusIcon(name)}</span>`;
+  if (label) {
+    const text = document.createElement("span");
+    text.className = "app-status__label";
+    text.textContent = label;
+    element.appendChild(text);
+  }
+  return element;
+}
+
+const remoteItem = statusIconItem("remote", "", "Open a Remote Window");
+remoteItem.classList.add("app-status__item--remote");
+
+const branchLabel = document.createElement("span");
+branchLabel.className = "app-status__branch-name";
+branchLabel.textContent = "master";
+
+const branchItem = document.createElement("span");
+branchItem.className = "app-status__item";
+branchItem.title = "Git branch: master";
+branchItem.innerHTML = `<span class="app-status__icon">${statusIcon("branch")}</span>`;
+branchItem.appendChild(branchLabel);
+
+const syncItem = statusIconItem("sync", "", "Synchronize Changes");
+const errorsItem = statusIconItem("error", "0", "No errors");
+const warningsItem = statusIconItem("warning", "0", "No warnings");
+const gitGraphItem = statusItem("Git Graph");
+gitGraphItem.title = "Git Graph";
+const remoteNameItem = statusItem("LiteGUI Dev Space: local");
+remoteNameItem.title = "Remote environment";
+
+statusBar.leftElement.append(remoteItem, branchItem, syncItem, errorsItem, warningsItem, gitGraphItem, remoteNameItem);
+
+const statusPosition = statusItem("Ln 1, Col 1");
+const statusSpaces = statusItem("Spaces: 2");
+const statusEncoding = statusItem("UTF-8");
+const statusEol = statusItem("LF");
+
+const statusLanguage = document.createElement("span");
+statusLanguage.className = "app-status__item";
+statusLanguage.title = "Select language mode";
+statusLanguage.innerHTML =
+  '<span class="app-status__icon app-status__lang-icon"></span><span class="app-status__label"></span>';
+
+const LANGUAGE_ICONS: Record<string, string> = {
+  JSON: "{}",
+  TypeScript: "TS",
+  JavaScript: "JS",
+  CSS: "#",
+  HTML: "<>",
+  XML: "<>",
+  Markdown: "M↓",
+  "Plain Text": "TXT"
+};
+
+function setStatusLanguage(language: string): void {
+  const icon = statusLanguage.querySelector<HTMLElement>(".app-status__lang-icon")!;
+  const label = statusLanguage.querySelector<HTMLElement>(".app-status__label")!;
+  icon.textContent = LANGUAGE_ICONS[language] ?? "TXT";
+  label.textContent = language;
+}
+setStatusLanguage("Plain Text");
+
+const layoutItem = statusIconItem("layout", "", "Layout controls");
+const formatterItem = statusIconItem("formatter", "Prettier", "Format document");
+const bellItem = statusIconItem("bell", "", "Notifications");
+
+statusBar.setRight([
+  statusPosition,
+  statusSpaces,
+  statusEncoding,
+  statusEol,
+  statusLanguage,
+  layoutItem,
+  formatterItem,
+  bellItem
+]);
+
+function updateBranchStatus(): void {
+  const dirty = Array.from(openTabs.values()).some(record => record.dirty);
+  branchLabel.textContent = dirty ? "master*" : "master";
+}
+
+const statusActions: Array<[HTMLElement, string]> = [
+  [remoteItem, "Remote: LiteGUI Dev Space"],
+  [branchItem, "Git branch: master"],
+  [syncItem, "No remote configured."],
+  [errorsItem, "No problems detected."],
+  [warningsItem, "No warnings detected."],
+  [gitGraphItem, "Git Graph (demo)"],
+  [remoteNameItem, "Remote: LiteGUI Dev Space"],
+  [layoutItem, "Layout controls (demo)"],
+  [formatterItem, "Format document with Prettier"],
+  [bellItem, "No new notifications"]
+];
+for (const [element, message] of statusActions) {
+  element.classList.add("app-status__item--clickable");
+  element.addEventListener("click", () => showToast(message));
 }
 
 /* terminal */
@@ -522,7 +685,7 @@ const terminal = new Console({ prompt: "$" });
 terminal.$input.placeholder = "Type a command (help)";
 terminal.$input.setAttribute("aria-label", "Terminal command");
 document.querySelector<HTMLElement>("#terminal-host")!.appendChild(terminal.root);
-terminal.addMessage("LiteGUI Code terminal. Type help for commands.", "msglog");
+terminal.addMessage("LiteGUI VS Code terminal. Type help for commands.", "msglog");
 
 /* search filter */
 searchBox.input.addEventListener("input", () => {
@@ -549,7 +712,7 @@ let untitledCount = 0;
 interface OpenTab {
   path: string;
   file: FsFile;
-  editor: TextEditor;
+  editor: monaco.editor.IStandaloneCodeEditor;
   tab: HTMLElement;
   titleElement: HTMLElement | null;
   dirty: boolean;
@@ -565,8 +728,56 @@ function activeTab(): OpenTab | null {
   return activePath ? openTabs.get(activePath) ?? null : null;
 }
 
-function activeEditor(): TextEditor | null {
+function activeEditor(): monaco.editor.IStandaloneCodeEditor | null {
   return activeTab()?.editor ?? null;
+}
+
+function selectAllActive(): void {
+  const editor = activeEditor();
+  const model = editor?.getModel();
+  if (!editor || !model) return;
+  editor.setSelection(model.getFullRange());
+  editor.focus();
+}
+
+const MONACO_LANGUAGES: Record<string, string> = {
+  TypeScript: "typescript",
+  JavaScript: "javascript",
+  CSS: "css",
+  HTML: "html",
+  JSON: "json",
+  Markdown: "markdown",
+  XML: "xml",
+  "Plain Text": "plaintext"
+};
+
+let minimapEnabled = true;
+
+function currentMonacoTheme(): string {
+  return document.documentElement.dataset.lgTheme === "light" ? "vs" : "vs-dark";
+}
+
+function createCodeEditor(file: FsFile): { editor: monaco.editor.IStandaloneCodeEditor; host: HTMLElement } {
+  const host = document.createElement("div");
+  host.className = "app-code-editor";
+  const uri = monaco.Uri.file(file.path);
+  monaco.editor.getModel(uri)?.dispose();
+  const model = monaco.editor.createModel(file.content, MONACO_LANGUAGES[file.language] ?? "plaintext", uri);
+  const editor = monaco.editor.create(host, {
+    model,
+    theme: currentMonacoTheme(),
+    automaticLayout: true,
+    fontSize: 13,
+    fontFamily: 'ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace',
+    lineNumbersMinChars: 3,
+    minimap: { enabled: minimapEnabled, renderCharacters: false, maxColumn: 90, showSlider: "mouseover" },
+    scrollBeyondLastLine: false,
+    smoothScrolling: true,
+    tabSize: 2,
+    padding: { top: 6 },
+    fixedOverflowWidgets: true
+  });
+  return { editor, host };
 }
 
 function showToast(message: string): void {
@@ -616,38 +827,17 @@ function updateBreadcrumb(path: string | null): void {
   }
 }
 
-function updateMinimap(file: FsFile | null): void {
-  if (!file) {
-    minimap.textContent = "";
-    return;
-  }
-  const lines = file.content
-    .split("\n")
-    .slice(0, 180)
-    .map(line => line.replace(/\t/g, "  ").slice(0, 64));
-  minimap.textContent = lines.join("\n");
-}
-
 function updateCursorPosition(line: number, column: number): void {
   statusPosition.textContent = `Ln ${line}, Col ${column}`;
 }
 
-function computeCursor(editor: TextEditor): { line: number; column: number } {
-  const value = editor.textarea.value;
-  const position = editor.textarea.selectionStart || 0;
-  const before = value.slice(0, position);
-  const line = before.split("\n").length;
-  const column = position - before.lastIndexOf("\n");
-  return { line, column };
-}
-
-function updateStatusForEditor(editor: TextEditor | null): void {
+function updateStatusForEditor(editor: monaco.editor.IStandaloneCodeEditor | null): void {
   if (!editor) {
     statusPosition.textContent = "Ln 1, Col 1";
     return;
   }
-  const { line, column } = computeCursor(editor);
-  updateCursorPosition(line, column);
+  const position = editor.getPosition();
+  if (position) updateCursorPosition(position.lineNumber, position.column);
 }
 
 function setEmptyState(empty: boolean): void {
@@ -839,13 +1029,7 @@ function openFile(path: string): void {
   const source = findFile(path);
   if (!source) return;
 
-  const editor = new TextEditor({
-    value: source.content,
-    language: source.language,
-    title: source.name,
-    showTabs: false,
-    showFooter: false
-  });
+  const { editor, host } = createCodeEditor(source);
 
   const record: OpenTab = {
     path,
@@ -857,7 +1041,7 @@ function openFile(path: string): void {
   };
   openTabs.set(path, record);
 
-  const tabInfo = editorTabs.addTab(path, { title: source.name, content: editor.root });
+  const tabInfo = editorTabs.addTab(path, { title: source.name, content: host });
   record.tab = tabInfo.tab;
   record.titleElement = tabInfo.tab.querySelector<HTMLElement>(".lg-tabs__tab-title");
 
@@ -874,18 +1058,16 @@ function openFile(path: string): void {
   });
   tabInfo.tab.appendChild(close);
 
-  editor.on("change", ({ value }: { value: string }) => {
-    source.content = value;
+  editor.onDidChangeModelContent(() => {
+    source.content = editor.getValue();
     record.dirty = true;
     updateTabTitle(path);
-    if (activePath === path) {
-      updateMinimap(source);
-      updateBreadcrumb(path);
-    }
+    updateBranchStatus();
+    if (activePath === path) updateBreadcrumb(path);
   });
 
-  editor.on("cursor", ({ line, column }: { line: number; column: number }) => {
-    if (activePath === path) updateCursorPosition(line, column);
+  editor.onDidChangeCursorPosition(({ position }) => {
+    if (activePath === path) updateCursorPosition(position.lineNumber, position.column);
   });
 
   editorTabs.selectTab(path);
@@ -899,9 +1081,9 @@ function activateFile(path: string): void {
   activePath = path;
   setEmptyState(false);
   updateBreadcrumb(path);
-  updateMinimap(record.file);
-  statusLanguage.textContent = record.file.language;
+  setStatusLanguage(record.file.language);
   statusEncoding.textContent = "UTF-8";
+  record.editor.layout();
   updateStatusForEditor(record.editor);
   highlightTreeFile(path);
 }
@@ -916,6 +1098,10 @@ function closeFile(path: string): void {
 
   editorTabs.removeTab(path);
   openTabs.delete(path);
+  updateBranchStatus();
+  const model = record.editor.getModel();
+  record.editor.dispose();
+  model?.dispose();
 
   if (!wasActive) {
     if (!openTabs.size) setEmptyState(true);
@@ -936,8 +1122,7 @@ function closeFile(path: string): void {
     setEmptyState(true);
     updateBreadcrumb(null);
     updateStatusForEditor(null);
-    updateMinimap(null);
-    statusLanguage.textContent = "Plain Text";
+    setStatusLanguage("Plain Text");
     highlightTreeFile(null);
   }
 }
@@ -975,6 +1160,7 @@ function saveActiveFile(): void {
   }
   record.dirty = false;
   updateTabTitle(record.path);
+  updateBranchStatus();
   updateBreadcrumb(record.path);
   showToast(`Saved ${record.file.name}`);
 }
@@ -982,8 +1168,8 @@ function saveActiveFile(): void {
 function editCommand(command: "undo" | "redo"): void {
   const editor = activeEditor();
   if (!editor) return;
-  editor.textarea.focus();
-  document.execCommand(command);
+  editor.focus();
+  editor.trigger("app", command, null);
 }
 
 function deleteFile(path: string): void {
@@ -1089,7 +1275,7 @@ const commands: Command[] = [
   { label: "Run: Run Current File", run: () => runCurrentFile() },
   { label: "Run: Run Tests", run: () => runTests() },
   { label: "Terminal: Toggle Terminal", keys: "Ctrl+`", run: () => toggleTerminal() },
-  { label: "Help: About LiteGUI Code", run: () => openAboutDialog() }
+  { label: "Help: About LiteGUI VS Code", run: () => openAboutDialog() }
 ];
 
 const palette = document.querySelector<HTMLElement>("#command-palette")!;
@@ -1184,31 +1370,42 @@ function toggleSidebar(): void {
 }
 
 function toggleMinimap(): void {
-  shell.classList.toggle("minimap-hidden");
+  minimapEnabled = !minimapEnabled;
+  openTabs.forEach(record => record.editor.updateOptions({ minimap: { enabled: minimapEnabled } }));
+  showToast(minimapEnabled ? "Minimap enabled" : "Minimap disabled");
 }
 
-function toggleTheme(): void {
-  const light = document.documentElement.dataset.lgTheme !== "light";
+function setTheme(light: boolean): void {
   if (light) document.documentElement.dataset.lgTheme = "light";
   else delete document.documentElement.dataset.lgTheme;
-  themeButton.content.textContent = light ? "Dark theme" : "Light theme";
+  monaco.editor.setTheme(light ? "vs" : "vs-dark");
   showToast(light ? "Light theme" : "Dark theme");
 }
 
-function openAboutDialog(): void {
+function toggleTheme(): void {
+  setTheme(document.documentElement.dataset.lgTheme !== "light");
+}
+
+let density: "comfortable" | "compact" = "comfortable";
+
+function setDensity(value: "comfortable" | "compact"): void {
+  density = value;
+  shell.classList.toggle("density-compact", value === "compact");
+  showToast(value === "compact" ? "Compact layout" : "Comfortable layout");
+}
+
+function openSettings(): void {
+  openFile(".vscode/settings.json");
+}
+
+function openInfoDialog(title: string, content: string, width: number, height: number): void {
   const dialog = new Dialog({
-    title: "About LiteGUI Code",
-    width: 440,
-    height: 230,
+    title,
+    width,
+    height,
     close: true,
-    className: "app-about-dialog",
-    content: `
-      <div class="app-about">
-        <strong>LiteGUI Code</strong>
-        <span>Version 1.0.0</span>
-        <span>A VS Code-style editor built with LiteGUI components.</span>
-      </div>
-    `,
+    className: "app-info-dialog",
+    content,
     buttons: [{ name: "Close", close: true }]
   });
   dialog.show();
@@ -1217,6 +1414,312 @@ function openAboutDialog(): void {
   const rect = dialog.root.getBoundingClientRect();
   dialog.root.style.left = `${Math.max(12, Math.round((window.innerWidth - rect.width) / 2))}px`;
   dialog.root.style.top = `${Math.max(12, Math.round((window.innerHeight - rect.height) / 2))}px`;
+}
+
+function openAboutDialog(): void {
+  openInfoDialog(
+    "About LiteGUI VS Code",
+    `
+      <div class="app-about">
+        <strong>LiteGUI VS Code</strong>
+        <span>Version 1.0.0</span>
+        <span>A VS Code-style editor built with LiteGUI components.</span>
+      </div>
+    `,
+    440,
+    230
+  );
+}
+
+function openKeyboardShortcutsDialog(): void {
+  const shortcuts: Array<[string, string]> = [
+    ["Command Palette", "Ctrl+Shift+P"],
+    ["Go to File", "Ctrl+P"],
+    ["Save", "Ctrl+S"],
+    ["Toggle Sidebar", "Ctrl+B"],
+    ["Toggle Terminal", "Ctrl+`"],
+    ["Settings", "Ctrl+,"],
+    ["Extensions", "Ctrl+Shift+X"]
+  ];
+  const rows = shortcuts
+    .map(([name, keys]) => `<div class="app-shortcut-row"><span>${name}</span><kbd>${keys}</kbd></div>`)
+    .join("");
+  openInfoDialog("Keyboard Shortcuts", `<div class="app-shortcuts">${rows}</div>`, 420, 300);
+}
+
+/* ------------------------------------------------------------------ */
+/* bottom-left flyout menus (Accounts / Manage)                        */
+/* ------------------------------------------------------------------ */
+
+interface FlyoutItem {
+  label?: string;
+  shortcut?: string;
+  separator?: boolean;
+  checked?: boolean;
+  disabled?: boolean;
+  submenu?: FlyoutItem[];
+  action?: () => void;
+}
+
+let flyoutRoot: HTMLElement | null = null;
+let flyoutSource: string | null = null;
+let flyoutSubmenu: HTMLElement | null = null;
+let flyoutCleanup: (() => void) | null = null;
+let flyoutRowSeq = 0;
+let submenuTimer = 0;
+
+const CHEVRON_ICON =
+  '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="m6 4 4 4-4 4"/></svg>';
+
+function buildManageMenu(): FlyoutItem[] {
+  const light = document.documentElement.dataset.lgTheme === "light";
+  return [
+    { label: "Command Palette…", shortcut: "Ctrl+Shift+P", action: () => openCommandPalette() },
+    {
+      label: "Profile (Default)",
+      submenu: [
+        { label: "Default", checked: true, action: () => showToast("Profile: Default") },
+        { separator: true },
+        { label: "New Profile…", action: () => showToast("Create a profile (demo)") },
+        { label: "Manage Profiles…", action: () => showToast("Manage profiles (demo)") }
+      ]
+    },
+    { label: "Settings", shortcut: "Ctrl+,", action: () => openSettings() },
+    { label: "Extensions", shortcut: "Ctrl+Shift+X", action: () => setSidebarView("extensions") },
+    { label: "Keyboard Shortcuts", shortcut: "Ctrl+K Ctrl+S", action: () => openKeyboardShortcutsDialog() },
+    { label: "Snippets", action: () => showToast("No snippets configured.") },
+    { label: "Tasks", action: () => showToast("No tasks found in this workspace.") },
+    {
+      label: "Themes",
+      submenu: [
+        { label: "Dark Modern", checked: !light, action: () => setTheme(false) },
+        { label: "Light Modern", checked: light, action: () => setTheme(true) },
+        { separator: true },
+        { label: "Browse Themes…", action: () => showToast("Theme marketplace (demo)") }
+      ]
+    },
+    {
+      label: "Layout Density",
+      submenu: [
+        { label: "Comfortable", checked: density === "comfortable", action: () => setDensity("comfortable") },
+        { label: "Compact", checked: density === "compact", action: () => setDensity("compact") }
+      ]
+    },
+    { separator: true },
+    { label: "Backup and Sync Settings…", action: () => showToast("Sign in to enable Settings Sync.") },
+    { separator: true },
+    { label: "Check for Updates…", action: () => showToast("LiteGUI VS Code 1.0.0 is up to date.") }
+  ];
+}
+
+function buildAccountMenu(): FlyoutItem[] {
+  return [
+    { label: "You are not signed in", disabled: true },
+    { separator: true },
+    { label: "Sign in to Sync Settings", action: () => showToast("Sign in to sync settings (demo)") },
+    { label: "Manage Accounts", action: () => showToast("Manage accounts (demo)") }
+  ];
+}
+
+function buildFlyout(items: FlyoutItem[], level: number): HTMLElement {
+  const menu = document.createElement("div");
+  menu.className = "app-menu-flyout" + (level === 1 ? " app-menu-flyout--root" : " app-menu-flyout--submenu");
+  menu.setAttribute("role", "menu");
+
+  for (const item of items) {
+    if (item.separator) {
+      const separator = document.createElement("div");
+      separator.className = "app-menu-flyout__separator";
+      separator.setAttribute("role", "separator");
+      menu.appendChild(separator);
+      continue;
+    }
+
+    const row = document.createElement("div");
+    row.className = "app-menu-flyout__item";
+    row.dataset.rowId = String(++flyoutRowSeq);
+    row.tabIndex = -1;
+    row.setAttribute("role", "menuitem");
+    if (item.disabled) row.classList.add("app-menu-flyout__item--disabled");
+    if (item.checked) row.classList.add("app-menu-flyout__item--checked");
+    if (item.submenu?.length) row.classList.add("app-menu-flyout__item--submenu");
+
+    const check = document.createElement("span");
+    check.className = "app-menu-flyout__check";
+    check.textContent = item.checked ? "✓" : "";
+    const label = document.createElement("span");
+    label.className = "app-menu-flyout__label";
+    label.textContent = item.label ?? "";
+    row.append(check, label);
+
+    if (item.shortcut) {
+      const shortcut = document.createElement("span");
+      shortcut.className = "app-menu-flyout__shortcut";
+      shortcut.textContent = item.shortcut;
+      row.appendChild(shortcut);
+    }
+    if (item.submenu?.length) {
+      const more = document.createElement("span");
+      more.className = "app-menu-flyout__more";
+      more.innerHTML = CHEVRON_ICON;
+      row.appendChild(more);
+    }
+
+    row.addEventListener("mouseenter", () => {
+      const rowMenu = row.closest<HTMLElement>(".app-menu-flyout");
+      const insideOpenSubmenu = !!rowMenu && rowMenu === flyoutSubmenu;
+      if (item.submenu?.length) {
+        if (flyoutSubmenu?.dataset.owner !== row.dataset.rowId) {
+          openFlyoutSubmenu(row, item.submenu, level + 1);
+        }
+      } else if (!insideOpenSubmenu) {
+        closeFlyoutSubmenu();
+      }
+    });
+
+    row.addEventListener("click", () => {
+      if (item.disabled) return;
+      if (item.submenu?.length) {
+        if (flyoutSubmenu?.dataset.owner !== row.dataset.rowId) {
+          openFlyoutSubmenu(row, item.submenu, level + 1);
+        }
+        return;
+      }
+      closeLauncherMenu();
+      item.action?.();
+    });
+
+    menu.appendChild(row);
+  }
+
+  return menu;
+}
+
+function openFlyoutSubmenu(row: HTMLElement, items: FlyoutItem[], level: number): void {
+  window.clearTimeout(submenuTimer);
+  closeFlyoutSubmenu();
+
+  const submenu = buildFlyout(items, level);
+  submenu.dataset.owner = row.dataset.rowId ?? "";
+  document.body.appendChild(submenu);
+
+  const rowRect = row.getBoundingClientRect();
+  const rect = submenu.getBoundingClientRect();
+  let left = rowRect.right - 2;
+  if (left + rect.width > window.innerWidth - 8) left = rowRect.left - rect.width + 2;
+  const top = Math.max(8, Math.min(rowRect.top - 4, window.innerHeight - rect.height - 8));
+  submenu.style.left = `${Math.round(left)}px`;
+  submenu.style.top = `${Math.round(top)}px`;
+
+  submenu.addEventListener("mouseenter", () => window.clearTimeout(submenuTimer));
+  submenu.addEventListener("mouseleave", event => {
+    const next = event.relatedTarget as Node | null;
+    if (next && submenu.contains(next)) return;
+    submenuTimer = window.setTimeout(closeFlyoutSubmenu, 200);
+  });
+
+  flyoutSubmenu = submenu;
+}
+
+function closeFlyoutSubmenu(): void {
+  window.clearTimeout(submenuTimer);
+  flyoutSubmenu?.remove();
+  flyoutSubmenu = null;
+}
+
+function closeLauncherMenu(): void {
+  window.clearTimeout(submenuTimer);
+  closeFlyoutSubmenu();
+  flyoutRoot?.remove();
+  flyoutRoot = null;
+  flyoutSource = null;
+  flyoutCleanup?.();
+  flyoutCleanup = null;
+  accountButton.setAttribute("aria-expanded", "false");
+  manageButton.setAttribute("aria-expanded", "false");
+}
+
+function openLauncherMenu(source: string, anchor: HTMLButtonElement, items: FlyoutItem[]): void {
+  closeLauncherMenu();
+
+  const menu = buildFlyout(items, 1);
+  document.body.appendChild(menu);
+
+  const activity = document.querySelector<HTMLElement>(".app-activity");
+  const status = document.querySelector<HTMLElement>(".app-status");
+  const left = activity ? activity.getBoundingClientRect().right : 48;
+  const bottom = status ? window.innerHeight - status.getBoundingClientRect().top : 26;
+  menu.style.left = `${Math.round(left)}px`;
+  menu.style.bottom = `${Math.round(bottom)}px`;
+
+  flyoutRoot = menu;
+  flyoutSource = source;
+  anchor.setAttribute("aria-expanded", "true");
+
+  const dismiss = (event: MouseEvent) => {
+    const target = event.target as HTMLElement | null;
+    if (!target) return;
+    if (target.closest(".app-menu-flyout")) return;
+    if (target.closest("[data-menu-anchor]")) return;
+    closeLauncherMenu();
+  };
+
+  const keydown = (event: KeyboardEvent) => {
+    if (!flyoutRoot) return;
+    const active = document.activeElement instanceof HTMLElement ? document.activeElement : null;
+    const insideSubmenu = !!active && !!flyoutSubmenu && flyoutSubmenu.contains(active);
+    const current = insideSubmenu && flyoutSubmenu ? flyoutSubmenu : flyoutRoot;
+    const rows = Array.from(
+      current.querySelectorAll<HTMLElement>(".app-menu-flyout__item:not(.app-menu-flyout__item--disabled)")
+    );
+
+    if (event.key === "Escape" || event.key === "Esc") {
+      event.preventDefault();
+      event.stopPropagation();
+      closeLauncherMenu();
+      return;
+    }
+    if (event.key === "ArrowDown" || event.key === "ArrowUp") {
+      event.preventDefault();
+      if (!rows.length) return;
+      const index = active ? rows.indexOf(active) : -1;
+      const delta = event.key === "ArrowDown" ? 1 : -1;
+      rows[(index + delta + rows.length) % rows.length].focus();
+      return;
+    }
+    if (event.key === "ArrowRight" && active?.classList.contains("app-menu-flyout__item--submenu")) {
+      event.preventDefault();
+      active.click();
+      return;
+    }
+    if (event.key === "ArrowLeft" && insideSubmenu && flyoutSubmenu) {
+      event.preventDefault();
+      const ownerId = flyoutSubmenu.dataset.owner;
+      closeFlyoutSubmenu();
+      const owner = ownerId ? flyoutRoot?.querySelector<HTMLElement>(`[data-row-id="${ownerId}"]`) : null;
+      owner?.focus();
+      return;
+    }
+    if (event.key === "Enter" && active?.classList.contains("app-menu-flyout__item")) {
+      event.preventDefault();
+      active.click();
+    }
+  };
+
+  document.addEventListener("mousedown", dismiss, true);
+  document.addEventListener("keydown", keydown, true);
+  flyoutCleanup = () => {
+    document.removeEventListener("mousedown", dismiss, true);
+    document.removeEventListener("keydown", keydown, true);
+  };
+}
+
+function toggleLauncherMenu(source: string, anchor: HTMLButtonElement, items: FlyoutItem[]): void {
+  if (flyoutRoot && flyoutSource === source) {
+    closeLauncherMenu();
+    return;
+  }
+  openLauncherMenu(source, anchor, items);
 }
 
 /* ------------------------------------------------------------------ */
@@ -1276,6 +1779,12 @@ document.addEventListener("keydown", event => {
   } else if (key === "b") {
     event.preventDefault();
     toggleSidebar();
+  } else if (key === ",") {
+    event.preventDefault();
+    openSettings();
+  } else if (event.shiftKey && key === "x") {
+    event.preventDefault();
+    setSidebarView("extensions");
   } else if (key === "`") {
     event.preventDefault();
     toggleTerminal();

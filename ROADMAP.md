@@ -86,7 +86,7 @@ LiteGUI 用 JavaScript/TypeScript 直接创建 DOM，不依赖 React/Vue，提�
 | 页面构建 | Vite 5（apps/*） |
 | 库构建 | Vite 5 lib 模式（ESM + UMD / CJS）+ `tsc` 声明 |
 | 运行时依赖 | `mitt`、`lodash-es` |
-| 演示 | `apps/demo`（最小示例）、`apps/editor`（综合示例） |
+| 演示 | `apps/vscode`（VS Code 风格）、`apps/blender`（Blender 风格工作台）、`apps/photocraft`（图像编辑器） |
 | 部署 | `pnpm pages:build` + `shells/gh-pages.sh`（CI 自动发布） |
 | 包管理 | pnpm workspace（`pnpm-lock.yaml` 入库） |
 
@@ -98,8 +98,9 @@ packages/
   litegui/                 # 全部组件（含 Inspector、Tree）、LiteGUI 命名空间、entries、styles
   tests/                   # Vitest + Playwright + bench
 apps/
-  demo/                    # 最小演示页
-  editor/                  # 综合演示页
+  vscode/                  # VS Code 风格代码编辑器
+  blender/                 # Blender 风格工作台
+  photocraft/              # 图像编辑器
 docs/                      # VitePress 文档站（API 由 Typedoc 生成）
 scripts/                   # size / verify-umd / verify-pack / pages:build
 shells/                    # build.sh、gh-pages.sh

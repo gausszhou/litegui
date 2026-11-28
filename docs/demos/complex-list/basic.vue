@@ -6,11 +6,7 @@ const host = ref<HTMLElement>();
 const selected = ref("（未选择）");
 
 onMounted(() => {
-  const list = new ComplexList({
-    height: 220,
-    item_code:
-      "<div class='listitem'><span class='tick'><span>Tick</span></span><span class='title'></span></div>",
-  });
+  const list = new ComplexList({ height: 220 });
   list.addTitle("图层");
   list.addItem({ name: "背景" }, "背景", true);
   list.addItem({ name: "角色" }, "角色", true);

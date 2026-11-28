@@ -288,10 +288,11 @@ description: LiteGUI 默认 Blender 风格的主题、尺寸、组件解剖与�
 | Table | `Table` / `table.lg-table` |
 | Console | `Console` / `.lg-console` |
 | Tooltip | `.lg-tooltip`（含 `[role="tooltip"]`） |
+| Viewport | `Viewport` / `.lg-viewport`、`.lg-viewport__canvas`、`.lg-viewport__info` |
 | Timeline | editor `.be-timeline`（后续抽成 `Timeline` 组件） |
 | Status Bar | editor `.be-statusbar` |
 
-> 目前 Top Bar、Workspace Tabs、Area Header、Timeline、Status Bar 在 `apps/editor`/workspace 组件内实现；后续抽到组件包时，class 和 token 保持本规范不变。
+> 目前 Top Bar、Workspace Tabs、Area Header、Timeline、Status Bar 在 `apps/blender`/workspace 组件内实现；后续抽到组件包时，class 和 token 保持本规范不变。
 
 ## 6. 代码组织
 
@@ -359,7 +360,7 @@ LiteGUI.setTheme("dark");  // 写入 data-lg-theme="dark"，也可移除属性
 2. 新组件必须给出 default / hover / active / focus / disabled 五种状态，并且暗/亮两套 token 下都成立。
 3. 新组件必须提供 26px 控件高度和 13px 文本基线；图标 14–16px。
 4. 新增或修改视觉规范时，同步更新本文档、`docs/theming.md` 和演示页。
-5. 用固定 1600×961 视口截图对比 editor；用 390×720 验证窄屏。
+5. 用固定 1600×961 视口截图对比 blender 示例；用 390×720 验证窄屏。
 6. 修改 `styles/**` 后重新执行 `pnpm docs:styles`，文档站会给选择器加 `.lg-demo` 前缀，因此组件规则不要依赖 `:root` 祖先选择器。
 
 ## 7. 禁止项

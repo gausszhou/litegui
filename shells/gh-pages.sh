@@ -6,7 +6,7 @@ set -e
 
 rm -rf dist
 
-# demo + editor + 文档站 + 站点入口页 + .nojekyll
+# 示例应用 + 文档站 + 站点入口页 + .nojekyll
 pnpm pages:build
 
 cd dist

@@ -15,9 +15,6 @@ hero:
     - theme: alt
       text: 组件
       link: /components
-    - theme: alt
-      text: 在线 Editor
-      link: https://gausszhou.github.io/litegui/editor/
 
 features:
   - title: 零框架依赖
