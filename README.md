@@ -7,6 +7,7 @@ LiteGUI 面向编辑器、调试器、工具台这类需要菜单、面板、分
 - 在线 Demo：https://gausszhou.github.io/litegui/vscode/
 - 在线 VectorCraft：https://gausszhou.github.io/litegui/vectorcraft/
 - 在线 LightCraft：https://gausszhou.github.io/litegui/lightcraft/
+- 在线 GridCraft：https://gausszhou.github.io/litegui/gridcraft/
 - 文档：https://gausszhou.github.io/litegui/docs/
 - 路线图：[ROADMAP.md](./ROADMAP.md)
 
@@ -33,6 +34,7 @@ LiteGUI 面向编辑器、调试器、工具台这类需要菜单、面板、分
 | `apps/vscode`         | VS Code 风格代码编辑器（Monaco）                                                                                                  |
 | `apps/blender`        | Blender 风格工作台：视口、Outliner、属性、时间线                                                                                  |
 | `apps/photocraft`     | 图像编辑器：工具栏、画布、曲线与图层                                                                                              |
+| `apps/gridcraft`      | GridCraft 风格电子表格：功能区、公式栏、图表、数据透视表                                                                          |
 | `apps/vectorcraft`    | Illustrator 风格矢量设计工作台：画板、标尺、图层、属性、外发光、SVG/PNG 导出                                                      |
 | `apps/lightcraft`     | 照片图库 + 非破坏性显影：直方图、曲线、8 色带混合器、颜色分级、遮罩、评分与 JPEG/PNG 导出                                          |
 | `apps/filmcraft`      | 非线性视频剪辑器：源/节目监视器、时间线、调色示波器与导出                                                                         |
@@ -49,6 +51,7 @@ pnpm install
 pnpm dev          # 最小示例 http://127.0.0.1:5173/
 pnpm dev:vectorcraft # 矢量设计工作台 http://127.0.0.1:5179/
 pnpm dev:lightcraft  # 照片图库与显影 http://127.0.0.1:5181/
+pnpm dev:gridcraft   # 电子表格工作台 http://127.0.0.1:5184/
 
 pnpm build        # 按拓扑序构建 packages/* 与 apps/*
 pnpm test         # Vitest + jsdom

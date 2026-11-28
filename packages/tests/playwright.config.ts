@@ -1,9 +1,10 @@
 import { defineConfig, devices } from "@playwright/test";
 
-// vscode / blender / photocraft / vectorcraft / lightcraft / filmcraft / cadcraft 各自是独立 app，分别起 dev server。
+// vscode / blender / photocraft / gridcraft / vectorcraft / lightcraft / filmcraft / cadcraft 各自是独立 app，分别起 dev server。
 const VSCODE_URL = process.env.LITEGUI_VSCODE_URL ?? "http://127.0.0.1:5173/";
 const BLENDER_URL = process.env.LITEGUI_BLENDER_URL ?? "http://127.0.0.1:5175/";
 const PHOTOCRAFT_URL = process.env.LITEGUI_PHOTOCRAFT_URL ?? "http://127.0.0.1:5176/";
+const GRIDCRAFT_URL = process.env.LITEGUI_GRIDCRAFT_URL ?? "http://127.0.0.1:5184/";
 const FILMCRAFT_URL = process.env.LITEGUI_FILMCRAFT_URL ?? "http://127.0.0.1:5177/";
 const VECTORCRAFT_URL = process.env.LITEGUI_VECTORCRAFT_URL ?? "http://127.0.0.1:5179/";
 const LIGHTCRAFT_URL = process.env.LITEGUI_LIGHTCRAFT_URL ?? "http://127.0.0.1:5181/";
@@ -61,6 +62,12 @@ export default defineConfig({
       url: CADCRAFT_URL,
       reuseExistingServer: true,
       timeout: 120_000
+    },
+    {
+      command: "pnpm --filter @gausszhou/litegui-gridcraft dev",
+      url: GRIDCRAFT_URL,
+      reuseExistingServer: true,
+      timeout: 120_000,
     },
     {
       command: "pnpm -w docs:dev",
