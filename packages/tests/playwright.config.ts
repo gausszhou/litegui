@@ -1,12 +1,13 @@
 import { defineConfig, devices } from "@playwright/test";
 
-// vscode / blender / photocraft / vectorcraft / lightcraft / filmcraft 各自是独立 app，分别起 dev server。
+// vscode / blender / photocraft / vectorcraft / lightcraft / filmcraft / cadcraft 各自是独立 app，分别起 dev server。
 const VSCODE_URL = process.env.LITEGUI_VSCODE_URL ?? "http://127.0.0.1:5173/";
 const BLENDER_URL = process.env.LITEGUI_BLENDER_URL ?? "http://127.0.0.1:5175/";
 const PHOTOCRAFT_URL = process.env.LITEGUI_PHOTOCRAFT_URL ?? "http://127.0.0.1:5176/";
 const FILMCRAFT_URL = process.env.LITEGUI_FILMCRAFT_URL ?? "http://127.0.0.1:5177/";
 const VECTORCRAFT_URL = process.env.LITEGUI_VECTORCRAFT_URL ?? "http://127.0.0.1:5179/";
 const LIGHTCRAFT_URL = process.env.LITEGUI_LIGHTCRAFT_URL ?? "http://127.0.0.1:5181/";
+const CADCRAFT_URL = process.env.LITEGUI_CADCRAFT_URL ?? "http://127.0.0.1:5180/";
 const DOCS_URL = process.env.LITEGUI_DOCS_URL ?? "http://127.0.0.1:5178/litegui/docs/";
 
 export default defineConfig({
@@ -52,6 +53,12 @@ export default defineConfig({
     {
       command: "pnpm --filter @gausszhou/litegui-lightcraft dev",
       url: LIGHTCRAFT_URL,
+      reuseExistingServer: true,
+      timeout: 120_000
+    },
+    {
+      command: "pnpm --filter @gausszhou/litegui-cadcraft dev",
+      url: CADCRAFT_URL,
       reuseExistingServer: true,
       timeout: 120_000
     },

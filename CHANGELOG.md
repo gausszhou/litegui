@@ -1,5 +1,14 @@
 # Changelog
 
+## Unreleased（CADCraft 示例应用）
+
+### Added
+
+- 新增 `apps/cadcraft`：仿 CAD 制图工作台的 LiteGUI 示例，包含快速工具栏、文件页签、菜单栏、Tool Sets、模型/图纸空间画布、Layers 与 Properties 面板、命令历史与布局页签。
+- 命令引擎支持 `LINE`/`PLINE`/`RECTANG`/`POLYGON`/`CIRCLE`/`ARC`/`ELLIPSE`/`POINT`/`TEXT`/`LEADER`/`HATCH`/`INSERT` 与 `MOVE`/`COPY`/`ROTATE`/`SCALE`/`MIRROR`/`OFFSET`/`ERASE`，以及线性/对齐/半径标注、对象捕捉、极轴/正交、直接距离输入、窗口选择、撤销/重做。
+- 示例图纸包含 12 000 × 8 000 mm 公寓平面、墙体填充、门窗图块、家具图块、尺寸标注、引线、房间明细表，以及 A1/A3 两张图纸空间布局。
+- 支持 Layers 面板与图层管理器、Properties 编辑、PNG 出图与 DXF 导出；新增 `packages/tests/e2e/cadcraft.spec.ts` 覆盖外壳、命令、图层、布局与导出流程。
+
 ## Unreleased（LightCraft 示例）
 
 ### Added
