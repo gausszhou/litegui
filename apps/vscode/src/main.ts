@@ -811,6 +811,9 @@ timelineToggle.addEventListener("click", () => {
   if (open) renderTimeline();
 });
 
+// Explorer 的层级缩进比 Tree 默认值窄一半（VS Code 约 10px/级）。
+Tree.INDENT = 10;
+
 const tree = new Tree(buildTreeData(project), {
   height: "100%",
   collapsed_depth: 10,
