@@ -373,6 +373,8 @@ test("customize layout opens from the first titlebar button and controls the she
   const searchBox = await page.locator(".app-command-center").boundingBox();
   expect(panelBox?.width).toBeCloseTo(searchBox?.width ?? 0, 0);
   expect(Math.abs((panelBox?.x ?? 0) - (searchBox?.x ?? 0))).toBeLessThanOrEqual(1);
+  const rowBox = await page.locator(".app-customize__row").first().boundingBox();
+  expect(rowBox?.height).toBe(27);
   await expect(page.locator('[data-layout-action="toggle-menu"]')).toHaveAttribute("aria-checked", "true");
 
   await page.locator('[data-layout-action="toggle-activity"]').click();
