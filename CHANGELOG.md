@@ -1,5 +1,19 @@
 # Changelog
 
+## Unreleased（apps/pdfcraft）
+
+### Added
+
+- 新增 `apps/pdfcraft`：PdfCraft 风格的 PDF 工作台，内置 13 页程序化生成的 `pdfcraft-showcase.pdf` 与 4 页 `field-notes.pdf`，参考 [PdfCraft](https://getartcraft.com/apps/pdfcraft) 的信息架构与视觉语言（独立实现，非官方构建）。
+- 阅读：连续 / 单页 / 双页布局、Read 模式、缩放与适配、页码跳转、明暗主题、浮动页面控件。
+- 页面：缩略图整理器（多选、旋转、删除、插入空白、复制、拖动排序）、撤销重做、提取 / 拆分 / 合并文档与多标签。
+- 批注：划词弹层（高亮 / 下划线 / 批注 / 复制）、评论线程与回复、解决与删除；批注按原文锚定，页面重排后仍可定位。
+- 表单：13 个可交互字段、Fields 面板、字段高亮、清空表单；表单值随文档保存。
+- 搜索：⌘F 即输即搜、匹配高亮、逐条跳转、侧栏结果列表；⌘K 命令面板与完整菜单 / 快捷键。
+- 文档：属性、保护、压缩、OCR、签章、证书、打印等对话框；文档属性可编辑。
+- 导出：零依赖 PDF 写入器，按当前页序与旋转生成真实可打开的 PDF（含元数据与页码）。
+- 接入根脚本 `dev:pdfcraft`、Pages 构建、README / 示例文档与 Playwright e2e（5182）。
+
 ## Unreleased（WordCraft 示例）
 
 ### Added

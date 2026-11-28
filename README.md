@@ -9,6 +9,7 @@ LiteGUI 面向编辑器、调试器、工具台这类需要菜单、面板、分
 - 在线 LightCraft：https://gausszhou.github.io/litegui/lightcraft/
 - 在线 GridCraft：https://gausszhou.github.io/litegui/gridcraft/
 - WordCraft Demo：https://gausszhou.github.io/litegui/wordcraft/
+- 在线 PdfCraft：https://gausszhou.github.io/litegui/pdfcraft/
 - 文档：https://gausszhou.github.io/litegui/docs/
 - 路线图：[ROADMAP.md](./ROADMAP.md)
 
@@ -40,6 +41,7 @@ LiteGUI 面向编辑器、调试器、工具台这类需要菜单、面板、分
 | `apps/lightcraft`     | 照片图库 + 非破坏性显影：直方图、曲线、8 色带混合器、颜色分级、遮罩、评分与 JPEG/PNG 导出                                          |
 | `apps/filmcraft`      | 非线性视频剪辑器：源/节目监视器、时间线、调色示波器与导出                                                                         |
 | `apps/wordcraft`      | WordCraft 风格文字处理工作台：功能区、样式、修订、批注、引用与邮件合并                                                            |
+| `apps/pdfcraft`       | PdfCraft 风格 PDF 工作台：阅读、搜索、页面整理、批注、表单与真实 PDF 导出                                                         |
 | `docs`                | VitePress 文档站；`docs:api` 由 Typedoc 生成 API 参考                                                                             |
 | `scripts`             | 体积报告、UMD / tarball 校验、Pages 构建                                                                                          |
 | `shells`              | `build.sh`、`gh-pages.sh` 手动发布脚本                                                                                            |
@@ -54,6 +56,7 @@ pnpm dev          # 最小示例 http://127.0.0.1:5173/
 pnpm dev:vectorcraft # 矢量设计工作台 http://127.0.0.1:5179/
 pnpm dev:lightcraft  # 照片图库与显影 http://127.0.0.1:5181/
 pnpm dev:gridcraft   # 电子表格工作台 http://127.0.0.1:5184/
+pnpm dev:pdfcraft    # PDF 工作台 http://127.0.0.1:5182/
 
 pnpm build        # 按拓扑序构建 packages/* 与 apps/*
 pnpm test         # Vitest + jsdom

@@ -11,6 +11,7 @@
 - [CADCraft](https://gausszhou.github.io/litegui/cadcraft/)：仿 CAD 制图工作台（参考 [ArtCraft CADCraft](https://getartcraft.com/apps/cadcraft)）
 - [GridCraft](https://gausszhou.github.io/litegui/gridcraft/)：Excel 风格电子表格工作台（参考 [ArtCraft GridCraft](https://getartcraft.com/apps/gridcraft)）
 - [WordCraft](https://gausszhou.github.io/litegui/wordcraft/)：Word 风格文字处理工作台（参考 [ArtCraft WordCraft](https://getartcraft.com/apps/wordcraft)）
+- [PdfCraft](https://gausszhou.github.io/litegui/pdfcraft/)：PDF 工作台，阅读、整理、批注与导出（参考 [ArtCraft PdfCraft](https://getartcraft.com/apps/pdfcraft)）
 
 ## 1. 工具台布局
 

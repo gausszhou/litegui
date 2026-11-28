@@ -10,6 +10,7 @@
  *   dist/cadcraft/  apps/cadcraft CAD 制图工作台
  *   dist/gridcraft/ apps/gridcraft 电子表格工作台
  *   dist/wordcraft/  apps/wordcraft WordCraft 风格文字处理工作台
+ *   dist/pdfcraft/   apps/pdfcraft PDF 工作台（阅读 / 整理 / 标注 / 导出）
  *   dist/docs/    VitePress 文档站 + Typedoc API（base 由 DOCS_BASE 决定，默认 /litegui/docs/）
  *   dist/index.html  站点入口页
  *   dist/.nojekyll   跳过 GitHub Pages 的 Jekyll 处理
@@ -44,6 +45,7 @@ run("pnpm --filter @gausszhou/litegui-filmcraft build");
 run("pnpm --filter @gausszhou/litegui-cadcraft build");
 run("pnpm --filter @gausszhou/litegui-gridcraft build");
 run("pnpm --filter @gausszhou/litegui-wordcraft build");
+run("pnpm --filter @gausszhou/litegui-pdfcraft build");
 run("pnpm docs:build");
 
 writeFileSync(join(distDir, ".nojekyll"), "");
@@ -60,6 +62,7 @@ const expected = [
   join(distDir, "cadcraft", "index.html"),
   join(distDir, "gridcraft", "index.html"),
   join(distDir, "wordcraft", "index.html"),
+  join(distDir, "pdfcraft", "index.html"),
   join(distDir, "docs", "index.html"),
 ];
 const missing = expected.filter(file => !existsSync(file));
@@ -180,6 +183,10 @@ function landingPage() {
         <a class="card" href="./wordcraft/">
           <strong>WordCraft</strong>
           <span>文字处理：功能区、样式、修订、批注与引用</span>
+        </a>
+        <a class="card" href="./pdfcraft/">
+          <strong>PdfCraft</strong>
+          <span>PDF 工作台：阅读、页面整理、批注与真实 PDF 导出</span>
         </a>
       </nav>
       <p class="meta">MIT License · <a href="https://github.com/gausszhou/litegui">GitHub</a></p>
