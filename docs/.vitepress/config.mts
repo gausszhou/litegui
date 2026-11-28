@@ -58,7 +58,8 @@ export default defineConfig({
               { text: "Box", link: "/components/box" },
               { text: "Panel", link: "/components/panel" },
               { text: "Split", link: "/components/split" },
-              { text: "Tabs", link: "/components/tabs" }
+              { text: "Tabs", link: "/components/tabs" },
+              { text: "Viewport", link: "/components/viewport" }
             ]
           },
           {

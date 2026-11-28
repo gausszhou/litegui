@@ -115,6 +115,8 @@ LiteGUI.init({
 | `--lg-color-focus-ring` | 输入聚焦环 |
 | `--lg-color-scrollbar-track` / `--lg-color-scrollbar-thumb` | 滚动条 |
 | `--lg-shadow-panel` / `--lg-shadow-menu` | 面板 / 菜单阴影 |
+| `--lg-viewport-bg` / `--lg-viewport-bg-wire` / `--lg-viewport-grid` / `--lg-viewport-grid-axis` / `--lg-viewport-outline` | Viewport 背景、网格与描边 |
+| `--lg-viewport-axis-*` / `--lg-viewport-gizmo-*` / `--lg-viewport-selection*` / `--lg-viewport-edit*` / `--lg-viewport-face-1..6` / `--lg-viewport-camera` / `--lg-viewport-light` / `--lg-viewport-brush*` | Viewport 3D 场景配色 |
 
 ## 覆盖主题
 

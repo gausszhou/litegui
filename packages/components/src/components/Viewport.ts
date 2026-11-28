@@ -51,6 +51,16 @@ interface Palette {
   light: string;
   brush: string;
   brushFill: string;
+  outline: string;
+  edit: string;
+  editSoft: string;
+  editFill: string;
+  face1: string;
+  face2: string;
+  face3: string;
+  face4: string;
+  face5: string;
+  face6: string;
 }
 
 const DEFAULT_PALETTE: Palette = {
@@ -68,7 +78,17 @@ const DEFAULT_PALETTE: Palette = {
   camera: "#d8d8d8",
   light: "#e0d080",
   brush: "rgba(240, 160, 48, 0.9)",
-  brushFill: "rgba(240, 160, 48, 0.10)"
+  brushFill: "rgba(240, 160, 48, 0.10)",
+  outline: "#3c3c3c",
+  edit: "#ffb84d",
+  editSoft: "rgba(255, 184, 77, 0.55)",
+  editFill: "rgba(255, 184, 77, 0.18)",
+  face1: "#9d9d9d",
+  face2: "#c4c4c4",
+  face3: "#b4b4b4",
+  face4: "#8c8c8c",
+  face5: "#a8a8a8",
+  face6: "#bdbdbd"
 };
 
 const CUBE_FACES = [
@@ -621,7 +641,17 @@ export class Viewport extends EventMitter {
       camera: this.color("--lg-viewport-camera", d.camera),
       light: this.color("--lg-viewport-light", d.light),
       brush: this.color("--lg-viewport-brush", d.brush),
-      brushFill: this.color("--lg-viewport-brush-fill", d.brushFill)
+      brushFill: this.color("--lg-viewport-brush-fill", d.brushFill),
+      outline: this.color("--lg-viewport-outline", d.outline),
+      edit: this.color("--lg-viewport-edit", d.edit),
+      editSoft: this.color("--lg-viewport-edit-soft", d.editSoft),
+      editFill: this.color("--lg-viewport-edit-fill", d.editFill),
+      face1: this.color("--lg-viewport-face-1", d.face1),
+      face2: this.color("--lg-viewport-face-2", d.face2),
+      face3: this.color("--lg-viewport-face-3", d.face3),
+      face4: this.color("--lg-viewport-face-4", d.face4),
+      face5: this.color("--lg-viewport-face-5", d.face5),
+      face6: this.color("--lg-viewport-face-6", d.face6)
     };
   }
 
@@ -737,7 +767,14 @@ export class Viewport extends EventMitter {
             "rgba(55,55,55,0.35)",
             "rgba(65,65,65,0.35)"
           ]
-        : ["#9d9d9d", "#c4c4c4", "#b4b4b4", "#8c8c8c", "#a8a8a8", "#bdbdbd"];
+        : [
+            this.palette.face1,
+            this.palette.face2,
+            this.palette.face3,
+            this.palette.face4,
+            this.palette.face5,
+            this.palette.face6
+          ];
 
     faces.forEach((face, index) => {
       ctx.beginPath();
@@ -748,7 +785,7 @@ export class Viewport extends EventMitter {
       ctx.closePath();
       ctx.fillStyle = shades[index % shades.length];
       ctx.fill();
-      ctx.strokeStyle = selected ? this.palette.selection : "#3c3c3c";
+      ctx.strokeStyle = selected ? this.palette.selection : this.palette.outline;
       ctx.lineWidth = selected ? 1.4 : 1;
       ctx.stroke();
     });
@@ -763,7 +800,7 @@ export class Viewport extends EventMitter {
     }
 
     if (this.editMode && selected) {
-      ctx.strokeStyle = this.editElement === "edge" ? "#ffb84d" : "rgba(255, 184, 77, 0.55)";
+      ctx.strokeStyle = this.editElement === "edge" ? this.palette.edit : this.palette.editSoft;
       ctx.lineWidth = this.editElement === "edge" ? 2 : 1.2;
       for (const face of CUBE_FACES) {
         ctx.beginPath();
@@ -774,14 +811,14 @@ export class Viewport extends EventMitter {
         });
         ctx.closePath();
         if (this.editElement === "face") {
-          ctx.fillStyle = "rgba(255, 184, 77, 0.18)";
+          ctx.fillStyle = this.palette.editFill;
           ctx.fill();
         }
         ctx.stroke();
       }
       const showVertices = this.editElement === "vertex" || this.editElement === "edge";
       if (showVertices) {
-        ctx.fillStyle = "#ffb84d";
+        ctx.fillStyle = this.palette.edit;
         for (const p of projected) {
           ctx.beginPath();
           ctx.arc(p[0], p[1], this.editElement === "vertex" ? 3.5 : 2, 0, Math.PI * 2);
@@ -852,7 +889,7 @@ export class Viewport extends EventMitter {
       ctx.lineTo(end[0] - Math.cos(angle + 0.4) * 8, end[1] - Math.sin(angle + 0.4) * 8);
       ctx.closePath();
       ctx.fill();
-      ctx.font = "10px Inter, sans-serif";
+      ctx.font = `11px ${getComputedStyle(this.root).fontFamily || "sans-serif"}`;
       ctx.fillText(axis.label, end[0] + 5, end[1] - 5);
     }
     ctx.fillStyle = this.palette.selection;
@@ -885,10 +922,10 @@ export class Viewport extends EventMitter {
       ctx.moveTo(cx, cy);
       ctx.lineTo(x, y);
       ctx.stroke();
-      ctx.font = "9px Inter, sans-serif";
+      ctx.font = `11px ${getComputedStyle(this.root).fontFamily || "sans-serif"}`;
       ctx.fillText(axis.label, x + (dx / length) * 6 - 3, y + (dy / length) * 6 + 3);
     }
-    ctx.strokeStyle = "#777";
+    ctx.strokeStyle = this.palette.gridAxis;
     ctx.beginPath();
     ctx.arc(cx, cy, 3, 0, Math.PI * 2);
     ctx.stroke();

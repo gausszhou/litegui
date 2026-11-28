@@ -141,6 +141,40 @@ description: LiteGUI 默认 Blender 风格的主题、尺寸、组件解剖与�
 - 不使用渐变、发光、玻璃拟态。
 - 选中态优先使用底色 + 2px 强调线，不只用文字颜色。
 
+### 2.6 组件级 3D token（Viewport）
+
+`Viewport` 的 3D 场景配色由 `--lg-viewport-*` 控制：暗色默认值定义在 `.lg-viewport`，亮色在 `:root[data-lg-theme="light"] .lg-viewport` 覆盖。覆盖时优先改 token，不要改组件样式。
+
+| Token | 暗色 | 亮色 |
+| --- | --- | --- |
+| `--lg-viewport-bg` | `#484848` | `#b8b8b8` |
+| `--lg-viewport-bg-wire` | `#2c2c2c` | `#d0d0d0` |
+| `--lg-viewport-grid` | `#565656` | `#9a9a9a` |
+| `--lg-viewport-grid-axis` | `#666666` | `#7a7a7a` |
+| `--lg-viewport-axis-x` | `#a04a4a` | `#a04a4a` |
+| `--lg-viewport-axis-y` | `#4a8a4a` | `#3f7f3f` |
+| `--lg-viewport-gizmo-x` | `#c85a5a` | `#b34a4a` |
+| `--lg-viewport-gizmo-y` | `#61a861` | `#4f9a4f` |
+| `--lg-viewport-gizmo-z` | `#5f8fc8` | `#4f7fb8` |
+| `--lg-viewport-selection` | `#f0a030` | `#b8761c` |
+| `--lg-viewport-selection-soft` | `rgba(240,160,48,.55)` | `rgba(184,118,28,.55)` |
+| `--lg-viewport-camera` | `#d8d8d8` | `#3a3a3a` |
+| `--lg-viewport-light` | `#e0d080` | `#8a7a30` |
+| `--lg-viewport-brush` | `rgba(240,160,48,.9)` | `rgba(184,118,28,.9)` |
+| `--lg-viewport-brush-fill` | `rgba(240,160,48,.1)` | `rgba(184,118,28,.12)` |
+| `--lg-viewport-outline` | `#3c3c3c` | `#9a9a9a` |
+| `--lg-viewport-edit` | `#ffb84d` | `#b86e1a` |
+| `--lg-viewport-edit-soft` | `rgba(255,184,77,.55)` | `rgba(184,110,26,.55)` |
+| `--lg-viewport-edit-fill` | `rgba(255,184,77,.18)` | `rgba(184,110,26,.18)` |
+| `--lg-viewport-face-1` | `#9d9d9d` | `#d6d6d6` |
+| `--lg-viewport-face-2` | `#c4c4c4` | `#efefef` |
+| `--lg-viewport-face-3` | `#b4b4b4` | `#e3e3e3` |
+| `--lg-viewport-face-4` | `#8c8c8c` | `#c9c9c9` |
+| `--lg-viewport-face-5` | `#a8a8a8` | `#dddddd` |
+| `--lg-viewport-face-6` | `#bdbdbd` | `#e9e9e9` |
+| `--lg-viewport-info-color` | `#d8d8d8` | `#2a2a2a` |
+| `--lg-viewport-info-muted` | `#aaaaaa` | `#4d4d4d` |
+
 ## 3. 布局骨架
 
 ```

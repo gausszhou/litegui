@@ -13,7 +13,7 @@
 	min-width: 0;
 	min-height: 0;
 	overflow: hidden;
-	background: var(--lg-viewport-bg, #484848);
+	background: var(--lg-viewport-bg);
 	outline: 0;
 	user-select: none;
 }
@@ -34,15 +34,20 @@
 	top: 8px;
 	left: 12px;
 	z-index: 2;
-	color: var(--lg-viewport-info-color, #d8d8d8);
+	color: var(--lg-viewport-info-color);
 	font-family: var(--lg-font);
 	font-size: var(--lg-font-size-sm, 12px);
 	line-height: 1.35;
 	pointer-events: none;
-	text-shadow: 0 1px 1px #000;
+}
+
+.lg-viewport:focus-visible,
+.lg-viewport__canvas:focus-visible {
+	outline: 1px solid var(--lg-color-accent);
+	outline-offset: -1px;
 }
 
 .lg-viewport__muted {
-	color: var(--lg-viewport-info-muted, #aaaaaa);
-	font-size: 10px;
+	color: var(--lg-viewport-info-muted);
+	font-size: 11px;
 }
