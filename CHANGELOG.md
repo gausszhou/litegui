@@ -1,5 +1,13 @@
 # Changelog
 
+## Unreleased（GridCraft 示例应用）
+
+### Added
+
+- 新增 `apps/gridcraft`：GridCraft 风格的 Excel 桌面工作台示例，包含功能区（Home / Insert / Page Layout / Formulas / Data / Review / View / Automate）、名称框与公式栏、工作表标签、条件格式、表格筛选、图表（柱/条/线/饼/环/面积/散点）、迷你图、数据透视表字段面板、格式图表面板、查找替换、格式单元格和撤销/重做。
+- 内置 60+ 工作表函数与跨表引用，示例工作簿含 Sales / Budget / Grades / Data / Pivot 五张表；`SUBTOTAL` 支持表格汇总行。
+- 新增 `pnpm dev:gridcraft`（5184）与 Pages 产物 `dist/gridcraft`，补充 Playwright e2e 用例 `gridcraft.spec.ts`。
+
 ## Unreleased（CADCraft 示例应用）
 
 ### Added
