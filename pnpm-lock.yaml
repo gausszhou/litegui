@@ -203,6 +203,22 @@ importers:
         specifier: ^5.4.11
         version: 5.4.21(@types/node@22.20.7)(sass@1.108.2)
 
+  apps/vectorcraft:
+    dependencies:
+      '@gausszhou/litegui-components':
+        specifier: workspace:*
+        version: link:../../packages/components
+      '@gausszhou/litegui-core':
+        specifier: workspace:*
+        version: link:../../packages/core
+    devDependencies:
+      typescript:
+        specifier: ^5.8.3
+        version: 5.9.3
+      vite:
+        specifier: ^5.4.11
+        version: 5.4.21(@types/node@22.20.7)(sass@1.108.2)
+
   packages/components:
     dependencies:
       '@gausszhou/litegui-core':

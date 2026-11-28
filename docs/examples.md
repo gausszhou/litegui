@@ -5,6 +5,7 @@
 - [LiteGUI VS Code](https://gausszhou.github.io/litegui/vscode/)
 - [Blender Workbench](https://gausszhou.github.io/litegui/blender/)
 - [Photocraft](https://gausszhou.github.io/litegui/photocraft/)
+- [VectorCraft](https://gausszhou.github.io/litegui/vectorcraft/)：Illustrator 风格矢量设计工作台
 
 ## 1. 工具台布局
 

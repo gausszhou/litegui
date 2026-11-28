@@ -11,6 +11,13 @@
 - 3D 场景配色改为 CSS 变量（`--lg-viewport-bg`、`--lg-viewport-selection` 等），并补亮色主题覆盖。
 - 补 Viewport 组件、元素、Vue 绑定单测；Blender app 改为使用组件包并删除本地实现。
 
+## Unreleased（VectorCraft 示例）
+
+### Added
+
+- 新增 `apps/vectorcraft`：参考 Illustrator 工作台的矢量设计示例。SVG 渲染 Neon Drive 海报，包含画板/标尺、选择/拖拽/缩放/旋转、钢笔与形状工具、文本框架与外发光、图层面板、属性/对齐/快速操作、浮动外观面板、上下文工具栏、撤销重做以及 SVG/PNG/`.vectorcraft` 导出。
+- 新增 Playwright e2e 覆盖（`packages/tests/e2e/vectorcraft.spec.ts`），并接入 `pages:build`、根脚本 `dev:vectorcraft` 与 Playwright dev server。
+
 ## Unreleased（CSS class BEM 化）
 
 ### Changed
