@@ -1,5 +1,5 @@
 import { afterEach, beforeAll, describe, expect, it, vi } from "vitest";
-import { Viewport, type ViewportObject } from "@gausszhou/litegui-components";
+import { Viewport, type ViewportObject, type ViewportOptions } from "@gausszhou/litegui-components";
 
 beforeAll(() => {
   // jsdom 不实现 canvas；Viewport 只需要一个可调用的 2D context。
@@ -20,6 +20,18 @@ beforeAll(() => {
     measureText: () => ({ width: 10 })
   })) as unknown as typeof HTMLCanvasElement.prototype.getContext;
 });
+
+const canvasRect = {
+  width: 400,
+  height: 300,
+  top: 0,
+  left: 0,
+  right: 400,
+  bottom: 300,
+  x: 0,
+  y: 0,
+  toJSON: () => ({})
+} as DOMRect;
 
 function scene(): ViewportObject[] {
   return [
@@ -68,15 +80,38 @@ function scene(): ViewportObject[] {
 
 const instances: Viewport[] = [];
 
-function create(options: Partial<ConstructorParameters<typeof Viewport>[0]> = {}) {
+function create(options: Partial<ViewportOptions> = {}): Viewport {
   const viewport = new Viewport({ objects: scene(), selected: "Cube", ...options });
-  viewport.root.getBoundingClientRect = () =>
-    ({ width: 400, height: 300, top: 0, left: 0, right: 400, bottom: 300, x: 0, y: 0, toJSON: () => ({}) } as DOMRect);
-  viewport.resize();
+  viewport.root.getBoundingClientRect = () => canvasRect;
+  viewport.canvas.getBoundingClientRect = () => canvasRect;
   document.body.appendChild(viewport.root);
-  (viewport as unknown as { draw: () => void }).draw();
+  viewport.resize();
   instances.push(viewport);
   return viewport;
+}
+
+function mouseDownAt(target: HTMLElement, x: number, y: number): void {
+  const event = new MouseEvent("mousedown", {
+    bubbles: true,
+    cancelable: true,
+    button: 0,
+    clientX: x,
+    clientY: y
+  });
+  Object.defineProperty(event, "offsetX", { value: x });
+  Object.defineProperty(event, "offsetY", { value: y });
+  target.dispatchEvent(event);
+}
+
+function mouseMoveTo(x: number, y: number): void {
+  window.dispatchEvent(new MouseEvent("mousemove", { bubbles: true, clientX: x, clientY: y }));
+}
+
+async function nextFrame(): Promise<void> {
+  await new Promise<void>(resolve => {
+    if (typeof requestAnimationFrame === "function") requestAnimationFrame(() => resolve());
+    else setTimeout(resolve, 0);
+  });
 }
 
 afterEach(() => {
@@ -84,7 +119,7 @@ afterEach(() => {
 });
 
 describe("Viewport", () => {
-  it("builds the BEM shell and exposes options", () => {
+  it("builds the BEM shell and exposes options", async () => {
     const viewport = create({
       id: "vp",
       className: "extra",
@@ -98,6 +133,8 @@ describe("Viewport", () => {
     expect(viewport.root.classList.contains("extra")).toBe(true);
     expect(viewport.root.id).toBe("vp");
     expect(viewport.root.querySelector(".lg-viewport__canvas")).toBe(viewport.canvas);
+    await nextFrame();
+    await nextFrame();
     expect(viewport.root.querySelector(".lg-viewport__info")?.innerHTML).toContain("Cube");
     expect(viewport.getSelected()).toBe("Cube");
     expect(viewport.getOverlays()).toBe(true);
@@ -139,20 +176,31 @@ describe("Viewport", () => {
     viewport.invalidate();
   });
 
-  it("picks objects and emits select", () => {
+  it("picks objects through canvas pointer input and emits select", () => {
     const viewport = create({ overlays: true });
     const onSelect = vi.fn();
     viewport.on("select", onSelect);
 
-    // Cube 位于视口中心附近；空区域应选中 null。
-    (viewport as unknown as { selectAt: (x: number, y: number) => void }).selectAt(200, 150);
+    // Cube 位于视口中心；空白区域应选中 null。
+    mouseDownAt(viewport.canvas, 200, 150);
     expect(onSelect).toHaveBeenLastCalledWith("Cube");
 
-    (viewport as unknown as { selectAt: (x: number, y: number) => void }).selectAt(5, 5);
+    mouseDownAt(viewport.canvas, 5, 5);
     expect(onSelect).toHaveBeenLastCalledWith(null);
   });
 
-  it("transforms the selected object and can cancel", () => {
+  it("emits context-menu with canvas pointer coordinates", () => {
+    const viewport = create();
+    const onContextMenu = vi.fn();
+    viewport.on("context-menu", onContextMenu);
+
+    viewport.canvas.dispatchEvent(
+      new MouseEvent("contextmenu", { bubbles: true, cancelable: true, clientX: 42, clientY: 24 })
+    );
+    expect(onContextMenu).toHaveBeenLastCalledWith({ x: 42, y: 24 });
+  });
+
+  it("transforms the selected object via window pointer events and can cancel", () => {
     const viewport = create({ overlays: true });
     const status = vi.fn();
     const change = vi.fn();
@@ -165,8 +213,7 @@ describe("Viewport", () => {
     expect(status).toHaveBeenCalled();
     expect(transform).toHaveBeenLastCalledWith({ kind: "translate", phase: "start" });
 
-    const move = (viewport as unknown as { onMouseMove: (event: MouseEvent) => void }).onMouseMove;
-    move(new MouseEvent("mousemove", { clientX: 40, clientY: 20 }));
+    mouseMoveTo(40, 20);
     expect(viewport.getObjects()[0].loc[0]).not.toBe(0);
     expect(change).toHaveBeenCalled();
 
@@ -176,7 +223,7 @@ describe("Viewport", () => {
     // 取消：位置回到开始拖拽前。
     const before = [...viewport.getObjects()[0].loc] as [number, number, number];
     viewport.beginTransform("translate");
-    move(new MouseEvent("mousemove", { clientX: 80, clientY: 30 }));
+    mouseMoveTo(80, 30);
     viewport.cancelTransform();
     expect(transform).toHaveBeenLastCalledWith({ kind: "translate", phase: "cancel" });
     expect(viewport.getObjects()[0].loc).toEqual(before);
@@ -186,30 +233,51 @@ describe("Viewport", () => {
     expect(status).toHaveBeenLastCalledWith("No active object to transform");
   });
 
-  it("draws every shading and edit mode without throwing", () => {
+  it("renders every shading and edit mode through the public render loop", async () => {
     const viewport = create({ overlays: true, shading: "wireframe", editMode: true });
-    const draw = () => (viewport as unknown as { draw: () => void }).draw();
+    await nextFrame();
+    await nextFrame();
 
-    draw();
     viewport.setShading("solid");
     viewport.setEditElementMode("vertex");
-    draw();
+    viewport.invalidate();
+    await nextFrame();
+    await nextFrame();
+
     viewport.setEditElementMode("edge");
-    draw();
+    viewport.invalidate();
+    await nextFrame();
+    await nextFrame();
+
     viewport.setEditElementMode("face");
-    draw();
+    viewport.invalidate();
+    await nextFrame();
+    await nextFrame();
 
     viewport.setBrush("paint-draw");
-    Object.assign(viewport as unknown as Record<string, unknown>, { hasPointer: true, pointerX: 100, pointerY: 80 });
-    draw();
+    mouseMoveTo(100, 80);
+    viewport.invalidate();
+    await nextFrame();
+    await nextFrame();
 
     viewport.setEditMode(false);
     viewport.setSelected("Camera");
-    draw();
+    viewport.invalidate();
+    await nextFrame();
+    await nextFrame();
+
     viewport.setSelected("Light");
-    draw();
+    viewport.invalidate();
+    await nextFrame();
+    await nextFrame();
+
     viewport.setSelected("Hidden");
-    draw();
+    viewport.invalidate();
+    await nextFrame();
+    await nextFrame();
+
+    viewport.canvas.dispatchEvent(new WheelEvent("wheel", { deltaY: 120, bubbles: true, cancelable: true }));
+    expect(viewport.getSelected()).toBe("Hidden");
   });
 
   it("disposes listeners and the render loop idempotently", () => {
