@@ -7,28 +7,28 @@ export interface SearchCommand {
 }
 
 const SHORTCUTS: Array<[string, string]> = [
-  ["V", "Selection"],
-  ["A", "Direct Selection"],
-  ["P", "Pen"],
-  ["M", "Rectangle"],
-  ["L", "Ellipse"],
-  ["T", "Type"],
-  ["Q", "Lasso"],
-  ["B", "Paintbrush"],
-  ["H", "Hand"],
-  ["Z", "Zoom"],
-  ["R", "Rotate"],
-  ["Space + Drag", "Pan"],
-  ["Ctrl + Wheel", "Zoom"],
-  ["Ctrl + 0", "Fit Artboard"],
-  ["Ctrl + 1", "Actual Size"],
-  ["Ctrl + Z / Shift + Ctrl + Z", "Undo / Redo"],
-  ["Ctrl + D", "Duplicate"],
-  ["Ctrl + G / Shift + Ctrl + G", "Group / Ungroup"],
-  ["Ctrl + A", "Select All"],
-  ["Delete", "Delete selection"],
-  ["Arrows", "Nudge 1 pt（Shift 10 pt）"],
-  ["Shift + Ctrl + O", "Create Outlines"]
+  ["V", "选择"],
+  ["A", "直接选择"],
+  ["P", "钢笔"],
+  ["M", "矩形"],
+  ["L", "椭圆"],
+  ["T", "文字"],
+  ["Q", "套索"],
+  ["B", "画笔"],
+  ["H", "抓手"],
+  ["Z", "缩放"],
+  ["R", "旋转"],
+  ["Space + 拖动", "平移画布"],
+  ["Ctrl + 滚轮", "缩放"],
+  ["Ctrl + 0", "适应画板"],
+  ["Ctrl + 1", "实际大小"],
+  ["Ctrl + Z / Shift + Ctrl + Z", "撤销 / 重做"],
+  ["Ctrl + D", "重复"],
+  ["Ctrl + G / Shift + Ctrl + G", "编组 / 取消编组"],
+  ["Ctrl + A", "全选"],
+  ["Delete", "删除选中对象"],
+  ["方向键", "微移 1 pt（Shift 10 pt）"],
+  ["Shift + Ctrl + O", "创建轮廓"]
 ];
 
 export function showShortcutsDialog() {
@@ -37,13 +37,13 @@ export function showShortcutsDialog() {
       <header class="vc-modal-head"><span>${icon(
         "help",
         14
-      )} Keyboard Shortcuts</span><button class="vc-mini-btn" data-modal="close">${icon("close", 12)}</button></header>
+      )} 键盘快捷键</span><button class="vc-mini-btn" data-modal="close">${icon("close", 12)}</button></header>
       <div class="vc-modal-body">
         <div class="vc-shortcut-grid">${SHORTCUTS.map(([key, label]) => `<kbd>${key}</kbd><span>${label}</span>`).join(
           ""
         )}</div>
       </div>
-      <footer class="vc-modal-foot"><span class="vc-modal-hint">LiteGUI VectorCraft demo</span></footer>
+      <footer class="vc-modal-foot"><span class="vc-modal-hint">LiteGUI VectorCraft 示例</span></footer>
     </div>`
   );
 }
@@ -60,7 +60,7 @@ export function showAboutDialog() {
         <p>特性：SVG 矢量渲染 · 画板/标尺 · 选择/拖拽/缩放/旋转 · 路径与锚点编辑 · 真实文字轮廓 · 图层/属性面板 · SVG/PNG 导出。</p>
         <p class="vc-modal-hint">LiteGUI monorepo · apps/vectorcraft · 字体 Chakra Petch（SIL OFL 1.1）</p>
       </div>
-      <footer class="vc-modal-foot"><button class="vc-quick-btn vc-quick-btn--primary" data-modal="close">Close</button></footer>
+      <footer class="vc-modal-foot"><button class="vc-quick-btn vc-quick-btn--primary" data-modal="close">关闭</button></footer>
     </div>`
   );
 }
@@ -76,15 +76,15 @@ export function showHistoryDialog(options: {
       <header class="vc-modal-head"><span>${icon(
         "history",
         14
-      )} History</span><button class="vc-mini-btn" data-modal="close">${icon("close", 12)}</button></header>
+      )} 历史记录</span><button class="vc-mini-btn" data-modal="close">${icon("close", 12)}</button></header>
       <div class="vc-modal-body">
         <p>可撤销 ${options.undoCount} 步，可重做 ${options.redoCount} 步。</p>
         <div class="vc-quick-grid">
-          <button class="vc-quick-btn" data-history="undo">Undo</button>
-          <button class="vc-quick-btn" data-history="redo">Redo</button>
+          <button class="vc-quick-btn" data-history="undo">撤销</button>
+          <button class="vc-quick-btn" data-history="redo">重做</button>
         </div>
       </div>
-      <footer class="vc-modal-foot"><button class="vc-quick-btn vc-quick-btn--primary" data-modal="close">Close</button></footer>
+      <footer class="vc-modal-foot"><button class="vc-quick-btn vc-quick-btn--primary" data-modal="close">关闭</button></footer>
     </div>`,
     ({ root, close }) => {
       root.addEventListener("click", event => {
@@ -103,7 +103,7 @@ export function showSearchDialog(commands: SearchCommand[]) {
       <header class="vc-modal-head"><span>${icon(
         "search",
         14
-      )} Command Search</span><button class="vc-mini-btn" data-modal="close">${icon("close", 12)}</button></header>
+      )} 命令搜索</span><button class="vc-mini-btn" data-modal="close">${icon("close", 12)}</button></header>
       <div class="vc-modal-body">
         <input class="vc-input vc-search-input" placeholder="搜索命令…" />
         <div class="vc-search-list"></div>

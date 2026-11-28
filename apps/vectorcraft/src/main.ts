@@ -56,61 +56,90 @@ interface DragState {
   historyPushed: boolean;
 }
 
+const TOOL_STATUS: Record<string, string> = {
+  select: "选择工具",
+  direct: "直接选择工具",
+  group: "编组选择工具",
+  lasso: "套索工具",
+  pen: "钢笔工具",
+  penAdd: "添加锚点工具",
+  penRemove: "删除锚点工具",
+  anchor: "锚点工具",
+  type: "文字工具",
+  verticalType: "直排文字工具",
+  line: "直线段工具",
+  rect: "矩形工具",
+  ellipse: "椭圆工具",
+  polygon: "多边形工具",
+  star: "星形工具",
+  brush: "画笔工具",
+  pencil: "铅笔工具",
+  smooth: "平滑工具",
+  shaper: "成形工具",
+  pathEraser: "路径橡皮擦工具",
+  eraser: "橡皮擦工具",
+  scissors: "剪刀工具",
+  knife: "刻刀工具",
+  hand: "抓手工具",
+  rotate: "旋转工具",
+  zoom: "缩放工具"
+};
+
 const TOOLS: ToolbarTool[] = [
-  { id: "select", label: "Selection", shortcut: "V", icon: icon("select", 17, "vc-tool-svg") },
-  { id: "direct", label: "Direct Selection", shortcut: "A", icon: icon("directSelect", 17) },
-  { id: "group", label: "Group Selection", icon: icon("groupSelect", 17) },
-  { id: "lasso", label: "Lasso", shortcut: "Q", icon: icon("lasso", 17) },
-  { id: "pen", label: "Pen", shortcut: "P", icon: icon("pen", 17) },
-  { id: "penAdd", label: "Add Anchor Point", icon: icon("penAdd", 17) },
-  { id: "penRemove", label: "Delete Anchor Point", icon: icon("penRemove", 17) },
-  { id: "anchor", label: "Anchor Point", shortcut: "Shift+C", icon: icon("anchor", 17) },
-  { id: "type", label: "Type", shortcut: "T", icon: icon("type", 17) },
-  { id: "verticalType", label: "Vertical Type", shortcut: "Shift+T", icon: icon("verticalType", 17) },
-  { id: "line", label: "Line Segment", shortcut: "\\", icon: icon("line", 17) },
-  { id: "rect", label: "Rectangle", shortcut: "M", icon: icon("rect", 17) },
-  { id: "ellipse", label: "Ellipse", shortcut: "L", icon: icon("ellipse", 17) },
-  { id: "polygon", label: "Polygon", icon: icon("polygon", 17) },
-  { id: "star", label: "Star", icon: icon("star", 17) },
-  { id: "brush", label: "Paintbrush", shortcut: "B", icon: icon("brush", 17) },
-  { id: "pencil", label: "Pencil", shortcut: "N", icon: icon("pencil", 17) },
-  { id: "smooth", label: "Smooth", icon: icon("smooth", 17) },
-  { id: "shaper", label: "Shaper", shortcut: "Shift+N", icon: icon("shaper", 17) },
-  { id: "pathEraser", label: "Path Eraser", icon: icon("pathEraser", 17) },
-  { id: "eraser", label: "Eraser", shortcut: "Shift+E", icon: icon("eraser", 17) },
-  { id: "scissors", label: "Scissors", shortcut: "C", icon: icon("scissors", 17) },
-  { id: "knife", label: "Knife", icon: icon("knife", 17) },
-  { id: "hand", label: "Hand", shortcut: "H", icon: icon("hand", 17) },
-  { id: "rotate", label: "Rotate", shortcut: "R", icon: icon("rotate", 17) },
-  { id: "zoom", label: "Zoom", shortcut: "Z", icon: icon("zoom", 17) }
+  { id: "select", label: "选择", shortcut: "V", icon: icon("select", 17, "vc-tool-svg") },
+  { id: "direct", label: "直接选择", shortcut: "A", icon: icon("directSelect", 17) },
+  { id: "group", label: "编组选择", icon: icon("groupSelect", 17) },
+  { id: "lasso", label: "套索", shortcut: "Q", icon: icon("lasso", 17) },
+  { id: "pen", label: "钢笔", shortcut: "P", icon: icon("pen", 17) },
+  { id: "penAdd", label: "添加锚点", icon: icon("penAdd", 17) },
+  { id: "penRemove", label: "删除锚点", icon: icon("penRemove", 17) },
+  { id: "anchor", label: "锚点", shortcut: "Shift+C", icon: icon("anchor", 17) },
+  { id: "type", label: "文字", shortcut: "T", icon: icon("type", 17) },
+  { id: "verticalType", label: "直排文字", shortcut: "Shift+T", icon: icon("verticalType", 17) },
+  { id: "line", label: "直线段", shortcut: "\\", icon: icon("line", 17) },
+  { id: "rect", label: "矩形", shortcut: "M", icon: icon("rect", 17) },
+  { id: "ellipse", label: "椭圆", shortcut: "L", icon: icon("ellipse", 17) },
+  { id: "polygon", label: "多边形", icon: icon("polygon", 17) },
+  { id: "star", label: "星形", icon: icon("star", 17) },
+  { id: "brush", label: "画笔", shortcut: "B", icon: icon("brush", 17) },
+  { id: "pencil", label: "铅笔", shortcut: "N", icon: icon("pencil", 17) },
+  { id: "smooth", label: "平滑", icon: icon("smooth", 17) },
+  { id: "shaper", label: "成形", shortcut: "Shift+N", icon: icon("shaper", 17) },
+  { id: "pathEraser", label: "路径橡皮擦", icon: icon("pathEraser", 17) },
+  { id: "eraser", label: "橡皮擦", shortcut: "Shift+E", icon: icon("eraser", 17) },
+  { id: "scissors", label: "剪刀", shortcut: "C", icon: icon("scissors", 17) },
+  { id: "knife", label: "刻刀", icon: icon("knife", 17) },
+  { id: "hand", label: "抓手", shortcut: "H", icon: icon("hand", 17) },
+  { id: "rotate", label: "旋转", shortcut: "R", icon: icon("rotate", 17) },
+  { id: "zoom", label: "缩放", shortcut: "Z", icon: icon("zoom", 17) }
 ];
 
 const RAIL_MAIN = [
-  { id: "properties", title: "Properties", icon: "properties" },
-  { id: "layers", title: "Layers", icon: "layers" },
-  { id: "libraries", title: "Libraries", icon: "libraries" },
-  { id: "appearance", title: "Appearance", icon: "appearance" },
-  { id: "color", title: "Color", icon: "color" },
-  { id: "gradient", title: "Gradient", icon: "gradient" },
-  { id: "opacity", title: "Transparency", icon: "opacity" },
-  { id: "transform", title: "Transform", icon: "transform" },
-  { id: "symbols", title: "Symbols", icon: "symbols" },
-  { id: "align", title: "Align", icon: "align" },
-  { id: "pathfinder", title: "Pathfinder", icon: "pathfinder" },
-  { id: "effects", title: "Effects", icon: "effects" },
-  { id: "artboard", title: "Artboards", icon: "artboard" },
-  { id: "guides", title: "Guides", icon: "guides" },
-  { id: "measure", title: "Measure", icon: "measure" },
-  { id: "comment", title: "Comments", icon: "comment" },
-  { id: "history", title: "History", icon: "history" },
-  { id: "actions", title: "Actions", icon: "actions" },
-  { id: "export", title: "Export", icon: "export" }
+  { id: "properties", title: "属性", icon: "properties" },
+  { id: "layers", title: "图层", icon: "layers" },
+  { id: "libraries", title: "库", icon: "libraries" },
+  { id: "appearance", title: "外观", icon: "appearance" },
+  { id: "color", title: "颜色", icon: "color" },
+  { id: "gradient", title: "渐变", icon: "gradient" },
+  { id: "opacity", title: "透明度", icon: "opacity" },
+  { id: "transform", title: "变换", icon: "transform" },
+  { id: "symbols", title: "符号", icon: "symbols" },
+  { id: "align", title: "对齐", icon: "align" },
+  { id: "pathfinder", title: "路径查找器", icon: "pathfinder" },
+  { id: "effects", title: "效果", icon: "effects" },
+  { id: "artboard", title: "画板", icon: "artboard" },
+  { id: "guides", title: "参考线", icon: "guides" },
+  { id: "measure", title: "测量", icon: "measure" },
+  { id: "comment", title: "注释", icon: "comment" },
+  { id: "history", title: "历史记录", icon: "history" },
+  { id: "actions", title: "动作", icon: "actions" },
+  { id: "export", title: "导出", icon: "export" }
 ];
 
 const RAIL_FOOT = [
-  { id: "settings", title: "Settings", icon: "settings" },
-  { id: "help", title: "Help", icon: "help" },
-  { id: "pointer", title: "Selection", icon: "pointer" }
+  { id: "settings", title: "设置", icon: "settings" },
+  { id: "help", title: "帮助", icon: "help" },
+  { id: "pointer", title: "选择", icon: "pointer" }
 ];
 
 const TOOL_SHORTCUTS: Record<string, string> = {
@@ -138,8 +167,8 @@ const MOUNT = `<div class="vc-app">
         <div class="vc-doctab is-active" id="vc-doctab">
           <span class="vc-doctab-icon">${icon("logo", 14)}</span>
           <span class="vc-doctab-title" id="vc-doc-title">neon-drive.vectorcraft</span>
-          <span class="vc-doctab-meta" id="vc-doc-meta">@ 100% (RGB/Preview)</span>
-          <button class="vc-doctab-close" data-doc-close title="Close document">${icon("close", 11)}</button>
+          <span class="vc-doctab-meta" id="vc-doc-meta">@ 100% (RGB/预览)</span>
+          <button class="vc-doctab-close" data-doc-close title="关闭文档">${icon("close", 11)}</button>
         </div>
         <div class="vc-doctabs-fill"></div>
       </div>
@@ -159,39 +188,39 @@ const MOUNT = `<div class="vc-app">
   <footer class="vc-status">
     <div class="vc-status-row vc-status-row--hints">
       <button class="vc-status-info" title="快捷键帮助" data-help>${icon("info", 13)}</button>
-      <span class="vc-status-hint" id="vc-hint">Click the object to select</span>
+      <span class="vc-status-hint" id="vc-hint">单击以选择对象 | Shift+单击以选择多个对象 | Alt+拖动以复制对象</span>
       <span class="vc-spacer"></span>
-      <span class="vc-status-mode">RGB / Preview</span>
+      <span class="vc-status-mode">RGB / 预览</span>
     </div>
     <div class="vc-status-row vc-status-row--controls">
-      <button class="vc-status-btn vc-zoom-btn" id="vc-zoom" title="Zoom level">100%</button>
-      <button class="vc-status-btn" id="vc-rotation" title="Rotation">0°</button>
+      <button class="vc-status-btn vc-zoom-btn" id="vc-zoom" title="缩放比例">100%</button>
+      <button class="vc-status-btn" id="vc-rotation" title="旋转">0°</button>
       <span class="vc-status-sep"></span>
-      <button class="vc-status-btn vc-icon-only" data-status-action="prev-artboard" title="Previous artboard">${icon(
+      <button class="vc-status-btn vc-icon-only" data-status-action="prev-artboard" title="上一个画板">${icon(
         "navPrev",
         13
       )}</button>
-      <button class="vc-status-btn vc-icon-only" data-status-action="fit" title="Fit artboard (Ctrl+0)">${icon(
+      <button class="vc-status-btn vc-icon-only" data-status-action="fit" title="适应画板 (Ctrl+0)">${icon(
         "fit",
         13
       )}</button>
-      <button class="vc-status-btn vc-icon-only" data-status-action="next-artboard" title="Next artboard">${icon(
+      <button class="vc-status-btn vc-icon-only" data-status-action="next-artboard" title="下一个画板">${icon(
         "navNext",
         13
       )}</button>
       <span class="vc-status-sep"></span>
       <span class="vc-artboard-chip" id="vc-artboard">1 Artboard 1</span>
-      <button class="vc-status-btn vc-icon-only" data-status-action="prev-artboard" title="Previous artboard">${icon(
+      <button class="vc-status-btn vc-icon-only" data-status-action="prev-artboard" title="上一个画板">${icon(
         "chevronLeft",
         12
       )}</button>
-      <button class="vc-status-btn vc-icon-only" data-status-action="next-artboard" title="Next artboard">${icon(
+      <button class="vc-status-btn vc-icon-only" data-status-action="next-artboard" title="下一个画板">${icon(
         "chevronRight",
         12
       )}</button>
-      <span class="vc-select-state" id="vc-selection-state">No Selection</span>
+      <span class="vc-select-state" id="vc-selection-state">选择工具</span>
       <span class="vc-spacer"></span>
-      <span class="vc-status-stats" id="vc-stats">render 0.0 ms · ul 0.0 ms · 60 fps</span>
+      <span class="vc-status-stats" id="vc-stats">渲染 0.0 ms · 界面 0.0 ms · 60 fps</span>
     </div>
   </footer>
 </div>`;
@@ -253,8 +282,7 @@ class Editor implements EditorContext {
   private fpsStamp = performance.now();
   private toastTimer = 0;
   private measureMode = false;
-  private defaultHint =
-    "Click the object to select | Shift+Click to select multiple objects | Alt+Drag the object to duplicate";
+  private defaultHint = "单击以选择对象 | Shift+单击以选择多个对象 | Alt+拖动以复制对象";
 
   start() {
     const app = document.querySelector<HTMLElement>("#app");
@@ -346,12 +374,23 @@ class Editor implements EditorContext {
     const menubar = document.createElement("nav");
     menubar.className = "vc-menubar";
     menubar.id = "vc-menubar";
+    const menuLabels: Record<string, string> = {
+      File: "文件",
+      Edit: "编辑",
+      Object: "对象",
+      Type: "文字",
+      Select: "选择",
+      Effect: "效果",
+      View: "视图",
+      Window: "窗口",
+      Help: "帮助"
+    };
     for (const name of ["File", "Edit", "Object", "Type", "Select", "Effect", "View", "Window", "Help"]) {
       const button = document.createElement("button");
       button.type = "button";
       button.className = "vc-menu-btn";
       button.dataset.menu = name;
-      button.textContent = name;
+      button.textContent = menuLabels[name] ?? name;
       button.addEventListener("click", () => this.openMenu(button, this.menus()[name] ?? []));
       menubar.appendChild(button);
     }
@@ -361,12 +400,12 @@ class Editor implements EditorContext {
     right.className = "vc-topbar-right";
     right.innerHTML = `
       <button class="vc-discord" data-top-action="discord">${icon("discord", 15)}<span>Discord</span></button>
-      <button class="vc-top-icon" data-top-action="search" title="Search">${icon("search", 16)}</button>
-      <button class="vc-workspace" data-top-action="workspace">Essentials ${icon("chevronDown", 12)}</button>
+      <button class="vc-top-icon" data-top-action="search" title="搜索">${icon("search", 16)}</button>
+      <button class="vc-workspace" data-top-action="workspace">基本功能 ${icon("chevronDown", 12)}</button>
       <div class="vc-window-controls">
-        <button class="vc-window-btn" data-top-action="minimize" title="Minimize">${icon("minimize", 13)}</button>
-        <button class="vc-window-btn" data-top-action="maximize" title="Maximize">${icon("maximize", 12)}</button>
-        <button class="vc-window-btn vc-window-btn--close" data-top-action="close" title="Close">${icon(
+        <button class="vc-window-btn" data-top-action="minimize" title="最小化">${icon("minimize", 13)}</button>
+        <button class="vc-window-btn" data-top-action="maximize" title="最大化">${icon("maximize", 12)}</button>
+        <button class="vc-window-btn vc-window-btn--close" data-top-action="close" title="关闭">${icon(
           "close",
           12
         )}</button>
@@ -390,10 +429,16 @@ class Editor implements EditorContext {
       case "workspace":
         this.openMenu(
           anchor,
-          ["Essentials", "Layout", "Typography", "Painting", "Export"].map(name => ({
-            label: name,
-            checked: name === "Essentials",
-            action: () => this.toast(`Workspace：${name}`)
+          [
+            ["基本功能", "Essentials"],
+            ["布局", "Layout"],
+            ["排版", "Typography"],
+            ["绘画", "Painting"],
+            ["导出", "Export"]
+          ].map(([label, key]) => ({
+            label,
+            checked: key === "Essentials",
+            action: () => this.toast(`工作区：${label}`)
           }))
         );
         break;
@@ -427,28 +472,25 @@ class Editor implements EditorContext {
     const swatches = document.createElement("div");
     swatches.className = "vc-swatches";
     swatches.innerHTML = `
-      <div class="vc-colorstack" title="Fill">
-        <button class="vc-colorstack-fill" data-swatch="fill" aria-label="Fill"></button>
-        <button class="vc-colorstack-stroke" data-swatch="stroke" aria-label="Stroke"></button>
+      <div class="vc-colorstack" title="填色">
+        <button class="vc-colorstack-fill" data-swatch="fill" aria-label="填色"></button>
+        <button class="vc-colorstack-stroke" data-swatch="stroke" aria-label="描边"></button>
       </div>
-      <button class="vc-mini-btn vc-swatch-swap" data-swatch="swap" title="Swap Fill and Stroke (Shift+X)">${icon(
+      <button class="vc-mini-btn vc-swatch-swap" data-swatch="swap" title="交换填色和描边 (Shift+X)">${icon(
         "swap",
         13
       )}</button>
-      <button class="vc-mini-btn vc-swatch-default" data-swatch="default" title="Default Fill and Stroke (D)">${icon(
+      <button class="vc-mini-btn vc-swatch-default" data-swatch="default" title="默认填色和描边 (D)">${icon(
         "defaultColors",
         13
       )}</button>
-      <button class="vc-mini-btn vc-swatch-screen" data-swatch="screen" title="Screen Mode">${icon(
+      <button class="vc-mini-btn vc-swatch-screen" data-swatch="screen" title="屏幕模式">${icon(
         "screenMode",
         13
       )}</button>
       <div class="vc-swatch-chips">
-        <button class="vc-swatch-chip" data-swatch="gradient" title="Gradient Fill">${icon(
-          "gradientSwatch",
-          12
-        )}</button>
-        <button class="vc-swatch-chip" data-swatch="none" title="No Fill">${icon("noneSwatch", 12)}</button>
+        <button class="vc-swatch-chip" data-swatch="gradient" title="渐变填色">${icon("gradientSwatch", 12)}</button>
+        <button class="vc-swatch-chip" data-swatch="none" title="无填色">${icon("noneSwatch", 12)}</button>
       </div>`;
     swatches.addEventListener("click", event => {
       const target = (event.target as HTMLElement).closest<HTMLElement>("[data-swatch]");
@@ -532,7 +574,7 @@ class Editor implements EditorContext {
         break;
       case "guides":
         this.toggleGrid();
-        this.toast(`Grid ${this.ui.showGrid ? "shown" : "hidden"}`);
+        this.toast(`网格已${this.ui.showGrid ? "显示" : "隐藏"}`);
         break;
       case "measure":
         this.toggleMeasure();
@@ -556,10 +598,10 @@ class Editor implements EditorContext {
         this.setTool("select");
         break;
       case "settings":
-        this.toast("Settings：仅提供深色主题");
+        this.toast("设置：当前仅提供深色主题");
         break;
       default:
-        this.toast(`${id}：面板示例未接入`);
+        this.toast(`${id}：该面板暂未接入`);
         break;
     }
   }
@@ -570,16 +612,16 @@ class Editor implements EditorContext {
       if (!target) return;
       const action = target.dataset.statusAction;
       if (action === "fit") this.zoomFit();
-      else if (action === "prev-artboard" || action === "next-artboard") this.toast("只有一个画板");
+      else if (action === "prev-artboard" || action === "next-artboard") this.toast("当前只有一个画板");
     });
     document.querySelector("[data-help]")?.addEventListener("click", () => this.showShortcuts());
     this.zoomButton.addEventListener("click", () => {
       this.openMenu(this.zoomButton, [
-        { label: "Zoom In", shortcut: "Ctrl++", action: () => this.zoomBy(1.25) },
-        { label: "Zoom Out", shortcut: "Ctrl+-", action: () => this.zoomBy(0.8) },
+        { label: "放大", shortcut: "Ctrl++", action: () => this.zoomBy(1.25) },
+        { label: "缩小", shortcut: "Ctrl+-", action: () => this.zoomBy(0.8) },
         { separator: true },
-        { label: "Fit Artboard", shortcut: "Ctrl+0", action: () => this.zoomFit() },
-        { label: "Actual Size", shortcut: "Ctrl+1", action: () => this.setZoomPercent(100) },
+        { label: "适应画板", shortcut: "Ctrl+0", action: () => this.zoomFit() },
+        { label: "实际大小", shortcut: "Ctrl+1", action: () => this.setZoomPercent(100) },
         { separator: true },
         ...[400, 200, 100, 66.67, 50, 25].map(value => ({
           label: `${value}%`,
@@ -595,100 +637,100 @@ class Editor implements EditorContext {
   private menus(): Record<string, MenuItem[]> {
     return {
       File: [
-        { label: "New", shortcut: "Ctrl N", action: () => this.newDocument() },
-        { label: "Open…", shortcut: "Ctrl O", action: () => this.fileInput.click() },
-        { label: "Revert", action: () => this.newDocument() },
+        { label: "新建", shortcut: "Ctrl N", action: () => this.newDocument() },
+        { label: "打开…", shortcut: "Ctrl O", action: () => this.fileInput.click() },
+        { label: "恢复", action: () => this.newDocument() },
         { separator: true },
-        { label: "Save", shortcut: "Ctrl S", action: () => this.saveDocument() },
-        { label: "Save As…", action: () => this.saveDocument() },
+        { label: "保存", shortcut: "Ctrl S", action: () => this.saveDocument() },
+        { label: "另存为…", action: () => this.saveDocument() },
         { separator: true },
-        { label: "Export SVG…", action: () => void this.exportSvg() },
-        { label: "Export PNG…", shortcut: "Alt Shift P", action: () => void this.exportPng() },
+        { label: "导出 SVG…", action: () => void this.exportSvg() },
+        { label: "导出 PNG…", shortcut: "Alt Shift P", action: () => void this.exportPng() },
         { separator: true },
-        { label: "Document Setup…", action: () => this.toast("Document Setup：800 × 1000 pt · 72 ppi · RGB") },
-        { label: "Print…", shortcut: "Ctrl P", action: () => this.toast("Print：示例未接入") }
+        { label: "文档设置…", action: () => this.showDocumentSetup() },
+        { label: "打印…", shortcut: "Ctrl P", action: () => this.toast("打印：示例未接入") }
       ],
       Edit: [
-        { label: "Undo", shortcut: "Ctrl Z", disabled: this.history.length === 0, action: () => this.undo() },
-        { label: "Redo", shortcut: "Shift Ctrl Z", disabled: this.future.length === 0, action: () => this.redo() },
+        { label: "撤销", shortcut: "Ctrl Z", disabled: this.history.length === 0, action: () => this.undo() },
+        { label: "重做", shortcut: "Shift Ctrl Z", disabled: this.future.length === 0, action: () => this.redo() },
         { separator: true },
-        { label: "Cut", shortcut: "Ctrl X", action: () => this.cutSelection() },
-        { label: "Copy", shortcut: "Ctrl C", action: () => this.copySelection() },
-        { label: "Paste", shortcut: "Ctrl V", action: () => this.pasteSelection() },
+        { label: "剪切", shortcut: "Ctrl X", action: () => this.cutSelection() },
+        { label: "复制", shortcut: "Ctrl C", action: () => this.copySelection() },
+        { label: "粘贴", shortcut: "Ctrl V", action: () => this.pasteSelection() },
         { separator: true },
-        { label: "Delete", shortcut: "Del", action: () => this.deleteSelection() },
-        { label: "Duplicate", shortcut: "Ctrl D", action: () => this.duplicateSelection() },
+        { label: "删除", shortcut: "Del", action: () => this.deleteSelection() },
+        { label: "重复", shortcut: "Ctrl D", action: () => this.duplicateSelection() },
         { separator: true },
-        { label: "Keyboard Shortcuts…", action: () => this.showShortcuts() }
+        { label: "键盘快捷键…", action: () => this.showShortcuts() }
       ],
       Object: [
-        { label: "Transform Again", shortcut: "Ctrl D", action: () => this.duplicateSelection() },
-        { label: "Rotate 90° CW", action: () => this.rotateSelection(90) },
-        { label: "Rotate 90° CCW", action: () => this.rotateSelection(-90) },
+        { label: "再次变换", shortcut: "Ctrl D", action: () => this.duplicateSelection() },
+        { label: "顺时针旋转 90°", action: () => this.rotateSelection(90) },
+        { label: "逆时针旋转 90°", action: () => this.rotateSelection(-90) },
         { separator: true },
-        { label: "Arrange: Bring to Front", shortcut: "Shift Ctrl ]", action: () => this.bringToFront() },
-        { label: "Arrange: Send to Back", shortcut: "Shift Ctrl [", action: () => this.sendToBack() },
+        { label: "排列：置于顶层", shortcut: "Shift Ctrl ]", action: () => this.bringToFront() },
+        { label: "排列：置于底层", shortcut: "Shift Ctrl [", action: () => this.sendToBack() },
         { separator: true },
-        { label: "Lock", shortcut: "Ctrl 2", action: () => this.selection.forEach(id => this.toggleLock(id)) },
+        { label: "锁定", shortcut: "Ctrl 2", action: () => this.selection.forEach(id => this.toggleLock(id)) },
         {
-          label: "Unlock All",
+          label: "全部解锁",
           shortcut: "Alt Ctrl 2",
           action: () => this.doc.objects.forEach(object => (object.locked = false))
         },
-        { label: "Hide", shortcut: "Ctrl 3", action: () => this.selection.forEach(id => this.toggleVisibility(id)) },
+        { label: "隐藏", shortcut: "Ctrl 3", action: () => this.selection.forEach(id => this.toggleVisibility(id)) },
         { separator: true },
-        { label: "Group", shortcut: "Ctrl G", action: () => this.groupSelection() },
-        { label: "Ungroup", shortcut: "Shift Ctrl G", action: () => this.ungroupSelection() }
+        { label: "编组", shortcut: "Ctrl G", action: () => this.groupSelection() },
+        { label: "取消编组", shortcut: "Shift Ctrl G", action: () => this.ungroupSelection() }
       ],
       Type: [
-        { label: "Create Outlines", shortcut: "Shift Ctrl O", action: () => void this.outlineSelection() },
-        { label: "Font Size Increase", shortcut: "Ctrl Shift >", action: () => this.stepFontSize(4) },
-        { label: "Font Size Decrease", shortcut: "Ctrl Shift <", action: () => this.stepFontSize(-4) },
+        { label: "创建轮廓", shortcut: "Shift Ctrl O", action: () => void this.outlineSelection() },
+        { label: "增大字号", shortcut: "Ctrl Shift >", action: () => this.stepFontSize(4) },
+        { label: "减小字号", shortcut: "Ctrl Shift <", action: () => this.stepFontSize(-4) },
         { separator: true },
-        { label: "Align Center", action: () => this.updateSelection({ align: "center" }, true) },
-        { label: "Reset Tracking", action: () => this.updateSelection({ letterSpacing: 0 }, true) },
+        { label: "居中对齐", action: () => this.updateSelection({ align: "center" }, true) },
+        { label: "重置字距", action: () => this.updateSelection({ letterSpacing: 0 }, true) },
         { separator: true },
-        { label: "Edit Text…", action: () => this.editPrimaryText() }
+        { label: "编辑文字…", action: () => this.editPrimaryText() }
       ],
       Select: [
-        { label: "All", shortcut: "Ctrl A", action: () => this.selectAll() },
-        { label: "Deselect", shortcut: "Ctrl Shift A", action: () => this.select([]) },
+        { label: "全部", shortcut: "Ctrl A", action: () => this.selectAll() },
+        { label: "取消选择", shortcut: "Ctrl Shift A", action: () => this.select([]) },
         { separator: true },
-        { label: "Same: Fill Color", action: () => this.selectSameFill() },
-        { label: "Inverse", action: () => this.selectInverse() },
-        { label: "Next Object Below", shortcut: "Ctrl Alt ]", action: () => this.selectNextObject(1) },
-        { label: "Next Object Above", shortcut: "Ctrl Alt [", action: () => this.selectNextObject(-1) }
+        { label: "相同：填色", action: () => this.selectSameFill() },
+        { label: "反向", action: () => this.selectInverse() },
+        { label: "下一个对象（下层）", shortcut: "Ctrl Alt ]", action: () => this.selectNextObject(1) },
+        { label: "上一个对象（上层）", shortcut: "Ctrl Alt [", action: () => this.selectNextObject(-1) }
       ],
       Effect: [
-        { label: "Outer Glow", checked: (this.primaryObject()?.glow ?? 0) > 0, action: () => this.toggleGlow() },
-        { label: "Remove All Effects", action: () => this.updateSelection({ glow: 0 }, true) },
+        { label: "外发光", checked: (this.primaryObject()?.glow ?? 0) > 0, action: () => this.toggleGlow() },
+        { label: "移除所有效果", action: () => this.updateSelection({ glow: 0 }, true) },
         { separator: true },
-        { label: "Drop Shadow…", action: () => this.toast("Drop Shadow：示例未接入") },
-        { label: "Gaussian Blur…", action: () => this.toast("Gaussian Blur：示例未接入") }
+        { label: "投影…", action: () => this.toast("投影：示例未接入") },
+        { label: "高斯模糊…", action: () => this.toast("高斯模糊：示例未接入") }
       ],
       View: [
-        { label: "Zoom In", shortcut: "Ctrl +", action: () => this.zoomBy(1.25) },
-        { label: "Zoom Out", shortcut: "Ctrl -", action: () => this.zoomBy(0.8) },
-        { label: "Fit Artboard", shortcut: "Ctrl 0", action: () => this.zoomFit() },
-        { label: "Actual Size", shortcut: "Ctrl 1", action: () => this.setZoomPercent(100) },
-        { label: "Zoom to Selection", shortcut: "Ctrl 2", action: () => this.zoomToSelection() },
+        { label: "放大", shortcut: "Ctrl +", action: () => this.zoomBy(1.25) },
+        { label: "缩小", shortcut: "Ctrl -", action: () => this.zoomBy(0.8) },
+        { label: "适应画板", shortcut: "Ctrl 0", action: () => this.zoomFit() },
+        { label: "实际大小", shortcut: "Ctrl 1", action: () => this.setZoomPercent(100) },
+        { label: "缩放到选中对象", shortcut: "Ctrl 2", action: () => this.zoomToSelection() },
         { separator: true },
         {
-          label: "Show Rulers",
+          label: "显示标尺",
           shortcut: "Ctrl R",
           checked: this.ui.showRulers,
           command: "show-rulers",
           action: () => this.toggleRulers()
         },
         {
-          label: "Show Grid",
+          label: "显示网格",
           shortcut: "Ctrl '",
           checked: this.ui.showGrid,
           command: "show-grid",
           action: () => this.toggleGrid()
         },
         {
-          label: "Outline Mode",
+          label: "轮廓模式",
           shortcut: "Ctrl Y",
           checked: this.ui.outlineMode,
           command: "outline-mode",
@@ -696,20 +738,20 @@ class Editor implements EditorContext {
         }
       ],
       Window: [
-        { label: "Properties", action: () => this.focusSidebar("properties") },
-        { label: "Layers", action: () => this.focusSidebar("layers") },
-        { label: "Libraries", action: () => this.focusSidebar("libraries") },
+        { label: "属性", action: () => this.focusSidebar("properties") },
+        { label: "图层", action: () => this.focusSidebar("layers") },
+        { label: "库", action: () => this.focusSidebar("libraries") },
         { separator: true },
-        { label: "Appearance", checked: this.ui.showAppearance, action: () => this.toggleAppearance() },
-        { label: "Context Bar", checked: this.ui.showContextBar, action: () => this.toggleContextBar() },
+        { label: "外观", checked: this.ui.showAppearance, action: () => this.toggleAppearance() },
+        { label: "上下文栏", checked: this.ui.showContextBar, action: () => this.toggleContextBar() },
         { separator: true },
-        { label: "Reset Workspace", action: () => this.resetWorkspace() }
+        { label: "重置工作区", action: () => this.resetWorkspace() }
       ],
       Help: [
-        { label: "Keyboard Shortcuts", action: () => this.showShortcuts() },
-        { label: "About VectorCraft", action: () => this.showAbout() },
+        { label: "键盘快捷键", action: () => this.showShortcuts() },
+        { label: "关于 VectorCraft", action: () => this.showAbout() },
         {
-          label: "LiteGUI Documentation",
+          label: "LiteGUI 文档",
           action: () => window.open("https://gausszhou.github.io/litegui/docs/", "_blank")
         }
       ]
@@ -839,13 +881,12 @@ class Editor implements EditorContext {
     if (!this.stage) return;
     const zoomText = formatZoom(this.stage.zoomLevel);
     this.zoomButton.textContent = zoomText;
-    this.docMeta.textContent = `@ ${zoomText} (RGB/Preview)`;
+    this.docMeta.textContent = `@ ${zoomText} (RGB/预览)`;
     const docTitle = document.querySelector<HTMLElement>("#vc-doc-title");
     if (docTitle) docTitle.textContent = this.doc.name;
     const primary = this.primaryObject();
     this.rotationButton.textContent = `${Math.round(primary?.rotation ?? 0)}°`;
-    const count = this.selection.length;
-    this.selectionState.textContent = count === 0 ? "No Selection" : count === 1 ? "Selection" : `${count} Objects`;
+    this.selectionState.textContent = TOOL_STATUS[this.tool] ?? "选择工具";
     this.hintElement.textContent = this.hintForTool();
     const fillSwatch = document.querySelector<HTMLElement>(".vc-colorstack-fill");
     const strokeSwatch = document.querySelector<HTMLElement>(".vc-colorstack-stroke");
@@ -869,7 +910,7 @@ class Editor implements EditorContext {
   setDefaultPaint(paint: Paint) {
     this.fillPaint = paint;
     this.updateChrome();
-    this.toast(`默认填充：${paintLabel(paint)}`);
+    this.toast(`默认填色：${paintLabel(paint)}`);
   }
 
   defaultPaint(): { fill: Paint; stroke: Paint } {
@@ -888,30 +929,30 @@ class Editor implements EditorContext {
   private hintForTool(): string {
     switch (this.tool) {
       case "rect":
-        return "Drag to draw a rectangle | Shift+Drag to constrain proportions | Alt+Drag from center";
+        return "拖动绘制矩形 | Shift+拖动保持比例 | Alt+从中心绘制";
       case "ellipse":
-        return "Drag to draw an ellipse | Shift+Drag to draw a circle";
+        return "拖动绘制椭圆 | Shift+拖动绘制正圆";
       case "polygon":
-        return "Drag to draw a polygon | 3–10 sides via panel";
+        return "拖动绘制多边形 | 边数可在属性面板调整";
       case "star":
-        return "Drag to draw a star | Drag further from center for sharper points";
+        return "拖动绘制星形 | 离中心越远星角越尖";
       case "line":
-        return "Drag to draw a line segment | Shift+Drag to constrain to 45°";
+        return "拖动绘制直线段 | Shift+拖动限制为 45°";
       case "type":
-        return "Click to place type | Double-click an existing text object to edit";
+        return "单击放置文字 | 双击已有文字进行编辑";
       case "pen":
-        return "Click to add anchor points | Enter or double-click to finish | Esc to cancel";
+        return "单击添加锚点 | Enter 或双击结束 | Esc 取消";
       case "brush":
       case "pencil":
-        return "Drag to paint a path | Release to finish the stroke";
+        return "拖动绘制路径 | 松开结束笔画";
       case "hand":
-        return "Drag to pan the canvas | Space+Drag works with any tool";
+        return "拖动平移画布 | 任意工具下按住空格拖动";
       case "zoom":
-        return "Click to zoom in | Alt+Click to zoom out | Ctrl+0 to fit artboard";
+        return "单击放大 | Alt+单击缩小 | Ctrl+0 适应画板";
       case "rotate":
-        return "Drag to rotate the selection around its centre";
+        return "拖动围绕中心旋转选中对象";
       case "eraser":
-        return "Click an object to erase it";
+        return "单击对象将其擦除";
       case "lasso":
         return "拖动圈选对象 · Esc 取消";
       case "group":
@@ -967,7 +1008,7 @@ class Editor implements EditorContext {
   }
 
   private updateStats() {
-    this.statsElement.textContent = `render ${this.renderTime.toFixed(1)} ms · ul ${this.uiTime.toFixed(1)} ms · ${
+    this.statsElement.textContent = `渲染 ${this.renderTime.toFixed(1)} ms · 界面 ${this.uiTime.toFixed(1)} ms · ${
       this.fps
     } fps`;
   }
@@ -983,23 +1024,23 @@ class Editor implements EditorContext {
   private undo() {
     const entry = this.history.pop();
     if (!entry) {
-      this.toast("Nothing to undo");
+      this.toast("没有可撤销的操作");
       return;
     }
     this.future.push({ doc: JSON.stringify(this.doc), selection: [...this.selection] });
     this.restore(entry);
-    this.toast("Undo");
+    this.toast("已撤销");
   }
 
   private redo() {
     const entry = this.future.pop();
     if (!entry) {
-      this.toast("Nothing to redo");
+      this.toast("没有可重做的操作");
       return;
     }
     this.history.push({ doc: JSON.stringify(this.doc), selection: [...this.selection] });
     this.restore(entry);
-    this.toast("Redo");
+    this.toast("已重做");
   }
 
   private restore(entry: Snapshot) {
@@ -1029,13 +1070,13 @@ class Editor implements EditorContext {
   duplicateSelection() {
     const objects = this.editableSelection();
     if (!objects.length) {
-      this.toast("Select an object first");
+      this.toast("请先选择对象");
       return;
     }
     this.pushHistory();
     this.selection = this.insertClones(objects, 16, 16, "copy");
     this.refresh();
-    this.toast("Duplicated");
+    this.toast("已重复");
   }
 
   private insertClones(objects: VecObject[], dx: number, dy: number, prefix: string): string[] {
@@ -1068,13 +1109,13 @@ class Editor implements EditorContext {
 
   pasteSelection() {
     if (!this.clipboard?.length) {
-      this.toast("Clipboard is empty");
+      this.toast("剪贴板为空");
       return;
     }
     this.pushHistory();
     this.selection = this.insertClones(this.clipboard, 24, 24, "paste");
     this.refresh();
-    this.toast("Pasted");
+    this.toast("已粘贴");
   }
 
   selectAll() {
@@ -1109,7 +1150,7 @@ class Editor implements EditorContext {
     const ids = new Set(moving.map(object => object.id));
     this.doc.objects = [...this.doc.objects.filter(object => !ids.has(object.id)), ...moving];
     this.refresh();
-    this.toast("Brought to Front");
+    this.toast("已置于顶层");
   }
 
   sendToBack() {
@@ -1119,7 +1160,7 @@ class Editor implements EditorContext {
     const ids = new Set(moving.map(object => object.id));
     this.doc.objects = [...moving, ...this.doc.objects.filter(object => !ids.has(object.id))];
     this.refresh();
-    this.toast("Sent to Back");
+    this.toast("已置于底层");
   }
 
   unlockAll() {
@@ -1153,7 +1194,7 @@ class Editor implements EditorContext {
   toggleGlow() {
     const primary = this.primaryObject();
     if (!primary) {
-      this.toast("Select an object to add Outer Glow");
+      this.toast("请先选择对象再添加外发光");
       return;
     }
     this.updateSelection({ glow: primary.glow > 0 ? 0 : 22, glowColor: primary.glowColor || "#8f6bff" }, true);
@@ -1163,11 +1204,11 @@ class Editor implements EditorContext {
   async outlineSelection() {
     const texts = this.editableSelection().filter(object => isText(object));
     if (!texts.length) {
-      this.toast("Create Outlines 需要选中文本对象");
+      this.toast("创建轮廓需要选中文本对象");
       return;
     }
     if (texts.some(object => object.vertical)) {
-      this.toast("竖排文字暂不支持 Create Outlines");
+      this.toast("竖排文字暂不支持创建轮廓");
       return;
     }
     try {
@@ -1189,7 +1230,7 @@ class Editor implements EditorContext {
         object.name = object.name.includes("(Outlines)") ? object.name : `${object.name} (Outlines)`;
       }
       this.refresh();
-      this.toast("已转换为真实字形轮廓（可编辑锚点由字形路径提供）");
+      this.toast("已转换为真实字形轮廓（锚点可继续编辑）");
     } catch {
       this.toast("字体加载失败，无法创建轮廓");
     }
@@ -1262,7 +1303,7 @@ class Editor implements EditorContext {
   rotateSelection(degrees: number) {
     const objects = this.editableSelection();
     if (!objects.length) {
-      this.toast("Select an object first");
+      this.toast("请先选择对象");
       return;
     }
     this.pushHistory();
@@ -1453,7 +1494,7 @@ class Editor implements EditorContext {
   editPrimaryText() {
     const primary = this.primaryObject();
     if (primary && isText(primary)) this.editText(primary);
-    else this.toast("Select a text object first");
+    else this.toast("请先选中文本对象");
   }
 
   /* ------------------------- 视图 ------------------------- */
@@ -1525,7 +1566,7 @@ class Editor implements EditorContext {
     this.ui.appearancePos = null;
     this.panels.renderAll();
     this.syncRail();
-    this.toast("Workspace reset");
+    this.toast("工作区已重置");
   }
 
   selectionScreenRect(): ScreenRect | null {
@@ -1546,7 +1587,7 @@ class Editor implements EditorContext {
   private newDocument() {
     const background = createObject({
       kind: "rect",
-      name: "Artboard",
+      name: "画板",
       x: 0,
       y: 0,
       width: 800,
@@ -1562,7 +1603,7 @@ class Editor implements EditorContext {
     this.stage.setDocument(this.doc);
     this.stage.fit(28);
     this.refresh();
-    this.toast("New document");
+    this.toast("已新建文档");
   }
 
   private saveDocument() {
@@ -1649,7 +1690,7 @@ class Editor implements EditorContext {
         this.updateSelection({ fill: "#ffffff", stroke: "#000000", strokeWidth: 2 }, true);
         break;
       case "screen":
-        this.toast("Screen Mode：示例未接入");
+        this.toast("屏幕模式：示例未接入");
         break;
       case "gradient":
         this.updateSelection({ fill: "url(#vc-sunset-1)" }, true);
@@ -2198,8 +2239,8 @@ class Editor implements EditorContext {
       y: Math.round(point.y - 30),
       width: vertical ? fontSize * 1.15 : 280,
       height: vertical ? fontSize * 1.05 * 4 : 60,
-      name: vertical ? "Vertical Type" : "Type",
-      text: "Type something",
+      name: vertical ? "直排文字" : "文字",
+      text: "输入文字",
       fontSize,
       fontWeight: 700,
       letterSpacing: 0,
@@ -2223,7 +2264,7 @@ class Editor implements EditorContext {
         y: point.y,
         width: 1,
         height: 1,
-        name: "Pen Path",
+        name: "钢笔路径",
         fill: "none",
         stroke: this.strokePaint === "none" ? "#ff3fae" : this.strokePaint,
         strokeWidth: 2,
@@ -2296,12 +2337,12 @@ class Editor implements EditorContext {
         <header class="vc-modal-head"><span>${icon(
           "type",
           14
-        )} Edit Text</span><button class="vc-mini-btn" data-modal="close">${icon("close", 12)}</button></header>
+        )} 编辑文字</span><button class="vc-mini-btn" data-modal="close">${icon("close", 12)}</button></header>
         <div class="vc-modal-body">
           <textarea class="vc-textarea" spellcheck="false"></textarea>
           <p class="vc-modal-hint">Enter 换行 · Ctrl+Enter 应用 · Esc 取消</p>
         </div>
-        <footer class="vc-modal-foot"><button class="vc-quick-btn" data-text="cancel">Cancel</button><button class="vc-quick-btn vc-quick-btn--primary" data-text="apply">Apply</button></footer>
+        <footer class="vc-modal-foot"><button class="vc-quick-btn" data-text="cancel">取消</button><button class="vc-quick-btn vc-quick-btn--primary" data-text="apply">应用</button></footer>
       </div>`,
       ({ root, close }) => {
         const textarea = root.querySelector<HTMLTextAreaElement>(".vc-textarea")!;
@@ -2316,8 +2357,7 @@ class Editor implements EditorContext {
             const lines = Math.max(1, [...value].length);
             object.height = round(Math.max(object.fontSize ?? 36, lines * (object.fontSize ?? 36) * 1.05));
           }
-          if (object.name === "Type" || object.name === "Vertical Type")
-            object.name = value.slice(0, 24) || object.name;
+          if (object.name === "文字" || object.name === "直排文字") object.name = value.slice(0, 24) || object.name;
           close();
           this.refresh();
         };
@@ -2346,17 +2386,17 @@ class Editor implements EditorContext {
         <header class="vc-modal-head"><span>${icon(
           "artboard",
           14
-        )} Document Setup</span><button class="vc-mini-btn" data-modal="close">${icon("close", 12)}</button></header>
+        )} 文档设置</span><button class="vc-mini-btn" data-modal="close">${icon("close", 12)}</button></header>
         <div class="vc-modal-body vc-doc-form">
-          <label><span>Name</span><input class="vc-input" data-doc="name" value="${this.doc.name.replace(
+          <label><span>名称</span><input class="vc-input" data-doc="name" value="${this.doc.name.replace(
             /"/g,
             "&quot;"
           )}" /></label>
-          <label><span>Width</span><input class="vc-input" data-doc="width" value="${this.doc.width}" /></label>
-          <label><span>Height</span><input class="vc-input" data-doc="height" value="${this.doc.height}" /></label>
+          <label><span>宽度</span><input class="vc-input" data-doc="width" value="${this.doc.width}" /></label>
+          <label><span>高度</span><input class="vc-input" data-doc="height" value="${this.doc.height}" /></label>
           <p class="vc-modal-hint">尺寸单位为 pt，修改后画板按新尺寸裁剪。</p>
         </div>
-        <footer class="vc-modal-foot"><button class="vc-quick-btn" data-doc="cancel">Cancel</button><button class="vc-quick-btn vc-quick-btn--primary" data-doc="apply">Apply</button></footer>
+        <footer class="vc-modal-foot"><button class="vc-quick-btn" data-doc="cancel">取消</button><button class="vc-quick-btn vc-quick-btn--primary" data-doc="apply">应用</button></footer>
       </div>`,
       ({ root, close }) => {
         const field = (name: string) => root.querySelector<HTMLInputElement>(`[data-doc="${name}"]`)!;
@@ -2378,7 +2418,7 @@ class Editor implements EditorContext {
             close();
             this.stage.setDocument(this.doc);
             this.refresh();
-            this.toast("Document updated");
+            this.toast("文档已更新");
           }
         });
       }
@@ -2403,22 +2443,22 @@ class Editor implements EditorContext {
 
   private showSearch() {
     showSearchDialog([
-      { label: "Fit Artboard", run: () => this.zoomFit() },
-      { label: "Actual Size", run: () => this.setZoomPercent(100) },
-      { label: "Zoom to Selection", run: () => this.zoomToSelection() },
-      { label: "Export SVG", run: () => void this.exportSvg() },
-      { label: "Export PNG", run: () => void this.exportPng() },
-      { label: "Create Outlines", run: () => void this.outlineSelection() },
-      { label: "Duplicate Selection", run: () => this.duplicateSelection() },
-      { label: "Delete Selection", run: () => this.deleteSelection() },
-      { label: "Group", run: () => this.groupSelection() },
-      { label: "Ungroup", run: () => this.ungroupSelection() },
-      { label: "Toggle Rulers", run: () => this.toggleRulers() },
-      { label: "Toggle Grid", run: () => this.toggleGrid() },
-      { label: "Outline Mode", run: () => this.toggleOutlineMode() },
-      { label: "Reset Workspace", run: () => this.resetWorkspace() },
-      { label: "Keyboard Shortcuts", run: () => this.showShortcuts() },
-      { label: "About VectorCraft", run: () => this.showAbout() }
+      { label: "适应画板", run: () => this.zoomFit() },
+      { label: "实际大小", run: () => this.setZoomPercent(100) },
+      { label: "缩放到选中对象", run: () => this.zoomToSelection() },
+      { label: "导出 SVG", run: () => void this.exportSvg() },
+      { label: "导出 PNG", run: () => void this.exportPng() },
+      { label: "创建轮廓", run: () => void this.outlineSelection() },
+      { label: "重复选中对象", run: () => this.duplicateSelection() },
+      { label: "删除选中对象", run: () => this.deleteSelection() },
+      { label: "编组", run: () => this.groupSelection() },
+      { label: "取消编组", run: () => this.ungroupSelection() },
+      { label: "切换标尺", run: () => this.toggleRulers() },
+      { label: "切换网格", run: () => this.toggleGrid() },
+      { label: "轮廓模式", run: () => this.toggleOutlineMode() },
+      { label: "重置工作区", run: () => this.resetWorkspace() },
+      { label: "键盘快捷键", run: () => this.showShortcuts() },
+      { label: "关于 VectorCraft", run: () => this.showAbout() }
     ]);
   }
 
@@ -2439,24 +2479,24 @@ class Editor implements EditorContext {
     const primary = this.primaryObject();
     const items: MenuItem[] = primary
       ? [
-          { label: "Cut", shortcut: "Ctrl X", action: () => this.cutSelection() },
-          { label: "Copy", shortcut: "Ctrl C", action: () => this.copySelection() },
-          { label: "Paste", shortcut: "Ctrl V", action: () => this.pasteSelection() },
-          { label: "Duplicate", shortcut: "Ctrl D", action: () => this.duplicateSelection() },
+          { label: "剪切", shortcut: "Ctrl X", action: () => this.cutSelection() },
+          { label: "复制", shortcut: "Ctrl C", action: () => this.copySelection() },
+          { label: "粘贴", shortcut: "Ctrl V", action: () => this.pasteSelection() },
+          { label: "重复", shortcut: "Ctrl D", action: () => this.duplicateSelection() },
           { separator: true },
-          { label: "Bring to Front", action: () => this.bringToFront() },
-          { label: "Send to Back", action: () => this.sendToBack() },
+          { label: "置于顶层", action: () => this.bringToFront() },
+          { label: "置于底层", action: () => this.sendToBack() },
           { separator: true },
-          { label: "Create Outlines", action: () => this.outlineSelection() },
-          { label: "Lock", action: () => this.toggleLock(primary.id) },
-          { label: "Hide", action: () => this.toggleVisibility(primary.id) },
+          { label: "创建轮廓", action: () => this.outlineSelection() },
+          { label: "锁定", action: () => this.toggleLock(primary.id) },
+          { label: "隐藏", action: () => this.toggleVisibility(primary.id) },
           { separator: true },
-          { label: "Delete", shortcut: "Del", action: () => this.deleteSelection() }
+          { label: "删除", shortcut: "Del", action: () => this.deleteSelection() }
         ]
       : [
-          { label: "Paste", shortcut: "Ctrl V", action: () => this.pasteSelection() },
-          { label: "Select All", shortcut: "Ctrl A", action: () => this.selectAll() },
-          { label: "Fit Artboard", shortcut: "Ctrl 0", action: () => this.zoomFit() }
+          { label: "粘贴", shortcut: "Ctrl V", action: () => this.pasteSelection() },
+          { label: "全选", shortcut: "Ctrl A", action: () => this.selectAll() },
+          { label: "适应画板", shortcut: "Ctrl 0", action: () => this.zoomFit() }
         ];
     this.openMenuAt(event.clientX, event.clientY, items);
   };
@@ -2547,7 +2587,7 @@ class Editor implements EditorContext {
           return;
         case "r":
           event.preventDefault();
-          if (event.shiftKey) this.toast("Show Rulers 使用 View 菜单");
+          if (event.shiftKey) this.toast("请在“视图”菜单中切换标尺");
           else this.toggleRulers();
           return;
         case "=":

@@ -116,7 +116,7 @@ export interface GradientDef {
 export const GRADIENTS: Record<string, GradientDef> = {
   "vc-sky": {
     id: "vc-sky",
-    label: "Dusk Sky",
+    label: "暮色天空",
     stops: [
       [0, "#0e0339"],
       [0.06, "#1b0759"],
@@ -135,7 +135,7 @@ export const GRADIENTS: Record<string, GradientDef> = {
   },
   "vc-sun": {
     id: "vc-sun",
-    label: "Sunset Sun",
+    label: "落日",
     stops: [
       [0, "#ffdd9a"],
       [0.35, "#ffb35f"],
@@ -145,7 +145,7 @@ export const GRADIENTS: Record<string, GradientDef> = {
   },
   "vc-ground": {
     id: "vc-ground",
-    label: "Grid Floor",
+    label: "网格地面",
     stops: [
       [0, "#2a0648"],
       [0.5, "#12012a"],
@@ -154,7 +154,7 @@ export const GRADIENTS: Record<string, GradientDef> = {
   },
   "vc-mountain": {
     id: "vc-mountain",
-    label: "Mountain Dusk",
+    label: "山体暮色",
     stops: [
       [0, "#54127f"],
       [0.6, "#32094f"],
@@ -163,7 +163,7 @@ export const GRADIENTS: Record<string, GradientDef> = {
   },
   "vc-sunset-1": {
     id: "vc-sunset-1",
-    label: "Sunset",
+    label: "日落",
     stops: [
       [0, "#ffd27a"],
       [1, "#ff4f7a"]
@@ -171,7 +171,7 @@ export const GRADIENTS: Record<string, GradientDef> = {
   },
   "vc-sunset-2": {
     id: "vc-sunset-2",
-    label: "Hot Pink",
+    label: "霓虹粉",
     stops: [
       [0, "#ff9f43"],
       [1, "#ff3f8e"]
@@ -179,7 +179,7 @@ export const GRADIENTS: Record<string, GradientDef> = {
   },
   "vc-cyber": {
     id: "vc-cyber",
-    label: "Cyber Dusk",
+    label: "赛博暮色",
     stops: [
       [0, "#2a0768"],
       [1, "#ff63d6"]
@@ -187,7 +187,7 @@ export const GRADIENTS: Record<string, GradientDef> = {
   },
   "vc-mint": {
     id: "vc-mint",
-    label: "Mint Glow",
+    label: "薄荷光",
     stops: [
       [0, "#29e7ff"],
       [1, "#6effc8"]
@@ -333,54 +333,54 @@ export function createObject(init: ObjectInit): VecObject {
 export function defaultName(kind: ShapeKind): string {
   switch (kind) {
     case "text":
-      return "Type";
+      return "文字";
     case "path":
-      return "Path";
+      return "路径";
     case "rect":
-      return "Rectangle";
+      return "矩形";
     case "ellipse":
-      return "Ellipse";
+      return "椭圆";
     case "polygon":
-      return "Polygon";
+      return "多边形";
     case "star":
-      return "Star";
+      return "星形";
     case "grid":
-      return "Grid";
+      return "网格";
     case "sun":
-      return "Sun";
+      return "落日";
     case "stars":
-      return "Stars";
+      return "星点";
     case "mountains":
-      return "Mountains";
+      return "山脉";
     default:
-      return "Object";
+      return "对象";
   }
 }
 
 export function kindLabel(kind: ShapeKind): string {
   switch (kind) {
     case "text":
-      return "Type";
+      return "文字";
     case "stars":
-      return "Symbol";
+      return "符号";
     case "grid":
-      return "Group";
+      return "组";
     case "sun":
-      return "Shape";
+      return "形状";
     case "mountains":
-      return "Path";
+      return "路径";
     case "path":
-      return "Path";
+      return "路径";
     case "rect":
-      return "Rect";
+      return "矩形";
     case "ellipse":
-      return "Ellipse";
+      return "椭圆";
     case "polygon":
-      return "Polygon";
+      return "多边形";
     case "star":
-      return "Star";
+      return "星形";
     default:
-      return "Object";
+      return "对象";
   }
 }
 
@@ -411,7 +411,7 @@ export function createNeonDocument(): VecDocument {
 
   const sky = createObject({
     id: "neon-sky",
-    name: "Sky · Dusk Gradient",
+    name: "夜空 · 渐变",
     kind: "rect",
     x: 0,
     y: 0,
@@ -423,7 +423,7 @@ export function createNeonDocument(): VecDocument {
 
   const stars = createObject({
     id: "neon-stars",
-    name: "Stars",
+    name: "星点",
     kind: "stars",
     x: 0,
     y: 0,
@@ -437,7 +437,7 @@ export function createNeonDocument(): VecDocument {
 
   const sun = createObject({
     id: "neon-sun",
-    name: "Sun",
+    name: "落日",
     kind: "sun",
     x: 214,
     y: 334,
@@ -450,7 +450,7 @@ export function createNeonDocument(): VecDocument {
 
   const mountains = createObject({
     id: "neon-mountains",
-    name: "Mountains",
+    name: "山脉",
     kind: "mountains",
     x: 0,
     y: 400,
@@ -482,7 +482,7 @@ export function createNeonDocument(): VecDocument {
 
   const grid = createObject({
     id: "neon-grid",
-    name: "Neon Grid",
+    name: "霓虹网格",
     kind: "grid",
     x: 0,
     y: horizon,

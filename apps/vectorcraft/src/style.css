@@ -42,7 +42,8 @@
   --vc-button: #333b48;
   --vc-button-border: #3f4856;
   --vc-danger: #e05b6a;
-  --vc-font: "Inter", "Segoe UI", "Helvetica Neue", Roboto, Arial, sans-serif;
+  --vc-font: "Inter", "Segoe UI", "Microsoft YaHei", "PingFang SC", "Noto Sans CJK SC", "Source Han Sans SC",
+    "WenQuanYi Micro Hei", "Helvetica Neue", Roboto, Arial, sans-serif;
 
   /* 让 LiteGUI 组件（HeaderBar / Toolbar）也落到同一套色板上 */
   --lg-font: var(--vc-font);
@@ -1045,7 +1046,7 @@ button {
 
 .vc-sidebar-wrap {
   display: flex;
-  flex: 0 0 390px;
+  flex: 0 0 322px;
   min-height: 0;
   background: var(--vc-panel);
   border-left: 1px solid #12161d;
@@ -1054,8 +1055,8 @@ button {
 .vc-rail {
   display: flex;
   flex-direction: column;
-  flex: 0 0 38px;
-  width: 38px;
+  flex: 0 0 36px;
+  width: 36px;
   padding: 6px 0;
   background: var(--vc-rail);
   border-right: 1px solid #303743;
@@ -1196,12 +1197,16 @@ button {
   font-size: 11.5px;
 }
 
+.vc-doc-row > span:first-child {
+  white-space: nowrap;
+}
+
 .vc-doc-row > span:last-child {
   color: #98a1b0;
 }
 
 .vc-select--inline {
-  width: 132px;
+  width: 108px;
   height: 24px;
   margin: 0;
 }
@@ -2252,7 +2257,7 @@ button {
 /* 窄屏适配 */
 @media (max-width: 1180px) {
   .vc-sidebar-wrap {
-    flex-basis: 340px;
+    flex-basis: 310px;
   }
 
   .vc-doctab {
@@ -2270,7 +2275,7 @@ button {
   }
 
   .vc-sidebar-wrap {
-    flex-basis: 300px;
+    flex-basis: 290px;
   }
 
   .vc-menubar .vc-menu-btn {

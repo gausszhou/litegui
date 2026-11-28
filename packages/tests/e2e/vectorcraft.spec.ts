@@ -10,13 +10,14 @@ test("vectorcraft mounts the Illustrator-style shell", async ({ page }) => {
 
   await expect(page.locator(".vc-topbar")).toBeVisible();
   await expect(page.locator(".vc-menu-btn")).toHaveCount(9);
+  await expect(page.locator("[data-menu='File']")).toHaveText("文件");
   await expect(page.locator(".lg-toolbar__tool")).toHaveCount(26);
   await expect(page.locator(".vc-canvas")).toBeVisible();
   await expect(page.locator("#vc-doctab")).toContainText("neon-drive.vectorcraft");
   await expect(page.locator(".vc-appearance")).toBeVisible();
   await expect(page.locator(".vc-app-row")).toHaveCount(4);
   await expect(page.locator("#vc-ctxbar")).toBeVisible();
-  await expect(page.locator("#vc-selection-state")).toHaveText("Selection");
+  await expect(page.locator("#vc-selection-state")).toHaveText("选择工具");
   await expect(page.locator("#vc-zoom")).toContainText("%");
   await expect(page.locator(".vc-world [data-obj]")).toHaveCount(7);
 
@@ -32,7 +33,7 @@ test("layer selection, transform editing and undo work", async ({ page }) => {
   await page.locator('[data-layer-id="neon-sun"]').click();
   await page.click("[data-tab='properties']");
 
-  await expect(page.locator("#vc-selection-state")).toHaveText("Selection");
+  await expect(page.locator("#vc-selection-state")).toHaveText("选择工具");
   await expect(page.locator("[data-prop='width']").first()).toHaveValue("364");
 
   const xInput = page.locator("[data-prop='x']").first();

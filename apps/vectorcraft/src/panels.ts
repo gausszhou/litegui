@@ -86,7 +86,7 @@ const fmt = (value: number): string => `${round(value, 2)}`;
 function swatchMarkup(paint: Paint, extraClass = ""): string {
   const gradient = gradientOf(paint);
   if (paint === "none") {
-    return `<span class="vc-swatch vc-swatch--none ${extraClass}" title="None"></span>`;
+    return `<span class="vc-swatch vc-swatch--none ${extraClass}" title="无"></span>`;
   }
   if (gradient) {
     return `<span class="vc-swatch vc-swatch--gradient ${extraClass}" style="background:${gradientCss(paint)}" title="${
@@ -132,7 +132,7 @@ function paragraphControls(object: VecObject): string {
       )
       .join("")}
   </div>
-  <label class="vc-check"><input type="checkbox" data-check="hyphenate" /><span>Hyphenate</span></label>`;
+  <label class="vc-check"><input type="checkbox" data-check="hyphenate" /><span>断字</span></label>`;
 }
 
 const alignButtons: Array<[AlignMode, string, string]> = [
@@ -163,7 +163,7 @@ function transformSection(object: VecObject | null): string {
     return `<div class="vc-empty">未选择对象。点击画布中的对象，或在图层面板中选择。</div>`;
   }
   return `<div class="vc-section" data-section="transform">
-    <div class="vc-section-head"><span>Transform</span><div class="vc-section-tools">
+    <div class="vc-section-head"><span>变换</span><div class="vc-section-tools">
       <button class="vc-mini-btn" data-action="toggle-constrain" title="锁定比例">${icon("link", 13)}</button>
     </div></div>
     <div class="vc-transform">
@@ -192,19 +192,19 @@ function transformSection(object: VecObject | null): string {
 function characterSection(object: VecObject | null): string {
   if (!object || !isText(object)) return "";
   const families: Array<[string, string]> = [
-    ["Chakra Petch (VectorCraft)", '"VectorCraft", "Chakra Petch", "Segoe UI", sans-serif'],
+    ["Chakra Petch（矢量显示）", '"VectorCraft", "Chakra Petch", "Segoe UI", sans-serif'],
     ["Inter", '"Inter", "Segoe UI", Arial, sans-serif'],
     ["Georgia", 'Georgia, "Times New Roman", serif'],
     ["Courier", '"Courier New", monospace']
   ];
   const weights: Array<[number, string]> = [
-    [300, "Light"],
-    [400, "Regular"],
-    [500, "Medium"],
-    [700, "Bold"]
+    [300, "细体"],
+    [400, "常规"],
+    [500, "中等"],
+    [700, "粗体"]
   ];
   return `<div class="vc-section">
-    <div class="vc-section-head"><span>Character</span><button class="vc-mini-btn" data-action="character-options" title="更多">${icon(
+    <div class="vc-section-head"><span>字符</span><button class="vc-mini-btn" data-action="character-options" title="更多">${icon(
       "more",
       14
     )}</button></div>
@@ -239,18 +239,18 @@ function characterSection(object: VecObject | null): string {
 function appearanceSection(object: VecObject | null): string {
   if (!object) return "";
   return `<div class="vc-section" data-section="appearance">
-    <div class="vc-section-head"><span>Appearance</span></div>
+    <div class="vc-section-head"><span>外观</span></div>
     <div class="vc-appearance-row">
-      ${swatchMarkup(object.fill)}<span class="vc-app-label">Fill</span>
+      ${swatchMarkup(object.fill)}<span class="vc-app-label">填色</span>
       <button class="vc-mini-btn" data-action="toggle-fill" title="切换填充">${icon("chevronDown", 12)}</button>
     </div>
     <div class="vc-appearance-row">
-      ${swatchMarkup(object.stroke === "none" ? "none" : object.stroke)}<span class="vc-app-label">Stroke</span>
+      ${swatchMarkup(object.stroke === "none" ? "none" : object.stroke)}<span class="vc-app-label">描边</span>
       <span class="vc-stroke-value">${fmt(object.strokeWidth)} pt</span>
       <button class="vc-mini-btn" data-action="toggle-stroke" title="切换描边">${icon("chevronDown", 12)}</button>
     </div>
     <div class="vc-appearance-row">
-      <span class="vc-app-label vc-app-label--wide">Opacity</span>
+      <span class="vc-app-label vc-app-label--wide">不透明度</span>
       <input class="vc-input vc-input--tiny" type="text" inputmode="decimal" value="${Math.round(
         object.opacity * 100
       )}" data-prop="opacity" data-id="${object.id}" />%
@@ -263,12 +263,12 @@ function appearanceSection(object: VecObject | null): string {
 
 function quickActionsSection(): string {
   return `<div class="vc-section">
-    <div class="vc-section-head"><span>Quick Actions</span></div>
+    <div class="vc-section-head"><span>快速操作</span></div>
     <div class="vc-quick-grid">
-      <button class="vc-quick-btn" data-action="offset-path">Offset Path</button>
-      <button class="vc-quick-btn" data-action="simplify">Simplify</button>
-      <button class="vc-quick-btn" data-action="bring-front">Arrange: Bring to Front</button>
-      <button class="vc-quick-btn" data-action="lock-object">Lock</button>
+      <button class="vc-quick-btn" data-action="offset-path">偏移路径</button>
+      <button class="vc-quick-btn" data-action="simplify">简化</button>
+      <button class="vc-quick-btn" data-action="bring-front">排列：置于顶层</button>
+      <button class="vc-quick-btn" data-action="lock-object">锁定</button>
     </div>
   </div>`;
 }
@@ -281,18 +281,18 @@ function displayUnit(value: number, unit: UiState["unit"]): number {
 function documentBody(ctx: EditorContext): string {
   const paint = ctx.defaultPaint();
   const units: Array<[string, string]> = [
-    ["pt", "Points"],
-    ["px", "Pixels"],
-    ["mm", "Millimeters"]
+    ["pt", "点"],
+    ["px", "像素"],
+    ["mm", "毫米"]
   ];
   return `
     <div class="vc-section" data-section="document">
-      <div class="vc-section-head"><span>Document</span></div>
-      <div class="vc-doc-row"><span>Size</span><span>${displayUnit(ctx.doc.width, ctx.ui.unit)} × ${displayUnit(
+      <div class="vc-section-head"><span>文档</span></div>
+      <div class="vc-doc-row"><span>尺寸</span><span>${displayUnit(ctx.doc.width, ctx.ui.unit)} × ${displayUnit(
     ctx.doc.height,
     ctx.ui.unit
   )} ${ctx.ui.unit}</span></div>
-      <label class="vc-doc-row"><span>Units</span>
+      <label class="vc-doc-row"><span>单位</span>
         <select class="vc-select vc-select--inline" data-unit>
           ${units
             .map(
@@ -303,61 +303,61 @@ function documentBody(ctx: EditorContext): string {
         </select>
       </label>
       <div class="vc-doc-actions">
-        <button class="vc-quick-btn" data-action="doc-setup">Document Setup…</button>
-        <button class="vc-quick-btn" data-action="edit-artboards">Edit Artboards</button>
+        <button class="vc-quick-btn" data-action="doc-setup">文档设置…</button>
+        <button class="vc-quick-btn" data-action="edit-artboards">编辑画板</button>
       </div>
     </div>
     <div class="vc-section" data-section="document-appearance">
-      <div class="vc-section-head"><span>Appearance</span></div>
-      <div class="vc-appearance-row">${swatchMarkup(paint.fill)}<span class="vc-app-label">Fill</span></div>
+      <div class="vc-section-head"><span>外观</span></div>
+      <div class="vc-appearance-row">${swatchMarkup(paint.fill)}<span class="vc-app-label">填色</span></div>
       <div class="vc-appearance-row">
-        ${swatchMarkup(paint.stroke)}<span class="vc-app-label">Stroke</span>
+        ${swatchMarkup(paint.stroke)}<span class="vc-app-label">描边</span>
         <span class="vc-stroke-value">${displayUnit(1, ctx.ui.unit)} ${ctx.ui.unit}</span>
       </div>
     </div>
     <div class="vc-section" data-section="rulers-grid">
-      <div class="vc-section-head"><span>Rulers &amp; Grid</span></div>
+      <div class="vc-section-head"><span>标尺和网格</span></div>
       <div class="vc-icon-row">
         <button class="vc-icon-toggle${
           ctx.ui.showRulers ? " is-active" : ""
-        }" data-action="toggle-rulers" title="Toggle Rulers">${icon("ruler", 15)}</button>
+        }" data-action="toggle-rulers" title="切换标尺">${icon("ruler", 15)}</button>
         <button class="vc-icon-toggle${
           ctx.ui.showGrid ? " is-active" : ""
-        }" data-action="toggle-grid" title="Toggle Grid">${icon("grid", 15)}</button>
+        }" data-action="toggle-grid" title="切换网格">${icon("grid", 15)}</button>
       </div>
     </div>
     <div class="vc-section" data-section="guides">
-      <div class="vc-section-head"><span>Guides</span></div>
+      <div class="vc-section-head"><span>参考线</span></div>
       <div class="vc-doc-actions">
-        <button class="vc-quick-btn" data-action="show-guides">Show Guides</button>
-        <button class="vc-quick-btn" data-action="lock-guides">Lock Guides</button>
+        <button class="vc-quick-btn" data-action="show-guides">显示参考线</button>
+        <button class="vc-quick-btn" data-action="lock-guides">锁定参考线</button>
       </div>
     </div>
     <div class="vc-section" data-section="align-options">
-      <div class="vc-section-head"><span>Align Options</span></div>
+      <div class="vc-section-head"><span>对齐选项</span></div>
       <label class="vc-check"><input type="checkbox" data-pref="alignToPoint" ${
         ctx.ui.alignToPoint ? "checked" : ""
-      } /><span>Align to Point</span></label>
+      } /><span>对齐点</span></label>
       <label class="vc-check"><input type="checkbox" data-pref="alignToGrid" ${
         ctx.ui.alignToGrid ? "checked" : ""
-      } /><span>Align to Grid</span></label>
+      } /><span>对齐网格</span></label>
     </div>
     <div class="vc-section" data-section="preferences">
-      <div class="vc-section-head"><span>Preferences</span></div>
-      <label class="vc-doc-row"><span>Keyboard Increment</span>
+      <div class="vc-section-head"><span>首选项</span></div>
+      <label class="vc-doc-row"><span>键盘增量</span>
         <span class="vc-inline-field"><input class="vc-input" type="text" inputmode="decimal" value="${
           ctx.ui.keyboardIncrement
         }" data-pref-number="keyboardIncrement" /> ${ctx.ui.unit}</span>
       </label>
       <label class="vc-check"><input type="checkbox" data-pref="scaleStrokes" ${
         ctx.ui.scaleStrokes ? "checked" : ""
-      } /><span>Scale Strokes &amp; Effects</span></label>
+      } /><span>缩放描边和效果</span></label>
     </div>
     <div class="vc-section" data-section="quick-actions">
-      <div class="vc-section-head"><span>Quick Actions</span></div>
+      <div class="vc-section-head"><span>快速操作</span></div>
       <div class="vc-quick-grid">
-        <button class="vc-quick-btn" data-action="doc-setup">Document Setup…</button>
-        <button class="vc-quick-btn" data-action="preferences">Preferences…</button>
+        <button class="vc-quick-btn" data-action="doc-setup">文档设置…</button>
+        <button class="vc-quick-btn" data-action="preferences">首选项…</button>
       </div>
     </div>`;
 }
@@ -368,7 +368,7 @@ function propertiesBody(ctx: EditorContext): string {
   const isType = isText(object);
   return `
     <div class="vc-section vc-section--title">
-      <div class="vc-section-head"><span>${isType ? "Type" : object ? "Object" : "Artboard"}</span>
+      <div class="vc-section-head"><span>${isType ? "文字" : object ? "对象" : "画板"}</span>
         <div class="vc-section-tools">
           <button class="vc-mini-btn" data-action="doc-setup" title="文档设置">${icon("artboard", 13)}</button>
           <button class="vc-mini-btn" data-action="properties-menu" title="面板菜单">${icon("more", 14)}</button>
@@ -379,7 +379,7 @@ function propertiesBody(ctx: EditorContext): string {
     ${characterSection(object)}
     ${
       isType
-        ? `<div class="vc-section"><div class="vc-section-head"><span>Paragraph</span></div>${paragraphControls(
+        ? `<div class="vc-section"><div class="vc-section-head"><span>段落</span></div>${paragraphControls(
             object as VecObject
           )}</div>`
         : ""
@@ -387,7 +387,7 @@ function propertiesBody(ctx: EditorContext): string {
     ${appearanceSection(object)}
     ${
       object
-        ? `<div class="vc-section"><div class="vc-section-head"><span>Align</span></div>${alignControls()}</div>`
+        ? `<div class="vc-section"><div class="vc-section-head"><span>对齐</span></div>${alignControls()}</div>`
         : ""
     }
     ${quickActionsSection()}
@@ -398,7 +398,7 @@ function layersBody(ctx: EditorContext): string {
   const objects = ctx.doc.objects.slice().reverse();
   const selected = new Set(ctx.selectedObjects().map(object => object.id));
   return `<div class="vc-layer-head">
-      <span class="vc-layer-head-title">${icon("artboard", 13)} Layer 1</span>
+      <span class="vc-layer-head-title">${icon("artboard", 13)} 图层 1</span>
       <div class="vc-section-tools">
         <button class="vc-mini-btn" data-action="layer-search" title="搜索">${icon("search", 13)}</button>
         <button class="vc-mini-btn" data-action="new-layer" title="新建图层">${icon("plus", 13)}</button>
@@ -426,14 +426,14 @@ function layersBody(ctx: EditorContext): string {
     <div class="vc-layer-foot">
       <button class="vc-mini-btn" data-action="layers-menu" title="面板菜单">${icon("hamburger", 14)}</button>
       <span class="vc-spacer"></span>
-      <span class="vc-layer-count">${ctx.doc.objects.length} objects</span>
+      <span class="vc-layer-count">${ctx.doc.objects.length} 个对象</span>
     </div>`;
 }
 
 function librariesBody(_ctx: EditorContext): string {
   const gradients = Object.values(GRADIENTS).slice(0, 6);
   return `<div class="vc-lib-section">
-      <div class="vc-section-head"><span>Swatches</span><button class="vc-mini-btn" data-action="lib-menu">${icon(
+      <div class="vc-section-head"><span>色板</span><button class="vc-mini-btn" data-action="lib-menu">${icon(
         "more",
         14
       )}</button></div>
@@ -445,7 +445,7 @@ function librariesBody(_ctx: EditorContext): string {
       </div>
     </div>
     <div class="vc-lib-section">
-      <div class="vc-section-head"><span>Ink &amp; Paper</span></div>
+      <div class="vc-section-head"><span>墨水与纸张</span></div>
       <div class="vc-lib-grid">
         ${INK_PALETTE.map(
           color =>
@@ -454,7 +454,7 @@ function librariesBody(_ctx: EditorContext): string {
       </div>
     </div>
     <div class="vc-lib-section">
-      <div class="vc-section-head"><span>Gradients</span></div>
+      <div class="vc-section-head"><span>渐变</span></div>
       <div class="vc-lib-gradients">
         ${gradients
           .map(
@@ -469,10 +469,10 @@ function librariesBody(_ctx: EditorContext): string {
       </div>
     </div>
     <div class="vc-lib-section">
-      <div class="vc-section-head"><span>Type Styles</span></div>
+      <div class="vc-section-head"><span>文字样式</span></div>
       <div class="vc-lib-styles">
-        <button class="vc-lib-style" data-style="display"><b>NEON DRIVE</b><span>Display · 149 pt</span></button>
-        <button class="vc-lib-style" data-style="caption"><b>made with VectorCraft</b><span>Caption · 14 pt</span></button>
+        <button class="vc-lib-style" data-style="display"><b>NEON DRIVE</b><span>展示 · 149 pt</span></button>
+        <button class="vc-lib-style" data-style="caption"><b>made with VectorCraft</b><span>说明 · 14 pt</span></button>
       </div>
     </div>
     <p class="vc-lib-hint">${icon("info", 13)} 点击色板应用到当前选中对象，未选中时应用到新建图形。</p>`;
@@ -531,13 +531,13 @@ export class PanelsController {
         <div class="vc-tabs" role="tablist">
           <button class="vc-tab${
             ctx.ui.sidebarTab === "properties" ? " is-active" : ""
-          }" data-tab="properties" role="tab">Properties</button>
+          }" data-tab="properties" role="tab">属性</button>
           <button class="vc-tab${
             ctx.ui.sidebarTab === "layers" ? " is-active" : ""
-          }" data-tab="layers" role="tab">Layers</button>
+          }" data-tab="layers" role="tab">图层</button>
           <button class="vc-tab${
             ctx.ui.sidebarTab === "libraries" ? " is-active" : ""
-          }" data-tab="libraries" role="tab">Libraries</button>
+          }" data-tab="libraries" role="tab">库</button>
         </div>
         <button class="vc-icon-btn vc-panel-menu" data-action="panel-menu" title="面板菜单">${icon(
           "hamburger",
@@ -576,7 +576,7 @@ export class PanelsController {
       ? isText(object)
         ? `
         <div class="vc-app-row">
-          ${swatchMarkup(object.fill)}<span class="vc-app-name">Type</span>
+          ${swatchMarkup(object.fill)}<span class="vc-app-name">文字</span>
           <span class="vc-app-trail">${swatchMarkup(object.fill, "vc-swatch--mini")}${swatchMarkup(
             object.stroke,
             "vc-swatch--mini"
@@ -587,14 +587,14 @@ export class PanelsController {
             object.fill === "none" ? "eyeOff" : "eye",
             13
           )}</button>
-          <span class="vc-app-name vc-app-name--sub">Characters</span>
+          <span class="vc-app-name vc-app-name--sub">字符</span>
           <span class="vc-app-trail">${swatchMarkup(object.fill, "vc-swatch--mini")}${swatchMarkup(
             object.stroke,
             "vc-swatch--mini"
           )}</span>
         </div>`
         : `
-        <div class="vc-app-row">${swatchMarkup(object.fill)}<span class="vc-app-name">Path</span>
+        <div class="vc-app-row">${swatchMarkup(object.fill)}<span class="vc-app-name">路径</span>
           <span class="vc-app-trail">${swatchMarkup(object.fill, "vc-swatch--mini")}${swatchMarkup(
             object.stroke,
             "vc-swatch--mini"
@@ -608,14 +608,14 @@ export class PanelsController {
             13
           )}</button>
           <span class="vc-app-chevron">${icon("chevronRight", 11)}</span>
-          <span class="vc-app-name vc-app-name--sub">Outer Glow</span>
+          <span class="vc-app-name vc-app-name--sub">外发光</span>
           <span class="vc-app-trail vc-app-trail--fx">${icon("fx", 12)}</span>
         </div>`
       : "";
 
     this.appearance.innerHTML = `
       <header class="vc-float-head" data-drag="appearance">
-        <span class="vc-float-title">Appearance</span>
+        <span class="vc-float-title">外观</span>
         <div class="vc-float-actions">
           <button class="vc-mini-btn" data-action="appearance-menu" title="面板菜单">${icon("hamburger", 14)}</button>
           <button class="vc-mini-btn" data-action="appearance-collapse" title="折叠">${icon(
@@ -628,11 +628,11 @@ export class PanelsController {
         ${rows}
         ${glowRow}
         <div class="vc-app-row vc-app-row--opacity">
-          <span class="vc-app-name">Opacity:</span>
+          <span class="vc-app-name">不透明度：</span>
           <input class="vc-app-opacity" type="text" inputmode="decimal" value="${
             object ? Math.round(object.opacity * 100) : 100
           }" data-prop="opacity" data-id="${object ? object.id : ""}" />%
-          <span class="vc-app-default">Default</span>
+          <span class="vc-app-default">默认</span>
         </div>
       </div>
       <footer class="vc-float-foot">
@@ -658,20 +658,20 @@ export class PanelsController {
     this.contextBar.innerHTML = `
       ${
         isText(object)
-          ? `<button class="vc-ctx-btn" data-action="outline" title="Create Outlines">${icon(
+          ? `<button class="vc-ctx-btn" data-action="outline" title="创建轮廓">${icon(
               "type",
               15
-            )}<span>Create Outlines</span></button>`
+            )}<span>创建轮廓</span></button>`
           : ""
       }
-      <button class="vc-ctx-btn" data-action="duplicate" title="Duplicate (Ctrl+D)">${icon(
+      <button class="vc-ctx-btn" data-action="duplicate" title="复制 (Ctrl+D)">${icon(
         "duplicate",
         15
-      )}<span>Duplicate</span></button>
+      )}<span>复制</span></button>
       <span class="vc-ctx-sep"></span>
-      <button class="vc-ctx-swatch" data-action="fill" title="Fill">${swatchMarkup(object.fill)}</button>
-      <button class="vc-ctx-swatch" data-action="stroke" title="Stroke">${swatchMarkup(object.stroke)}</button>
-      <button class="vc-ctx-icon" data-action="palette" title="Color Picker">${icon("color", 16)}</button>
+      <button class="vc-ctx-swatch" data-action="fill" title="填色">${swatchMarkup(object.fill)}</button>
+      <button class="vc-ctx-swatch" data-action="stroke" title="描边">${swatchMarkup(object.stroke)}</button>
+      <button class="vc-ctx-icon" data-action="palette" title="拾色器">${icon("color", 16)}</button>
       <button class="vc-ctx-icon" data-action="hide" title="隐藏">${icon(
         object.visible ? "eye" : "eyeOff",
         15
@@ -807,13 +807,13 @@ export class PanelsController {
         ctx.toast("锁定参考线：示例未接入");
         break;
       case "preferences":
-        ctx.toast("Preferences：可在属性面板中调整键盘增量与缩放描边");
+        ctx.toast("首选项：可在属性面板中调整键盘增量与缩放描边");
         break;
       case "reset-rotation":
         ctx.updateSelection({ rotation: 0 }, true);
         break;
       case "flip":
-        ctx.toast("Flip：示例未接入");
+        ctx.toast("翻转：示例未接入");
         break;
       case "more-transform":
       case "properties-menu":
@@ -1034,7 +1034,7 @@ export class PanelsController {
         if (object) this.ctx.toggleLock(object.id);
         break;
       case "more":
-        this.ctx.toast("Arrange / Align / Delete：使用右键或对象菜单");
+        this.ctx.toast("排列 / 对齐 / 删除：请使用右键或对象菜单");
         break;
       default:
         break;
@@ -1052,7 +1052,7 @@ export class PanelsController {
     popover.className = "vc-popover vc-color-popover";
     popover.innerHTML = `
       <div class="vc-popover-head"><span>${
-        target === "fill" ? "Fill" : "Stroke"
+        target === "fill" ? "填色" : "描边"
       }</span><button class="vc-mini-btn" data-action="close">${icon("close", 12)}</button></div>
       <div class="vc-popover-body">
         <div class="vc-color-current">${swatchMarkup(current)}<input class="vc-input" data-color-hex value="${
@@ -1078,8 +1078,8 @@ export class PanelsController {
             .join("")}
         </div>
         <div class="vc-popover-actions">
-          <button class="vc-quick-btn" data-action="remove">None</button>
-          <button class="vc-quick-btn" data-action="default">Default</button>
+          <button class="vc-quick-btn" data-action="remove">无</button>
+          <button class="vc-quick-btn" data-action="default">默认</button>
         </div>
       </div>`;
     document.body.appendChild(popover);
