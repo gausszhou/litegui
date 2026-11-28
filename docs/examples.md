@@ -7,6 +7,7 @@
 - [Photocraft](https://gausszhou.github.io/litegui/photocraft/)
 - [VectorCraft](https://gausszhou.github.io/litegui/vectorcraft/)：Illustrator 风格矢量设计工作台
 - [LightCraft](https://gausszhou.github.io/litegui/lightcraft/)：照片图库与非破坏性显影工作台（参考 [ArtCraft LightCraft](https://getartcraft.com/apps/lightcraft)）
+- [FilmCraft](https://gausszhou.github.io/litegui/filmcraft/)：非线性视频剪辑工作台
 
 ## 1. 工具台布局
 

@@ -86,7 +86,7 @@ jobs:
       - name: Install
         run: pnpm install --frozen-lockfile
 
-      - name: Build Pages artifacts (vscode + blender + photocraft + vectorcraft + lightcraft + docs)
+      - name: Build Pages artifacts (vscode + blender + photocraft + vectorcraft + lightcraft + filmcraft + docs)
         run: pnpm pages:build
 
       - name: Publish to gh-pages

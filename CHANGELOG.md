@@ -12,6 +12,13 @@
 
 - 显影面板复用 LiteGUI 的 `HeaderBar` 与 `Toolbar`（右侧模块栏），其余控件为自绘滑杆、曲线、色轮与直方图，保持与 VectorCraft 一致的主题 token（`--lg-*`）。
 
+## Unreleased（FilmCraft 示例）
+
+### Added
+
+- 新增 `apps/filmcraft`：参考 FilmCraft 的非线性视频剪辑示例，包含源/节目监视器、多轨时间线、剪辑/波纹/滑移/滑动/变速/剃刀/标题工具、关键帧、Lumetri 调色与波形/矢量示波器、媒体导入及 SVG/PNG 导出。
+- 新增 Playwright e2e（`packages/tests/e2e/filmcraft.spec.ts`），并接入 `pages:build`、根脚本 `dev:filmcraft` 与 Playwright dev server。
+
 ## Unreleased（Viewport 组件化）
 
 ### Added

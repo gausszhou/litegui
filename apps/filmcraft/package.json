@@ -1,0 +1,20 @@
+{
+  "name": "@gausszhou/litegui-filmcraft",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "description": "FilmCraft-style non-linear video editor workbench built with LiteGUI",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc --noEmit && vite build",
+    "preview": "vite preview",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@gausszhou/litegui-components": "workspace:*"
+  },
+  "devDependencies": {
+    "typescript": "^5.8.3",
+    "vite": "^5.4.11"
+  }
+}
