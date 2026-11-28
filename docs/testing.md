@@ -48,10 +48,10 @@ it("clicks", () => {
 
 ## 端到端测试
 
-`packages/tests/e2e/` 下按应用拆分：`vscode.spec.ts`、`blender.spec.ts`、`photocraft.spec.ts`、`gridcraft.spec.ts`、`vectorcraft.spec.ts`、`lightcraft.spec.ts`、`filmcraft.spec.ts`、`cadcraft.spec.ts` 覆盖对应示例应用，
+`packages/tests/e2e/` 下按应用拆分：`vscode.spec.ts`、`blender.spec.ts`、`photocraft.spec.ts`、`gridcraft.spec.ts`、`vectorcraft.spec.ts`、`lightcraft.spec.ts`、`filmcraft.spec.ts`、`cadcraft.spec.ts`、`wordcraft.spec.ts` 覆盖对应示例应用，
 `docs.spec.ts` 逐个加载文档站的 18 个组件页，确认 demo 挂载、无运行时错误，
 并校验画廊数量、二级菜单对齐与对话框容器。
-vscode / blender / photocraft / gridcraft / vectorcraft / lightcraft / filmcraft / cadcraft 各自是独立 app，Playwright 会分别启动 dev server（5173 / 5175 / 5176 / 5177 / 5179 / 5180 / 5181 / 5184），文档站使用 5178。
+vscode / blender / photocraft / gridcraft / vectorcraft / lightcraft / filmcraft / cadcraft / wordcraft 各自是独立 app，Playwright 会分别启动 dev server（5173 / 5175 / 5176 / 5177 / 5179 / 5180 / 5181 / 5184 / 5183），文档站使用 5178。
 使用系统 Chrome，并需要下载 Firefox：
 
 ```bash

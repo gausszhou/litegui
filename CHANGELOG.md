@@ -1,5 +1,13 @@
 # Changelog
 
+## Unreleased（WordCraft 示例）
+
+### Added
+
+- 新增 `apps/wordcraft`：WordCraft 风格文字处理工作台。包含功能区（Home / Insert / Draw / Design / Layout / References / Mailings / Review / View / Help）、样式库、两页 A4 文档、导航窗格、查找替换、批注与边栏、修订标记与接受/拒绝、目录、脚注、参考文献、页面设置、深色模式、缩放、阅读/专注模式与墨迹批注。
+- 示例通过 `HeaderBar` / `StatusBar` 复用 LiteGUI 组件，其余交互使用原生 DOM 与 TypeScript 实现；新增 Playwright 用例覆盖挂载、功能区、格式化、修订、批注、查找、布局、深色模式、目录与 Backstage。
+- 接入 `pnpm dev:wordcraft`、Pages 构建、README / 文档与 E2E 端口（5183）。
+
 ## Unreleased（GridCraft 示例应用）
 
 ### Added
@@ -35,7 +43,6 @@
 
 - 新增 `apps/filmcraft`：参考 FilmCraft 的非线性视频剪辑示例，包含源/节目监视器、多轨时间线、剪辑/波纹/滑移/滑动/变速/剃刀/标题工具、关键帧、Lumetri 调色与波形/矢量示波器、媒体导入及 SVG/PNG 导出。
 - 新增 Playwright e2e（`packages/tests/e2e/filmcraft.spec.ts`），并接入 `pages:build`、根脚本 `dev:filmcraft` 与 Playwright dev server。
-
 ## Unreleased（Viewport 组件化）
 
 ### Added

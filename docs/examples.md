@@ -10,6 +10,7 @@
 - [FilmCraft](https://gausszhou.github.io/litegui/filmcraft/)：非线性视频剪辑工作台
 - [CADCraft](https://gausszhou.github.io/litegui/cadcraft/)：仿 CAD 制图工作台（参考 [ArtCraft CADCraft](https://getartcraft.com/apps/cadcraft)）
 - [GridCraft](https://gausszhou.github.io/litegui/gridcraft/)：Excel 风格电子表格工作台（参考 [ArtCraft GridCraft](https://getartcraft.com/apps/gridcraft)）
+- [WordCraft](https://gausszhou.github.io/litegui/wordcraft/)：Word 风格文字处理工作台（参考 [ArtCraft WordCraft](https://getartcraft.com/apps/wordcraft)）
 
 ## 1. 工具台布局
 
