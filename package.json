@@ -38,7 +38,8 @@
     "dev:photocraft": "pnpm --filter @gausszhou/litegui-photocraft dev",
     "dev:filmcraft": "pnpm --filter @gausszhou/litegui-filmcraft dev",
     "dev:cadcraft": "pnpm --filter @gausszhou/litegui-cadcraft dev",
-    "dev:vscode": "pnpm --filter @gausszhou/litegui-vscode dev"
+    "dev:vscode": "pnpm --filter @gausszhou/litegui-vscode dev",
+    "dev:wordcraft": "pnpm --filter @gausszhou/litegui-wordcraft dev"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",

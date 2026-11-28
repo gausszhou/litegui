@@ -136,4 +136,4 @@ pnpm verify-pack     # 校验发布会话中的 tarball 内容
 pnpm docs:dev        # 文档站
 ```
 
-库产物在各包的 `dist/`，示例页面在根目录 `dist/vscode`、`dist/blender`、`dist/photocraft`、`dist/gridcraft`、`dist/vectorcraft`、`dist/lightcraft`、`dist/filmcraft` 与 `dist/cadcraft`。
+库产物在各包的 `dist/`，示例页面在根目录 `dist/vscode`、`dist/blender`、`dist/photocraft`、`dist/gridcraft`、`dist/vectorcraft`、`dist/lightcraft`、`dist/filmcraft`、`dist/cadcraft` 与 `dist/wordcraft`。
