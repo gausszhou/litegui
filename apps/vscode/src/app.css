@@ -309,13 +309,42 @@ body {
 }
 
 .app-activity .lg-toolbar__tools {
-  gap: 4px;
+  gap: 0;
 }
 
 .app-activity .lg-toolbar__tool {
-  width: 38px;
+  width: 100%;
   height: 38px;
-  margin: 0 auto;
+  margin: 0;
+  border: 0;
+  border-radius: 0;
+  color: var(--lg-color-text-muted);
+}
+
+.app-activity .lg-toolbar__tool:hover {
+  background: var(--lg-color-header-2);
+}
+
+/* VS Code 的选中项是左侧 2px 指示条 + 白色图标，不是整块蓝色填充。 */
+.app-activity .lg-toolbar__tool--active,
+.app-activity .lg-toolbar__tool--active:hover {
+  background: transparent;
+  border: 0;
+  color: #ffffff;
+}
+
+.app-activity .lg-toolbar__tool--active::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  background: #3794ff;
+}
+
+.app-activity .lg-toolbar__tool--active:hover {
+  background: var(--lg-color-header-2);
 }
 
 .app-activity .lg-toolbar__icon {
