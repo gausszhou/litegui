@@ -298,10 +298,13 @@ test("status bar language and layout menus work", async ({ page }) => {
   const errors = collectPageErrors(page);
   await page.goto(VSCODE_URL, { waitUntil: "networkidle" });
 
-  await page.locator("#layout-customize").click();
-  await expect(page.locator(".app-menu-flyout__item", { hasText: "Primary Side Bar" })).toBeVisible();
-  await page.locator(".app-menu-flyout__item", { hasText: "Minimap" }).click();
-  await expect(page.locator(".app-menu-flyout")).toHaveCount(0);
+  await page.locator(".app-status [data-layout-open]").click();
+  await expect(page.locator("#customize-layout")).toBeVisible();
+  await expect(page.locator(".app-customize__title")).toHaveText("Customize Layout");
+  await page.locator('[data-layout-action="density-compact"]').click();
+  await expect(page.locator("#app-shell")).toHaveClass(/density-compact/);
+  await page.locator("[data-customize-close]").click();
+  await expect(page.locator("#customize-layout")).toBeHidden();
 
   await page.locator("#status-language").click();
   await expect(page.locator(".app-menu-flyout__item", { hasText: "JSON" })).toBeVisible();
@@ -344,6 +347,39 @@ test("explorer mirrors VS Code file tree chrome", async ({ page }) => {
 
   await page.locator('.app-tree-action[data-tree-action="collapse-all"]').click();
   expect(await page.locator(".app-tree .ltreeitem.hidden").count()).toBeGreaterThan(0);
+
+  expect(errors).toEqual([]);
+});
+
+test("customize layout opens from the first titlebar button and controls the shell", async ({ page }) => {
+  const errors = collectPageErrors(page);
+  await page.goto(VSCODE_URL, { waitUntil: "networkidle" });
+
+  await expect(page.locator(".app-titlebar__layout").first()).toHaveAttribute("id", "layout-customize");
+  await page.locator("#layout-customize").click();
+  await expect(page.locator("#customize-layout")).toBeVisible();
+  await expect(page.locator(".app-customize__title")).toHaveText("Customize Layout");
+  await expect(page.locator('[data-layout-action="toggle-menu"]')).toHaveAttribute("aria-checked", "true");
+
+  await page.locator('[data-layout-action="toggle-activity"]').click();
+  await expect(page.locator("#app-shell")).toHaveClass(/activity-hidden/);
+  await page.locator('[data-layout-action="toggle-activity"]').click();
+  await expect(page.locator("#app-shell")).not.toHaveClass(/activity-hidden/);
+
+  await page.locator('[data-layout-action="sidebar-right"]').click();
+  await expect(page.locator("#app-shell")).toHaveClass(/sidebar-right/);
+  await page.locator('[data-layout-action="quick-center"]').click();
+  await expect(page.locator("#app-shell")).toHaveClass(/quick-input-center/);
+
+  await page.keyboard.press("Escape");
+  await expect(page.locator("#customize-layout")).toBeHidden();
+
+  await page.locator("#layout-customize").click();
+  await page.locator("[data-customize-reset]").click();
+  await expect(page.locator("#app-shell")).not.toHaveClass(/sidebar-right/);
+  await expect(page.locator("#app-shell")).not.toHaveClass(/quick-input-center/);
+  await page.locator("[data-customize-close]").click();
+  await expect(page.locator("#customize-layout")).toBeHidden();
 
   expect(errors).toEqual([]);
 });

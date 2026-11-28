@@ -132,10 +132,35 @@ app.innerHTML = `
 `;
 
 const shell = document.querySelector<HTMLElement>("#app-shell")!;
+shell.dataset.panelAlign = "right";
 const breadcrumb = document.querySelector<HTMLElement>("#breadcrumb")!;
 const editorStack = document.querySelector<HTMLElement>("#editor-stack")!;
 const editorEmpty = document.querySelector<HTMLElement>("#editor-empty")!;
 const terminalDrawer = document.querySelector<HTMLElement>("#terminal-drawer")!;
+
+const customizePanel = document.createElement("section");
+customizePanel.id = "customize-layout";
+customizePanel.className = "app-customize";
+customizePanel.hidden = true;
+customizePanel.setAttribute("role", "dialog");
+customizePanel.setAttribute("aria-label", "Customize Layout");
+customizePanel.innerHTML = `
+  <header class="app-customize__header">
+    <span></span>
+    <span class="app-customize__title">Customize Layout</span>
+    <span class="app-customize__actions">
+      <button type="button" class="app-customize__icon" data-customize-reset title="Reset Layout" aria-label="Reset Layout">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 12a8 8 0 1 0 2.4-5.7L4 8.5"/><path d="M4 4v4.5h4.5"/></svg>
+      </button>
+      <button type="button" class="app-customize__icon" data-customize-close title="Close" aria-label="Close">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18"/></svg>
+      </button>
+    </span>
+  </header>
+  <div class="app-customize__body"></div>
+`;
+document.body.appendChild(customizePanel);
+const customizeBody = customizePanel.querySelector<HTMLElement>(".app-customize__body")!;
 
 /* ------------------------------------------------------------------ */
 /* in-memory project                                                   */
@@ -665,10 +690,9 @@ const layoutCustomizeButton = createTitlebarButton(
   titlebarIcon("layoutCustomize")
 );
 layoutCustomizeButton.id = "layout-customize";
-layoutCustomizeButton.setAttribute("data-menu-anchor", "");
-layoutCustomizeButton.setAttribute("aria-haspopup", "menu");
+layoutCustomizeButton.setAttribute("aria-haspopup", "dialog");
 layoutCustomizeButton.setAttribute("aria-expanded", "false");
-titlebar.setRight([layoutSidebarButton, layoutActivityButton, layoutPanelButton, layoutCustomizeButton]);
+titlebar.setRight([layoutCustomizeButton, layoutSidebarButton, layoutActivityButton, layoutPanelButton]);
 
 document.querySelector<HTMLElement>("#titlebar-host")!.appendChild(titlebar.root);
 
@@ -715,9 +739,7 @@ titlebarForward.addEventListener("click", () => stepNavigation(1));
 layoutSidebarButton.addEventListener("click", () => toggleSidebar());
 layoutActivityButton.addEventListener("click", () => toggleActivityBar());
 layoutPanelButton.addEventListener("click", () => toggleTerminal());
-layoutCustomizeButton.addEventListener("click", () =>
-  toggleLauncherMenu("layout", layoutCustomizeButton, buildLayoutMenu())
-);
+layoutCustomizeButton.addEventListener("click", () => toggleCustomizeLayout());
 chatButton.addEventListener("click", () => showToast("Chat is not available in this demo."));
 chatMenuButton.addEventListener("click", () => toggleLauncherMenu("chat", chatMenuButton, buildChatMenu()));
 avatarButton.addEventListener("click", () => toggleLauncherMenu("titlebar-account", avatarButton, buildAccountMenu()));
@@ -1065,8 +1087,8 @@ for (const [element, message] of statusActions) {
 statusLanguage.addEventListener("click", () => toggleLauncherMenu("language", statusLanguage, buildLanguageMenu()));
 
 layoutItem.classList.add("app-status__item--clickable");
-layoutItem.setAttribute("data-menu-anchor", "");
-layoutItem.addEventListener("click", () => toggleLauncherMenu("layout-status", layoutItem, buildLayoutMenu()));
+layoutItem.setAttribute("data-layout-open", "");
+layoutItem.addEventListener("click", () => toggleCustomizeLayout());
 
 formatterItem.classList.add("app-status__item--clickable");
 formatterItem.addEventListener("click", () => {
@@ -2116,17 +2138,222 @@ function buildSidebarMenu(): FlyoutItem[] {
   ];
 }
 
-function buildLayoutMenu(): FlyoutItem[] {
-  return [
-    { label: "Primary Side Bar", checked: !shell.classList.contains("sidebar-hidden"), action: () => toggleSidebar() },
-    { label: "Activity Bar", checked: !shell.classList.contains("activity-hidden"), action: () => toggleActivityBar() },
-    { label: "Panel", checked: !terminalDrawer.hidden, action: () => toggleTerminal() },
-    { label: "Minimap", checked: minimapEnabled, action: () => toggleMinimap() },
-    { separator: true },
-    { label: "Comfortable", checked: density === "comfortable", action: () => setDensity("comfortable") },
-    { label: "Compact", checked: density === "compact", action: () => setDensity("compact") }
-  ];
+/* ------------------------------------------------------------------ */
+/* customize layout panel                                              */
+/* ------------------------------------------------------------------ */
+
+type SidebarPosition = "left" | "right";
+type PanelAlignment = "left" | "right" | "center" | "justify";
+type QuickInputPosition = "top" | "center";
+
+let sidebarPosition: SidebarPosition = "left";
+let panelAlignment: PanelAlignment = "right";
+let quickInputPosition: QuickInputPosition = "top";
+
+function applySidebarPosition(value: SidebarPosition): void {
+  sidebarPosition = value;
+  shell.classList.toggle("sidebar-right", value === "right");
 }
+
+function applyPanelAlignment(value: PanelAlignment): void {
+  panelAlignment = value;
+  shell.dataset.panelAlign = value;
+}
+
+function applyQuickInputPosition(value: QuickInputPosition): void {
+  quickInputPosition = value;
+  shell.classList.toggle("quick-input-center", value === "center");
+}
+
+function layoutKeys(shortcut: string): string {
+  const keys = shortcut.split("+").map(key => `<kbd>${key}</kbd>`);
+  return `<span class="app-customize__keys">${keys.join('<span class="app-customize__plus">+</span>')}</span>`;
+}
+
+function layoutCheckRow(
+  action: string,
+  label: string,
+  checked: boolean,
+  options: { meta?: string; shortcut?: string; disabled?: boolean } = {}
+): string {
+  return `<button type="button" class="app-customize__row${checked ? " is-checked" : ""}" data-layout-action="${action}" role="checkbox" aria-checked="${checked}"${options.disabled ? " disabled" : ""}>
+    <span class="app-customize__mark"></span>
+    <span class="app-customize__label">${label}</span>
+    ${options.meta ? `<span class="app-customize__meta">${options.meta}</span>` : ""}
+    ${options.shortcut ? layoutKeys(options.shortcut) : ""}
+  </button>`;
+}
+
+function layoutRadioRow(
+  action: string,
+  label: string,
+  checked: boolean,
+  options: { meta?: string } = {}
+): string {
+  return `<button type="button" class="app-customize__row app-customize__row--radio${checked ? " is-checked" : ""}" data-layout-action="${action}" role="radio" aria-checked="${checked}">
+    <span class="app-customize__mark"></span>
+    <span class="app-customize__label">${label}</span>
+    ${options.meta ? `<span class="app-customize__meta">${options.meta}</span>` : ""}
+  </button>`;
+}
+
+const layoutSeparator = '<div class="app-customize__sep" role="separator"></div>';
+
+function renderCustomizeLayout(): void {
+  const rows = [
+    layoutCheckRow("toggle-menu", "Menu Bar", !activityMenuButton.hidden, { meta: "Visibility" }),
+    layoutCheckRow("toggle-activity", "Activity Bar", !shell.classList.contains("activity-hidden")),
+    layoutCheckRow("toggle-sidebar", "Primary Side Bar", !shell.classList.contains("sidebar-hidden"), {
+      shortcut: "Ctrl+B"
+    }),
+    layoutCheckRow("toggle-secondary", "Secondary Side Bar", false, {
+      shortcut: "Ctrl+Alt+B",
+      disabled: true
+    }),
+    layoutCheckRow("toggle-panel", "Panel", !terminalDrawer.hidden, { shortcut: "Ctrl+J" }),
+    layoutCheckRow("toggle-status", "Status Bar", !shell.classList.contains("status-hidden")),
+    layoutSeparator,
+    layoutRadioRow("sidebar-left", "Left", sidebarPosition === "left", { meta: "Primary Side Bar Position" }),
+    layoutRadioRow("sidebar-right", "Right", sidebarPosition === "right"),
+    layoutSeparator,
+    layoutRadioRow("panel-left", "Left", panelAlignment === "left"),
+    layoutRadioRow("panel-right", "Right", panelAlignment === "right", { meta: "Panel Alignment" }),
+    layoutRadioRow("panel-center", "Center", panelAlignment === "center"),
+    layoutRadioRow("panel-justify", "Justify", panelAlignment === "justify"),
+    layoutSeparator,
+    layoutRadioRow("quick-top", "Top", quickInputPosition === "top", { meta: "Quick Input Position" }),
+    layoutRadioRow("quick-center", "Center", quickInputPosition === "center"),
+    layoutSeparator,
+    layoutRadioRow("density-default", "Default", density === "comfortable", { meta: "Layout Density" }),
+    layoutRadioRow("density-compact", "Compact", density === "compact"),
+    layoutSeparator,
+    layoutCheckRow("fullscreen", "Full Screen", Boolean(document.fullscreenElement), { shortcut: "F11" })
+  ];
+  customizeBody.innerHTML = rows.join("");
+}
+
+async function toggleFullscreen(): Promise<void> {
+  try {
+    if (document.fullscreenElement) await document.exitFullscreen();
+    else await document.documentElement.requestFullscreen();
+  } catch {
+    showToast("Full screen is not available.");
+  }
+  renderCustomizeLayout();
+}
+
+function resetCustomizeLayout(): void {
+  activityMenuButton.hidden = false;
+  shell.classList.remove("sidebar-hidden", "activity-hidden", "status-hidden");
+  terminalDrawer.hidden = true;
+  applySidebarPosition("left");
+  applyPanelAlignment("right");
+  applyQuickInputPosition("top");
+  setDensity("comfortable");
+  if (document.fullscreenElement) void document.exitFullscreen();
+  renderCustomizeLayout();
+}
+
+function onCustomizePointerDown(event: PointerEvent): void {
+  const target = event.target as HTMLElement | null;
+  if (!target) return;
+  if (customizePanel.contains(target)) return;
+  if (target.closest("#layout-customize") || target.closest("[data-layout-open]")) return;
+  closeCustomizeLayout();
+}
+
+function onCustomizeKeyDown(event: KeyboardEvent): void {
+  if (event.key !== "Escape" && event.key !== "Esc") return;
+  event.preventDefault();
+  event.stopPropagation();
+  closeCustomizeLayout();
+}
+
+function openCustomizeLayout(): void {
+  closeLauncherMenu();
+  renderCustomizeLayout();
+  customizePanel.hidden = false;
+  layoutCustomizeButton.setAttribute("aria-expanded", "true");
+  document.addEventListener("pointerdown", onCustomizePointerDown, true);
+  document.addEventListener("keydown", onCustomizeKeyDown, true);
+}
+
+function closeCustomizeLayout(): void {
+  if (customizePanel.hidden) return;
+  customizePanel.hidden = true;
+  layoutCustomizeButton.setAttribute("aria-expanded", "false");
+  document.removeEventListener("pointerdown", onCustomizePointerDown, true);
+  document.removeEventListener("keydown", onCustomizeKeyDown, true);
+}
+
+function toggleCustomizeLayout(): void {
+  if (customizePanel.hidden) openCustomizeLayout();
+  else closeCustomizeLayout();
+}
+
+customizeBody.addEventListener("click", event => {
+  const row = (event.target as HTMLElement).closest<HTMLElement>("[data-layout-action]");
+  if (!row || row.hasAttribute("disabled")) return;
+  switch (row.dataset.layoutAction) {
+    case "toggle-menu":
+      activityMenuButton.hidden = !activityMenuButton.hidden;
+      break;
+    case "toggle-activity":
+      toggleActivityBar();
+      break;
+    case "toggle-sidebar":
+      toggleSidebar();
+      break;
+    case "toggle-panel":
+      toggleTerminal();
+      break;
+    case "toggle-status":
+      shell.classList.toggle("status-hidden");
+      break;
+    case "sidebar-left":
+      applySidebarPosition("left");
+      break;
+    case "sidebar-right":
+      applySidebarPosition("right");
+      break;
+    case "panel-left":
+      applyPanelAlignment("left");
+      break;
+    case "panel-right":
+      applyPanelAlignment("right");
+      break;
+    case "panel-center":
+      applyPanelAlignment("center");
+      break;
+    case "panel-justify":
+      applyPanelAlignment("justify");
+      break;
+    case "quick-top":
+      applyQuickInputPosition("top");
+      break;
+    case "quick-center":
+      applyQuickInputPosition("center");
+      break;
+    case "density-default":
+      setDensity("comfortable");
+      break;
+    case "density-compact":
+      setDensity("compact");
+      break;
+    case "fullscreen":
+      void toggleFullscreen();
+      return;
+    default:
+      break;
+  }
+  renderCustomizeLayout();
+});
+
+customizePanel.querySelector("[data-customize-close]")!.addEventListener("click", closeCustomizeLayout);
+customizePanel.querySelector("[data-customize-reset]")!.addEventListener("click", resetCustomizeLayout);
+document.addEventListener("fullscreenchange", () => {
+  if (!customizePanel.hidden) renderCustomizeLayout();
+});
 
 function buildChatMenu(): FlyoutItem[] {
   return [
