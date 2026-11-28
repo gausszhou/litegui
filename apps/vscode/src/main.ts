@@ -156,7 +156,7 @@ function dir(name: string, children: FsNode[]): FsFolder {
   return { kind: "folder", name, path: "", children };
 }
 
-const project: FsFolder = dir("LITEGUI-VSCODE", [
+const project: FsFolder = dir("litegui-vscode", [
   dir("src", [
     dir("components", [
       file(
@@ -416,13 +416,118 @@ function flattenFiles(node: FsNode = project): FsFile[] {
 /* tree data                                                           */
 /* ------------------------------------------------------------------ */
 
+let openTabsReady = false;
+
+function escapeHtml(value: string): string {
+  return value.replace(/[&<>"']/g, character => {
+    const map: Record<string, string> = { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" };
+    return map[character] ?? character;
+  });
+}
+
+const FILE_BADGES: Record<string, { label: string; className: string }> = {
+  ts: { label: "TS", className: "ts" },
+  js: { label: "JS", className: "js" },
+  json: { label: "{}", className: "json" },
+  css: { label: "#", className: "css" },
+  html: { label: "<>", className: "html" },
+  md: { label: "M↓", className: "md" },
+  svg: { label: "SVG", className: "svg" },
+  xml: { label: "XML", className: "xml" },
+  txt: { label: "TXT", className: "default" }
+};
+
+function fileBadge(name: string): { label: string; className: string } {
+  if (name === "package.json") return { label: "n", className: "npm" };
+  if (name === ".gitignore") return { label: "G", className: "default" };
+  const extension = name.includes(".") ? name.split(".").pop()!.toLowerCase() : "";
+  return FILE_BADGES[extension] ?? { label: extension ? extension.slice(0, 2).toUpperCase() : "•", className: "default" };
+}
+
+function fileIconHtml(name: string): string {
+  const badge = fileBadge(name);
+  return `<span class="app-file-icon app-file-icon--${badge.className}">${badge.label}</span>`;
+}
+
+function folderIconHtml(): string {
+  return '<span class="app-folder-icon"><svg viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M1.6 3.4h4.2l1.4 1.7h7.2v7.3a1.1 1.1 0 0 1-1.1 1.1H2.7a1.1 1.1 0 0 1-1.1-1.1z"/></svg></span>';
+}
+
+const SEEDED_GIT: Record<string, string> = {
+  "package.json": "R",
+  "public/index.html": "R"
+};
+
+function folderHasChanges(path: string): boolean {
+  if (!path) return false;
+  if (path === "src") return true;
+  const prefix = `${path}/`;
+  if (Object.keys(SEEDED_GIT).some(file => file.startsWith(prefix))) return true;
+  if (!openTabsReady) return false;
+  return Array.from(openTabs.entries()).some(([openPath, record]) => record.dirty && openPath.startsWith(prefix));
+}
+
+function gitDecoration(path: string, isFolder: boolean): string {
+  if (isFolder) {
+    return folderHasChanges(path) ? '<span class="app-git-dot" title="Uncommitted changes"></span>' : "";
+  }
+  let letter = SEEDED_GIT[path] ?? "";
+  if (path.startsWith("src/untitled-")) letter = "U";
+  if (openTabsReady && openTabs.get(path)?.dirty) letter = "M";
+  if (!letter) return "";
+  const titles: Record<string, string> = { R: "Renamed", M: "Modified", U: "Untracked", D: "Deleted" };
+  return `<span class="app-git-badge app-git-badge--${letter}" title="${titles[letter] ?? "Changed"}">${letter}</span>`;
+}
+
+const TREE_ACTION_ICONS: Record<string, string> = {
+  "new-file":
+    '<path d="M9 2H4a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1V6z"/><path d="M9 2v4h4"/><path d="M11.5 11.5h-3"/><path d="M10 10v3"/>',
+  "new-folder":
+    '<path d="M1.5 4h4.3l1.5 1.8h7.2V13a1 1 0 0 1-1 1H2.5a1 1 0 0 1-1-1z"/><path d="M8 8.5v4"/><path d="M6 10.5h4"/>',
+  refresh:
+    '<path d="M13.5 8A5.5 5.5 0 0 0 3.3 6"/><path d="M2.5 8V4.5H6"/><path d="M2.5 8a5.5 5.5 0 0 0 10.2 2"/><path d="M13.5 8v3.5H10"/>',
+  "collapse-all":
+    '<rect x="2.5" y="3.5" width="11" height="9" rx="1"/><path d="m6.5 6 2 2-2 2"/><path d="m10 6-2 2 2 2"/>'
+};
+
+function treeActionsHtml(): string {
+  const actions: Array<[string, string]> = [
+    ["new-file", "New File"],
+    ["new-folder", "New Folder"],
+    ["refresh", "Refresh Explorer"],
+    ["collapse-all", "Collapse Folders"]
+  ];
+  const buttons = actions
+    .map(
+      ([action, label]) =>
+        `<button type="button" class="app-tree-action" data-tree-action="${action}" title="${label}" aria-label="${label}"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${TREE_ACTION_ICONS[action]}</svg></button>`
+    )
+    .join("");
+  return `<span class="app-tree-actions">${buttons}</span>`;
+}
+
+const collapsedFolders = new Set<string>();
+
+function folderCaretHtml(path: string): string {
+  const collapsed = collapsedFolders.has(path);
+  return `<span class="app-folder-caret${collapsed ? " app-folder-caret--collapsed" : ""}" data-folder-path="${path}"><svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 4 4 4-4 4"/></svg></span>`;
+}
+
 function buildTreeData(node: FsNode): any {
   if (node.kind === "file") {
-    return { id: node.path, content: node.name, filePath: node.path, name: node.name };
+    return {
+      id: node.path,
+      content: `<span class="app-tree-caret-spacer"></span>${fileIconHtml(node.name)}<span class="app-tree-name">${escapeHtml(node.name)}</span>`,
+      postcontent: gitDecoration(node.path, false),
+      filePath: node.path,
+      name: node.name
+    };
   }
+  const isRoot = node.path === "";
   return {
-    id: node.path ? `dir:${node.path}` : "dir:root",
-    content: node.name,
+    id: isRoot ? "dir:root" : `dir:${node.path}`,
+    content: `${folderCaretHtml(node.path)}${isRoot ? "" : folderIconHtml()}<span class="app-tree-name">${escapeHtml(node.name)}</span>`,
+    postcontent: isRoot ? treeActionsHtml() : gitDecoration(node.path, true),
     name: node.name,
     children: node.children.map(buildTreeData)
   };
@@ -676,6 +781,20 @@ manageButton.addEventListener("click", () => toggleLauncherMenu("manage", manage
 /* sidebar */
 const sidebarPanel = new Panel({ title: "Explorer", width: "100%", height: "100%", className: "app-sidebar-panel" });
 document.querySelector<HTMLElement>("#sidebar-host")!.appendChild(sidebarPanel.root);
+
+const explorerMenuButton = document.createElement("button");
+explorerMenuButton.type = "button";
+explorerMenuButton.className = "app-sidebar__menu";
+explorerMenuButton.textContent = "…";
+explorerMenuButton.title = "Views and More Actions";
+explorerMenuButton.setAttribute("aria-label", "Views and More Actions");
+explorerMenuButton.setAttribute("data-menu-anchor", "");
+explorerMenuButton.setAttribute("aria-haspopup", "menu");
+explorerMenuButton.setAttribute("aria-expanded", "false");
+sidebarPanel.header.appendChild(explorerMenuButton);
+explorerMenuButton.addEventListener("click", () =>
+  toggleLauncherMenu("sidebar-menu", explorerMenuButton, buildSidebarMenu())
+);
 const sidebarBody = document.createElement("div");
 sidebarBody.className = "app-sidebar-body";
 sidebarPanel.content.appendChild(sidebarBody);
@@ -687,6 +806,24 @@ treeHost.className = "app-tree";
 explorerView.appendChild(treeHost);
 sidebarBody.appendChild(explorerView);
 
+const timelineView = document.createElement("div");
+timelineView.className = "app-timeline";
+timelineView.innerHTML = `
+  <button type="button" class="app-timeline__header" aria-expanded="false">
+    <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 4 4 4-4 4"/></svg>
+    <span>Timeline</span>
+  </button>
+  <div class="app-timeline__body" hidden></div>
+`;
+const timelineToggle = timelineView.querySelector<HTMLButtonElement>(".app-timeline__header")!;
+const timelineBody = timelineView.querySelector<HTMLElement>(".app-timeline__body")!;
+timelineToggle.addEventListener("click", () => {
+  const open = timelineView.classList.toggle("app-timeline--open");
+  timelineBody.hidden = !open;
+  timelineToggle.setAttribute("aria-expanded", String(open));
+  if (open) renderTimeline();
+});
+
 const tree = new Tree(buildTreeData(project), {
   height: "100%",
   collapsed_depth: 10,
@@ -695,6 +832,31 @@ const tree = new Tree(buildTreeData(project), {
   allow_multiselection: false
 });
 treeHost.appendChild(tree.root);
+
+tree.root.addEventListener(
+  "click",
+  event => {
+    const target = event.target as HTMLElement;
+    const button = target.closest?.("[data-tree-action]") as HTMLElement | null;
+    if (button) {
+      event.preventDefault();
+      event.stopPropagation();
+      const action = button.dataset.treeAction;
+      if (action === "new-file") newFile();
+      else if (action === "new-folder") newFolder();
+      else if (action === "refresh") renderExplorerTree();
+      else if (action === "collapse-all") collapseAllFolders();
+      return;
+    }
+    const caret = target.closest?.("[data-folder-path]") as HTMLElement | null;
+    if (caret) {
+      event.preventDefault();
+      event.stopPropagation();
+      toggleFolder(caret.dataset.folderPath ?? "");
+    }
+  },
+  true
+);
 
 /* editor tabs */
 const editorTabs = new Tabs({ id: "editor-tabs" });
@@ -951,6 +1113,7 @@ interface OpenTab {
 }
 
 const openTabs = new Map<string, OpenTab>();
+openTabsReady = true;
 
 /* ------------------------------------------------------------------ */
 /* helpers                                                             */
@@ -1084,6 +1247,95 @@ function highlightTreeFile(path: string | null): void {
   if (item) item.classList.add("selected");
 }
 
+function applyCollapseState(): void {
+  const rows = Array.from(tree.root.querySelectorAll<HTMLElement>(".ltreeitem"));
+  const stack: Array<{ level: number; collapsed: boolean }> = [];
+  for (const row of rows) {
+    const level = Number(row.dataset.level ?? 0);
+    while (stack.length && stack[stack.length - 1].level >= level) stack.pop();
+    const hidden = stack.some(entry => entry.collapsed);
+    row.classList.toggle("hidden", hidden);
+    const itemId = row.dataset.item_id ?? "";
+    if (itemId.startsWith("dir:")) {
+      const folderPath = itemId === "dir:root" ? "" : itemId.slice(4);
+      const collapsed = !searchQuery && collapsedFolders.has(folderPath);
+      stack.push({ level, collapsed });
+      row
+        .querySelector<HTMLElement>("[data-folder-path]")
+        ?.classList.toggle("app-folder-caret--collapsed", collapsed);
+    }
+  }
+}
+
+function toggleFolder(path: string): void {
+  if (collapsedFolders.has(path)) collapsedFolders.delete(path);
+  else collapsedFolders.add(path);
+  applyCollapseState();
+}
+
+function expandAncestors(path: string): void {
+  const parts = path.split("/");
+  parts.pop();
+  let prefix = "";
+  for (const part of parts) {
+    prefix = prefix ? `${prefix}/${part}` : part;
+    collapsedFolders.delete(prefix);
+  }
+  applyCollapseState();
+}
+
+function collapseAllFolders(): void {
+  const collect = (node: FsNode): void => {
+    if (node.kind !== "folder") return;
+    if (node.path) collapsedFolders.add(node.path);
+    node.children.forEach(collect);
+  };
+  project.children.forEach(collect);
+  applyCollapseState();
+}
+
+function updateTreeDecoration(path: string): void {
+  const row = Array.from(tree.root.querySelectorAll<HTMLElement>(".ltreeitem")).find(
+    element => element.dataset.item_id === path
+  );
+  const post = row?.querySelector<HTMLElement>(".postcontent");
+  if (post) post.innerHTML = gitDecoration(path, false);
+}
+
+function renderTimeline(): void {
+  timelineBody.innerHTML = "";
+  const record = activeTab();
+  if (!record) {
+    const empty = document.createElement("div");
+    empty.className = "app-empty";
+    empty.textContent = "No timeline items.";
+    timelineBody.appendChild(empty);
+    return;
+  }
+  const entries = [
+    { label: `${record.file.name} · Saved`, meta: "just now" },
+    { label: `${record.file.name} · Opened`, meta: "2 minutes ago" },
+    { label: "Initial commit", meta: "3 days ago" }
+  ];
+  for (const entry of entries) {
+    const row = document.createElement("div");
+    row.className = "app-timeline__item";
+    const label = document.createElement("span");
+    label.className = "app-timeline__label";
+    label.textContent = entry.label;
+    const meta = document.createElement("span");
+    meta.className = "app-timeline__meta";
+    meta.textContent = entry.meta;
+    row.append(label, meta);
+    row.addEventListener("click", () => showToast(`Timeline: ${entry.label}`));
+    timelineBody.appendChild(row);
+  }
+}
+
+function toggleTimeline(): void {
+  timelineToggle.click();
+}
+
 /* ------------------------------------------------------------------ */
 /* explorer                                                            */
 /* ------------------------------------------------------------------ */
@@ -1093,10 +1345,13 @@ function renderExplorerTree(): void {
   const filtered = searchQuery ? filterTree(project, searchQuery.toLowerCase()) : project;
   const result = filtered ?? { ...project, children: [] };
   tree.updateTree(buildTreeData(result));
+  applyCollapseState();
   highlightTreeFile(activePath);
   if (currentView === "explorer") {
     const resultCount = countFiles(filtered);
-    sidebarPanel.setTitle(searchQuery ? `Explorer: ${resultCount} result${resultCount === 1 ? "" : "s"}` : "Explorer");
+    sidebarPanel.setTitle(searchQuery ? `Folders: ${resultCount} result${resultCount === 1 ? "" : "s"}` : "Folders");
+    sidebarPanel.root.classList.add("app-explorer-panel");
+    explorerMenuButton.hidden = false;
     explorerView.hidden = false;
   }
 }
@@ -1106,9 +1361,11 @@ function setSidebarView(view: string): void {
   activityBar.setActive(view);
   sidebarBody.innerHTML = "";
   explorerView.hidden = view !== "explorer";
+  sidebarPanel.root.classList.toggle("app-explorer-panel", view === "explorer");
+  explorerMenuButton.hidden = view !== "explorer";
 
   if (view === "explorer") {
-    sidebarBody.appendChild(explorerView);
+    sidebarBody.append(explorerView, timelineView);
     renderExplorerTree();
     return;
   }
@@ -1295,6 +1552,7 @@ function openFile(path: string): void {
     record.dirty = true;
     updateTabTitle(path);
     updateBranchStatus();
+    updateTreeDecoration(path);
     if (activePath === path) {
       updateBreadcrumb(path);
       updateEditorStatus();
@@ -1320,8 +1578,10 @@ function activateFile(path: string): void {
   updateEditorStatus();
   record.editor.layout();
   updateStatusForEditor(record.editor);
+  expandAncestors(path);
   highlightTreeFile(path);
   pushNavigation(path);
+  if (timelineView.classList.contains("app-timeline--open")) renderTimeline();
 }
 
 function closeFile(path: string): void {
@@ -1379,6 +1639,7 @@ function cycleEditor(direction: number): void {
 function newFile(): void {
   untitledCount += 1;
   const target = findFolder("src") ?? project;
+  collapsedFolders.delete(target.path);
   const name = `untitled-${untitledCount}.ts`;
   const next = file(name, "TypeScript", `// ${name}\n`);
   target.children.push(next);
@@ -1386,6 +1647,21 @@ function newFile(): void {
   renderExplorerTree();
   openFile(next.path);
   showToast(`Created ${next.path}`);
+}
+
+function newFolder(): void {
+  const name = window.prompt("New folder name");
+  if (!name) return;
+  const trimmed = name.trim();
+  if (!trimmed) return;
+  if (project.children.some(child => child.kind === "folder" && child.name === trimmed)) {
+    showToast(`Folder "${trimmed}" already exists.`);
+    return;
+  }
+  project.children.push(dir(trimmed, []));
+  assignPaths(project);
+  renderExplorerTree();
+  showToast(`Created ${trimmed}`);
 }
 
 function saveActiveFile(): void {
@@ -1397,6 +1673,7 @@ function saveActiveFile(): void {
   record.dirty = false;
   updateTabTitle(record.path);
   updateBranchStatus();
+  updateTreeDecoration(record.path);
   updateBreadcrumb(record.path);
   showToast(`Saved ${record.file.name}`);
 }
@@ -1756,6 +2033,17 @@ function buildManageMenu(): FlyoutItem[] {
   ];
 }
 
+function buildSidebarMenu(): FlyoutItem[] {
+  return [
+    { label: "New File", action: () => newFile() },
+    { label: "New Folder…", action: () => newFolder() },
+    { label: "Refresh Explorer", action: () => renderExplorerTree() },
+    { label: "Collapse Folders in Explorer", action: () => collapseAllExplorer() },
+    { separator: true },
+    { label: "Toggle Timeline", action: () => toggleTimeline() }
+  ];
+}
+
 function buildLayoutMenu(): FlyoutItem[] {
   return [
     { label: "Primary Side Bar", checked: !shell.classList.contains("sidebar-hidden"), action: () => toggleSidebar() },
@@ -1913,6 +2201,13 @@ function openLauncherMenu(source: string, anchor: HTMLButtonElement, items: Flyo
   document.body.appendChild(menu);
 
   if (anchor.closest(".app-titlebar")) {
+    menu.classList.add("app-menu-flyout--titlebar");
+    const anchorRect = anchor.getBoundingClientRect();
+    const menuRect = menu.getBoundingClientRect();
+    const left = Math.min(Math.max(8, anchorRect.right - menuRect.width), window.innerWidth - menuRect.width - 8);
+    menu.style.left = `${Math.round(left)}px`;
+    menu.style.top = `${Math.round(anchorRect.bottom + 4)}px`;
+  } else if (anchor.closest(".app-sidebar")) {
     menu.classList.add("app-menu-flyout--titlebar");
     const anchorRect = anchor.getBoundingClientRect();
     const menuRect = menu.getBoundingClientRect();

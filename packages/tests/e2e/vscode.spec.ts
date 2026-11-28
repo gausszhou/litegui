@@ -280,3 +280,34 @@ test("status bar language and layout menus work", async ({ page }) => {
 
   expect(errors).toEqual([]);
 });
+
+test("explorer mirrors VS Code file tree chrome", async ({ page }) => {
+  const errors = collectPageErrors(page);
+  await page.goto(VSCODE_URL, { waitUntil: "networkidle" });
+
+  await expect(page.locator(".app-sidebar .lg-panel__title")).toHaveText("Folders");
+  await expect(page.locator(".app-tree-action")).toHaveCount(4);
+  await expect(
+    page.locator(".app-tree .ltreeitem", { hasText: "package.json" }).locator(".app-file-icon--npm")
+  ).toBeVisible();
+  await expect(page.locator(".app-git-badge--R")).toHaveCount(2);
+  await expect(page.locator(".app-folder-icon").first()).toBeVisible();
+  await expect(page.locator(".app-timeline__header")).toContainText("Timeline");
+
+  await page.locator(".app-sidebar__menu").click();
+  await expect(page.locator(".app-menu-flyout__item", { hasText: "Collapse Folders in Explorer" })).toBeVisible();
+  await page.keyboard.press("Escape");
+
+  await page.locator(".app-timeline__header").click();
+  await expect(page.locator(".app-timeline__body")).toBeVisible();
+  await expect(page.locator(".app-timeline__item")).toHaveCount(3);
+
+  await page.locator('.app-tree-action[data-tree-action="new-file"]').click();
+  await expect(page.locator("#editor-tabs .lg-tabs__tab--selected .lg-tabs__tab-title")).toContainText("untitled-1.ts");
+  await expect(page.locator(".app-tree .ltreeitem")).toHaveCount(20);
+
+  await page.locator('.app-tree-action[data-tree-action="collapse-all"]').click();
+  expect(await page.locator(".app-tree .ltreeitem.hidden").count()).toBeGreaterThan(0);
+
+  expect(errors).toEqual([]);
+});

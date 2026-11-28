@@ -353,15 +353,53 @@ body {
 }
 
 .app-sidebar .lg-panel__header {
+  display: flex;
   flex: 0 0 auto;
+  align-items: center;
+  gap: 4px;
+  padding: 0 4px 0 8px;
   border-bottom: 1px solid var(--lg-color-border);
   background: var(--lg-color-header);
 }
 
 .app-sidebar .lg-panel__title {
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
   text-transform: uppercase;
   letter-spacing: 0.08em;
   font-size: 11px;
+}
+
+.app-explorer-panel .lg-panel__title {
+  text-transform: none;
+  letter-spacing: 0;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--lg-color-text);
+}
+
+.app-sidebar__menu {
+  display: grid;
+  flex: 0 0 auto;
+  place-items: center;
+  width: 20px;
+  height: 20px;
+  padding: 0;
+  border: 0;
+  border-radius: 3px;
+  background: transparent;
+  color: var(--lg-color-text-muted);
+  font-size: 14px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.app-sidebar__menu:hover {
+  background: var(--lg-color-header-2);
+  color: var(--lg-color-text-strong);
 }
 
 .app-sidebar .lg-panel__content {
@@ -392,6 +430,300 @@ body {
 
 .app-tree .litetree {
   overflow: auto;
+}
+
+.app-tree .ltreeitem {
+  height: 22px;
+  color: var(--lg-color-text);
+}
+
+.app-tree .ltreeitem:nth-child(even) {
+  background-color: transparent;
+}
+
+.app-tree .ltreeitem:hover {
+  background-color: var(--lg-color-row-hover);
+}
+
+.app-tree .ltreeitem.selected,
+.app-tree .ltreeitem.selected:hover {
+  background-color: #04395e;
+}
+
+.app-tree .ltreeitem.selected .incontent {
+  color: #ffffff;
+}
+
+.app-tree .ltreeitemtitle {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  height: 22px;
+  overflow: hidden;
+  font-size: 12px;
+}
+
+.app-tree .ltreeitemtitle .incontent {
+  display: flex;
+  flex: 1 1 auto;
+  align-items: center;
+  min-width: 0;
+  overflow: hidden;
+}
+
+.app-tree .app-tree-name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.app-tree .ltreeitemtitle .precontent,
+.app-tree .ltreeitemtitle .postcontent {
+  display: inline-flex;
+  align-items: center;
+  margin: 0;
+}
+
+[data-item_id="dir:root"] > .ltreeitemtitle .incontent {
+  font-weight: 600;
+}
+
+.app-file-icon {
+  display: inline-grid;
+  flex: 0 0 auto;
+  place-items: center;
+  width: 15px;
+  height: 15px;
+  margin-right: 6px;
+  border-radius: 3px;
+  font: 700 7px/1 ui-sans-serif, system-ui, sans-serif;
+  letter-spacing: -0.02em;
+}
+
+.app-file-icon--ts {
+  background: #3178c6;
+  color: #ffffff;
+}
+
+.app-file-icon--js {
+  background: #f7df1e;
+  color: #222222;
+}
+
+.app-file-icon--json {
+  background: #f7df1e;
+  color: #333333;
+}
+
+.app-file-icon--css {
+  background: #2965f1;
+  color: #ffffff;
+}
+
+.app-file-icon--html {
+  background: #e34c26;
+  color: #ffffff;
+}
+
+.app-file-icon--md {
+  background: #519aba;
+  color: #ffffff;
+}
+
+.app-file-icon--svg {
+  background: #a074c4;
+  color: #ffffff;
+}
+
+.app-file-icon--xml {
+  background: #e37933;
+  color: #ffffff;
+}
+
+.app-file-icon--npm {
+  background: #cb3837;
+  color: #ffffff;
+}
+
+.app-file-icon--default {
+  background: #6a6a6a;
+  color: #ffffff;
+}
+
+.app-tree .ltreeitemtitle .collapsebox {
+  display: none;
+}
+
+.app-folder-caret {
+  display: inline-grid;
+  flex: 0 0 auto;
+  place-items: center;
+  width: 16px;
+  height: 16px;
+  margin-right: 2px;
+  color: var(--lg-color-text-muted);
+  cursor: pointer;
+}
+
+.app-folder-caret svg {
+  width: 12px;
+  height: 12px;
+  transform: rotate(90deg);
+  transition: transform 0.12s ease;
+}
+
+.app-folder-caret--collapsed svg {
+  transform: rotate(0deg);
+}
+
+.app-tree-caret-spacer {
+  flex: 0 0 auto;
+  width: 18px;
+}
+
+.app-folder-icon {
+  display: inline-flex;
+  flex: 0 0 auto;
+  align-items: center;
+  width: 15px;
+  height: 15px;
+  margin-right: 6px;
+  color: #8a8a8a;
+}
+
+.app-folder-icon svg {
+  width: 14px;
+  height: 14px;
+}
+
+.app-git-badge {
+  margin-left: 6px;
+  font: 600 11px/1 var(--lg-font);
+}
+
+.app-git-badge--M {
+  color: #e2c08d;
+}
+
+.app-git-badge--R,
+.app-git-badge--U {
+  color: #73c991;
+}
+
+.app-git-badge--D {
+  color: #f48771;
+}
+
+.app-git-dot {
+  flex: 0 0 auto;
+  width: 7px;
+  height: 7px;
+  margin-left: 6px;
+  border-radius: 50%;
+  background: #73c991;
+}
+
+.app-tree-actions {
+  display: inline-flex;
+  flex: 0 0 auto;
+  gap: 2px;
+  margin-left: 4px;
+}
+
+.app-tree-action {
+  display: grid;
+  place-items: center;
+  width: 20px;
+  height: 20px;
+  padding: 0;
+  border: 0;
+  border-radius: 3px;
+  background: transparent;
+  color: var(--lg-color-text-muted);
+  cursor: pointer;
+}
+
+.app-tree-action:hover {
+  background: var(--lg-color-header-2);
+  color: var(--lg-color-text-strong);
+}
+
+.app-tree-action svg {
+  width: 14px;
+  height: 14px;
+}
+
+/* timeline */
+
+.app-timeline {
+  flex: 0 0 auto;
+  margin-top: 4px;
+  padding-top: 4px;
+  border-top: 1px solid var(--lg-color-border);
+}
+
+.app-timeline__header {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  width: 100%;
+  height: 24px;
+  padding: 0 4px;
+  border: 0;
+  border-radius: 3px;
+  background: transparent;
+  color: var(--lg-color-text);
+  font-size: 12px;
+  letter-spacing: 0.02em;
+  cursor: pointer;
+}
+
+.app-timeline__header:hover {
+  background: var(--lg-color-header-2);
+}
+
+.app-timeline__header svg {
+  width: 12px;
+  height: 12px;
+  transition: transform 0.15s ease;
+}
+
+.app-timeline--open .app-timeline__header svg {
+  transform: rotate(90deg);
+}
+
+.app-timeline__body {
+  max-height: 140px;
+  padding: 2px 4px 6px;
+  overflow: auto;
+}
+
+.app-timeline__item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  height: 22px;
+  padding: 0 4px;
+  border-radius: 3px;
+  font-size: 11px;
+  cursor: pointer;
+}
+
+.app-timeline__item:hover {
+  background: var(--lg-color-row-hover);
+}
+
+.app-timeline__label {
+  overflow: hidden;
+  color: var(--lg-color-text);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.app-timeline__meta {
+  flex: 0 0 auto;
+  color: var(--lg-color-text-muted);
 }
 
 .app-sidebar-view {
