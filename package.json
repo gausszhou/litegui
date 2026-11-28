@@ -33,6 +33,7 @@
     "elements:styles": "node scripts/build-elements-css.mjs",
     "dev:blender": "pnpm --filter @gausszhou/litegui-blender dev",
     "dev:vectorcraft": "pnpm --filter @gausszhou/litegui-vectorcraft dev",
+    "dev:lightcraft": "pnpm --filter @gausszhou/litegui-lightcraft dev",
     "dev:photocraft": "pnpm --filter @gausszhou/litegui-photocraft dev",
     "dev:vscode": "pnpm --filter @gausszhou/litegui-vscode dev"
   },
