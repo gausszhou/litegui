@@ -48,5 +48,14 @@ export type { TimelineOptions } from "./components/Timeline";
 export { Toolbar } from "./components/Toolbar";
 export type { ToolbarOptions, ToolbarTool } from "./components/Toolbar";
 export { Tree } from "./components/Tree";
+export { Viewport } from "./components/Viewport";
+export type {
+  ViewportEditElement,
+  ViewportObject,
+  ViewportOptions,
+  ViewportShading,
+  ViewportTransform,
+  ViewportVec3
+} from "./components/Viewport";
 
 export default LiteGUI;

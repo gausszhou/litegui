@@ -1,9 +1,9 @@
 {
-  "name": "@gausszhou/litegui-editor",
+  "name": "@gausszhou/litegui-vscode",
   "version": "0.0.0",
   "private": true,
   "type": "module",
-  "description": "Classic LiteGUI editor layout demo with Blender theme",
+  "description": "VS Code-style code editor built with LiteGUI components",
   "scripts": {
     "dev": "vite",
     "build": "tsc --noEmit && vite build",
@@ -12,7 +12,7 @@
   },
   "dependencies": {
     "@gausszhou/litegui-components": "workspace:*",
-    "@gausszhou/litegui-core": "workspace:*"
+    "monaco-editor": "^0.58.0"
   },
   "devDependencies": {
     "typescript": "^5.8.3",

@@ -80,6 +80,7 @@ import "@gausszhou/litegui-elements";
 | `<lg-node-editor>`  | `nodes` JSON、`links` JSON、`readonly`；方法 `select(id)`                            | `litegui-change` → `{ nodes, links }`、`litegui-select` → `{ id }`                             |
 | `<lg-text-editor>`  | `value`、`language`、`readonly`                                                      | `litegui-change` → `{ value }`、`litegui-cursor` → `{ line, column }`                          |
 | `<lg-image-editor>` | `src`、`title`、`zoom`；方法 `fit()` / `resetView()`                                 | `litegui-zoom` → `{ zoom }`                                                                   |
+| `<lg-viewport>`     | `objects` JSON、`selected`、`shading`、`overlays`、`sidebar-open`、`edit-mode`、`edit-element`、`brush`；方法 `frameAll()` / `focusSelection()` / `setView()` / `zoom()` | `litegui-select` → `{ id }`、`litegui-status` → `{ text }`、`litegui-change` → `{ objects }`、`litegui-contextmenu` → `{ x, y }`、`litegui-transform` → `{ kind, phase }` |
 
 `<lg-menu-item>` 只是声明式数据载体，不渲染自身。
 

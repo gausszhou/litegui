@@ -165,9 +165,37 @@ export class Dragger extends EventMitter {
       return true;
     }
 
+    // 直接输入：change（失焦）或 Enter 时把输入框的值提交回实例。
+    // emit 用于区分“键盘提交”和“原生 change”：原生 change 已经把事件发给监听器，
+    // 此时只同步 value，不再二次派发，避免同一次输入触发两遍 change。
+    const applyInputValue = (emit: boolean) => {
+      const parsed = parseFloat(this.input.value);
+      if (!Number.isFinite(parsed)) {
+        this.input.value = this.value.toFixed(precision) + (options.units ? options.units : "");
+        return;
+      }
+
+      let value = parsed;
+      if (options.max != null && value > options.max) value = options.max;
+      if (options.min != null && value < options.min) value = options.min;
+      const changed = value !== this.value;
+      this.value = value;
+      // 只在发生夹取时改写输入框，保留用户原样输入（如 "5" 不会变成 "5.00"）。
+      if (value !== parsed) {
+        this.input.value = value.toFixed(precision) + (options.units ? options.units : "");
+      }
+      if (changed && emit) trigger(this.input, "change");
+    };
+
+    const onInputKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Enter") applyInputValue(true);
+    };
+
     this.dragger.addEventListener("mousedown", onMouseDown);
     this.input.addEventListener("wheel", onWheel, false);
     this.input.addEventListener("keydown",onKeyDown );
+    this.input.addEventListener("keydown", onInputKeyDown);
+    this.input.addEventListener("change", () => applyInputValue(false));
   }
 
   setRange(min: number, max: number) {

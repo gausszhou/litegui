@@ -1,0 +1,53 @@
+/* Viewport — 3D scene canvas with orbit / pan / zoom and object picking.
+ * BEM: .lg-viewport, __canvas/__info/__muted
+ *
+ * The canvas paints itself; these custom properties are read by the component
+ * at draw time so themes can restyle the 3D scene without touching TS.
+ */
+
+.lg-viewport {
+	position: relative;
+	flex: 1 1 auto;
+	width: 100%;
+	height: 100%;
+	min-width: 0;
+	min-height: 0;
+	overflow: hidden;
+	background: var(--lg-viewport-bg);
+	outline: 0;
+	user-select: none;
+}
+
+.lg-viewport__canvas {
+	position: absolute;
+	inset: 0;
+	width: 100%;
+	height: 100%;
+	display: block;
+	touch-action: none;
+	outline: 0;
+	cursor: default;
+}
+
+.lg-viewport__info {
+	position: absolute;
+	top: 8px;
+	left: 12px;
+	z-index: 2;
+	color: var(--lg-viewport-info-color);
+	font-family: var(--lg-font);
+	font-size: var(--lg-font-size-sm, 12px);
+	line-height: 1.35;
+	pointer-events: none;
+}
+
+.lg-viewport:focus-visible,
+.lg-viewport__canvas:focus-visible {
+	outline: 1px solid var(--lg-color-accent);
+	outline-offset: -1px;
+}
+
+.lg-viewport__muted {
+	color: var(--lg-viewport-info-muted);
+	font-size: 11px;
+}

@@ -1,5 +1,16 @@
 # Changelog
 
+## Unreleased（Viewport 组件化）
+
+### Added
+
+- 新增 `Viewport` 组件：把 Blender app 里的 `apps/blender/src/viewport.ts` 抽到 `packages/components`，统一为 `.lg-viewport` BEM 结构，支持轨道/平移/缩放、对象点选、变换 gizmo、编辑模式、笔刷光标与 `snapshot()`。
+- 新增事件 API：`select`、`status`、`change`、`context-menu`、`transform`；选中状态由组件持有，`setSelected()` 只做程序化同步，不派发事件。
+- 新增子路径导出 `@gausszhou/litegui-components/viewport`，并在主入口导出 `Viewport` 与 `ViewportObject` / `ViewportOptions` 等类型。
+- 新增 `<lg-viewport>` Web Component（JSON `objects` + `litegui-*` 事件）与 `<LiteGuiViewport>` Vue 绑定（支持 `v-model:selected`）。
+- 3D 场景配色改为 CSS 变量（`--lg-viewport-bg`、`--lg-viewport-selection` 等），并补亮色主题覆盖。
+- 补 Viewport 组件、元素、Vue 绑定单测；Blender app 改为使用组件包并删除本地实现。
+
 ## Unreleased（CSS class BEM 化）
 
 ### Changed

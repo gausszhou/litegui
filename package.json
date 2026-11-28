@@ -10,8 +10,7 @@
   },
   "scripts": {
     "build": "pnpm -r build",
-    "dev": "pnpm --filter @gausszhou/litegui-coder dev",
-    "dev:editor": "pnpm --filter @gausszhou/litegui-editor dev",
+    "dev": "pnpm --filter @gausszhou/litegui-vscode dev",
     "typecheck": "pnpm -r typecheck",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
@@ -34,7 +33,7 @@
     "elements:styles": "node scripts/build-elements-css.mjs",
     "dev:blender": "pnpm --filter @gausszhou/litegui-blender dev",
     "dev:photocraft": "pnpm --filter @gausszhou/litegui-photocraft dev",
-    "dev:coder": "pnpm --filter @gausszhou/litegui-coder dev"
+    "dev:vscode": "pnpm --filter @gausszhou/litegui-vscode dev"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",

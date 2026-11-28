@@ -25,6 +25,7 @@ import { LiteGuiTextEditorElement } from "./elements/text-editor";
 import { LiteGuiTimelineElement } from "./elements/timeline";
 import { LiteGuiToolbarElement } from "./elements/toolbar";
 import { LiteGuiTreeElement } from "./elements/tree";
+import { LiteGuiViewportElement } from "./elements/viewport";
 
 export const ELEMENT_TAGS = {
   // 基础控件
@@ -57,7 +58,8 @@ export const ELEMENT_TAGS = {
   "lg-toolbar": LiteGuiToolbarElement,
   "lg-node-editor": LiteGuiNodeEditorElement,
   "lg-text-editor": LiteGuiTextEditorElement,
-  "lg-image-editor": LiteGuiImageEditorElement
+  "lg-image-editor": LiteGuiImageEditorElement,
+  "lg-viewport": LiteGuiViewportElement
 } as const;
 
 export type LiteGuiElementTag = keyof typeof ELEMENT_TAGS;

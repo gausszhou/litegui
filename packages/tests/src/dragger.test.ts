@@ -28,4 +28,27 @@ describe("Dragger keyboard and wheel", () => {
     dragger.setValue(3);
     expect(dragger.input.value).toBe("3.0px");
   });
+
+  it("commits typed values on change or Enter", () => {
+    const dragger = new Dragger(1, { precision: 2, min: 0, max: 10 });
+    const changes: number[] = [];
+    dragger.input.addEventListener("change", () => changes.push(dragger.getValue()));
+
+    dragger.input.value = "7.25";
+    dragger.input.dispatchEvent(new Event("change"));
+    expect(dragger.getValue()).toBe(7.25);
+    expect(dragger.input.value).toBe("7.25");
+
+    // 超出范围时夹到 min/max
+    dragger.input.value = "42";
+    dragger.input.dispatchEvent(new Event("change"));
+    expect(dragger.getValue()).toBe(10);
+    expect(dragger.input.value).toBe("10.00");
+
+    // Enter 不产生原生 change 事件，也要提交
+    dragger.input.value = "-3";
+    dragger.input.dispatchEvent(new KeyboardEvent("keydown", { key: "Enter", bubbles: true }));
+    expect(dragger.getValue()).toBe(0);
+    expect(changes).toEqual([7.25, 10, 0]);
+  });
 });

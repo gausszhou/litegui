@@ -391,6 +391,28 @@ ImageEditor 用 `v-model:zoom` 同步缩放比例：
 <LiteGuiImageEditor v-model:zoom="zoom" src="/render.png" title="Render Result" />
 ```
 
+Viewport 渲染 3D 场景；`v-model:selected` 同步选中对象，`objects` 里的 `loc` / `rot` / `scale` 会被原地修改：
+
+```vue
+<LiteGuiViewport
+  v-model:selected="selected"
+  :objects="objects"
+  shading="solid"
+  overlays
+  :height="360"
+  @change="onSceneChange"
+  @contextmenu="openContextMenu"
+/>
+```
+
+```ts
+const selected = ref<string | null>("Cube");
+const objects = ref([
+  { id: "Cube", name: "Cube", type: "mesh", loc: [0, 0, 1], rot: [0, 0, 0], scale: [1, 1, 1], visible: true, selectable: true }
+]);
+const onSceneChange = ({ objects: next }: { objects: unknown[] }) => console.log(next);
+```
+
 ## 弹出菜单（新增）
 
 ContextMenu 由 `modelValue`（或 `open`）控制显隐，位置用 `x` / `y` 指定，选择条目时触发 `select`：
@@ -436,6 +458,7 @@ ContextMenu 由 `modelValue`（或 `open`）控制显隐，位置用 `x` / `y` �
 | `<LiteGuiTimeline>`    | `start`、`end`、`fps`、`frame`、`keyframes`、`height`               | `v-model:frame`、`@play`、`@range`、`@keyframe`           |
 | `<LiteGuiToolbar>`     | `tools`、`active`、`orientation`、`title`                           | `v-model:active`、`@change`                               |
 | `<LiteGuiTree>`        | `data`、`height`、`allowRename`、`allowDrag`、`allowMultiSelection` | `@select` → 节点 data                                     |
+| `<LiteGuiViewport>`    | `objects`、`selected`、`shading`、`overlays`、`sidebarOpen`、`editMode`、`editElement`、`brush`、`height` | `v-model:selected`、`@select`、`@status`、`@change`、`@contextmenu`、`@transform` |
 
 所有组件都暴露 `getInstance()`，用于拿到底层 LiteGUI 实例。事件名不带 `litegui-` 前缀；`v-model:frame`、`v-model:zoom`、`v-model:active` 分别对应 `update:frame`、`update:zoom`、`update:active`。
 

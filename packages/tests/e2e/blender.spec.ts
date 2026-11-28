@@ -120,7 +120,7 @@ test("blender selects objects and edits transform properties", async ({ page }) 
   const camera = page.locator(".be-tree-row", { hasText: "Camera" }).first();
   await camera.click();
   await expect(camera).toHaveClass(/selected/);
-  await expect(page.locator(".be-viewport-info")).toContainText("Camera");
+  await expect(page.locator(".lg-viewport__info")).toContainText("Camera");
 
   const locationRow = page.locator(".be-prop-row", { hasText: "Location" }).first();
   const x = locationRow.locator("input").first();
@@ -161,7 +161,7 @@ test("blender timeline, playback and keyboard shortcuts work", async ({ page }) 
   const frame = page.locator("#frame-input");
   await expect(frame).not.toHaveValue("1");
 
-  await page.locator("canvas.be-canvas").click({ position: { x: 470, y: 256 } });
+  await page.locator("canvas.lg-viewport__canvas").click({ position: { x: 470, y: 256 } });
   await page.keyboard.press("Space");
   await page.waitForTimeout(300);
   const playingFrame = Number(await frame.inputValue());
@@ -179,7 +179,7 @@ test("blender timeline, playback and keyboard shortcuts work", async ({ page }) 
   await page.keyboard.press("t");
   await expect(page.locator("#viewport-toolbar")).toBeVisible();
 
-  await page.locator("canvas.be-canvas").click({ position: { x: 470, y: 256 } });
+  await page.locator("canvas.lg-viewport__canvas").click({ position: { x: 470, y: 256 } });
   await page.keyboard.press("Tab");
   await expect(page.locator("#viewport-header")).toContainText("Edit Mode");
   await page.keyboard.press("1");
@@ -197,7 +197,7 @@ test("blender timeline, playback and keyboard shortcuts work", async ({ page }) 
   await page.keyboard.press("Escape");
   await expect(page.locator(".be-popup")).toHaveCount(0);
 
-  await page.locator("canvas.be-canvas").click({ position: { x: 600, y: 380 }, button: "right" });
+  await page.locator("canvas.lg-viewport__canvas").click({ position: { x: 600, y: 380 }, button: "right" });
   await expect(page.locator(".be-popup")).toBeVisible();
   await page.keyboard.press("Escape");
   await expect(page.locator(".be-popup")).toHaveCount(0);
@@ -209,7 +209,7 @@ test("blender timeline, playback and keyboard shortcuts work", async ({ page }) 
 test("blender G/R/S transform, cancel, and undo keep object state consistent", async ({ page }) => {
   await page.goto(BLENDER_URL);
 
-  await page.locator("canvas.be-canvas").click({ position: { x: 470, y: 256 } });
+  await page.locator("canvas.lg-viewport__canvas").click({ position: { x: 470, y: 256 } });
   const locationX = page.locator(".be-prop-row", { hasText: "Location" }).first().locator("input").first();
   const initial = await locationX.inputValue();
 

@@ -14,7 +14,6 @@ LiteGUI 是一个无框架的 DOM UI 组件库。它不依赖 React/Vue，适合
 pnpm install
 
 pnpm dev          # 最小示例 http://127.0.0.1:5173/
-pnpm dev:editor   # 综合示例 http://127.0.0.1:5174/
 ```
 
 ## 初始化
@@ -137,4 +136,4 @@ pnpm verify-pack     # 校验发布会话中的 tarball 内容
 pnpm docs:dev        # 文档站
 ```
 
-库产物在各包的 `dist/`，示例页面在根目录 `dist/coder`、`dist/editor`、`dist/blender` 与 `dist/photocraft`。
+库产物在各包的 `dist/`，示例页面在根目录 `dist/vscode`、`dist/blender` 与 `dist/photocraft`。

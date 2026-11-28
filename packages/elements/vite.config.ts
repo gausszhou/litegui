@@ -30,7 +30,8 @@ const entry = {
   "text-editor": resolve(__dirname, "src/elements/text-editor.ts"),
   timeline: resolve(__dirname, "src/elements/timeline.ts"),
   toolbar: resolve(__dirname, "src/elements/toolbar.ts"),
-  tree: resolve(__dirname, "src/elements/tree.ts")
+  tree: resolve(__dirname, "src/elements/tree.ts"),
+  viewport: resolve(__dirname, "src/elements/viewport.ts")
 };
 
 // ESM 构建：litegui 外置，CSS 以字符串内联到 base 模块中。

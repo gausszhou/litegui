@@ -21,7 +21,7 @@ LiteGUI 使用 [Semantic Versioning](https://semver.org/)：
 
 ## Experimental
 
-`Inspector`、`Tree`、`ContextMenu`、`Dragger`、`LineEditor`、`ComplexList` 暂不承诺 API 稳定，可能在 minor 版本调整。
+`Inspector`、`Tree`、`ContextMenu`、`Dragger`、`LineEditor`、`ComplexList`、`Viewport` 暂不承诺 API 稳定，可能在 minor 版本调整。
 
 ## Deprecated
 

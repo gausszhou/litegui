@@ -2,10 +2,9 @@
 
 在线示例：
 
-- [Coder](https://gausszhou.github.io/litegui/coder/)
+- [LiteGUI VS Code](https://gausszhou.github.io/litegui/vscode/)
 - [Blender Workbench](https://gausszhou.github.io/litegui/blender/)
 - [Photocraft](https://gausszhou.github.io/litegui/photocraft/)
-- [Editor](https://gausszhou.github.io/litegui/editor/)
 
 ## 1. 工具台布局
 

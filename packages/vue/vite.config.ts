@@ -31,7 +31,8 @@ const entry = {
   "text-editor": resolve(__dirname, "src/components/text-editor.ts"),
   timeline: resolve(__dirname, "src/components/timeline.ts"),
   toolbar: resolve(__dirname, "src/components/toolbar.ts"),
-  tree: resolve(__dirname, "src/components/tree.ts")
+  tree: resolve(__dirname, "src/components/tree.ts"),
+  viewport: resolve(__dirname, "src/components/viewport.ts")
 };
 
 export default defineConfig({
