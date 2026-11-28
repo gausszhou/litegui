@@ -2040,3 +2040,16 @@ button.wcombobutton.selected {
 	background: rgba(0, 0, 0, 0.5);
 	box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.6);
 }
+
+:root[data-lg-theme="light"] .lg-viewport {
+	--lg-viewport-bg: #b8b8b8;
+	--lg-viewport-bg-wire: #d0d0d0;
+	--lg-viewport-grid: #9a9a9a;
+	--lg-viewport-grid-axis: #7a7a7a;
+	--lg-viewport-info-color: #2a2a2a;
+	--lg-viewport-info-muted: #4d4d4d;
+}
+
+:root[data-lg-theme="light"] .lg-viewport__info {
+	text-shadow: none;
+}

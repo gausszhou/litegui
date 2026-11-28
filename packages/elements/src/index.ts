@@ -28,6 +28,7 @@ export * from "./elements/text-editor";
 export * from "./elements/timeline";
 export * from "./elements/toolbar";
 export * from "./elements/tree";
+export * from "./elements/viewport";
 
 // 自动注册；SSR/Node 下 customElements 不存在，跳过。
 if (typeof customElements !== "undefined") {

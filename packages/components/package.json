@@ -40,7 +40,8 @@
     "./toolbar": "./src/entries/toolbar.ts",
     "./node-editor": "./src/entries/node-editor.ts",
     "./text-editor": "./src/entries/text-editor.ts",
-    "./image-editor": "./src/entries/image-editor.ts"
+    "./image-editor": "./src/entries/image-editor.ts",
+    "./viewport": "./src/entries/viewport.ts"
   },
   "sideEffects": [
     "*.css"
@@ -179,6 +180,10 @@
       "./image-editor": {
         "types": "./dist/types/entries/image-editor.d.ts",
         "import": "./dist/entries/image-editor.js"
+      },
+      "./viewport": {
+        "types": "./dist/types/entries/viewport.d.ts",
+        "import": "./dist/entries/viewport.js"
       }
     },
     "unpkg": "./dist/index.umd.cjs",

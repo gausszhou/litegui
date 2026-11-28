@@ -275,37 +275,9 @@ select {
 	flex: 1 1 auto;
 }
 
-.be-viewport {
-	position: relative;
-	flex: 1 1 auto;
-	min-height: 0;
-	overflow: hidden;
-	background: #484848;
-}
-
-.be-canvas {
-	position: absolute;
-	inset: 0;
-	width: 100%;
-	height: 100%;
-	display: block;
-	touch-action: none;
-}
-
-.be-viewport-info {
-	position: absolute;
-	top: 8px;
+/* 3D 视口基础样式由 Viewport 组件提供（.lg-viewport）；这里只保留 Blender 壳的偏移。 */
+.be-viewport .lg-viewport__info {
 	left: 46px;
-	z-index: 2;
-	color: #d8d8d8;
-	line-height: 1.35;
-	pointer-events: none;
-	text-shadow: 0 1px 1px #000;
-}
-
-.be-viewport-info .muted {
-	color: #aaa;
-	font-size: 10px;
 }
 
 .be-toolbar-slot {

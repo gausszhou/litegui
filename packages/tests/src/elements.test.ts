@@ -22,7 +22,8 @@ import {
   LiteGuiTextEditorElement,
   LiteGuiTimelineElement,
   LiteGuiToolbarElement,
-  LiteGuiTreeElement
+  LiteGuiTreeElement,
+  LiteGuiViewportElement
 } from "@gausszhou/litegui-elements";
 
 defineElements();
@@ -80,7 +81,7 @@ describe("LiteGUI custom elements", () => {
 
   it("registers every entry of ELEMENT_TAGS", () => {
     const tags = Object.keys(ELEMENT_TAGS);
-    expect(tags).toHaveLength(28);
+    expect(tags).toHaveLength(29);
     for (const tag of tags) {
       expect(customElements.get(tag), tag).toBeDefined();
     }
@@ -717,6 +718,45 @@ describe("LiteGUI workspace elements", () => {
 
     editor.readonly = true;
     expect(textarea?.readOnly).toBe(true);
+  });
+
+  it("lg-viewport renders objects, reflects attributes and emits select", async () => {
+    const objects = [
+      { id: "Cube", name: "Cube", type: "mesh", loc: [0, 0, 1], rot: [0, 0, 0], scale: [1, 1, 1], visible: true, selectable: true }
+    ];
+    const viewport = mount<LiteGuiViewportElement>("lg-viewport", {
+      objects: JSON.stringify(objects),
+      selected: "Cube",
+      overlays: "",
+      shading: "wireframe"
+    });
+
+    expect(viewport.shadowRoot?.querySelector(".lg-viewport")).not.toBeNull();
+    await new Promise(requestAnimationFrame);
+    const canvas = viewport.shadowRoot?.querySelector<HTMLCanvasElement>(".lg-viewport__canvas");
+    expect(canvas).not.toBeNull();
+    expect(viewport.shadowRoot?.querySelector(".lg-viewport__info")?.textContent).toContain("Cube");
+
+    viewport.setAttribute("shading", "solid");
+    viewport.setAttribute("edit-mode", "");
+    viewport.setAttribute("edit-element", "face");
+    viewport.setAttribute("brush", "sculpt-draw");
+    expect(viewport.shading).toBe("solid");
+    expect(viewport.editMode).toBe(true);
+    expect(viewport.editElement).toBe("face");
+
+    const events: string[] = [];
+    viewport.addEventListener("litegui-select", event => events.push((event as CustomEvent).detail.id));
+    canvas!.dispatchEvent(new MouseEvent("mousedown", { button: 0, bubbles: true, clientX: 0, clientY: 0 }));
+
+    expect(viewport.selected).toBe("Cube");
+    expect(viewport.overlays).toBe(true);
+    expect(() => viewport.frameAll().zoom(100)).not.toThrow();
+
+    // 移出 DOM 时释放全局监听，重新接入时重建实例。
+    viewport.remove();
+    document.body.appendChild(viewport);
+    expect(viewport.shadowRoot?.querySelector(".lg-viewport__canvas")).not.toBeNull();
   });
 
   it("lg-image-editor reflects title/zoom and emits litegui-zoom", () => {

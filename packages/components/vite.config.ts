@@ -29,7 +29,8 @@ const entry = {
   toolbar: resolve(__dirname, "src/entries/toolbar.ts"),
   "node-editor": resolve(__dirname, "src/entries/node-editor.ts"),
   "text-editor": resolve(__dirname, "src/entries/text-editor.ts"),
-  "image-editor": resolve(__dirname, "src/entries/image-editor.ts")
+  "image-editor": resolve(__dirname, "src/entries/image-editor.ts"),
+  viewport: resolve(__dirname, "src/entries/viewport.ts")
 };
 
 // ESM 构建：core / lodash-es / mitt 外置，保证 core 只有一份实例。

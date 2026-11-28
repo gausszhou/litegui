@@ -26,6 +26,7 @@ import { LiteGuiTextEditor } from "./components/text-editor";
 import { LiteGuiTimeline } from "./components/timeline";
 import { LiteGuiToolbar } from "./components/toolbar";
 import { LiteGuiTree } from "./components/tree";
+import { LiteGuiViewport } from "./components/viewport";
 
 export * from "./components/area";
 export * from "./components/box";
@@ -54,6 +55,7 @@ export * from "./components/text-editor";
 export * from "./components/timeline";
 export * from "./components/toolbar";
 export * from "./components/tree";
+export * from "./components/viewport";
 
 export const components: Record<string, Component> = {
   LiteGuiArea,
@@ -82,7 +84,8 @@ export const components: Record<string, Component> = {
   LiteGuiTextEditor,
   LiteGuiTimeline,
   LiteGuiToolbar,
-  LiteGuiTree
+  LiteGuiTree,
+  LiteGuiViewport
 };
 
 /**

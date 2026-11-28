@@ -8,9 +8,10 @@ import {
   Toolbar,
   NodeEditor,
   TextEditor,
-  ImageEditor
+  ImageEditor,
+  Viewport,
+  type ViewportObject
 } from "@gausszhou/litegui-components";
-import { Viewport, type SceneObject, type Vec3 } from "./viewport";
 
 const icons: Record<string, string> = {
   blender: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="9"/><path d="M7 9h5a3 3 0 0 1 0 6H7z"/><path d="M14 6l4 4"/></svg>',
@@ -124,7 +125,7 @@ app.innerHTML = `
 /* data + state                                                        */
 /* ------------------------------------------------------------------ */
 
-const objects: SceneObject[] = [
+const objects: ViewportObject[] = [
   { id: "Camera", name: "Camera", type: "camera", loc: [-6.8, -4.6, 4.2], rot: [0, 0, 0], scale: [1, 1, 1], visible: true, selectable: true },
   { id: "Cube", name: "Cube", type: "mesh", loc: [0, 0, 1], rot: [0, 0, 0], scale: [1, 1, 1], visible: true, selectable: true },
   { id: "Light", name: "Light", type: "light", loc: [3.8, -1.5, 5.0], rot: [0, 0, 0], scale: [1, 1, 1], visible: true, selectable: true }
@@ -199,7 +200,7 @@ const sidebar = document.querySelector<HTMLElement>("#viewport-sidebar")!;
 const isNodeWorkspace = () => ["Shading", "Compositing", "Geometry Nodes"].includes(currentWorkspace);
 const hasViewport = () => ["Layout", "Modeling", "Sculpting", "UV Editing", "Texture Paint", "Shading", "Animation", "Geometry Nodes"].includes(currentWorkspace);
 
-function selectedObject(): SceneObject | undefined {
+function selectedObject(): ViewportObject | undefined {
   return objects.find((object) => object.id === selectedId);
 }
 
@@ -260,7 +261,7 @@ function updateStats() {
 /* ------------------------------------------------------------------ */
 
 interface HistoryEntry {
-  objects: SceneObject[];
+  objects: ViewportObject[];
   selectedId: string | null;
 }
 let history: HistoryEntry[] = [];
@@ -662,25 +663,36 @@ function invertSelection() {
 /* ------------------------------------------------------------------ */
 
 const slot = document.querySelector<HTMLElement>("#viewport-slot")!;
-viewport = new Viewport(slot, {
+viewport = new Viewport({
+  className: "be-viewport",
   objects,
-  getSelected: () => selectedId,
-  onSelect: (id) => {
-    selectedId = id;
-    renderOutliner();
-    renderProperties();
-    renderSidebar();
-    renderHeader();
-    syncTransformFields();
-    setStatus(id ? `${id} selected` : "Nothing selected", 1200);
-  },
-  onStatus: (text) => setStatus(text, 6000),
-  onContextMenu: (x, y) => openContextMenu(x, y),
-  onChange: () => {
-    syncTransformFields();
-    updateStats();
-    viewport.invalidate();
-  }
+  selected: selectedId,
+  overlays,
+  sidebarOpen,
+  shading,
+  editMode: currentMode === "Edit Mode"
+});
+slot.appendChild(viewport.root);
+
+viewport.on("select", (payload) => {
+  const id = (payload ?? null) as string | null;
+  selectedId = id;
+  renderOutliner();
+  renderProperties();
+  renderSidebar();
+  renderHeader();
+  syncTransformFields();
+  setStatus(id ? `${id} selected` : "Nothing selected", 1200);
+});
+viewport.on("status", (text) => setStatus(String(text ?? ""), 6000));
+viewport.on("context-menu", (payload) => {
+  const { x, y } = payload as { x: number; y: number };
+  openContextMenu(x, y);
+});
+viewport.on("change", () => {
+  syncTransformFields();
+  updateStats();
+  viewport.invalidate();
 });
 
 const sidebarToggle = document.createElement("button");
@@ -762,7 +774,6 @@ function isBrushTool(id: string) {
 function selectTool(id: string) {
   currentTool = id;
   toolbar.setActive(id);
-  viewport.setTool(id);
   viewport.setBrush(isBrushTool(id) ? id : null);
   const tool = toolsForWorkspace(currentWorkspace).find((item) => item.id === id);
   const label = tool?.label ?? id;
@@ -777,7 +788,6 @@ function selectTool(id: string) {
 function activateToolVisual(id: string) {
   currentTool = id;
   toolbar.setActive(id);
-  viewport.setTool(id);
   viewport.setBrush(isBrushTool(id) ? id : null);
 }
 
@@ -787,7 +797,6 @@ function applyWorkspaceToolbar(name: string) {
   toolbar.setTools(tools);
   toolbar.setActive(active);
   currentTool = active;
-  viewport.setTool(active);
   viewport.setBrush(isBrushTool(active) ? active : null);
 }
 
@@ -949,7 +958,7 @@ function bindNumericFields(root: HTMLElement) {
 /* object operations                                                   */
 /* ------------------------------------------------------------------ */
 
-function addObject(type: SceneObject["type"]) {
+function addObject(type: ViewportObject["type"]) {
   pushHistory();
   const index = objects.filter((object) => object.type === type).length + 1;
   const id = `${type === "mesh" ? "Cube" : type === "camera" ? "Camera" : "Light"}.${index}`;
@@ -977,7 +986,7 @@ function duplicateSelected() {
     return;
   }
   pushHistory();
-  const copy: SceneObject = { ...object, id: `${object.id}.copy`, name: `${object.name}.copy`, loc: [object.loc[0] + 1, object.loc[1] + 1, object.loc[2]], rot: [...object.rot], scale: [...object.scale] };
+  const copy: ViewportObject = { ...object, id: `${object.id}.copy`, name: `${object.name}.copy`, loc: [object.loc[0] + 1, object.loc[1] + 1, object.loc[2]], rot: [...object.rot], scale: [...object.scale] };
   objects.push(copy);
   selectedId = copy.id;
   viewport.setObjects(objects);
@@ -1094,6 +1103,7 @@ function renderOutliner() {
     });
     row.addEventListener("click", () => {
       selectedId = row.dataset.object!;
+      viewport.setSelected(selectedId);
       renderOutliner();
       renderProperties();
       renderSidebar();
@@ -1743,7 +1753,7 @@ function switchWorkspace(name: string) {
 let renderingTimer = 0;
 
 function captureViewport(): string {
-  const canvas = document.querySelector<HTMLCanvasElement>("canvas.be-canvas");
+  const canvas = viewport.canvas;
   if (!canvas || canvas.width <= 32 || canvas.height <= 32) return "";
   return viewport.snapshot();
 }
@@ -1995,6 +2005,7 @@ if (rightResizer) {
 
 function renderAll() {
   viewport?.setObjects(objects);
+  viewport?.setSelected(selectedId);
   renderSidebar();
   renderOutliner();
   renderProperties();

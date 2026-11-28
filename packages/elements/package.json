@@ -40,6 +40,7 @@
     "./timeline": "./src/elements/timeline.ts",
     "./toolbar": "./src/elements/toolbar.ts",
     "./tree": "./src/elements/tree.ts",
+    "./viewport": "./src/elements/viewport.ts",
     "./tokens.css": "./src/styles/generated/tokens.css",
     "./package.json": "./package.json"
   },
@@ -184,6 +185,10 @@
       "./tree": {
         "types": "./dist/types/elements/tree.d.ts",
         "import": "./dist/elements/tree.js"
+      },
+      "./viewport": {
+        "types": "./dist/types/elements/viewport.d.ts",
+        "import": "./dist/elements/viewport.js"
       },
       "./tokens.css": "./dist/tokens.css",
       "./package.json": "./package.json"

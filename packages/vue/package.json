@@ -39,7 +39,8 @@
     "./text-editor": "./src/components/text-editor.ts",
     "./timeline": "./src/components/timeline.ts",
     "./toolbar": "./src/components/toolbar.ts",
-    "./tree": "./src/components/tree.ts"
+    "./tree": "./src/components/tree.ts",
+    "./viewport": "./src/components/viewport.ts"
   },
   "sideEffects": false,
   "scripts": {
@@ -176,6 +177,10 @@
       "./tree": {
         "types": "./dist/types/components/tree.d.ts",
         "import": "./dist/components/tree.js"
+      },
+      "./viewport": {
+        "types": "./dist/types/components/viewport.d.ts",
+        "import": "./dist/components/viewport.js"
       }
     }
   },

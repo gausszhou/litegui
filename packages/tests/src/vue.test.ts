@@ -29,7 +29,8 @@ import LiteGuiVue, {
   LiteGuiTimeline,
   LiteGuiToolbar,
   LiteGuiTree,
-  LiteGuiSlider
+  LiteGuiSlider,
+  LiteGuiViewport
 } from "@gausszhou/litegui-vue";
 
 beforeAll(() => {
@@ -65,9 +66,10 @@ describe("Vue bindings", () => {
     app.use(LiteGuiVue);
     expect(app.component("LiteGuiButton")).toBeDefined();
     expect(app.component("LiteGuiMenu")).toBeDefined();
-    expect(Object.keys(components)).toHaveLength(27);
+    expect(Object.keys(components)).toHaveLength(28);
     expect(app.component("LiteGuiNodeEditor")).toBeDefined();
     expect(app.component("LiteGuiTimeline")).toBeDefined();
+    expect(app.component("LiteGuiViewport")).toBeDefined();
   });
 
   it("LiteGuiButton mounts, emits click and reflects label", async () => {
@@ -470,6 +472,28 @@ describe("Vue bindings", () => {
 
     expect(wrapper.emitted("change")).toHaveLength(1);
     expect(wrapper.emitted("update:modelValue")?.at(-1)?.[0]).toHaveLength(3);
+
+    wrapper.unmount();
+  });
+
+  it("LiteGuiViewport renders objects and syncs props", async () => {
+    const objects = [
+      { id: "Cube", name: "Cube", type: "mesh" as const, loc: [0, 0, 1] as [number, number, number], rot: [0, 0, 0] as [number, number, number], scale: [1, 1, 1] as [number, number, number], visible: true, selectable: true }
+    ];
+    const wrapper = mount(LiteGuiViewport, {
+      props: { objects, selected: "Cube", overlays: true, height: 280 },
+      attachTo: document.body
+    });
+    await nextTick();
+
+    expect(wrapper.find(".lg-viewport").exists()).toBe(true);
+    expect(wrapper.find(".lg-viewport__canvas").exists()).toBe(true);
+    expect((wrapper.element as HTMLElement).style.height).toBe("280px");
+    expect(getInstance<{ getSelected: () => string | null }>(wrapper).getSelected()).toBe("Cube");
+
+    await wrapper.setProps({ selected: null, shading: "wireframe", editMode: true });
+    expect(getInstance<{ getSelected: () => string | null; getShading: () => string }>(wrapper).getSelected()).toBeNull();
+    expect(getInstance<{ getShading: () => string }>(wrapper).getShading()).toBe("wireframe");
 
     wrapper.unmount();
   });
