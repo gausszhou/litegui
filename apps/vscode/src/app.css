@@ -1515,7 +1515,7 @@ body {
   z-index: 2400;
   display: flex;
   flex-direction: column;
-  width: min(1120px, calc(100vw - 160px));
+  width: min(560px, calc(100vw - 32px));
   max-height: calc(100vh - 80px);
   overflow: hidden;
   transform: translateX(-50%);

@@ -2295,6 +2295,11 @@ function onCustomizeKeyDown(event: KeyboardEvent): void {
 function openCustomizeLayout(): void {
   closeLauncherMenu();
   renderCustomizeLayout();
+  const center = document.querySelector<HTMLElement>(".app-command-center");
+  if (center) {
+    const rect = center.getBoundingClientRect();
+    customizePanel.style.left = `${Math.round(rect.left + rect.width / 2)}px`;
+  }
   customizePanel.hidden = false;
   layoutCustomizeButton.setAttribute("aria-expanded", "true");
   document.addEventListener("pointerdown", onCustomizePointerDown, true);
