@@ -4,6 +4,7 @@
  *   dist/vscode/  apps/vscode VS Code 风格代码编辑器
  *   dist/blender/ apps/blender Blender 风格工作台
  *   dist/photocraft/ apps/photocraft 图像编辑器
+ *   dist/vectorcraft/ apps/vectorcraft Illustrator 风格矢量设计工作台
  *   dist/docs/    VitePress 文档站 + Typedoc API（base 由 DOCS_BASE 决定，默认 /litegui/docs/）
  *   dist/index.html  站点入口页
  *   dist/.nojekyll   跳过 GitHub Pages 的 Jekyll 处理
@@ -32,6 +33,7 @@ mkdirSync(distDir, { recursive: true });
 run("pnpm --filter @gausszhou/litegui-vscode build");
 run("pnpm --filter @gausszhou/litegui-blender build");
 run("pnpm --filter @gausszhou/litegui-photocraft build");
+run("pnpm --filter @gausszhou/litegui-vectorcraft build");
 run("pnpm docs:build");
 
 writeFileSync(join(distDir, ".nojekyll"), "");
@@ -42,6 +44,7 @@ const expected = [
   join(distDir, "vscode", "index.html"),
   join(distDir, "blender", "index.html"),
   join(distDir, "photocraft", "index.html"),
+  join(distDir, "vectorcraft", "index.html"),
   join(distDir, "docs", "index.html"),
 ];
 const missing = expected.filter((file) => !existsSync(file));
@@ -137,6 +140,10 @@ function landingPage() {
         <a class="card" href="./photocraft/">
           <strong>Photocraft</strong>
           <span>图像编辑器：工具栏、画布、曲线与图层</span>
+        </a>
+        <a class="card" href="./vectorcraft/">
+          <strong>VectorCraft</strong>
+          <span>Illustrator 风格矢量设计：画板、图层、属性与 SVG 导出</span>
         </a>
       </nav>
       <p class="meta">MIT License · <a href="https://github.com/gausszhou/litegui">GitHub</a></p>

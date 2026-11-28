@@ -5,6 +5,7 @@
 LiteGUI 面向编辑器、调试器、工具台这类需要菜单、面板、分栏、对话框、属性检查器、树和表格的 Web 应用。项目从 [jagenjo/litegui.js](https://github.com/jagenjo/litegui.js)（MIT）重构而来，并拆分为「core + 组件库 + 示例应用 + 文档站」的 pnpm monorepo。
 
 - 在线 Demo：https://gausszhou.github.io/litegui/vscode/
+- 在线 VectorCraft：https://gausszhou.github.io/litegui/vectorcraft/
 - 文档：https://gausszhou.github.io/litegui/docs/
 - 路线图：[ROADMAP.md](./ROADMAP.md)
 
@@ -28,7 +29,10 @@ LiteGUI 面向编辑器、调试器、工具台这类需要菜单、面板、分
 | `packages/components` | `@gausszhou/litegui-components`：全部 28 个组件（含 `Inspector`、`Tree`）、`LiteGUI` 命名空间、28 个按组件入口、全局样式          |
 | `packages/elements`   | `@gausszhou/litegui-elements`：Web Components 适配层（Custom Elements + Shadow DOM），当前覆盖 Button / Checkbox / Panel / Dialog |
 | `packages/tests`      | 私有：Vitest + jsdom、Playwright、Table 基准                                                                                      |
-| `apps/vscode`         | VS Code 风格代码编辑器                                                                                                                        |
+| `apps/vscode`         | VS Code 风格代码编辑器（Monaco）                                                                                                  |
+| `apps/blender`        | Blender 风格工作台：视口、Outliner、属性、时间线                                                                                  |
+| `apps/photocraft`     | 图像编辑器：工具栏、画布、曲线与图层                                                                                              |
+| `apps/vectorcraft`    | Illustrator 风格矢量设计工作台：画板、标尺、图层、属性、外发光、SVG/PNG 导出                                                      |
 | `docs`                | VitePress 文档站；`docs:api` 由 Typedoc 生成 API 参考                                                                             |
 | `scripts`             | 体积报告、UMD / tarball 校验、Pages 构建                                                                                          |
 | `shells`              | `build.sh`、`gh-pages.sh` 手动发布脚本                                                                                            |
@@ -40,6 +44,7 @@ LiteGUI 面向编辑器、调试器、工具台这类需要菜单、面板、分
 pnpm install
 
 pnpm dev          # 最小示例 http://127.0.0.1:5173/
+pnpm dev:vectorcraft # 矢量设计工作台 http://127.0.0.1:5179/
 
 pnpm build        # 按拓扑序构建 packages/* 与 apps/*
 pnpm test         # Vitest + jsdom

@@ -4,6 +4,7 @@ import { defineConfig, devices } from "@playwright/test";
 const VSCODE_URL = process.env.LITEGUI_VSCODE_URL ?? "http://127.0.0.1:5173/";
 const BLENDER_URL = process.env.LITEGUI_BLENDER_URL ?? "http://127.0.0.1:5175/";
 const PHOTOCRAFT_URL = process.env.LITEGUI_PHOTOCRAFT_URL ?? "http://127.0.0.1:5176/";
+const VECTORCRAFT_URL = process.env.LITEGUI_VECTORCRAFT_URL ?? "http://127.0.0.1:5179/";
 const DOCS_URL = process.env.LITEGUI_DOCS_URL ?? "http://127.0.0.1:5178/litegui/docs/";
 
 export default defineConfig({
@@ -31,6 +32,12 @@ export default defineConfig({
     {
       command: "pnpm --filter @gausszhou/litegui-photocraft dev",
       url: PHOTOCRAFT_URL,
+      reuseExistingServer: true,
+      timeout: 120_000,
+    },
+    {
+      command: "pnpm --filter @gausszhou/litegui-vectorcraft dev",
+      url: VECTORCRAFT_URL,
       reuseExistingServer: true,
       timeout: 120_000,
     },
