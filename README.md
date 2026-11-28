@@ -35,6 +35,7 @@ LiteGUI 面向编辑器、调试器、工具台这类需要菜单、面板、分
 | `apps/photocraft`     | 图像编辑器：工具栏、画布、曲线与图层                                                                                              |
 | `apps/vectorcraft`    | Illustrator 风格矢量设计工作台：画板、标尺、图层、属性、外发光、SVG/PNG 导出                                                      |
 | `apps/lightcraft`     | 照片图库 + 非破坏性显影：直方图、曲线、8 色带混合器、颜色分级、遮罩、评分与 JPEG/PNG 导出                                          |
+| `apps/filmcraft`      | 非线性视频剪辑器：源/节目监视器、时间线、调色示波器与导出                                                                         |
 | `docs`                | VitePress 文档站；`docs:api` 由 Typedoc 生成 API 参考                                                                             |
 | `scripts`             | 体积报告、UMD / tarball 校验、Pages 构建                                                                                          |
 | `shells`              | `build.sh`、`gh-pages.sh` 手动发布脚本                                                                                            |
